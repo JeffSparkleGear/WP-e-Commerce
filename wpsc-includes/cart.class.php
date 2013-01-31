@@ -1791,6 +1791,8 @@ class wpsc_cart_item {
          $tax_rate = $taxes['rate'];
          $tax = $taxes['tax'];
       }
+      
+      do_action('wpsc_before_save_cart_item', $cart_id, $this );
 
 $wpdb->insert(
 		WPSC_TABLE_CART_CONTENTS,
@@ -1873,6 +1875,9 @@ $wpdb->insert(
 
       }
 
+      do_action('wpsc_after_save_cart_item', $cart_id, $this );
+
+      // wpsc_save_cart_item should be deprecated in favor of wpsc_after_save_cart_item
       do_action('wpsc_save_cart_item', $cart_id, $this->product_id);
    }
 
