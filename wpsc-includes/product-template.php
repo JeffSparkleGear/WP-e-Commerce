@@ -65,7 +65,7 @@ function wpsc_a_page_url($page=null) {
  *
  * @return
  */
-function wpsc_pagination($totalpages = '', $per_page = '', $current_page = '', $page_link = '') {
+function wpsc_pagination( $totalpages = '', $per_page = '', $current_page = '', $page_link = '' ) {
 	global $wp_query, $wpsc_query, $wp_the_query;
 
 	$num_paged_links = 4; //amount of links to show on either side of current page
@@ -264,7 +264,7 @@ function wpsc_pagination($totalpages = '', $per_page = '', $current_page = '', $
 		}
 	}
 	// Return the output.
-	echo $output;
+	echo apply_filters( 'wpsc_pagination', $output, $totalpages, $per_page, $current_page, $page_link );
 }
 
 /**
@@ -1104,7 +1104,11 @@ function wpsc_the_product_image( $width = '', $height = '', $product_id = '' ) {
 	$src = is_array( $src ) ? $src[0] : $src;
 
 	if ( is_ssl() && ! empty( $src ) )
-		$src = str_replace( 'http://', 'https://', $src[0] );
+		$src = str_replace( 'http://', 'https://', $src );
+
+	// WordPress's esc_url() function strips out spaces, so encode them here to ensure they don't get stripped out
+	// Ref: http://core.trac.wordpress.org/ticket/23605
+	$src = str_replace( ' ', '%20', $src );
 
 	return apply_filters( 'wpsc_product_image', $src );
 }
@@ -1280,6 +1284,10 @@ function wpsc_the_product_thumbnail( $width = null, $height = null, $product_id 
 	if ( ! empty( $thumbnail ) && is_ssl() )
 		$thumbnail = str_replace( 'http://', 'https://', $thumbnail );
 
+	// WordPress's esc_url() function strips out spaces, so encode them here to ensure they don't get stripped out
+	// Ref: http://core.trac.wordpress.org/ticket/23605
+	$thumbnail = str_replace( ' ', '%20', $thumbnail );
+
 	return $thumbnail;
 }
 
@@ -1450,12 +1458,11 @@ function wpsc_display_product_multicurrency() {
 
 /**
  * wpsc variation group name function
- * @return string - the variaton group name
+ * @return string - the variation group name
  */
 function wpsc_the_vargrp_name() {
-	// get the variation group name;
 	global $wpsc_variations;
-	return $wpsc_variations->variation_group->name;
+	return apply_filters( 'wpsc_vargrp_name', $wpsc_variations->variation_group->name, $wpsc_variations->variation_group );
 }
 
 /**
@@ -1579,11 +1586,11 @@ function wpsc_product_existing_rating( $product_id ) {
 	$count = $get_average[0]['count'];
 	$output  = "  <span class='votetext'>";
 	for ( $l = 1; $l <= $average; ++$l ) {
-		$output .= "<img class='goldstar' src='" . WPSC_CORE_IMAGES_URL . "/gold-star.gif' alt='$l' title='$l' />";
+		$output .= "<img class='goldstar' src='" . WPSC_CORE_IMAGES_URL . "/gold-star.png' alt='$l' title='$l' />";
 	}
 	$remainder = 5 - $average;
 	for ( $l = 1; $l <= $remainder; ++$l ) {
-		$output .= "<img class='goldstar' src='" . WPSC_CORE_IMAGES_URL . "/grey-star.gif' alt='$l' title='$l' />";
+		$output .= "<img class='goldstar' src='" . WPSC_CORE_IMAGES_URL . "/grey-star.png' alt='$l' title='$l' />";
 	}
 	$output .= "<span class='vote_total'>&nbsp;(<span id='vote_total_{$product_id}'>" . $count . "</span>)</span> \r\n";
 	$output .= "</span> \r\n";

@@ -1,28 +1,51 @@
 <?php 
 
 //
+<<<<<<< HEAD
 // {$OBJECT_TYPE} meta functions
 //
 
 /**
  * Add meta data field to a {$OBJECT_TYPE}.
+=======
+// THINGAMABOB meta functions
+//
+
+/**
+ * Add meta data field to a THINGAMABOB.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
  *
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID.
+=======
+ * @uses $wpdb
+ *
+ * @param int $THINGAMABOB_id THINGAMABOB ID.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * @param string $meta_key Metadata name.
  * @param mixed $meta_value Metadata value.
  * @param bool $unique Optional, default is false. Whether the same key should not be added.
  * @return bool False for failure. True for success.
  */
+<<<<<<< HEAD
 function add_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $meta_key , $meta_value , $unique = false ) {
 	return add_metadata( '{$OBJECT_TYPE}' ,  ${$OBJECT_TYPE}_id, $meta_key , $meta_value, $unique );
 }
 
 /**
  * Remove metadata matching criteria from a {$OBJECT_TYPE}.
+=======
+function add_THINGAMABOB_meta($THINGAMABOB_id, $meta_key, $meta_value, $unique = false) {
+	return add_metadata('THINGAMABOB', $THINGAMABOB_id, $meta_key, $meta_value, $unique);
+}
+
+/**
+ * Remove metadata matching criteria from a THINGAMABOB.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * You can match based on the key, or key and value. Removing based on key and
  * value, will keep from removing duplicate metadata with the same key. It also
@@ -31,12 +54,19 @@ function add_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $meta_key , $meta_value ,
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
  *
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID
+=======
+ * @uses $wpdb
+ *
+ * @param int $THINGAMABOB_id THINGAMABOB ID
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * @param string $meta_key Metadata name.
  * @param mixed $meta_value Optional. Metadata value.
  * @return bool False for failure. True for success.
  */
+<<<<<<< HEAD
 function delete_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $meta_key , $meta_value = '' ) {
 	return delete_metadata( '{$OBJECT_TYPE}' ,  ${$OBJECT_TYPE}_id , $meta_key , $meta_value );
 }
@@ -47,11 +77,26 @@ function delete_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $meta_key , $meta_valu
  * @since 3.9.0
  *
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID.
+=======
+function delete_THINGAMABOB_meta($THINGAMABOB_id, $meta_key, $meta_value = '') {
+	return delete_metadata('THINGAMABOB', $THINGAMABOB_id, $meta_key, $meta_value);
+}
+
+/**
+ * Retrieve THINGAMABOB meta field for a THINGAMABOB.
+ *
+ * @since 3.9.0
+ * @uses $wpdb
+ * @link http://codex.wordpress.org/Function_Reference/get_THINGAMABOB_meta
+ *
+ * @param int $THINGAMABOB_id THINGAMABOB ID.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
  * @param bool $single Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single
  *  is true.
  */
+<<<<<<< HEAD
 function get_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $key = '' , $single = false ) {
 	return get_metadata( '{$OBJECT_TYPE}' , ${$OBJECT_TYPE}_id , $key, $single );
 }
@@ -62,10 +107,25 @@ function get_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $key = '' , $single = fal
  * @since 3.9.0
  *
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID.
+=======
+function get_THINGAMABOB_meta($THINGAMABOB_id, $key = '', $single = false) {
+	return get_metadata('THINGAMABOB', $THINGAMABOB_id, $key, $single);
+}
+
+/**
+ *  Determine if a meta key is set for a given THINGAMABOB.
+ *
+ * @since 3.9.0
+ * @uses $wpdb
+ * @link http://codex.wordpress.org/Function_Reference/get_THINGAMABOB_meta
+ *
+ * @param int $THINGAMABOB_id THINGAMABOB ID.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
 * @return boolean true of the key is set, false if not.
  *  is true.
  */
+<<<<<<< HEAD
 function {$OBJECT_TYPE}_meta_exists( ${$OBJECT_TYPE}_id , $meta_key ) {
 	return metadata_exists( '{$OBJECT_TYPE}' , ${$OBJECT_TYPE}_id , $meta_key );
 }
@@ -77,17 +137,41 @@ function {$OBJECT_TYPE}_meta_exists( ${$OBJECT_TYPE}_id , $meta_key ) {
  * same key and {$OBJECT_TYPE} ID.
  *
  * If the meta field for the {$OBJECT_TYPE} does not exist, it will be added.
+=======
+function THINGAMABOB_meta_exists($THINGAMABOB_id, $meta_key ) {
+	return metadata_exists( 'THINGAMABOB', $THINGAMABOB_id, $meta_key );
+
+}
+
+
+
+
+/**
+ * Update THINGAMABOB meta field based on THINGAMABOB ID.
+ *
+ * Use the $prev_value parameter to differentiate between meta fields with the
+ * same key and THINGAMABOB ID.
+ *
+ * If the meta field for the THINGAMABOB does not exist, it will be added.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
  *
  * @param int ${$OBJECT_TYPE}_id ${$OBJECT_TYPE} ID.
+=======
+ * @uses $wpdb
+ *
+ * @param int $THINGAMABOB_id $THINGAMABOB ID.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * @param string $meta_key Metadata key.
  * @param mixed $meta_value Metadata value.
  * @param mixed $prev_value Optional. Previous value to check before removing.
  * @return bool False on failure, true if success.
  */
+<<<<<<< HEAD
 function update_{$OBJECT_TYPE}_meta( ${$OBJECT_TYPE}_id , $meta_key , $meta_value , $prev_value = '' ) {
 	return update_metadata( '{$OBJECT_TYPE}' , ${$OBJECT_TYPE}_id , $meta_key , $meta_value , $prev_value );
 }
@@ -108,11 +192,35 @@ function delete_{$OBJECT_TYPE}_meta_by_key( ${$OBJECT_TYPE}_meta_key ) {
  * Retrieve {$OBJECT_TYPE} meta fields, based on {$OBJECT_TYPE} ID.
  *
  * The {$OBJECT_TYPE} meta fields are retrieved from the cache where possible,
+=======
+function update_THINGAMABOB_meta($THINGAMABOB_id, $meta_key, $meta_value, $prev_value = '') {
+	return update_metadata('THINGAMABOB', $THINGAMABOB_id, $meta_key, $meta_value, $prev_value);
+}
+
+/**
+ * Delete everything from THINGAMABOB meta matching meta key.
+ * This meta data function mirrors a corresponding wordpress post meta function.
+ * @since 3.9.0
+ * @uses $wpdb
+ *
+ * @param string $THINGAMABOB_meta_key Key to search for when deleting.
+ * @return bool Whether the THINGAMABOB meta key was deleted from the database
+ */
+function delete_THINGAMABOB_meta_by_key($THINGAMABOB_meta_key) {
+	return delete_metadata( 'THINGAMABOB', null, $THINGAMABOB_meta_key, '', true );
+}
+
+/**
+ * Retrieve THINGAMABOB meta fields, based on THINGAMABOB ID.
+ *
+ * The THINGAMABOB meta fields are retrieved from the cache where possible,
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * so the function is optimized to be called more than once.
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
  *
+<<<<<<< HEAD
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID.
  * @return array
  */
@@ -123,12 +231,28 @@ function get_{$OBJECT_TYPE}_custom( ${$OBJECT_TYPE}_id = 0 ) {
 
 /**
  * Retrieve meta field names for a {$OBJECT_TYPE}.
+=======
+ * @param int $THINGAMABOB_id THINGAMABOB ID.
+ * @return array
+ */
+function get_THINGAMABOB_custom( $THINGAMABOB_id = 0 ) {
+	$THINGAMABOB_id = absint( $THINGAMABOB_id );
+	if ( ! $THINGAMABOB_id )
+		$THINGAMABOB_id = get_the_ID();
+
+	return get_THINGAMABOB_meta( $THINGAMABOB_id );
+}
+
+/**
+ * Retrieve meta field names for a THINGAMABOB.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * If there are no meta fields, then nothing (null) will be returned.
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
  *
+<<<<<<< HEAD
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID
  * @return array|null Either array of the keys, or null if keys could not be retrieved.
  */
@@ -139,19 +263,38 @@ function get_{$OBJECT_TYPE}_custom_keys( ${$OBJECT_TYPE}_id = 0 ) {
 		return;
 
 	if ( $keys = array_keys( $custom ) )
+=======
+ * @param int $THINGAMABOB_id THINGAMABOB ID
+ * @return array|null Either array of the keys, or null if keys could not be retrieved.
+ */
+function get_THINGAMABOB_custom_keys( $THINGAMABOB_id = 0 ) {
+	$custom = get_THINGAMABOB_custom( $THINGAMABOB_id );
+
+	if ( !is_array($custom) )
+		return;
+
+	if ( $keys = array_keys($custom) )
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 		return $keys;
 }
 
 /**
+<<<<<<< HEAD
  * Retrieve values for a custom {$OBJECT_TYPE} field.
  *
  * The parameters must not be considered optional. All of the {$OBJECT_TYPE} meta fields
+=======
+ * Retrieve values for a custom THINGAMABOB field.
+ *
+ * The parameters must not be considered optional. All of the THINGAMABOB meta fields
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  * will be retrieved and only the meta field key values returned.
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
  *
  * @param string $key Meta field key.
+<<<<<<< HEAD
  * @param int ${$OBJECT_TYPE}_id {$OBJECT_TYPE} ID
  * @return array Meta field values.
  */
@@ -162,6 +305,18 @@ function get_{$OBJECT_TYPE}_custom_values( $key = '', ${$OBJECT_TYPE}_id = 0 ) {
 	$custom = get_{$OBJECT_TYPE}_custom( ${$OBJECT_TYPE}_id );
 
 	return isset( $custom[$key] ) ? $custom[$key] : null;
+=======
+ * @param int $THINGAMABOB_id THINGAMABOB ID
+ * @return array Meta field values.
+ */
+function get_THINGAMABOB_custom_values( $key = '', $THINGAMABOB_id = 0 ) {
+	if ( !$key )
+		return null;
+
+	$custom = get_THINGAMABOB_custom($THINGAMABOB_id);
+
+	return isset($custom[$key]) ? $custom[$key] : null;
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 
@@ -175,8 +330,13 @@ function get_{$OBJECT_TYPE}_custom_values( $key = '', ${$OBJECT_TYPE}_id = 0 ) {
  	* @param int $meta_id ID for a specific meta row
  * @return object Meta object or false.
  */
+<<<<<<< HEAD
 function get_{$OBJECT_TYPE}_meta_timestamp( ${$OBJECT_TYPE}_id, $meta_key  ) {
 	return wpsc_get_metadata_timestamp( '{$OBJECT_TYPE}', ${$OBJECT_TYPE}_id, $meta_key );
+=======
+function get_THINGAMABOB_meta_timestamp( $THINGAMABOB_id, $meta_key  ) {
+	return wpsc_get_metadata_timestamp( 'THINGAMABOB', $THINGAMABOB_id, $meta_key );
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 

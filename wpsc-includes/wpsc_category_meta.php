@@ -2,7 +2,11 @@
  /* 
  * NOTICE: 
  * This file was automatically created, strongly suggest that it not be edited directly.
+<<<<<<< HEAD
  * See the code in the file wpsc_custom_meta_init.php at line 211 for more details.
+=======
+ * See the code in the file wpsc_custom_meta_init.php at line 213 for more details.
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  */
 ?>
 
@@ -18,6 +22,10 @@
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param int $category_id category ID.
  * @param string $meta_key Metadata name.
@@ -25,8 +33,13 @@
  * @param bool $unique Optional, default is false. Whether the same key should not be added.
  * @return bool False for failure. True for success.
  */
+<<<<<<< HEAD
 function add_category_meta( $category_id , $meta_key , $meta_value , $unique = false ) {
 	return add_metadata( 'category' ,  $category_id, $meta_key , $meta_value, $unique );
+=======
+function add_category_meta($category_id, $meta_key, $meta_value, $unique = false) {
+	return add_metadata('category', $category_id, $meta_key, $meta_value, $unique);
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 /**
@@ -39,20 +52,34 @@ function add_category_meta( $category_id , $meta_key , $meta_value , $unique = f
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param int $category_id category ID
  * @param string $meta_key Metadata name.
  * @param mixed $meta_value Optional. Metadata value.
  * @return bool False for failure. True for success.
  */
+<<<<<<< HEAD
 function delete_category_meta( $category_id , $meta_key , $meta_value = '' ) {
 	return delete_metadata( 'category' ,  $category_id , $meta_key , $meta_value );
+=======
+function delete_category_meta($category_id, $meta_key, $meta_value = '') {
+	return delete_metadata('category', $category_id, $meta_key, $meta_value);
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 /**
  * Retrieve category meta field for a category.
  *
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+ * @link http://codex.wordpress.org/Function_Reference/get_category_meta
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param int $category_id category ID.
  * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
@@ -60,24 +87,45 @@ function delete_category_meta( $category_id , $meta_key , $meta_value = '' ) {
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single
  *  is true.
  */
+<<<<<<< HEAD
 function get_category_meta( $category_id , $key = '' , $single = false ) {
 	return get_metadata( 'category' , $category_id , $key, $single );
+=======
+function get_category_meta($category_id, $key = '', $single = false) {
+	return get_metadata('category', $category_id, $key, $single);
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 /**
  *  Determine if a meta key is set for a given category.
  *
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+ * @link http://codex.wordpress.org/Function_Reference/get_category_meta
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param int $category_id category ID.
  * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
 * @return boolean true of the key is set, false if not.
  *  is true.
  */
+<<<<<<< HEAD
 function category_meta_exists( $category_id , $meta_key ) {
 	return metadata_exists( 'category' , $category_id , $meta_key );
 }
 
+=======
+function category_meta_exists($category_id, $meta_key ) {
+	return metadata_exists( 'category', $category_id, $meta_key );
+
+}
+
+
+
+
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 /**
  * Update category meta field based on category ID.
  *
@@ -89,6 +137,10 @@ function category_meta_exists( $category_id , $meta_key ) {
  * This meta data function mirrors a corresponding wordpress post meta function.
  *
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param int $category_id $category ID.
  * @param string $meta_key Metadata key.
@@ -96,20 +148,34 @@ function category_meta_exists( $category_id , $meta_key ) {
  * @param mixed $prev_value Optional. Previous value to check before removing.
  * @return bool False on failure, true if success.
  */
+<<<<<<< HEAD
 function update_category_meta( $category_id , $meta_key , $meta_value , $prev_value = '' ) {
 	return update_metadata( 'category' , $category_id , $meta_key , $meta_value , $prev_value );
+=======
+function update_category_meta($category_id, $meta_key, $meta_value, $prev_value = '') {
+	return update_metadata('category', $category_id, $meta_key, $meta_value, $prev_value);
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 /**
  * Delete everything from category meta matching meta key.
  * This meta data function mirrors a corresponding wordpress post meta function.
  * @since 3.9.0
+<<<<<<< HEAD
+=======
+ * @uses $wpdb
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
  *
  * @param string $category_meta_key Key to search for when deleting.
  * @return bool Whether the category meta key was deleted from the database
  */
+<<<<<<< HEAD
 function delete_category_meta_by_key( $category_meta_key ) {
 	return delete_metadata( 'category' , null , $category_meta_key , '' , true );
+=======
+function delete_category_meta_by_key($category_meta_key) {
+	return delete_metadata( 'category', null, $category_meta_key, '', true );
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 /**
@@ -126,6 +192,12 @@ function delete_category_meta_by_key( $category_meta_key ) {
  */
 function get_category_custom( $category_id = 0 ) {
 	$category_id = absint( $category_id );
+<<<<<<< HEAD
+=======
+	if ( ! $category_id )
+		$category_id = get_the_ID();
+
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 	return get_category_meta( $category_id );
 }
 
@@ -143,10 +215,17 @@ function get_category_custom( $category_id = 0 ) {
 function get_category_custom_keys( $category_id = 0 ) {
 	$custom = get_category_custom( $category_id );
 
+<<<<<<< HEAD
 	if ( !is_array( $custom ) )
 		return;
 
 	if ( $keys = array_keys( $custom ) )
+=======
+	if ( !is_array($custom) )
+		return;
+
+	if ( $keys = array_keys($custom) )
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 		return $keys;
 }
 
@@ -167,9 +246,15 @@ function get_category_custom_values( $key = '', $category_id = 0 ) {
 	if ( !$key )
 		return null;
 
+<<<<<<< HEAD
 	$custom = get_category_custom( $category_id );
 
 	return isset( $custom[$key] ) ? $custom[$key] : null;
+=======
+	$custom = get_category_custom($category_id);
+
+	return isset($custom[$key]) ? $custom[$key] : null;
+>>>>>>> d78c331f7eafb2d24a7bad174f842a09ed2fae69
 }
 
 
