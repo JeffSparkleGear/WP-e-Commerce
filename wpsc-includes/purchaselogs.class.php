@@ -162,6 +162,11 @@ function wpsc_purchaselog_details_id() {
    return $purchlogitem->purchitem->id;
 }
 
+function wpsc_purchaselog_details_prodid() {
+	global $purchlogitem;
+	return $purchlogitem->purchitem->prodid;
+}
+
 function wpsc_the_purchaselog_item() {
    global $purchlogitem;
    return $purchlogitem->the_purch_item();
