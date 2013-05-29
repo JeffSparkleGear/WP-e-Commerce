@@ -561,7 +561,7 @@ function wpsc_display_products() {
 	$product_page_id = wpsc_get_the_post_id_by_shortcode('[productspage]');
 	//we have to display something, if we are not displaying categories, then we must display products
 	$output = true;
-	if ( wpsc_display_categories () && $post ) {
+	if ( wpsc_display_categories () && isset ( $post->ID ) ) {
 		if ( get_option( 'wpsc_default_category' ) == 'list' && $post->ID == $product_page_id )
 			$output = false;
 
@@ -1133,18 +1133,14 @@ function wpsc_check_display_type(){
  * Get The Product Thumbnail ID
  *
  * If no post thumbnail is set, this will return the ID of the first image
- * associated with a product.
+ * associated with a product. If no image is found and the product is a variation it will
+ * then try getting the parent product's image instead.
  *
  * @param  int  $product_id  Product ID
  * @return int               Product thumbnail ID
  */
 function wpsc_the_product_thumbnail_id( $product_id ) {
 	$thumbnail_id = null;
-
-	// If variation, get parent product
-	$product = get_post( $product_id );
-	if ( $product->post_parent > 0 )
-		$product_id = $product->post_parent;
 
 	// Use product thumbnail...
 	if ( has_post_thumbnail( $product_id ) ) {
@@ -1162,8 +1158,30 @@ function wpsc_the_product_thumbnail_id( $product_id ) {
 		if ( ! empty( $attached_images ) )
 			$thumbnail_id = $attached_images[0]->ID;
 	}
+	return apply_filters( 'wpsc_the_product_thumbnail_id', $thumbnail_id, $product_id );
+}
+
+/**
+ * Maybe Get The Parent Product Thumbnail ID
+ *
+ * If no thumbnail is found and the product is a variation it will
+ * then try getting the parent product's image instead.
+ *
+ * @param  int  $thumbnail_id  Thumbnail ID
+ * @param  int  $product_id    Product ID
+ * @return int                 Product thumbnail ID
+ *
+ * @uses   wpsc_the_product_thumbnail_id()  Get the product thumbnail ID
+ */
+function wpsc_maybe_get_the_parent_product_thumbnail_id( $thumbnail_id, $product_id ) {
+	if ( ! $thumbnail_id ) {
+		$product = get_post( $product_id );
+		if ( $product->post_parent > 0 )
+			$thumbnail_id = wpsc_the_product_thumbnail_id( $product->post_parent );
+	}
 	return $thumbnail_id;
 }
+add_filter( 'wpsc_the_product_thumbnail_id', 'wpsc_maybe_get_the_parent_product_thumbnail_id', 10, 2 );
 
 /**
 * Regenerate size metadata of a thumbnail in case it's missing.
