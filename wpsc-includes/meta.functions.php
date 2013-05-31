@@ -101,15 +101,15 @@ function wpsc_delete_meta( $object_id = 0, $meta_key, $meta_value, $type, $globa
  * Cart meta functions are as follows:
 */
 function wpsc_get_cartmeta( $cart_id, $meta_key ) {
-	return wpsc_get_meta( $cart_id, $meta_key, 'wpsc_cart_item' );
+	return wpsc_get_cart_item_meta( $cart_id, $meta_key, true );
 }
 
 function wpsc_update_cartmeta( $cart_id, $meta_key, $meta_value ) {
-	return wpsc_update_meta( $cart_id, $meta_key, $meta_value, 'wpsc_cart_item' );
+	return wpsc_update_cart_item_meta( $cart_id, $meta_key, $meta_value);
 }
 
 function wpsc_delete_cartmeta( $cart_id, $meta_key, $meta_value = '' ) {
-	return wpsc_delete_meta( $cart_id, $meta_key, $meta_value, 'wpsc_cart_item' );
+	return wpsc_delete_cart_item_meta( $cart_id, $meta_key, $meta_value );
 }
 
 /**
@@ -268,7 +268,7 @@ class wpsc_custom_meta {
 	}
 
 	function rewind_custom_meta() {
-		if ($this->custom_meta_count > 0) {
+		if ( $this->custom_meta_count > 0 ) {
 			$this->custom_meta_values = $this->custom_meta[0];
 		}
 	}
