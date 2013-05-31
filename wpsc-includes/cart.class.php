@@ -944,11 +944,9 @@ class wpsc_cart {
                   $add_item = false;
                   $edit_item = true;
                   do_action('wpsc_edit_item' , $product_id , $parameters , $this);
-
-						break;
+					break;
                }
             }
-
          }
 
          // if we are still adding the item, add it
@@ -1651,49 +1649,46 @@ class wpsc_cart {
  */
 class wpsc_cart_item {
 
-   // Variation Cache
-   private static $variation_cache;
+	// Variation Cache
+	private static $variation_cache;
 
-  // each cart item contains a reference to the cart that it is a member of
-   var $cart;
+	// each cart item contains a reference to the cart that it is a member of
+	var $cart;
 
-  // provided values
-   var $product_id;
-   var $variation_values;
-   var $product_variations;
-   var $variation_data;
-   var $quantity = 1;
-   var $provided_price;
+	// provided values
+	var $product_id;
+	var $variation_values;
+	var $product_variations;
+	var $variation_data;
+	var $quantity = 1;
+	var $provided_price;
 
 
-   //values from the database
-   var $product_name;
-   var $category_list = array();
-   var $category_id_list = array();
-   var $unit_price;
-   var $total_price;
-   var $taxable_price = 0;
-   var $tax = 0;
-   var $weight = 0;
-   var $shipping = 0;
-   var $sku = null;
-   var $product_url;
-   var $image_id;
-   var $thumbnail_image;
-   var $custom_tax_rate = null;
-   var $meta = array();
-
+	//values from the database
+	var $product_name;
+	var $category_list = array();
+	var $category_id_list = array();
+	var $unit_price;
+	var $total_price;
+	var $taxable_price = 0;
+	var $tax = 0;
+	var $weight = 0;
+	var $shipping = 0;
+	var $sku = null;
+	var $product_url;
+	var $image_id;
+	var $thumbnail_image;
+	var $custom_tax_rate = null;
+	var $meta = array();
 	private $item_meta = array();
 
-   var $is_donation = false;
-   var $apply_tax = true;
-   var $priceandstock_id;
+	var $is_donation = false;
+	var $apply_tax = true;
+	var $priceandstock_id;
 
-   // user provided values
-   var $custom_message = null;
-   var $custom_file = null;
-
-	 
+	// user provided values
+	var $custom_message = null;
+	var $custom_file = null;
 	 
 	/**
 	 * add cart item meta value
@@ -1712,8 +1707,7 @@ class wpsc_cart_item {
 		 
 		return;
 	}
-	 
-	 
+	 	 
 	/**
 	 * update or add cart item meta value
 	 * @access public
