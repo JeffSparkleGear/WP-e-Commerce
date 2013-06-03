@@ -208,8 +208,9 @@ function wpsc_initialize_meta_table( $meta_object_type ) {
 		
 		$old_meta_rows = $wpdb->get_results( $wpdb->prepare( $sql , 'wpsc_'.$meta_object_type ) );
 		
-		foreach ( $old_meta_rows as $old_meta_row ) {
-			add_metadata( $meta_object_type, $old_meta_row->object_id, $old_meta_row->meta_key, $old_meta_row->meta_value, false );			
+		foreach ( $old_meta_rows as $old_meta_row ) {			
+			$meta_data = maybe_unserialize( $old_meta_row->meta_value );
+			add_metadata( $meta_object_type, $old_meta_row->object_id, $old_meta_row->meta_key, $meta_data, false );			
 		}
 		
 		do_action ( "wpsc_loaded_{$meta_object_type}_meta_table" );
@@ -352,19 +353,6 @@ function wpsc_meta_functions_file( $meta_object_type ) {
 	return $meta_functions_file;
 }
 
-/* We allow the wpsc meta supported custom object types to be added to, but we don't load the
- * functions for an object type that doesn't have a database table.  The side effect of this
- * is that plugins or themes that use custom meta types won't have the tables until after the
- * first page is viewed by a user or the admin when that page implements the filter that 
- * defines the custom meta types.
- * 
- * This should be ok becuase the first page viewed should be an admin page not a user facing 
- * page. The first view of the admin page will cause the meta tables and custom access functions 
- * to be created/validated/upgraded.
- * 
- */
-wpsc_meta_register_types( wpsc_meta_core_object_types() );
-
 /*
  * Because the core types are created at plugin activation or upgrade these core types should
  * alwyas be laoded. This logic will load (include) the function files for each of the supported 
@@ -380,6 +368,20 @@ foreach ( $meta_object_types as $meta_object_type ) {
 		include_once( wpsc_meta_functions_file( $meta_object_type ) );
 	}
 }
+
+/* We allow the wpsc meta supported custom object types to be added to, but we don't load the
+ * functions for an object type that doesn't have a database table.  The side effect of this
+* is that plugins or themes that use custom meta types won't have the tables until after the
+* first page is viewed by a user or the admin when that page implements the filter that
+* defines the custom meta types.
+*
+* This should be ok becuase the first page viewed should be an admin page not a user facing
+* page. The first view of the admin page will cause the meta tables and custom access functions
+* to be created/validated/upgraded.
+*
+*/
+wpsc_meta_register_types( wpsc_meta_core_object_types() );
+
 
 /*
  * We allow the custom object types to be extended, to the initialization for this 
