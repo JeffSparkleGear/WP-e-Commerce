@@ -1746,7 +1746,7 @@ class wpsc_cart_item {
 
 		$variation_product_ids = array();
 
-		foreach ( $wpsc_cart->get_items( ) as $cart_item ) {
+		foreach ( $wpsc_cart->get_items() as $cart_item ) {
 			if ( ! empty( $cart_item->variation_values ) )
 				$variation_product_ids[] = $cart_item->product_id;
 		}
@@ -1840,6 +1840,7 @@ class wpsc_cart_item {
 		$this->weight     = isset( $product_meta[0]['weight'] ) ? $product_meta[0]['weight'] : 0;
 		
 		// if we are using table rate price
+		
 		if ( isset( $product_meta[0]['table_rate_price'] ) ) {
 			$levels = $product_meta[0]['table_rate_price'];
 			if ( ! empty( $levels['quantity'] ) ) {
@@ -2155,7 +2156,9 @@ class wpsc_cart_item {
 		$meta_id = wpsc_update_cart_item_meta( $cart_item_id, 'sku', $this->sku );
 
 		if ( !empty( $this->item_meta ) ) {
-			$meta_id = wpsc_update_cart_item_meta( $cart_item_id, 'item_meta', $this->item_meta );
+			foreach (  $this->item_meta as $cart_item_meta_key => $cart_item_meta_value ) {
+				$meta_id = wpsc_update_cart_item_meta( $cart_item_id, $cart_item_meta_key, $cart_item_meta_value );
+			}
 		}
 
 		$downloads = get_option( 'max_downloads' );

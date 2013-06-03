@@ -55,12 +55,7 @@ function wpsc_meta_register_types( $meta_object_types = null ) {
 		$meta_object_types = wpsc_meta_core_object_types();
 	
 	foreach ( $meta_object_types as $meta_object_type ) {
-		if ( wpsc_meta_table_exists( $meta_object_type ) && wpsc_check_meta_access_functions( $meta_object_type ) ) {
-			$meta_functions_file = wpsc_meta_functions_file( $meta_object_type );
-			include_once( $meta_functions_file );
-		}
-		
-		wpsc_meta_register_type( $meta_object_type );
+		wpsc_meta_register_type( $meta_object_type );		
 	}	
 }
 
@@ -80,10 +75,10 @@ function wpsc_meta_register_type( $meta_object_type ) {
 		$table_name = wpsc_meta_table_name( $meta_object_type );		
 		
 		if ( ! wpsc_meta_table_exists( $meta_object_type ) ) {
-			/* Becuase a filter can override the list of object_types we
-			 * can keep meta for, we double check to be sure that the
+			/* Becuase a filter can override the list of object types we
+			 * keep meta for we double check to be sure that the
 			* functions required to access that meta exist before doing
-			* anything iin the database
+			* anything in the database
 			*/
 			if ( wpsc_check_meta_access_functions( $meta_object_type ) ) {
 				wpsc_create_meta_table( $meta_object_type );
@@ -183,10 +178,10 @@ function wpsc_create_meta_table( $meta_object_type ) {
 				.'meta_value longtext, '
 				.'meta_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, '
 				.'PRIMARY KEY  (meta_id), '
-				.'KEY ".$meta_object_type."_id (".$meta_object_type."_id`), '
-				.'KEY meta_key` (meta_key(191)), '
-				.'KEY meta_value` (meta_value(20)), '
-				.'KEY meta_key_and_value` (meta_key(191),meta_value(32)), '
+				.'KEY '.$meta_object_type.'_id ('.$meta_object_type.'_id), '
+				.'KEY meta_key (meta_key(191)), '
+				.'KEY meta_value (meta_value(20)), '
+				.'KEY meta_key_and_value (meta_key(191),meta_value(32)), '
 				.'KEY meta_timestamp_index (meta_timestamp) '
 				.') '. $charset_collate; 
 			
@@ -214,8 +209,10 @@ function wpsc_initialize_meta_table( $meta_object_type ) {
 		$old_meta_rows = $wpdb->get_results( $wpdb->prepare( $sql , 'wpsc_'.$meta_object_type ) );
 		
 		foreach ( $old_meta_rows as $old_meta_row ) {
-			add_metadata( $meta_object_type, $old_meta_row->object_id, $old_meta_row->meta_key, $old_meta_row->meta_value, false );
+			add_metadata( $meta_object_type, $old_meta_row->object_id, $old_meta_row->meta_key, $old_meta_row->meta_value, false );			
 		}
+		
+		do_action ( "wpsc_loaded_{$meta_object_type}_meta_table" );
 	}	
 }
 
@@ -336,6 +333,10 @@ function wpsc_check_meta_access_functions( $meta_object_type ) {
 		$meta_access_functions_ok = true;
 	}
 	
+	if ( $meta_access_functions_ok) {
+		include_once( $meta_functions_file );
+	}
+		
 	return $meta_access_functions_ok;
 }
 
