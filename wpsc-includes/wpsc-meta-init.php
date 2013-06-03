@@ -333,10 +333,6 @@ function wpsc_check_meta_access_functions( $meta_object_type ) {
 		$meta_access_functions_ok = true;
 	}
 	
-	if ( $meta_access_functions_ok) {
-		include_once( $meta_functions_file );
-	}
-		
 	return $meta_access_functions_ok;
 }
 
@@ -366,12 +362,24 @@ function wpsc_meta_functions_file( $meta_object_type ) {
  * page. The first view of the admin page will cause the meta tables and custom access functions 
  * to be created/validated/upgraded.
  * 
- * This logic will load (include) the function files for each of the supported core meta object 
- * types.  Because the core types are created at plugin activation or upgrade these core types should 
- * alwyas be laoded.  The check for the core types here is done out of an abundance of caution to
- * confirm that the init/upgrade process completed properly.
  */
 wpsc_meta_register_types( wpsc_meta_core_object_types() );
+
+/*
+ * Because the core types are created at plugin activation or upgrade these core types should
+ * alwyas be laoded. This logic will load (include) the function files for each of the supported 
+ * core meta object types. As the list of core meta types expands this code will automatically 
+ * pick up the new types. 
+ * 
+ * The check for the core types here is done out of an abundance of caution to
+ * confirm that the init/upgrade process completed properly.
+ */
+$meta_object_types = wpsc_meta_core_object_types();
+foreach ( $meta_object_types as $meta_object_type ) {
+	if ( wpsc_check_meta_access_functions( $meta_object_type ) ) {
+		include_once( wpsc_meta_functions_file( $meta_object_type ) );
+	}
+}
 
 /*
  * We allow the custom object types to be extended, to the initialization for this 

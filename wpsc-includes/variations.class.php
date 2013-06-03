@@ -263,10 +263,10 @@ function wpsc_get_child_object_in_terms_var( $parent_id, $terms, $taxonomies, $a
 		if ( $current_version_number < 3.8 ) {
 			if ( ! taxonomy_exists( $taxonomy ) )
 				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wpsc' ) );
-			} else {
+		} else {
 			if ( !taxonomy_exists( $taxonomy ) )
 				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wpsc' ) );
-			}
+		}
 	}
 
 	$defaults = array( 'order' => 'ASC' );
