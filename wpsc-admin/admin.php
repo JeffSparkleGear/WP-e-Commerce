@@ -1146,9 +1146,7 @@ add_filter( 'favorite_actions', 'wpsc_fav_action' );
 /**
  * Enqueue the user admin scripts into the admin interface
  *
- * @uses is_ssl()                 Defines if SSL is true
  * @uses wp_enqueue_script()      Enqueues scripts
- * @uses home_url()               Returns the base url for the site
  */
 function wpsc_admin_enqueue_user_dynamic() {
 
