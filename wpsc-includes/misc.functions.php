@@ -897,7 +897,7 @@ function wpsc_show_terms_and_conditions() {
  * @since 3.8.13
  * @return (string) permalink to product
  */
-function wpsc_fix_child_product_permalink( $post_link, $post, $leavename, $sample ) {
+function wpsc_redirect_child_product_permalink( $post_link, $post, $leavename, $sample ) {
 
 	if ( ($post->post_type == 'wpsc-product') && ($post->post_status = 'inherit') && ($post->post_parent != 0 ) ) {
 		$post_link = get_permalink( $post->post_parent );
@@ -906,4 +906,4 @@ function wpsc_fix_child_product_permalink( $post_link, $post, $leavename, $sampl
 	return $post_link;
 }
 
-add_action( 'post_type_link', 'wpsc_fix_child_product_permalink' , 10, 4 );
+add_action( 'post_type_link', 'wpsc_redirect_child_product_permalink' , 10, 4 );
