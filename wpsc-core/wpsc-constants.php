@@ -13,7 +13,7 @@ function wpsc_core_load_session() {
 	if ( ! isset( $_SESSION ) )
 		$_SESSION = null;
 
-	if ( session_id() != '' )
+	if ( session_status() !== PHP_SESSION_ACTIVE && session_id() != '' )
 		session_start();
 
 	return;
@@ -257,6 +257,9 @@ function wpsc_core_setup_cart() {
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
 
 	$cart = maybe_unserialize( wpsc_get_customer_data( 'cart' ) );
+
+	$x = wpsc_get_customer_data( 'cart' );
+	$y = unserialize( $x );
 
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
 		$GLOBALS['wpsc_cart'] = $cart;

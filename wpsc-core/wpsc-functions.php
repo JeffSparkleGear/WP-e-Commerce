@@ -623,6 +623,7 @@ function wpsc_get_all_user_data( $id = false ) {
 	// take multisite into account
 	$blog_prefix = is_multisite() ? $wpdb->get_blog_prefix() : '';
 	$profile = get_user_meta( $id, "_wpsc_{$blog_prefix}customer_profile", true );
+	$profile = maybe_unserialize( $profile );
 
 	if ( ! is_array( $profile ) )
 		$profile = array();
@@ -708,7 +709,9 @@ function wpsc_update_all_user_data( $profile, $id = false ) {
 			$id = wpsc_get_current_customer_id( 'create' );
 
 	$blog_prefix = is_multisite() ? $wpdb->get_blog_prefix() : '';
-	return update_user_meta( $id, "_wpsc_{$blog_prefix}customer_profile", $profile );
+	$result = update_user_meta( $id, "_wpsc_{$blog_prefix}customer_profile", $profile );
+	$returned = get_user_meta( $id, "_wpsc_{$blog_prefix}customer_profile", true); /* should return profile */
+	return $result;
 }
 
 function wpsc_update_all_visitor_data( $profile, $id = false ) {
@@ -1003,7 +1006,7 @@ function wpsc_delete_all_customer_meta( $id = false ) {
  *                          if there are any errors.
  */
 function wpsc_delete_customer_meta( $key, $id = false ) {
-	wpsc_delete_customer_data( $key, $id );
+	return wpsc_delete_customer_data( $key, $id );
 }
 
 /**
@@ -1018,7 +1021,7 @@ function wpsc_delete_customer_meta( $key, $id = false ) {
  *                           if there are any errors.
  */
 function wpsc_update_customer_meta( $key, $value, $id = false ) {
-	wpsc_update_customer_data( $key, $value, $id );
+	return wpsc_update_customer_data( $key, $value, $id );
 }
 
 /**
@@ -1032,7 +1035,7 @@ function wpsc_update_customer_meta( $key, $value, $id = false ) {
  *                             if otherwise.
  */
 function wpsc_update_all_customer_meta( $profile, $id = false ) {
-	wpsc_update_all_customer_data( $profile, $id );
+	return wpsc_update_all_customer_data( $profile, $id );
 }
 
 /**
@@ -1046,7 +1049,7 @@ function wpsc_update_all_customer_meta( $profile, $id = false ) {
  *                         customer ID is invalid.
  */
 function wpsc_get_customer_meta( $key = '', $id = false ) {
-	wpsc_get_customer_data( $key, $id );
+	return wpsc_get_customer_data( $key, $id );
 }
 
 /**
@@ -1059,6 +1062,6 @@ function wpsc_get_customer_meta( $key = '', $id = false ) {
  *                        if otherwise.
  */
 function wpsc_get_all_customer_meta( $id = false ) {
-	wpsc_get_all_customer_data( $id );
+	return wpsc_get_all_customer_data( $id );
 }
 
