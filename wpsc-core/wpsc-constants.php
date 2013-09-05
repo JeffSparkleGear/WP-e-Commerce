@@ -256,10 +256,9 @@ function wpsc_core_setup_cart() {
 	if ( 2 == get_option( 'cart_location' ) )
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
 
-	$cart = maybe_unserialize( wpsc_get_customer_data( 'cart' ) );
-
-	$x = wpsc_get_customer_data( 'cart' );
-	$y = unserialize( $x );
+	$cart_data = wpsc_get_customer_data( 'cart' );
+	$cart_data = base64_decode( $cart_data );
+	$cart = maybe_unserialize( $cart_data );
 
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
 		$GLOBALS['wpsc_cart'] = $cart;
@@ -267,6 +266,7 @@ function wpsc_core_setup_cart() {
 		$GLOBALS['wpsc_cart'] = new wpsc_cart();
 
 	$GLOBALS['wpsc_cart']->get_shipping_method();
+
 }
 
 /***

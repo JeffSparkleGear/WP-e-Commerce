@@ -456,8 +456,15 @@ function wpsc_serialize_shopping_cart() {
 	// need to prevent set_cookie from being called at this stage in case the user just logged out
 	// because by now, some output must have been printed out
 	$customer_id = wpsc_get_current_customer_id();
-	if ( $customer_id )
-		wpsc_update_customer_meta( 'cart', serialize( $wpsc_cart ) );
+	if ( $customer_id ) {
+		$serialized_cart = serialize( $wpsc_cart );
+		$encoded_serialized_cart = base64_encode($serialized_cart);
+		wpsc_update_customer_meta( 'cart', $encoded_serialized_cart );
+	}
+
+	$encoded_cart_data = wpsc_get_customer_meta( 'cart' );
+	$unserialized_cart = base64_decode(  $encoded_cart_data  );
+	$saved_cart = unserialize( $unserialized_cart );
 
 	return true;
 }
@@ -722,6 +729,10 @@ function wpsc_update_all_visitor_data( $profile, $id = false ) {
 }
 
 function wpsc_update_customer_data( $key, $value, $id = false ) {
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
 	if ( _wpsc_is_customer_user( $id ) )
 		return wpsc_update_user_data( $key, $value, $id );
 	else
@@ -743,6 +754,10 @@ function wpsc_update_user_data( $key, $value, $id = false ) {
 	$profile[$key] = $value;
 
 	return wpsc_update_all_user_data( $profile, $id );
+	if ( ! is_user_logged_in() )
+		return wpsc_update_all_visitor_data( $profile, $id );
+	else
+		return wpsc_update_all_user_data( $profile, $id );
 }
 
 function wpsc_update_visitor_data( $key, $value, $id = false ) {

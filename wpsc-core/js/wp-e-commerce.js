@@ -239,7 +239,9 @@ jQuery(document).ready(function ($) {
 		if(file_upload_elements.length > 0) {
 			return true;
 		} else {
-			form_values = jQuery(this).serialize() + '&action=' + jQuery( 'input[name="wpsc_ajax_action"]' ).val();
+			var action_buttons = jQuery(this).children('input[name="wpsc_ajax_action"]');
+			var action = action_buttons[0].value;
+			form_values = jQuery(this).serialize() + '&action=' + action;
 
 			// Sometimes jQuery returns an object instead of null, using length tells us how many elements are in the object, which is more reliable than comparing the object to null
 			if( jQuery( '#fancy_notification' ).length === 0 ) {
@@ -264,7 +266,7 @@ jQuery(document).ready(function ($) {
 					if ( response.wpsc_alternate_cart_html ) {
 						eval( response.wpsc_alternate_cart_html );
 					}
-	
+						
 					jQuery( document ).trigger( { type : 'wpsc_fancy_notification', response : response } );
 				}
 
@@ -390,6 +392,17 @@ jQuery(document).ready(function ($) {
 		object_html = jQuery(this).html();
 		window.parent.jQuery("div.shopping-cart-wrapper").html(object_html);
 	});
+	
+
+	var radios = jQuery(".productcart input:radio[name='shipping_method']");
+	if (radios.length == 1) {
+		// If there is only 1 shipping quote available during checkout, automatically select it
+		jQuery(radios).click();
+	} else if (radios.length > 1) {
+		// There are multiple shipping quotes, simulate a click on the checked one
+		jQuery(".productcart input:radio[name='shipping_method']:checked").click();
+	}
+	
 	jQuery( 'body' ).on( 'click', 'a.emptycart', function(){
 		parent_form = jQuery(this).parents( 'form' );
 		form_values = jQuery(parent_form).serialize() + '&action=' + jQuery( 'input[name="wpsc_ajax_action"]', parent_form ).val();
@@ -402,14 +415,6 @@ jQuery(document).ready(function ($) {
 		return false;
 	});
 
-	var radios = jQuery(".productcart input:radio[name='shipping_method']");
-	if (radios.length == 1) {
-		// If there is only 1 shipping quote available during checkout, automatically select it
-		jQuery(radios).click();
-	} else if (radios.length > 1) {
-		// There are multiple shipping quotes, simulate a click on the checked one
-		jQuery(".productcart input:radio[name='shipping_method']:checked").click();
-	}
 });
 
 // update the totals when shipping methods are changed.
