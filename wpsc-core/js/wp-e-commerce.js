@@ -128,34 +128,40 @@ function wpsc_shipping_same_as_billing() {
 		});
 	}	
 	
-	// if there is a select for the billing state, hide the input field for the shipping state 
-	if ( jQuery( "select[title='billingstate']" ).length )
+	// if there is a select for the billing state, hide the input field for the shipping state, make sure the 
+	// text field has the current value on the select
+	if ( jQuery( "select[title='billingstate']" ).length ) {
 		jQuery( "input[title='billingstate']" ).closest('tr').hide();
+		jQuery( "input[title='billingstate']" ).val( jQuery( "select[title='billingstate']" ).val() );
+	}
 	
-	// if there is a select for the shipping state, hide the input field for the shipping state 
-	if ( jQuery( "select[title='shippingstate']" ).length )
+	// if there is a select for the shipping state, hide the input field for the shipping state, make sure the 
+	// text field has the current value on the select
+	if ( jQuery( "select[title='shippingstate']" ).length ) {
 		jQuery( "input[title='shippingstate']" ).closest('tr').hide();
+		jQuery( "input[title='shippingstate']" ).val( jQuery( "select[title='shippingstate']" ).val() );
+	}
 	
 }
 
 
 /**
- * Update shipping quotes when "Shipping same as Billing" is checked or unchecked.
+ * Update shipping quotes AFTER  "Shipping same as Billing" check/uncheck happens and is processed
  * @since 3.8.8
  */
 function wpsc_update_shipping_quotes() {
 
-	var billing_country = jQuery('input[title="shippingcountry"]');
-	var billing_region  = jQuery('input[title="shippingstate"]');
-	var billing_zip     = jQuery('input[title="shippingpostcode"]');
+	var shipping_country = jQuery('select[title="shippingcountry"]');
+	var shipping_region  = jQuery('input[title="shippingstate"]');
+	var shipping_zip     = jQuery('input[title="shippingpostcode"]');
 
 	jQuery('p.validation-error').remove();
 
 	var data = {
 		action  : 'shipping_same_as_billing_update',
-		region  : billing_region.val(),
-		country : billing_country.val(),
-		zipcode : billing_zip.val()
+		region  : shipping_region.val(),
+		country : shipping_country.val(),
+		zipcode : shipping_zip.val()
 	};
 	
 	var success = function(response) {

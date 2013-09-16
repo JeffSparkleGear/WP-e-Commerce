@@ -466,6 +466,8 @@ function wpsc_update_product_price() {
  */
 function wpsc_update_location() {
 	global $wpdb, $wpsc_cart;
+	bling_log( __FUNCTION__ );
+	bling_log( $_POST );
 
 	$delivery_country = '';
 	$billing_country = '';
