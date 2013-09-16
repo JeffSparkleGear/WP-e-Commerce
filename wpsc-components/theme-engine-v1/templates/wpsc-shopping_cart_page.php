@@ -311,7 +311,6 @@ endif;
                <p class='validation-error'><?php echo $user_error; ?></p>
                <?php } ?>
          </div>
-
       <?php
       endif;
       ?>

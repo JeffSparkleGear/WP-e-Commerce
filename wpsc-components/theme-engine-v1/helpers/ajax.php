@@ -932,7 +932,7 @@ function wpsc_update_shipping_quotes_on_shipping_same_as_billing() {
          <?php if (wpsc_have_morethanone_shipping_quote()) :?>
             <?php while (wpsc_have_shipping_methods()) : wpsc_the_shipping_method(); ?>
                   <?php    if (!wpsc_have_shipping_quotes()) { continue; } // Don't display shipping method if it doesn't have at least one quote ?>
-                  <tr class='wpsc_shipping_header'><td class='shipping_header' colspan='5'><?php echo wpsc_shipping_method_name().__(' - Choose a Shipping Rate', 'wpsc'); ?> </td></tr>
+                  <tr class='wpsc_shipping_header'><td class='shipping_header' colspan='5'><?php echo wpsc_shipping_method_name(); ?> </td></tr>
                   <?php while (wpsc_have_shipping_quotes()) : wpsc_the_shipping_quote();  ?>
                      <tr class='<?php echo wpsc_shipping_quote_html_id(); ?>'>
                         <td class='wpsc_shipping_quote_name wpsc_shipping_quote_name_<?php echo wpsc_shipping_quote_html_id(); ?>' colspan='3'>

@@ -329,8 +329,7 @@ class wpsc_checkout {
 				break;
 
 			case "delivery_country":
-				//if ( wpsc_uses_shipping ( ) ) {
-				if ( false ) {
+				if ( !wpsc_uses_shipping ( ) ) {
 					$country_name = $wpdb->get_var( $wpdb->prepare( "SELECT `country` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `isocode`= %s LIMIT 1", $delivery_country ) );
 					$output = "<input title='" . $this->checkout_item->unique_name . "' type='hidden' id='" . $this->form_element_id() . "' class='shipping_country' name='collected_data[{$this->checkout_item->id}]' value='" . esc_attr( $delivery_country ) . "' size='4' /><span class='shipping_country_name'>" . $country_name . "</span> ";
 				} else {
