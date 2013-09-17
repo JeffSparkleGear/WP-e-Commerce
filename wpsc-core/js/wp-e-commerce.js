@@ -65,12 +65,13 @@ function address_field_change ( changed_field ) {
 var update_shipping_quotes_timer = null;
 
 function update_shipping_quotes_timer_callback() {
-    
+
+	// whenever the timer 'awakes' clear the timer;
+    unschedule_update_shipping_quotes();  
+
     // insert your code here...
     wpsc_update_shipping_quotes();
     
-	// whenever the timer 'awakes' set the flag to false:
-    update_shipping_quotes_timer = null;  
 }
 
 function schedule_update_shipping_quotes() {
