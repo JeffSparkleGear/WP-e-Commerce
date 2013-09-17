@@ -133,14 +133,16 @@ function wpsc_shipping_same_as_billing() {
 	// text field has the current value on the select
 	if ( jQuery( "select[title='billingstate']" ).length ) {
 		jQuery( "input[title='billingstate']" ).closest('tr').hide();
-		jQuery( "input[title='billingstate']" ).val( jQuery( "select[title='billingstate']" ).val() );
+		var billing_state = jQuery( "select[title='billingstate'] option:selected" ).html();
+		jQuery( "input[title='billingstate']" ).val( billing_state );
 	}
 	
 	// if there is a select for the shipping state, hide the input field for the shipping state, make sure the 
 	// text field has the current value on the select
 	if ( jQuery( "select[title='shippingstate']" ).length ) {
 		jQuery( "input[title='shippingstate']" ).closest('tr').hide();
-		jQuery( "input[title='shippingstate']" ).val( jQuery( "select[title='shippingstate']" ).val() );
+		var shipping_state = jQuery( "select[title='shippingstate'] option:selected" ).html();
+		jQuery( "input[title='shippingstate']" ).val( shipping_state );
 	}
 	
 }
