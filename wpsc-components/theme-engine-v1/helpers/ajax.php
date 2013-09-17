@@ -1,7 +1,4 @@
 <?php
-add_action('wp_ajax_wpsc_shipping_same_as_billing', 'wpsc_shipping_same_as_billing');
-add_action( 'wp_ajax_shipping_same_as_billing_update', 'wpsc_update_shipping_quotes_on_shipping_same_as_billing' );
-add_action( 'wp_ajax_nopriv_shipping_same_as_billing_update', 'wpsc_update_shipping_quotes_on_shipping_same_as_billing' );
 
 if ( isset( $_GET['termsandconds'] ) && 'true' == $_GET['termsandconds'] )
 	add_action( 'init', 'wpsc_show_terms_and_conditions' );
@@ -37,20 +34,39 @@ if ( isset( $_REQUEST['wpsc_update_quantity'] ) && ($_REQUEST['wpsc_update_quant
 if ( isset( $_REQUEST['wpsc_ajax_action'] ) && ($_REQUEST['wpsc_ajax_action'] == 'rate_product') )
 	add_action( 'init', 'wpsc_update_product_rating' );
 
+
 add_action( 'wp_ajax_add_to_cart'       , 'wpsc_add_to_cart' );
 add_action( 'wp_ajax_nopriv_add_to_cart', 'wpsc_add_to_cart' );
+
 add_action( 'wp_ajax_get_cart'       , 'wpsc_get_cart' );
 add_action( 'wp_ajax_nopriv_get_cart', 'wpsc_get_cart' );
+
 add_action( 'wp_ajax_update_shipping_price'       , 'wpsc_update_shipping_price' );
 add_action( 'wp_ajax_nopriv_update_shipping_price', 'wpsc_update_shipping_price' );
+
 add_action( 'wp_ajax_update_product_price'       , 'wpsc_update_product_price' );
 add_action( 'wp_ajax_nopriv_update_product_price', 'wpsc_update_product_price' );
+
 add_action( 'wp_ajax_update_location'       , 'wpsc_update_location' );
 add_action( 'wp_ajax_nopriv_update_location', 'wpsc_update_location' );
+
 add_action( 'wp_ajax_change_tax'       , 'wpsc_change_tax' );
 add_action( 'wp_ajax_nopriv_change_tax', 'wpsc_change_tax' );
+
 add_action( 'wp_ajax_change_profile_country'       , '_wpsc_change_profile_country' );
 add_action( 'wp_ajax_nopriv_change_profile_country', '_wpsc_change_profile_country' );
+
+add_action( 'wp_ajax_wpsc_get_customer_meta'       , '_wpsc_get_customer_meta_ajax' );
+add_action( 'wp_ajax_nopriv_wpsc_get_customer_meta', '_wpsc_get_customer_meta_ajax' );
+
+add_action( 'wp_ajax_wpsc_delete_customer_meta'       , '_wpsc_delete_customer_meta_ajax' );
+add_action( 'wp_ajax_nopriv_wpsc_delete_customer_meta', '_wpsc_delete_customer_meta_ajax' );
+
+add_action( 'wp_ajax_shipping_same_as_billing'        , 'wpsc_shipping_same_as_billing');
+add_action( 'wp_ajax_nopriv_shipping_same_as_billing' , 'wpsc_shipping_same_as_billing' );
+
+add_action( 'wp_ajax_shipping_same_as_billing_update'        , 'wpsc_update_shipping_quotes_on_shipping_same_as_billing' );
+add_action( 'wp_ajax_nopriv_shipping_same_as_billing_update' , 'wpsc_update_shipping_quotes_on_shipping_same_as_billing' );
 
 
 /**
@@ -64,6 +80,58 @@ add_action( 'wp_ajax_nopriv_change_profile_country', '_wpsc_change_profile_count
 function wpsc_special_widget() {
 	wpsc_add_to_cart();
 }
+
+
+function _wpsc_get_customer_meta_ajax() {
+
+	$meta_key = isset( $_POST["meta_key"] ) ?  $_REQUEST["meta_key"] : '';
+
+	$response = array();
+
+	if ( !empty( $meta_key ) ) {
+
+		$response['value'] = wpsc_get_customer_meta( $meta_key );
+		$response['type'] = 'success';
+		$response['error'] = '';
+
+	} else {
+		$response['value'] = '';
+		$response['type']  = 'success';
+		$response['error'] = 'no meta key';
+	}
+
+	$response = json_encode($response);
+	echo $response;
+	die();
+
+}
+
+
+function _wpsc_delete_customer_meta_ajax() {
+
+	$meta_key = isset( $_POST["meta_key"] ) ?  $_REQUEST["meta_key"] : '';
+
+	$response = array();
+
+	if ( !empty( $meta_key ) ) {
+
+		$response['value'] = wpsc_get_customer_meta( $meta_key );
+		$response['type'] = 'success';
+		$response['error'] = '';
+		wpsc_delete_customer_meta( $meta_key );
+
+	} else {
+		$response['value'] = '';
+		$response['type']  = 'success';
+		$response['error'] = 'no meta key';
+	}
+
+	$response = json_encode($response);
+	echo $response;
+	die();
+
+}
+
 
 /**
  * add_to_cart function, used through ajax and in normal page loading.
@@ -469,13 +537,15 @@ function wpsc_update_location() {
 	bling_log( __FUNCTION__ );
 	bling_log( $_POST );
 
-	$shipping_country_changed = false;
-	$shipping_region_changed  = false;
-	$shipping_zip_changed     = false;
+	$force_update = true;
 
-	$billing_country_changed = false;
-	$billing_region_changed  = false;
-	$billing_zip_changed     = false;
+	$shipping_country_changed = $force_update;
+	$shipping_region_changed  = $force_update;
+	$shipping_zip_changed     = $force_update;
+
+	$billing_country_changed = $force_update;
+	$billing_region_changed  = $force_update;
+	$billing_zip_changed     = $force_update;
 
 	$shipping_same_as_billing = wpsc_get_customer_meta( 'shipping_same_as_billing' );
 
@@ -487,7 +557,7 @@ function wpsc_update_location() {
 	if ( $shipping_same_as_billing ) {
 		$shipping_country = $billing_country;
 		$shipping_region  = $billing_region;
-		$shipping_zip     = $billing_zipcode;
+		$shipping_zip     = $billing_zip;
 	} else {
 		$shipping_country = wpsc_get_customer_meta( 'shipping_country' );
 		$shipping_region  = wpsc_get_customer_meta( 'shipping_region'  );
@@ -951,6 +1021,12 @@ function wpsc_shipping_same_as_billing(){
 
 function wpsc_update_shipping_quotes_on_shipping_same_as_billing() {
 	global $wpsc_cart;
+
+	bling_log( __FUNCTION__ );
+
+	if ( isset(  $_POST['wpsc_shipping_same_as_billing'] ) ) {
+		wpsc_update_customer_meta( 'shipping_same_as_billing', $_POST['wpsc_shipping_same_as_billing'] );
+	}
 
 	wpsc_update_location();
 
