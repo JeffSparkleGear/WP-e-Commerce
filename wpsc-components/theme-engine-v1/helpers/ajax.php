@@ -534,8 +534,6 @@ function wpsc_update_product_price() {
  */
 function wpsc_update_location() {
 	global $wpdb, $wpsc_cart;
-	bling_log( __FUNCTION__ );
-	bling_log( $_POST );
 
 	$force_update = true;
 
@@ -1021,8 +1019,6 @@ function wpsc_shipping_same_as_billing(){
 
 function wpsc_update_shipping_quotes_on_shipping_same_as_billing() {
 	global $wpsc_cart;
-
-	bling_log( __FUNCTION__ );
 
 	if ( isset(  $_POST['wpsc_shipping_same_as_billing'] ) ) {
 		wpsc_update_customer_meta( 'shipping_same_as_billing', $_POST['wpsc_shipping_same_as_billing'] );
