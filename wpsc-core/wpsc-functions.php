@@ -608,6 +608,12 @@ function wpsc_get_current_customer_id( $mode = '' ) {
 }
 
 function wpsc_get_all_customer_data( $id = false ) {
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
 	if ( _wpsc_is_customer_user( $id ) ) {
 		$profile = wpsc_get_all_user_data( $id );
 	} else {
@@ -660,10 +666,17 @@ function wpsc_get_all_visitor_data( $id = false ) {
 }
 
 function wpsc_get_customer_data( $key = '', $id = false ) {
-	if ( _wpsc_is_customer_user( $id ) )
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
+	if ( _wpsc_is_customer_user( $id ) ) {
 		return wpsc_get_user_data( $key, $id );
-	else
+	} else {
 		return wpsc_get_visitor_data( $key, $id );
+	}
 }
 
 function wpsc_get_user_data( $key = '', $id = false ) {
@@ -685,7 +698,7 @@ function wpsc_get_user_data( $key = '', $id = false ) {
 }
 
 function wpsc_get_visitor_data( $key = '', $id = false ) {
-	if ( ! $id && is_user_logged_in() )
+	if ( ! $id && !is_user_logged_in() )
 		return false;
 
 	$profile = wpsc_get_all_visitor_data( $id );
@@ -703,10 +716,17 @@ function wpsc_get_visitor_data( $key = '', $id = false ) {
 }
 
 function wpsc_update_all_customer_data( $profile, $id = false ) {
-	if ( _wpsc_is_customer_user( $id ) )
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
+	if ( _wpsc_is_customer_user( $id ) ) {
 		return wpsc_update_all_user_data( $profile, $id );
-	else
+	} else {
 		return wpsc_update_all_visitor_data( $profile, $id );
+	}
 }
 
 function wpsc_update_all_user_data( $profile, $id = false ) {
@@ -729,43 +749,47 @@ function wpsc_update_all_visitor_data( $profile, $id = false ) {
 }
 
 function wpsc_update_customer_data( $key, $value, $id = false ) {
+
+	// if we don't have a user id then we need one so we can decide where the data lives
 	if ( ! $id ) {
 		$id = wpsc_get_current_customer_id( 'create' );
 	}
 
-	if ( _wpsc_is_customer_user( $id ) )
+	if ( _wpsc_is_customer_user( $id ) ) {
 		return wpsc_update_user_data( $key, $value, $id );
-	else
+	} else {
 		return wpsc_update_visitor_data( $key, $value, $id );
+	}
 }
 
 function wpsc_update_user_data( $key, $value, $id = false ) {
-	if ( ! $id )
-		if ( ! is_user_logged_in() )
-			return false;
-		else
-			$id = wpsc_get_current_customer_id( 'create' );
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
 
 	$profile = wpsc_get_all_user_data( $id );
 
-	if ( is_wp_error( $profile ) )
+	if ( is_wp_error( $profile ) ) {
 		return $profile;
+	}
 
 	$profile[$key] = $value;
 
-	return wpsc_update_all_user_data( $profile, $id );
-	if ( ! is_user_logged_in() )
-		return wpsc_update_all_visitor_data( $profile, $id );
-	else
+	if ( _wpsc_is_customer_user( $id ) ) {
 		return wpsc_update_all_user_data( $profile, $id );
+	} else {
+		return wpsc_update_all_visitor_data( $profile, $id );
+	}
 }
 
 function wpsc_update_visitor_data( $key, $value, $id = false ) {
-	if ( ! $id )
-		if ( is_user_logged_in() )
-			return false;
-		else
-			$id = wpsc_get_current_customer_id( 'create' );
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
 
 	$profile = wpsc_get_all_customer_data( $id );
 
@@ -778,10 +802,17 @@ function wpsc_update_visitor_data( $key, $value, $id = false ) {
 }
 
 function wpsc_delete_customer_data( $key, $id = false ) {
-	if ( _wpsc_is_customer_user( $id ) )
-		return wpsc_delete_user_data( $key, $id = false );
-	else
-		return wpsc_delete_visitor_meta( $key, $id = false );
+
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
+	if ( _wpsc_is_customer_user( $id ) ) {
+		return wpsc_delete_user_data( $key, $id );
+	} else {
+		return wpsc_delete_visitor_data( $key, $id );
+	}
 }
 
 function wpsc_delete_user_data( $key, $id = false ) {
@@ -809,7 +840,7 @@ function wpsc_delete_visitor_data( $key, $id = false ) {
 		else
 			$id = wpsc_get_current_customer_id( 'create' );
 
-	$profile = wpsc_get_all_user_data( $id );
+	$profile = wpsc_get_all_visitor_data( $id );
 
 	if ( is_wp_error( $profile ) )
 		return $profile;
@@ -853,16 +884,17 @@ function _wpsc_action_setup_customer() {
  * @return boolean         True if successful, False otherwise.
  */
 function wpsc_delete_all_customer_data( $id = false ) {
-	if ( ! $id )
-		if ( is_user_logged_in() )
-			return wpsc_delete_all_user_data();
-		else
-			return wpsc_delete_all_visitor_data();
 
-	if ( is_int( $id ) )
+	// if we don't have a user id then we need one so we can decide where the data lives
+	if ( ! $id ) {
+		$id = wpsc_get_current_customer_id( 'create' );
+	}
+
+	if ( _wpsc_is_customer_user( $id ) ) {
 		return wpsc_delete_all_user_data( $id );
-	else
+	} else {
 		return wpsc_delete_all_visitor_data( $id );
+	}
 }
 
 /**
