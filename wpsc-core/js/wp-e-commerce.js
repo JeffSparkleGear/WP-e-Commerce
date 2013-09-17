@@ -5,6 +5,40 @@ if (typeof String.prototype.startsWith != 'function') {
   };
 }
 
+
+// get current cart checkout messages for display on the checkout pages
+function wpsc_display_error_messages() {
+	
+	jQuery.ajax({
+		type : "post",
+		dataType : "json",
+		url : wpsc_ajax.ajaxurl,
+		data : {action: 'wpsc_delete_customer_meta', meta_key : 'checkout_misc_error_messages'},
+		success: function (response) {			
+			
+			if (  !response.value ) {
+				jQuery( ".checkout_misc_error_messages" ).each( function () {
+					jQuery(this).html( '' ); 
+				});
+			} else {
+				var messages = response.value; 
+				var error_text = '';
+				
+				for (var i=0; i<messages.length; i++) {
+					error_text += '<span>' + messages[i] + '</span><br>';
+				 }
+				
+				jQuery( ".checkout_misc_error_messages" ).each( function () {
+						jQuery(this).html( error_text ); 
+				});
+			}			
+		},
+		error: function (response) { 
+			;
+		},
+	});			
+}		
+
 function address_field_change ( changed_field ) {
 	
 	var start_billing_region  = jQuery('input[title="shippingstate"]');
@@ -145,6 +179,8 @@ function wpsc_shipping_same_as_billing() {
 		jQuery( "input[title='shippingstate']" ).val( shipping_state );
 	}
 	
+	wpsc_display_error_messages();
+
 }
 
 
@@ -155,16 +191,17 @@ function wpsc_shipping_same_as_billing() {
 function wpsc_update_shipping_quotes() {
 
 	var shipping_country = jQuery('select[title="shippingcountry"]');
-	var shipping_region  = jQuery('input[title="shippingstate"]');
+	var shipping_region  = jQuery('select[title="shippingstate"]');
 	var shipping_zip     = jQuery('input[title="shippingpostcode"]');
 
 	jQuery('p.validation-error').remove();
 
 	var data = {
-		action  : 'shipping_same_as_billing_update',
-		region  : shipping_region.val(),
-		country : shipping_country.val(),
-		zipcode : shipping_zip.val()
+		action                        : 'shipping_same_as_billing_update',
+		region                        : shipping_region.val(),
+		country                       : shipping_country.val(),
+		zipcode                       : shipping_zip.val(),
+		wpsc_shipping_same_as_billing : jQuery( "#shippingSameBilling" ).is( ':checked' ),
 	};
 	
 	var success = function(response) {
@@ -178,6 +215,8 @@ function wpsc_update_shipping_quotes() {
 			jQuery('table.productcart:eq(0)').html( response );
 		}
 		jQuery('img.ajax-feedback').remove();
+		
+		wpsc_display_error_messages();
 	};
 
 	jQuery('input#shippingSameBilling').after( '<img class="ajax-feedback" src="' + wpsc_ajax.spinner + '" alt="" />' );
