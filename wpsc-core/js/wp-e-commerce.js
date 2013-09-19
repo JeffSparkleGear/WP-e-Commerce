@@ -5,6 +5,9 @@ if (typeof String.prototype.startsWith != 'function') {
   };
 }
 
+function isNumber(n) {
+	  return !isNaN(parseFloat(n)) && isFinite(n);
+}
 
 // get current cart checkout messages for display on the checkout pages
 function wpsc_display_error_messages() {
@@ -39,12 +42,28 @@ function wpsc_display_error_messages() {
 	});			
 }		
 
+// For shipping and billing fields find the name associated with the other field
+function other_field_name ( shipping_billing_field ) {
+	var shipping_billing_name = jQuery( shipping_billing_field ).attr( "title" );
+	var other_field_name = '';
+	
+	if ( shipping_billing_name.startsWith( "shipping") ) {
+		other_field_name = "billing" + shipping_billing_name.substring( 8 );  // get the name of the sister control			
+	} else if ( shipping_billing_name.startsWith( "billing") ) {
+		other_field_name = "shipping" + shipping_billing_name.substring( 7 );  // get the name of the sister control			
+	} else {
+		// not a shipping or billing field, no work to do
+		other_field_name = '';
+	}
+	
+	return other_field_name;
+}
+
 function address_field_change ( changed_field ) {
 	
 	var start_billing_region  = jQuery('input[title="shippingstate"]');
 	var start_billing_zip     = jQuery('input[title="shippingpostcode"]');
 	var start_billing_country = jQuery('input[title="shippingcountry"]');
-
 	
 	// if shipping same as billing is enabled then the change need to be copied
 	// to the sister field. We copy gi-directionally so that if a cart is implemented
@@ -52,19 +71,9 @@ function address_field_change ( changed_field ) {
 	// field can be edited by the customer
 	if( jQuery( "#shippingSameBilling" ).is( ":checked" ) ) {
 		
-		var changed_name = jQuery( changed_field ).attr( "title" );
-		var sister_name = '';
+		var sister_name = other_field_name ( changed_field );
 		var element_type = jQuery( changed_field ).get( 0 ).tagName.toLowerCase();
-		
-		if ( changed_name.startsWith( "shipping") ) {
-			sister_name = "billing" + changed_name.substring( 6 );  // get the name of the sister control			
-		} else if ( changed_name.startsWith( "billing") ) {
-			sister_name = "shipping" + changed_name.substring( 7 );  // get the name of the sister control			
-		} else {
-			// not a shipping or billing field, no work to do
-			return;
-		}
-		
+
 		// does the sister control exist? if not then no work do do
 		var selector = element_type + '[title="' + sister_name + '"]';
 		var sister_control = jQuery( selector );
@@ -110,11 +119,11 @@ function update_shipping_quotes_timer_callback() {
 
 function schedule_update_shipping_quotes() {
 	
-	// if the action is already scheduled restart the wait period
-	unschedule_update_shipping_quotes();
-	
-	// 100 milliseconds should be long enough for all updates to complete
-	update_shipping_quotes_timer = setTimeout('update_shipping_quotes_timer_callback()', 100 );  
+	// if the action is already scheduled don't do anything
+	if ( update_shipping_quotes_timer == null ) {
+		// 200 milliseconds should be long enough for all updates to complete
+		update_shipping_quotes_timer = setTimeout('update_shipping_quotes_timer_callback()', 300 );
+	}
 }
 
 function unschedule_update_shipping_quotes() {
@@ -128,7 +137,7 @@ function unschedule_update_shipping_quotes() {
 
 function wpsc_shipping_same_as_billing() {
 	
-	var hide_shipping_on_click = true;
+	var hide_shipping_on_click = false;
 	
 	if ( jQuery( '#hide-shipping-on-click').length != 0 ) {
 		hide_shipping_on_click = jQuery( '#hide-shipping-on-click').val();
@@ -136,9 +145,10 @@ function wpsc_shipping_same_as_billing() {
 	
 	var shipping_same_as_billing_checked = jQuery( "#shippingSameBilling" ).is(":checked");
 	
-	// if the checkbox is checked then we copy all of the billing fields 
-	// to thier shipping counterparts
+	// if the shipping same as box is checked then we copy all of the billing fields 
+	// to their shipping counterparts
 	if( shipping_same_as_billing_checked ) {
+		
 		jQuery("[title^=billing]").each( function( key, value ) {
 			address_field_change( this );		
 		});
@@ -149,19 +159,40 @@ function wpsc_shipping_same_as_billing() {
 		jQuery('#shippingsameasbillingmessage').hide();
 	}
 	
+	
+	// if shipping same as billing is checked we check every shipping field and
+	// if there isn't a corresponding billing field we remove it
+	jQuery("[title^=shipping]").each( function( key, value ) {
+		
+		var billing_field_name = other_field_name( this );
+		var element_type = jQuery( this ).get( 0 ).tagName.toLowerCase();
+		var billing_field_selector = element_type + "[title=" + billing_field_name + "]";
+		
+		var other_ctrl = jQuery(billing_field_selector);
+		if ( other_ctrl.length == 0 ) {
+			jQuery( this ).remove();
+		}
+	});
+	
+		
 	// if we are showing the shipping fields when shipping same as billing
 	// is checked / un-checked then we should do that work now
-	if ( hide_shipping_on_click ) {	
-		jQuery("[title^=shipping]").each( function( key, value ) {
-			if( shipping_same_as_billing_checked ) {
-				// if we are hiding the shipping fields when shipping same as billing
-				// is checked then we should do that work now
-				jQuery(this).parents('tr:first').hide();			
-			} else {
-				jQuery(this).parents('tr:first').show();
+	// if we are hiding the fields when the same as box is ticked/unticked do it,
+	// also, disable any shipping controls if the box is ticked, enable them if unticked
+	jQuery("[title^=shipping]").each( function( key, value ) {
+		if( shipping_same_as_billing_checked ) {
+			// if we are hiding the shipping fields when shipping same as billing
+			// is checked then we should do that work now
+			if ( hide_shipping_on_click ) {
+				jQuery(this).parents('tr:first').hide();
 			}
-		});
-	}	
+			jQuery( this ).prop( 'disabled', true );
+		} else {
+			jQuery(this).parents('tr:first').show();
+			jQuery( this ).prop( 'disabled', false );
+		}
+	});
+	
 	
 	// if there is a select for the billing state, hide the input field for the shipping state, make sure the 
 	// text field has the current value on the select
@@ -169,6 +200,9 @@ function wpsc_shipping_same_as_billing() {
 		jQuery( "input[title='billingstate']" ).closest('tr').hide();
 		var billing_state = jQuery( "select[title='billingstate'] option:selected" ).html();
 		jQuery( "input[title='billingstate']" ).val( billing_state );
+	} else {
+		jQuery( "input[title='billingstate']" ).closest('tr').show();
+		jQuery( "input[title='billingstate']" ).prop( 'disabled', false );
 	}
 	
 	// if there is a select for the shipping state, hide the input field for the shipping state, make sure the 
@@ -177,6 +211,8 @@ function wpsc_shipping_same_as_billing() {
 		jQuery( "input[title='shippingstate']" ).closest('tr').hide();
 		var shipping_state = jQuery( "select[title='shippingstate'] option:selected" ).html();
 		jQuery( "input[title='shippingstate']" ).val( shipping_state );
+	} else {
+		jQuery( "input[title='shippingstate']" ).closest('tr').show();
 	}
 	
 	wpsc_display_error_messages();
@@ -241,7 +277,7 @@ jQuery(document).ready(function ($) {
 	
 	wpsc_shipping_same_as_billing();
 
-	wpsc_update_shipping_quotes();
+	//wpsc_update_shipping_quotes();
 	
 	jQuery("#shippingSameBilling").change(function(){
 			var data = {
@@ -250,6 +286,40 @@ jQuery(document).ready(function ($) {
 			};
 
 			jQuery.post(wpsc_ajax.ajaxurl, data, function(response) {} );
+			
+			if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
+				var shipping_country_ctrl = jQuery("select[title='shippingcountry']");
+				
+				if ( shipping_country_ctrl.length != 0 ) {
+					var shipping_ctrl_form_id = jQuery(shipping_country_ctrl).attr("id");
+					
+					// TODO: sometimes the id is a string, somtimes it's numberic, YIKES!
+					if ( !isNumber(shipping_ctrl_form_id) ) {
+						var prefix = "wpsc_checkout_form_";
+						shipping_ctrl_form_id = Number(shipping_ctrl_form_id.substring( prefix.length ));
+					}
+					
+					
+					var region;
+					if ( jQuery("select[title='billingstate']" ).length != 0 )
+						region = jQuery("select[title='billingstate']").val();
+					else 
+						region = jQuery("input[title='billingstate']").val();
+					
+					var form_values = {
+							action           : 'change_tax',
+							form_id          : shipping_ctrl_form_id,
+							shipping_country : jQuery("select[title='billingcountry']").val(),
+							shipping_region  : region
+						};
+				
+					jQuery.post( wpsc_ajax.ajaxurl, form_values, function( response ) {
+							wpsc_handle_country_change( response );
+					}, 'json' );
+				}
+			}
+
+			
 			
 		wpsc_shipping_same_as_billing();
 	});
@@ -530,7 +600,7 @@ function set_billing_country(html_form_id, form){
 		billing_region = "&billing_region="+region;
 	}
 
-	form_values = {
+	var form_values = {
 		action          : 'change_tax',
 		form_id         : form,
 		billing_country : country,
@@ -540,6 +610,31 @@ function set_billing_country(html_form_id, form){
 	jQuery.post( wpsc_ajax.ajaxurl, form_values, function( response ) {
 		wpsc_handle_country_change( response );
 	}, 'json' );
+	
+	if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
+		var shipping_country_ctrl = jQuery("select[title='shippingcountry']");
+		
+		if ( shipping_country_ctrl.length != 0 ) {
+			var shipping_ctrl_form_id = jQuery(shipping_country_ctrl).attr("id");
+			
+			// TODO: sometimes the id is a string, somtimes it's numberic, YIKES!
+			if ( !isNumber(shipping_ctrl_form_id) ) {
+				var prefix = "wpsc_checkout_form_";
+				shipping_ctrl_form_id = Number(shipping_ctrl_form_id.substring( prefix.length ));
+			}
+			
+			var form_values = {
+					action           : 'change_tax',
+					form_id          : shipping_ctrl_form_id,
+					shipping_country : country,
+					shipping_region  : region
+				};
+		
+			jQuery.post( wpsc_ajax.ajaxurl, form_values, function( response ) {
+					wpsc_handle_country_change( response );
+			}, 'json' );
+		}
+	}
 }
 
 function set_shipping_country(html_form_id, form){
@@ -561,7 +656,6 @@ function set_shipping_country(html_form_id, form){
 	if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
 		jQuery("input[title='billingstate']").val( shipping_region ) ;	
 	}
-
 	
 	form_values = {
 		action           : 'change_tax',
@@ -578,11 +672,9 @@ function set_shipping_country(html_form_id, form){
 function wpsc_handle_country_change( response ) {
 	var wpsc_checkout_table_selector;
 
-	if ( response.lock_tax ) {
-		jQuery( '#current_country' ).val( response.delivery_country );
-
+	//if ( response.lock_tax ) {
+	if ( response.delivery_country ) { 
 		jQuery('.shipping_country').val( response.delivery_country );
-		jQuery('.shipping_country_name').html( response.country_name );
 
 		if ( response.delivery_country == 'US' || response.delivery_country == 'CA' ) {
 			jQuery( '#region' ).remove();
@@ -607,12 +699,33 @@ function wpsc_handle_country_change( response ) {
 		jQuery( wpsc_checkout_table_selector + ' .shipping_region' ).parent().parent().hide();
 		
 		if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
-			jQuery( 'inputt[title="shippingstate"]' ).html( jQuery( 'input[title="billingstate"]' ).html()  ) ;
+			jQuery( 'input[title="shippingstate"]' ).html( jQuery( 'input[title="billingstate"]' ).html()  ) ;
 			jQuery( 'select[title="shippingstate"]' ).html( jQuery( 'select[title="billingstate"]' ).html()  ) ;
-			jQuery( 'select[title="shippingcountry"]' ).html( jQuery( 'select[title="billingcountry"]' ).html() ) ;
-			
+			jQuery( 'select[title="shippingcountry"]' ).html( jQuery( 'select[title="billingcountry"]' ).html() ) ;			
 		}
+		
+		
+		// if there is a select for the shipping state, hide the input field for the shipping state, make sure the 
+		// text field has the current value on the select
+		if ( jQuery( 'select[title="shippingstate"]'  ).length ) {
+			jQuery( 'input[title="shippingstate"]' ).closest('tr').hide();
+		} else {
+			jQuery( 'input[title="shippingstate"]' ).closest('tr').show();
+			jQuery( 'input[title="shippingstate"]' ).removeAttr( 'disabled');
+		}
+		
+		// if there is a select for the shipping state, hide the input field for the shipping state, make sure the 
+		// text field has the current value on the select
+		if ( jQuery( 'select[title="billingstate"]'  ).length ) {
+			jQuery( 'input[title="billingstate"]' ).closest('tr').hide();
+		} else {
+			jQuery( 'input[title="billingstate"]' ).closest('tr').show();
+			jQuery( 'input[title="billingstate"]' ).removeAttr( 'disabled');
+		}
+		
+		
 	} else {
+		
 		if ( response.lock_tax ) {
 			jQuery( '#region' ).hide();
 		}
@@ -642,8 +755,7 @@ function wpsc_handle_country_change( response ) {
 	jQuery( '#checkout_total' ).html( response.total + "<input id='shopping_cart_total_price' type='hidden' value='" + response.total_input + "' />" );
 
 	if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
-		jQuery( '.shipping_region' ).parent().parent().hide();
-		jQuery( '.shipping_country_name' ).parent().parent().hide();
+		wpsc_shipping_same_as_billing();
 	}
 }
 
