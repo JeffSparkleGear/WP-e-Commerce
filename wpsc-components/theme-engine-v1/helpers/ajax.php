@@ -56,12 +56,6 @@ add_action( 'wp_ajax_nopriv_change_tax', 'wpsc_change_tax' );
 add_action( 'wp_ajax_change_profile_country'       , '_wpsc_change_profile_country' );
 add_action( 'wp_ajax_nopriv_change_profile_country', '_wpsc_change_profile_country' );
 
-add_action( 'wp_ajax_wpsc_get_customer_meta'       , '_wpsc_get_customer_meta_ajax' );
-add_action( 'wp_ajax_nopriv_wpsc_get_customer_meta', '_wpsc_get_customer_meta_ajax' );
-
-add_action( 'wp_ajax_wpsc_delete_customer_meta'       , '_wpsc_delete_customer_meta_ajax' );
-add_action( 'wp_ajax_nopriv_wpsc_delete_customer_meta', '_wpsc_delete_customer_meta_ajax' );
-
 add_action( 'wp_ajax_shipping_same_as_billing'        , 'wpsc_shipping_same_as_billing');
 add_action( 'wp_ajax_nopriv_shipping_same_as_billing' , 'wpsc_shipping_same_as_billing' );
 
@@ -81,56 +75,6 @@ function wpsc_special_widget() {
 	wpsc_add_to_cart();
 }
 
-
-function _wpsc_get_customer_meta_ajax() {
-
-	$meta_key = isset( $_POST["meta_key"] ) ?  $_REQUEST["meta_key"] : '';
-
-	$response = array();
-
-	if ( !empty( $meta_key ) ) {
-
-		$response['value'] = wpsc_get_customer_meta( $meta_key );
-		$response['type'] = 'success';
-		$response['error'] = '';
-
-	} else {
-		$response['value'] = '';
-		$response['type']  = 'success';
-		$response['error'] = 'no meta key';
-	}
-
-	$response = json_encode($response);
-	echo $response;
-	die();
-
-}
-
-
-function _wpsc_delete_customer_meta_ajax() {
-
-	$meta_key = isset( $_POST["meta_key"] ) ?  $_REQUEST["meta_key"] : '';
-
-	$response = array();
-
-	if ( !empty( $meta_key ) ) {
-
-		$response['value'] = wpsc_get_customer_meta( $meta_key );
-		$response['type'] = 'success';
-		$response['error'] = '';
-		wpsc_delete_customer_meta( $meta_key );
-
-	} else {
-		$response['value'] = '';
-		$response['type']  = 'success';
-		$response['error'] = 'no meta key';
-	}
-
-	$response = json_encode($response);
-	echo $response;
-	die();
-
-}
 
 
 /**
@@ -218,7 +162,7 @@ function wpsc_add_to_cart() {
 			$quantity = $wpsc_cart->get_remaining_quantity( $product_id, $parameters['variation_values'], $parameters['quantity'] );
 			$cart_messages[] = sprintf( _n( 'Sorry, but there is only %s of this item in stock.', 'Sorry, but there are only %s of this item in stock.', $quantity, 'wpsc' ), $quantity );
 		} else {
-			$cart_messages[] = sprintf( __( 'Sorry, but the item "%s" is out of stock.', 'wpsc' ), $product->post_title	);
+			$cart_messages[] = sprintf( __( 'Sorry, but the item "%s" is out of stock.', 'wpsc' ), get_the_title( $product_id )	);
 		}
 	}
 
@@ -964,11 +908,15 @@ function wpsc_change_tax() {
 	$form_selected_region  = null;
 	$onchange_function     = null;
 
-	if ( ! empty( $_POST['billing_country'] ) && $_POST['billing_country'] != 'undefined' && ! isset( $_POST['shipping_country'] ) ) {
+	$sql = $wpdb->prepare( 'SELECT unique_name FROM `'.WPSC_TABLE_CHECKOUT_FORMS.'` WHERE `id`= %d', $form_id );
+	$country_field_unique_name = $wpdb->get_var( $sql );
+
+
+	if ( $country_field_unique_name == 'billingcountry' ) {
 		$form_selected_country = $wpsc_selected_country;
 		$form_selected_region  = $wpsc_selected_region;
 		$onchange_function     = 'set_billing_country';
-	} else if ( ! empty( $_POST['shipping_country'] ) && $_POST['shipping_country'] != 'undefined' && ! isset( $_POST['billing_country'] ) ) {
+	} else if ( $country_field_unique_name == 'shippingcountry' ) {
 		$form_selected_country = $wpsc_delivery_country;
 		$form_selected_region  = $wpsc_delivery_region;
 		$onchange_function     = 'set_shipping_country';

@@ -448,7 +448,7 @@ class wpsc_cart {
    * @access public
    */
   function get_shipping_method() {
-      global $wpdb, $wpsc_shipping_modules;
+      global $wpdb, $wpsc_shipping_modules,$wpsc_cart;
       // Reset all the shipping data in case the destination has changed
       $this->selected_shipping_method = null;
       $this->selected_shipping_option = null;
@@ -458,13 +458,25 @@ class wpsc_cart {
       $this->shipping_quotes = array();
       $this->shipping_quote = null;
       $this->shipping_method_count = 0;
-     // set us up with a shipping method.
+
+      do_action( 'wpsc_before_get_shipping_method' );
+
+
+      $shippingfirstname = wpsc_get_customer_meta( 'shippingfirstname');
+      $shippinglastname = wpsc_get_customer_meta( 'shippinglastname');
+      $shippingaddress = wpsc_get_customer_meta( 'shippingaddress');
+      $shippingcity = wpsc_get_customer_meta( 'shippingcity');
+      $shippingpostcode = wpsc_get_customer_meta( 'shippingpostcode');
+
+      $have_minimum_shipping_fields = !( empty($shippingfirstname) || empty($shippinglastname) || empty($shippingaddress) || empty($shippingcity) || empty($shippingpostcode) );
+
+      // set us up with a shipping method.
      $custom_shipping = get_option('custom_shipping_options');
 
      $this->shipping_methods = get_option('custom_shipping_options');
      $this->shipping_method_count = count($this->shipping_methods);
 
-      if((get_option('do_not_use_shipping') != 1) && (count($this->shipping_methods) > 0)  ) {
+      if((get_option('do_not_use_shipping') != 1) && (count($this->shipping_methods) > 0)  && $have_minimum_shipping_fields ) {
          $shipping_quotes = null;
          if($this->selected_shipping_method != null) {
             // use the selected shipping module
@@ -499,6 +511,8 @@ class wpsc_cart {
             }
          }
       }
+
+      do_action( 'wpsc_after_get_shipping_method' );
   }
 
   /**

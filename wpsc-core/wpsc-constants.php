@@ -257,7 +257,27 @@ function wpsc_core_setup_cart() {
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
 
 	$cart_data = wpsc_get_customer_data( 'cart' );
-	$cart_data = base64_decode( $cart_data );
+
+	$unserialized_cart_data = base64_decode( $cart_data );
+	if ( $unserialized_cart_data !== FALSE ) {
+		$cart_data = $unserialized_cart_data;
+	}
+
+	/*
+	$serialized_cart_data = wpsc_get_customer_data( 'serialized_cart' );
+	if ( !empty( $serialized_cart_data ) ) {
+		$unserialized_cart_data = base64_decode( $serialized_cart_data );
+		if ( $unserialized_cart_data != $cart_data ) {
+			bling_log( '=========== CART DATA CORRUPTED ============');
+			bling_log( 'UNSERIARLIZED:');
+			bling_log( $cart_data );
+			bling_log( 'SERIARLIZED:');
+			bling_log( $unserialized_cart_data );
+			bling_log( '=========== CART DATA CORRUPTED ============');
+			bling_log( '============================================');
+		}
+	}
+	*/
 	$cart = maybe_unserialize( $cart_data );
 
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )

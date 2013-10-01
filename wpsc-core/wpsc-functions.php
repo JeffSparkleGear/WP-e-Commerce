@@ -459,6 +459,7 @@ function wpsc_serialize_shopping_cart() {
 	if ( $customer_id ) {
 		$serialized_cart = serialize( $wpsc_cart );
 		$encoded_serialized_cart = base64_encode($serialized_cart);
+		wpsc_delete_customer_meta( 'serialized_cart' );
 		wpsc_update_customer_meta( 'cart', $encoded_serialized_cart );
 	}
 
