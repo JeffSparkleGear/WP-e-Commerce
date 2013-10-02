@@ -80,14 +80,30 @@ function wpsc_create_customer_id() {
  * @return mixed Return the customer ID if the cookie is valid, false if otherwise.
  */
 function wpsc_validate_customer_cookie() {
+	static $validated_user_id = false;
+
+	// we hold on to the validated user id once we have it becuase this function might
+	// be called many times per url request.
+	if ( $validated_user_id !== false )
+		return $validated_user_id;
+
 	$cookie = $_COOKIE[WPSC_CUSTOMER_COOKIE];
-	list( $id, $expire, $hash ) = explode( '|', $cookie );
+	list( $id, $expire, $hash ) = $x = explode( '|', $cookie );
 	$data = $id . $expire;
 	$hmac = hash_hmac( 'md5', $data, wp_hash( $data ) );
 
-	if ( $hmac != $hash )
+	if ( ($hmac != $hash) || empty( $id ) || !is_numeric($id)) {
 		return false;
+	} else {
+		// check to be sure the user still exists, could have been purged
+		$id = intval( $id );
+		$wp_user = get_user_by( 'id', $id );
+		if ( $wp_user === false ) {
+			return false;
+		}
+	}
 
+	$validated_user_id = $id;
 	return $id;
 }
 
@@ -109,14 +125,17 @@ function wpsc_get_current_customer_id() {
 	if ( is_user_logged_in() && isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) )
 		_wpsc_set_customer_cookie( '', time() - 3600 );
 
-	if ( is_user_logged_in() )
+	// if the user is logged in we use the user id
+	if ( is_user_logged_in() ) {
 		return get_current_user_id();
-	elseif ( isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) )
-		return wpsc_validate_customer_cookie();
-	else
-		return wpsc_create_customer_id();
+	} elseif ( isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
+		// check the customer cookie, get the id, or if that doesn't work move on and create the user
+		$id = wpsc_validate_customer_cookie();
+		if ( $id != false )
+			return $id;
+	}
 
-	return false;
+	return wpsc_create_customer_id();
 }
 
 /**
