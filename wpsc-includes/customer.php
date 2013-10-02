@@ -35,10 +35,12 @@ function wpsc_create_customer_id() {
 
 	if ( _wpsc_is_bot_user() ) {
 		$username = '_wpsc_bot';
-		$user = get_user_by( 'login', $username );
-		if ( $user === false ) {
+		$wp_user = get_user_by( 'login', $username );
+		if ( $wp_user === false ) {
 			$password = wp_generate_password( 12, false );
 			$id = wp_create_user( $username, $password );
+		} else {
+			$id = $wp_user->ID;
 		}
 	} else {
 		$username = '_' . wp_generate_password( 8, false, false );
