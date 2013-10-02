@@ -31,9 +31,14 @@ function _wpsc_set_customer_cookie( $cookie, $expire ) {
  * @return string Customer ID
  */
 function wpsc_create_customer_id() {
+	static $cached_current_customer_id = false;
 	global $wp_roles;
 
-	if ( _wpsc_is_bot_user() ) {
+	if ( $cached_current_customer_id !== false ) {
+		return $cached_current_customer_id;
+	}
+
+	if ( $is_a_bot_user = _wpsc_is_bot_user() ) {
 		$username = '_wpsc_bot';
 		$wp_user = get_user_by( 'login', $username );
 		if ( $wp_user === false ) {
@@ -59,15 +64,19 @@ function wpsc_create_customer_id() {
 		update_user_meta( $id, '_wpsc_temporary_profile', 48 ); // 48 hours, cron job to delete will tick once per hour
 	}
 
-	$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
 
-	$data = $id . $expire;
-	$hash = hash_hmac( 'md5', $data, wp_hash( $data ) );
+	// set cookie for all live users
+	if ( !$is_a_bot_user ) {
+		$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
+		$data = $id . $expire;
+		$hash = hash_hmac( 'md5', $data, wp_hash( $data ) );
+		$cookie = $id . '|' . $expire . '|' . $hash;
 
-	// store ID, expire and hash to validate later
-	$cookie = $id . '|' . $expire . '|' . $hash;
+		// store ID, expire and hash to validate later
+		_wpsc_set_customer_cookie( $cookie, $expire );
+	}
 
-	_wpsc_set_customer_cookie( $cookie, $expire );
+	$cached_current_customer_id = $id;
 
 	return $id;
 }
@@ -329,6 +338,8 @@ function _wpsc_is_bot_user() {
 	if ( defined('XMLRPC_REQUEST') && XMLRPC_REQUEST )
 		return true;
 
+	bling_log( $_SESSION );
+	bling_log( $_SERVER );
 	// Ajax requests when there isn't a customer cookie don't smell like shopping beings
 	if ( defined('DOING_AJAX') && DOING_AJAX && !isset($_COOKIE[WPSC_CUSTOMER_COOKIE]) )
 		return true;
