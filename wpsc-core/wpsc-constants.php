@@ -162,7 +162,6 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_REGION_TAX',             "{$wp_table_prefix}wpsc_region_tax" );
 
 	define( 'WPSC_TABLE_CART_ITEM_META',         "{$wp_table_prefix}wpsc_cart_item_meta" );
-	define( 'WPSC_TABLE_VISITOR_META',           "{$wp_table_prefix}wpsc_visitor_meta" );
 }
 
 /**
@@ -256,29 +255,7 @@ function wpsc_core_setup_cart() {
 	if ( 2 == get_option( 'cart_location' ) )
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
 
-	$cart_data = wpsc_get_customer_data( 'cart' );
-
-	$unserialized_cart_data = base64_decode( $cart_data );
-	if ( $unserialized_cart_data !== FALSE ) {
-		$cart_data = $unserialized_cart_data;
-	}
-
-	/*
-	$serialized_cart_data = wpsc_get_customer_data( 'serialized_cart' );
-	if ( !empty( $serialized_cart_data ) ) {
-		$unserialized_cart_data = base64_decode( $serialized_cart_data );
-		if ( $unserialized_cart_data != $cart_data ) {
-			bling_log( '=========== CART DATA CORRUPTED ============');
-			bling_log( 'UNSERIARLIZED:');
-			bling_log( $cart_data );
-			bling_log( 'SERIARLIZED:');
-			bling_log( $unserialized_cart_data );
-			bling_log( '=========== CART DATA CORRUPTED ============');
-			bling_log( '============================================');
-		}
-	}
-	*/
-	$cart = maybe_unserialize( $cart_data );
+	$cart = maybe_unserialize( base64_decode( wpsc_get_customer_meta( 'cart' ) ) );
 
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
 		$GLOBALS['wpsc_cart'] = $cart;
