@@ -54,7 +54,7 @@ function wpsc_create_customer_id() {
 		$user->set_role( 'wpsc_anonymous' );
 
 		update_user_meta( $id, '_wpsc_last_active', time() );
-		update_user_meta( $id, '_wpsc_temporary_profile', time() );
+		update_user_meta( $id, '_wpsc_temporary_profile', 48 ); // 48 hours, cron job to delete will tick once per hour
 	}
 
 	$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
@@ -255,6 +255,8 @@ function wpsc_get_customer_meta( $key = '', $id = false ) {
  *                        if otherwise.
  */
 function wpsc_get_all_customer_meta( $id = false ) {
+	global $wpdb;
+
 	if ( ! $id )
 		$id = wpsc_get_current_customer_id();
 
@@ -265,7 +267,7 @@ function wpsc_get_all_customer_meta( $id = false ) {
 	$return = array();
 
 	foreach ( $meta as $key => $value ) {
-		if ( ! strpos( $key, $key_pattern ) === 0 )
+		if ( strpos( $key, $key_pattern ) === FALSE )
 			continue;
 
 		$short_key = str_replace( $key_pattern, '', $key );
@@ -284,6 +286,9 @@ function wpsc_get_all_customer_meta( $id = false ) {
 function _wpsc_update_customer_last_active() {
 	$id = wpsc_get_current_customer_id();
 	update_user_meta( $id, '_wpsc_last_active', time() );
+	$meta_value = get_user_meta($id, '_wpsc_temporary_profile', true);
+	if ( !empty( $meta_value ) )
+		update_user_meta( $id, '_wpsc_temporary_profile', 48 );
 }
 
 
