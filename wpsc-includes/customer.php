@@ -273,5 +273,5 @@ function wpsc_get_all_customer_meta( $id = false ) {
  */
 function _wpsc_update_customer_last_active() {
 	$id = wpsc_get_current_customer_id();
-	update_user_meta( '_wpsc_last_active', time() );
+	update_user_meta( $id, '_wpsc_last_active', time() );
 }
