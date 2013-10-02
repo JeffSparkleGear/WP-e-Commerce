@@ -33,19 +33,29 @@ function _wpsc_set_customer_cookie( $cookie, $expire ) {
 function wpsc_create_customer_id() {
 	global $wp_roles;
 
-	$username = '_' . wp_generate_password( 8, false, false );
-	$password = wp_generate_password( 12, false );
+	if ( _wpsc_is_bot_user() ) {
+		$username = '_wpsc_bot';
+		$user = get_user_by( 'login', $username );
+		if ( $user === false ) {
+			$password = wp_generate_password( 12, false );
+			$id = wp_create_user( $username, $password );
+		}
+	} else {
+		$username = '_' . wp_generate_password( 8, false, false );
+		$password = wp_generate_password( 12, false );
 
-	$role = $wp_roles->get_role( 'wpsc_anonymous' );
+		$role = $wp_roles->get_role( 'wpsc_anonymous' );
 
-	if ( ! $role )
-		$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
+		if ( ! $role )
+			$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
 
-	$id = wp_create_user( $username, $password );
-	$user = new WP_User( $id );
-	$user->set_role( 'wpsc_anonymous' );
+		$id = wp_create_user( $username, $password );
+		$user = new WP_User( $id );
+		$user->set_role( 'wpsc_anonymous' );
 
-	update_user_meta( $id, '_wpsc_last_active', time() );
+		update_user_meta( $id, '_wpsc_last_active', time() );
+		update_user_meta( $id, '_wpsc_temporary_profile', time() );
+	}
 
 	$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
 
@@ -274,4 +284,47 @@ function wpsc_get_all_customer_meta( $id = false ) {
 function _wpsc_update_customer_last_active() {
 	$id = wpsc_get_current_customer_id();
 	update_user_meta( $id, '_wpsc_last_active', time() );
+}
+
+
+/**
+ * Is the user an automata not worthy of a WPEC profile to hold shopping cart and other info
+ *
+ * @access private
+ * @since  3.8.13
+ */
+function _wpsc_is_bot_user() {
+
+	// Cron jobs are not flesh originated
+	if ( defined('DOING_CRON') && DOING_CRON )
+		return true;
+
+	// XML RPC requests are probably form cybernetic beasts
+	if ( defined('XMLRPC_REQUEST') && XMLRPC_REQUEST )
+		return true;
+
+	// Ajax requests when there isn't a customer cookie don't smell like shopping beings
+	if ( defined('DOING_AJAX') && DOING_AJAX && !isset($_COOKIE[WPSC_CUSTOMER_COOKIE]) )
+		return true;
+
+	// coming to login first, after the user logs in we know they are a live being, until then they are something else
+	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login' ) || strpos( $_SERVER['REQUEST_URI'], 'wp-register' ) )
+		return true;
+
+	// even web servers talk to themselves when they think no one is listening
+	if ( strpos( $_SERVER['HTTP_USER_AGENT'], 'wordpress' ) )
+		return true;
+
+	// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the string 'bot' in them
+	// check for the user being logged in in a real user is using a bot to access content from our site
+	if ( !is_user_logged_in() && strpos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) )
+		return true;
+
+	// Are we feeding the masses?
+	if ( is_feed() )
+		return true;
+
+	// at this point we have eliminated all but the most obvious choice, a human (or cylon?)
+	return false;
+
 }
