@@ -34,54 +34,34 @@ function wpsc_create_customer_id() {
 	static $cached_current_customer_id = false;
 	global $wp_roles;
 
-	if ( $cached_current_customer_id !== false ) {
-		return $cached_current_customer_id;
-	}
+	if ( $cached_current_customer_id === false ) {
 
-	if ( $is_a_bot_user = wpsc_is_bot_user() ) {
-		$username = '_wpsc_bot';
-		$wp_user = get_user_by( 'login', $username );
-		if ( $wp_user === false ) {
-			$password = wp_generate_password( 12, false );
-			$id = wp_create_user( $username, $password );
+		if ( $is_a_bot_user = wpsc_is_bot_user() ) {
+			$username = '_wpsc_bot';
+			$wp_user = get_user_by( 'login', $username );
+			if ( $wp_user === false ) {
+				$password = wp_generate_password( 12, false );
+				$id = wp_create_user( $username, $password );
+			} else {
+				$id = $wp_user->ID;
+			}
 		} else {
-			$id = $wp_user->ID;
+			$id = _wpsc_get_customer_wp_user_id();
+
+			$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
+			$data = $id . $expire;
+			$hash = hash_hmac( 'md5', $data, wp_hash( $data ) );
+			$cookie = $id . '|' . $expire . '|' . $hash;
+
+			// store ID, expire and hash to validate later
+			_wpsc_set_customer_cookie( $cookie, $expire );
+
 		}
-	} else {
-		$username = '_' . wp_generate_password( 8, false, false );
-		$password = wp_generate_password( 12, false );
 
-		$role = $wp_roles->get_role( 'wpsc_anonymous' );
-
-		if ( ! $role )
-			$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
-
-		$id = wp_create_user( $username, $password );
-		$user = new WP_User( $id );
-		$user->set_role( 'wpsc_anonymous' );
-
-		update_user_meta( $id, '_wpsc_last_active', time() );
-		update_user_meta( $id, '_wpsc_temporary_profile', 48 ); // 48 hours, cron job to delete will tick once per hour
+		$cached_current_customer_id = $id;
 	}
 
-
-	// set cookie for all live users
-	if ( !wpsc_is_bot_user() ) {
-		$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
-		$data = $id . $expire;
-		$hash = hash_hmac( 'md5', $data, wp_hash( $data ) );
-		$cookie = $id . '|' . $expire . '|' . $hash;
-
-		// store ID, expire and hash to validate later
-		_wpsc_set_customer_cookie( $cookie, $expire );
-	} else {
-		// set a customer meta so that functionality can be based on if the current user is a bot
-		_wpsc_update_customer_meta( 'is_bot_user' , true );
-	}
-
-	$cached_current_customer_id = $id;
-
-	return $id;
+	return $cached_current_customer_id;
 }
 
 /**
@@ -319,6 +299,9 @@ function wpsc_get_all_customer_meta( $id = false ) {
 function _wpsc_update_customer_last_active() {
 	$id = wpsc_get_current_customer_id();
 	update_user_meta( $id, '_wpsc_last_active', time() );
+
+	// if this is a temporary user reset the ticker for how long the temporary profile
+	// is kept before purging
 	$meta_value = get_user_meta($id, '_wpsc_temporary_profile', true);
 	if ( !empty( $meta_value ) )
 		update_user_meta( $id, '_wpsc_temporary_profile', 48 );
@@ -338,6 +321,16 @@ function wpsc_is_bot_user() {
 	if ( $is_a_bot_user !== null )
 		return $is_a_bot_user;
 
+	if ( is_user_logged_in() ) {
+		$is_a_bot_user = false;
+		return false;
+	}
+
+	if ( strpos( $_SERVER['REQUEST_URI'], '?wpsc_action=rss' ) ) {
+		$is_a_bot_user = true;
+		return true;
+	}
+
 	// Cron jobs are not flesh originated
 	if ( defined('DOING_CRON') && DOING_CRON ) {
 		$is_a_bot_user = true;
@@ -350,31 +343,34 @@ function wpsc_is_bot_user() {
 		return true;
 	}
 
-	// Ajax requests when there isn't a customer cookie don't smell like shopping beings
-	if ( defined('DOING_AJAX') && DOING_AJAX && !isset($_COOKIE[WPSC_CUSTOMER_COOKIE]) ) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
 	// coming to login first, after the user logs in we know they are a live being, until then they are something else
 	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login' ) || strpos( $_SERVER['REQUEST_URI'], 'wp-register' ) ) {
 		$is_a_bot_user = true;
 		return true;
 	}
 
+	// a cron request from a uri?
+	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-cron.php' ) ) {
+		$is_a_bot_user = true;
+		return true;
+	}
+
 	// even web servers talk to themselves when they think no one is listening
-	if ( strpos( $_SERVER['HTTP_USER_AGENT'], 'wordpress' ) ) {
+	if ( stripos( $_SERVER['HTTP_USER_AGENT'], 'wordpress' ) !== false ) {
 		$is_a_bot_user = true;
 		return true;
 	}
 
 	// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the
-	// string 'bot|spider|crawler' in them, there are bots that don't do us the kindness of identifying themselves as such,
+	// string 'bot|spider|crawler|preview' in them, there are bots that don't do us the kindness of identifying themselves as such,
 	// check for the user being logged in in a real user is using a bot to access content from our site
 	if ( !is_user_logged_in() && (
-			( strpos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
-				|| ( strpos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
-					|| ( strpos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
+			( stripos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
+				|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
+					|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
+						|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'preview' ) !== false )
+							|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'squider' ) !== false )
+								|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'slurp' ) !== false )
 		) ) {
 		$is_a_bot_user = true;
 		return true;
@@ -418,4 +414,143 @@ function _wpsc_set_purchase_log_customer_id( $data ) {
 if ( !is_user_logged_in() ) {
 	add_filter( 'wpsc_purchase_log_update_data', '_wpsc_set_purchase_log_customer_id', 1, 1 );
 	add_filter( 'wpsc_purchase_log_insert_data', '_wpsc_set_purchase_log_customer_id', 1, 1 );
+}
+
+
+/**
+ * Create a hash from what we know about a user's connection to try to determine if it is unique
+ *
+ * @access private
+ * @since  3.8.13
+ */
+function _wpsc_user_hash_meta_key() {
+	$user_hash_meta_key = '_wpsc_' . md5( $_SERVER['REMOTE_ADDR'] .  $_SERVER['HTTP_USER_AGENT'] );
+	return $user_hash_meta_key;
+}
+
+/**
+ * Check users with similar information to see if they were created in the last
+ * milliseconds so that we don't create two users when two requests come to the server
+ * in parallel.
+ *
+ * Why do we do this?
+ * WPEC creates a user profile for each visitor at the start of each visit. The user profile is used
+ * to hold information like the cart contents, shipping data, checkout errors, or anything that a WPEC
+ * aware plug-in may wish to save with the user.
+ *
+ * Creating the profile as soon as the user starts a visit has some advantages over waiting
+ * until there is data to save before creating the profile. Mostly it allows code to be written
+ * knowing that the user visit information can be saved to the profile without worrying about if
+ * any special initialization has taken place.
+ *
+ * It also has some disadvantages that need to be addressed. In addition to detecting if a visit is
+ * some type of bot, handled in _wpsc_is_bot, we need to make sure multiple profiles are not
+ * inadvertently created.  How can this happen?
+ *
+ * Consider this common scenario.  WPEC based site is built and used page caching, a page that is cached is
+ * is delivered to a real user.  When that page is delivered Wordpress/WPEC typically is unaware that anything
+ * has taken place because the cache software/hardware has done all of the communication with the user's browser.
+ *
+ * The browser parses and processes the cached page HTML and java script.  When the page is processed there are
+ * embedded AJAX calls, or other HTTP requests that are serviced by WPEC/Wordpress.  Modern browsers make the requests
+ * to the server in parallel.  THat means that a web server might have as many as 4-8 requests working at the same time,
+ * none of which has the WPEC customer cookie set.
+ *
+ * Without some means of detecting that each of these requests is coming from the same live user, a new user profile would
+ * be created for each request, and a unique customer cookie would be set in each request.  That's
+ * kind of messy.  It also could cause a problem if one of the HTTP requests coming to the server was an add to cart
+ * operation.  An item could be added to the cart, show on the users screen as in the cart, but not be there when the
+ * user goes to checkout because the cookie from a different request was what was ultimately set in the user's
+ * web browser. Keep in mind that hte JAX requests that create a user profile don't have to be WPEC requests. They
+ * could be requests from any plugin, doing anything that the plug-in intended.
+ *
+ * We are limited in what we can do to detect a common source for multiple requests. We look at the originating
+ * IP address, the user agent string and the time.  If the user agent and the ip address are the same, and the time
+ * is within half a second of a previous create profile request we treat the requests as coming from the same user.
+ *
+ *  When does this fail? Two users both behind the same caching proxy, or NAT firewall, who both go to the same website,
+ *  and the pages they go to are cached, and they do it at almost exactly the same time.
+ *
+ * @access private
+ * @since  3.8.13
+ */
+function _wpsc_get_customer_wp_user_id() {
+	global $wp_roles;
+	global $wpdb;
+
+	$user_name_prefix       = '_' . _wpsc_user_hash_meta_key();
+	$user_name_suffix       = '';
+	$user_name_check_count  = 0;
+	$avoid_infinite_loop    = 0;
+	$password               = wp_generate_password( 12, false );
+	$user_id                = false;
+
+	while( $user_id === false) {
+		$result = $wpdb->query('START TRANSACTION');
+		$user_name_to_look_for = $user_name_prefix . $user_name_suffix;
+		$create_user_result = wp_create_user( $user_name_to_look_for, $password );
+
+		if ( is_wp_error($create_user_result) ) {
+			// end the transaction we started above
+			$result = $wpdb->query('ROLLBACK');
+
+			if ( $create_user_result->get_error_code() == 'existing_user_login' ) {
+				$existing_user = get_user_by( 'login', $user_name_to_look_for );
+
+				$user_registered_time = strtotime( $existing_user->user_registered );
+
+				$how_long_ago = time() - $user_registered_time;
+
+				if ( $how_long_ago < 10 ) { // users created with within 10 seconds are treated as this user
+					$user_id = $existing_user->ID;
+				} else {
+					$user_name_check_count++;
+					$user_name_suffix = ('_' . $user_name_check_count);
+				}
+			}
+		} else {
+
+			$wordpress_user = new WP_User( $create_user_result );
+
+			// we created a user, let's do some initialization
+			$role = $wp_roles->get_role( 'wpsc_anonymous' );
+
+			if ( ! $role )
+				$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
+
+			$wordpress_user->set_role( 'wpsc_anonymous' );
+
+			update_user_meta( $create_user_result, '_wpsc_last_active', time() );
+			// we set the delete ticker low knowing it will be set to a bigger number on the first user
+			// action.  this will cause profiles that only a single page view to be deleted sooner
+			// uncluttering our user table and cache.
+			update_user_meta( $create_user_result, '_wpsc_temporary_profile', 2 );
+
+			// At this point we check to see if there is more than one user with our user login name.  This can happen
+			// because although Wordpress requires that login names are unique, however Wordpress doesn't enforce the
+			// requirement with a unique restriction on the column index.  If two requests from the same user come in
+			// at close to the same time both insert user requests can succeed. The two requests can be any combination
+			// of get requests for the page's html, ajax requests, or http get/post requests processing forms.
+
+			$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $wordpress_user->user_login . '"';
+			$user_count = $wpdb->get_var( $sql );
+
+			// if there is only one user all is well and we can commit the transaction, otherwise try again
+			if ( $user_count == 1 ) {
+				$user_id = $create_user_result;
+				$result = $wpdb->query('COMMIT');
+				do_action( 'wpsc_created_user_profile', $user_id , $wordpress_user );
+			} else {
+				$result = $wpdb->query('ROLLBACK');
+			}
+		}
+
+		// this should never happen, but infinite loops are really bad so we'll check anyway
+		if ( $avoid_infinite_loop++ > 100 )
+			exit(0);
+
+	}
+
+	return $user_id;
+
 }
