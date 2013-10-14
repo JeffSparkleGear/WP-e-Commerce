@@ -493,7 +493,7 @@ function wpsc_update_location() {
 
 	$billing_country = wpsc_get_customer_meta( 'billing_country' );
 	$billing_region  = wpsc_get_customer_meta( 'billing_region'  );
-	$billing_zip     = wpsc_get_customer_meta( 'billing_zipcode' );
+	$billing_zip     = wpsc_get_customer_meta( 'billingpostcode' );
 
 
 	if ( $shipping_same_as_billing ) {
@@ -503,7 +503,7 @@ function wpsc_update_location() {
 	} else {
 		$shipping_country = wpsc_get_customer_meta( 'shipping_country' );
 		$shipping_region  = wpsc_get_customer_meta( 'shipping_region'  );
-		$shipping_zip     = wpsc_get_customer_meta( 'shipping_zip'     );
+		$shipping_zip     = wpsc_get_customer_meta( 'shippingpostcode'     );
 	}
 
 	$delivery_country = '';
@@ -572,7 +572,7 @@ function wpsc_update_location() {
 		wpsc_update_customer_meta( 'shipping_region', $shipping_region  );
 
 	if ( $shipping_zip_changed )
-		wpsc_update_customer_meta( 'shipping_zip', $shipping_zip     );
+		wpsc_update_customer_meta( 'shippingpostcode', $shipping_zip     );
 
 	if ( $billing_country_changed )
 		wpsc_update_customer_meta( 'billing_country', $billing_country  );
@@ -581,7 +581,7 @@ function wpsc_update_location() {
 		wpsc_update_customer_meta( 'billing_region', $billing_region   );
 
 	if ( $billing_zip_changed )
-		wpsc_update_customer_meta( 'billing_zip', $billing_zip   );
+		wpsc_update_customer_meta( 'billingpostcode', $billing_zip   );
 
 	$wpsc_cart->update_location();
 	$wpsc_cart->get_shipping_method();

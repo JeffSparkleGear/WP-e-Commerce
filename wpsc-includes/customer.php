@@ -326,7 +326,12 @@ function wpsc_is_bot_user() {
 		return false;
 	}
 
-	if ( strpos( $_SERVER['REQUEST_URI'], '?wpsc_action=rss' ) ) {
+	if ( strpos( $_SERVER['REQUEST_URI'], '?wpsc_action=rss' ) !== false) {
+		$is_a_bot_user = true;
+		return true;
+	}
+
+	if ( preg_match( '|/feed/$|i', $_SERVER['REQUEST_URI'] ) === 1) {
 		$is_a_bot_user = true;
 		return true;
 	}
@@ -343,14 +348,17 @@ function wpsc_is_bot_user() {
 		return true;
 	}
 
-	// coming to login first, after the user logs in we know they are a live being, until then they are something else
-	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login' ) || strpos( $_SERVER['REQUEST_URI'], 'wp-register' ) ) {
+	// coming to login first, after the user logs in or registers we know they are a live being, until
+	// then they are something else
+	if ( (stripos( $_SERVER['REQUEST_URI'], 'wp-login' ) !== false )
+			|| ( stripos( $_SERVER['REQUEST_URI'], 'wp-register' ) !== false )
+	) {
 		$is_a_bot_user = true;
 		return true;
 	}
 
 	// a cron request from a uri?
-	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-cron.php' ) ) {
+	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-cron.php' ) !== false ) {
 		$is_a_bot_user = true;
 		return true;
 	}
@@ -364,14 +372,14 @@ function wpsc_is_bot_user() {
 	// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the
 	// string 'bot|spider|crawler|preview' in them, there are bots that don't do us the kindness of identifying themselves as such,
 	// check for the user being logged in in a real user is using a bot to access content from our site
-	if ( !is_user_logged_in() && (
-			( stripos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
-				|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
-					|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
-						|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'preview' ) !== false )
-							|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'squider' ) !== false )
-								|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'slurp' ) !== false )
-		) ) {
+	if ( ( stripos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
+			|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
+				|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
+					|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'preview' ) !== false )
+						|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'squider' ) !== false )
+							|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'slurp' ) !== false )
+								|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'pinterest.com' ) !== false )
+	) {
 		$is_a_bot_user = true;
 		return true;
 	}
@@ -381,6 +389,16 @@ function wpsc_is_bot_user() {
 		$is_a_bot_user = true;
 		return true;
 	}
+
+
+	$hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+	if ( ( stripos( $hostname, 'search.msn.com' ) !== false )
+			|| ( stripos( $hostname, '.amazonaws.com' ) !== false )
+	) {
+		$is_a_bot_user = true;
+		return true;
+	}
+
 
 	$is_a_bot_user = false;
 
@@ -486,27 +504,38 @@ function _wpsc_get_customer_wp_user_id() {
 	$user_id                = false;
 
 	while( $user_id === false) {
-		$result = $wpdb->query('START TRANSACTION');
+
 		$user_name_to_look_for = $user_name_prefix . $user_name_suffix;
-		$create_user_result = wp_create_user( $user_name_to_look_for, $password );
+		$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
+		$users_with_this_login_name_count = $wpdb->get_var( $sql );
 
-		if ( is_wp_error($create_user_result) ) {
-			// end the transaction we started above
-			$result = $wpdb->query('ROLLBACK');
+		if ( $users_with_this_login_name_count > 1 ) {
+			bling_log( 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
+		}
 
-			if ( $create_user_result->get_error_code() == 'existing_user_login' ) {
-				$existing_user = get_user_by( 'login', $user_name_to_look_for );
+		$result = $wpdb->query('START TRANSACTION');
 
+		if ( $users_with_this_login_name_count == 0 ) {
+			$create_user_result = wp_create_user( $user_name_to_look_for, $password );
+		}
+
+		if ( $users_with_this_login_name_count || ( is_wp_error($create_user_result) &&  ($create_user_result->get_error_code() == 'existing_user_login') ) ) {
+
+			$existing_user = get_user_by( 'login', $user_name_to_look_for );
+
+			if  ( $existing_user !== false )
 				$user_registered_time = strtotime( $existing_user->user_registered );
+			else
+				$user_registered_time = 0;
 
-				$how_long_ago = time() - $user_registered_time;
+			$how_long_ago = abs ( time() - $user_registered_time );
 
-				if ( $how_long_ago < 10 ) { // users created with within 10 seconds are treated as this user
-					$user_id = $existing_user->ID;
-				} else {
-					$user_name_check_count++;
-					$user_name_suffix = ('_' . $user_name_check_count);
-				}
+			if ( $how_long_ago < 20 ) { // users created with within 20 seconds are treated as this user
+				$create_user_result = $existing_user->ID;
+			} else {
+				$user_name_check_count++;
+				$user_name_suffix = ('_' . str_pad( $user_name_check_count, 2, "0", STR_PAD_LEFT ) );
+				$create_user_result = '';
 			}
 		} else {
 
@@ -521,35 +550,48 @@ function _wpsc_get_customer_wp_user_id() {
 			$wordpress_user->set_role( 'wpsc_anonymous' );
 
 			update_user_meta( $create_user_result, '_wpsc_last_active', time() );
+
 			// we set the delete ticker low knowing it will be set to a bigger number on the first user
 			// action.  this will cause profiles that only a single page view to be deleted sooner
 			// uncluttering our user table and cache.
 			update_user_meta( $create_user_result, '_wpsc_temporary_profile', 2 );
 
-			// At this point we check to see if there is more than one user with our user login name.  This can happen
-			// because although Wordpress requires that login names are unique, however Wordpress doesn't enforce the
-			// requirement with a unique restriction on the column index.  If two requests from the same user come in
-			// at close to the same time both insert user requests can succeed. The two requests can be any combination
-			// of get requests for the page's html, ajax requests, or http get/post requests processing forms.
+		}
 
-			$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $wordpress_user->user_login . '"';
-			$user_count = $wpdb->get_var( $sql );
+		// At this point we check to see if there is more than one user with our user login name.  This can happen
+		// because although Wordpress requires that login names are unique, however Wordpress doesn't enforce the
+		// requirement with a unique restriction on the column index.  If two requests from the same user come in
+		// at close to the same time both insert user requests can succeed. The two requests can be any combination
+		// of get requests for the page's html, ajax requests, or http get/post requests processing forms.
 
-			// if there is only one user all is well and we can commit the transaction, otherwise try again
-			if ( $user_count == 1 ) {
-				$user_id = $create_user_result;
-				$result = $wpdb->query('COMMIT');
-				do_action( 'wpsc_created_user_profile', $user_id , $wordpress_user );
-			} else {
-				$result = $wpdb->query('ROLLBACK');
+		$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
+		$user_count = $wpdb->get_var( $sql );
+
+		// If there is only one user wit the login we are considering then we are good to go,
+		// if there is more than one, and it is the same number as existed hwne we started we can also
+		// move on.  This second condition should never happen, but we can't risk not checking.
+		if ( !empty( $create_user_result ) && ($user_count == 1 ) ){
+			$user_id = $create_user_result;
+			$result = $wpdb->query('COMMIT');
+
+			if ( ($users_with_this_login_name_count == 0) && ($user_count == 1) ) {
+				do_action( 'wpsc_created_user_profile', $user_id );
+			}
+
+		} else {
+			$result = $wpdb->query('ROLLBACK');
+
+			if (time_nanosleep(0, 100000000)) {
+				bling_log ( "Slept for one tenth a second after finding login " . $user_name_to_look_for );
 			}
 		}
 
 		// this should never happen, but infinite loops are really bad so we'll check anyway
-		if ( $avoid_infinite_loop++ > 100 )
+		if ( $avoid_infinite_loop++ > 10000 )
 			exit(0);
 
 	}
+
 
 	return $user_id;
 

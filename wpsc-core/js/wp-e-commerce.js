@@ -39,6 +39,116 @@ function wpsc_update_customer_data(meta_key,meta_value) {
 }		
 
 
+function wpsc_get_customer_data() {
+		
+	var fieldsToGet = new Array();
+	
+	jQuery("input[title^=billing]").each( function() {
+		fieldsToGet.push( jQuery( this ).attr( "title" ) );
+	});	
+	
+	jQuery("input[title^=shipping]").each( function() {
+		var meta_key = jQuery( this ).attr( "title" );
+		fieldsToGet.push( meta_key );
+	});
+	
+	jQuery("textarea[title^=billing]").each( function() {
+		fieldsToGet.push( jQuery( this ).attr( "title" ) );
+	});	
+	
+	jQuery("textarea[title^=shipping]").each( function() {
+		var meta_key = jQuery( this ).attr( "title" );
+		fieldsToGet.push( meta_key );
+	});
+
+	jQuery("select[title^=billing]").each( function() {
+		var meta_key = jQuery( this ).attr( "title" );
+		
+		if ( meta_key == 'billingstate' ) {
+			meta_key = 'billing_region';
+		} else if ( meta_key == 'billingcountry' ) {
+			meta_key = 'billing_country';
+		} else if ( meta_key == 'shippingcountry' ) {
+			meta_key = 'shipping_country';
+		} else if ( meta_key == 'shippingstate' ) {
+			meta_key = 'shipping_region';
+		}
+		
+		fieldsToGet.push( meta_key );
+	});
+	
+	
+	jQuery("select[title^=shipping]").each( function() {
+		var meta_key = jQuery( this ).attr( "title" );
+		
+		if ( meta_key == 'billingstate' ) {
+			meta_key = 'billing_region';
+		} else if ( meta_key == 'billingcountry' ) {
+			meta_key = 'billing_country';
+		} else if ( meta_key == 'shippingcountry' ) {
+			meta_key = 'shipping_country';
+		} else if ( meta_key == 'shippingstate' ) {
+			meta_key = 'shipping_region';
+		}
+		
+		fieldsToGet.push( meta_key );
+	});
+	
+	
+	if ( jQuery("#shippingSameBilling").length ) {
+		fieldsToGet.push("shippingSameBilling");
+	}
+
+	jQuery.ajax({
+		type : "post",
+		dataType : "json",
+		cache : false,
+		url : wpsc_ajax.ajaxurl,
+		data : {action: 'wpsc_get_customer_data', meta_keys : fieldsToGet },
+		success: function (response) {
+			var shipping_same_as_billing_updated = false;
+
+			for ( var meta_key in response ) {
+				var ctrl_name = meta_key;
+				var ctrl_type = '';
+				
+				var meta_value = response[meta_key];
+				
+				if ( meta_key == 'billing_region' ) {
+					ctrl_name =  'billingstate';
+					ctrl_type = 'select';
+				} else if ( meta_key == 'billing_country' ) {
+					ctrl_name = 'billingcountry';
+					ctrl_type = 'select';
+				} else if ( meta_key == 'shipping_region') {
+					ctrl_name = 'shippingstate' ;
+					ctrl_type = 'select';
+				} else if ( meta_key == 'shipping_country' ) {
+					ctrl_name = 'shippingcountry';
+					ctrl_type = 'select';
+				} else if ( meta_key == 'shippingSameBilling' ) {
+					jQuery('#shippingSameBilling').prop('checked', meta_value );
+					shipping_same_as_billing_updated = true;
+					continue;
+				}
+
+				var ctrl = jQuery(ctrl_type+"[title='" + ctrl_name + "']");				
+				ctrl.val( meta_value );
+			}
+			
+			if ( shipping_same_as_billing_updated ) {
+				wpsc_shipping_same_as_billing();
+			}
+			
+			schedule_update_shipping_quotes();
+		},
+		error: function (response) { 
+			;
+		},
+	});			
+}
+
+
 // For shipping and billing fields find the name associated with the other field
 function other_field_name ( shipping_billing_field ) {
 	var shipping_billing_name = jQuery( shipping_billing_field ).attr( "title" );
@@ -85,7 +195,7 @@ function address_field_change ( changed_field ) {
 			wpsc_update_customer_data( sister_title , to_value );
 			
 			if ( sister_title == "shippingstate" || sister_title == "shippingpostcode" || sister_title == "shippingcountry" ) {
-				schedule_update_shipping_quotes();
+				;//schedule_update_shipping_quotes();
 			}
 		}
 	}
@@ -93,7 +203,7 @@ function address_field_change ( changed_field ) {
 	var changed_title = jQuery(changed_field).attr( "title" );
 	
 	if ( changed_title == "shippingstate" || changed_title == "shippingpostcode" || changed_title == "shippingcountry" ) {
-		schedule_update_shipping_quotes();
+		;//schedule_update_shipping_quotes();
 	}
 }
 
@@ -121,7 +231,7 @@ function schedule_update_shipping_quotes() {
 	// if the action is already scheduled don't do anything
 	if ( update_shipping_quotes_timer == null ) {
 		// 200 milliseconds should be long enough for all updates to complete
-		update_shipping_quotes_timer = setTimeout('update_shipping_quotes_timer_callback()', 300 );
+		update_shipping_quotes_timer = setTimeout('update_shipping_quotes_timer_callback()', 200 );
 	}
 }
 
@@ -139,9 +249,9 @@ function wpsc_shipping_same_as_billing() {
 	if ( !jQuery( "#shippingSameBilling" ).length )
 		return;
 	
-	var start_shipping_region  = jQuery('input[title="shippingstate"]');
-	var start_shipping_zip     = jQuery('input[title="shippingpostcode"]');
-	var start_shipping_country = jQuery('input[title="shippingcountry"]');
+	var start_shipping_region  = jQuery('input[title="shippingstate"]').val();
+	var start_shipping_zip     = jQuery('input[title="shippingpostcode"]').val();
+	var start_shipping_country = jQuery('input[title="shippingcountry"]').val();
 
 	var hide_shipping_on_click = true;
 	
@@ -220,6 +330,7 @@ function wpsc_shipping_same_as_billing() {
 		jQuery( "input[title='billingstate']" ).closest('tr').hide();
 		var billing_state = jQuery( "select[title='billingstate'] option:selected" ).html();
 		jQuery( "input[title='billingstate']" ).val( billing_state );
+		wpsc_update_customer_data( 'billingstate', billing_state);
 	} else {
 		jQuery( "input[title='billingstate']" ).closest('tr').show();
 		//jQuery( "input[title='billingstate']" ).prop( 'disabled', false );
@@ -231,19 +342,20 @@ function wpsc_shipping_same_as_billing() {
 		jQuery( "input[title='shippingstate']" ).closest('tr').hide();
 		var shipping_state = jQuery( "select[title='shippingstate'] option:selected" ).html();
 		jQuery( "input[title='shippingstate']" ).val( shipping_state );
+		wpsc_update_customer_data( 'shippingstate', shipping_state);
 	} else {
 		jQuery( "input[title='shippingstate']" ).closest('tr').show();
 	}
 	
 	// if any field has changed that requires the shipping quotes to be updated 
 	// schedule the update
-	var end_shipping_region  = jQuery('input[title="shippingstate"]');
-	var end_shipping_zip     = jQuery('input[title="shippingpostcode"]');
-	var end_shipping_country = jQuery('input[title="shippingcountry"]');
+	var end_shipping_region  = jQuery('input[title="shippingstate"]').val();
+	var end_shipping_zip     = jQuery('input[title="shippingpostcode"]').val();
+	var end_shipping_country = jQuery('input[title="shippingcountry"]').val();
 	
 	// update the shipping quotes if one of the key address fields have changed
 	if ( start_shipping_region != end_shipping_region || start_shipping_zip != end_shipping_zip || start_shipping_country != end_shipping_country ) {
-		schedule_update_shipping_quotes();
+		;//schedule_update_shipping_quotes();
 	}
 	
 }
@@ -302,6 +414,10 @@ function wpsc_update_shipping_quotes() {
 // these functions are bound to events on elements when the page is fully loaded.
 jQuery(document).ready(function ($) {
 	
+	if ( jQuery("#shippingSameBilling").length ) {
+		wpsc_get_customer_data();
+	}
+	
 	jQuery( ".text,.current_country,.current_region" ).on( 'change', function(){ 
 		var changed_title = jQuery( this ).attr( "title" );
 		address_field_change(this); 
@@ -333,6 +449,8 @@ jQuery(document).ready(function ($) {
 
 			jQuery.post(wpsc_ajax.ajaxurl, data, function(response) {} );
 			
+			wpsc_update_customer_data("shippingSameBilling", jQuery(this).is(":checked") );
+			
 			if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
 				var shipping_country_ctrl = jQuery("select[title='shippingcountry']");
 				
@@ -344,8 +462,7 @@ jQuery(document).ready(function ($) {
 						var prefix = "wpsc_checkout_form_";
 						shipping_ctrl_form_id = Number(shipping_ctrl_form_id.substring( prefix.length ));
 					}
-					
-					
+										
 					var region;
 					if ( jQuery("select[title='billingstate']" ).length != 0 )
 						region = jQuery("select[title='billingstate']").val();
@@ -366,6 +483,7 @@ jQuery(document).ready(function ($) {
 			}
 			
 		wpsc_shipping_same_as_billing();
+		schedule_update_shipping_quotes();
 	});
 
 
@@ -633,9 +751,12 @@ function set_billing_country(html_form_id, form){
 	
 	billing_region = jQuery("select[title='billingstate'] option:selected").text();
 	jQuery("input[title='billingstate']").val( billing_region ) ;
+	wpsc_update_customer_data( 'billingstate', billing_region);
+
 	
 	if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
 		jQuery("input[title='shippingstate']").val( billing_region ) ;	
+		wpsc_update_customer_data( 'shippingstate', billing_region);
 	}
 	
 	new_text = jQuery("input[title='billingstate']").val();
@@ -707,6 +828,7 @@ function set_shipping_country(html_form_id, form){
 	
 	if ( jQuery( "#shippingSameBilling" ).is( ':checked' ) ) {
 		jQuery("input[title='billingstate']").val( shipping_region ) ;	
+		wpsc_update_customer_data( 'billingstate', shipping_region);
 	}
 	
 	form_values = {
