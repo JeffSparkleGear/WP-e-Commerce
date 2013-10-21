@@ -4,6 +4,7 @@ add_action( 'wpsc_set_cart_item'         , '_wpsc_update_customer_last_active' )
 add_action( 'wpsc_add_item'              , '_wpsc_update_customer_last_active' );
 add_action( 'wpsc_before_submit_checkout', '_wpsc_update_customer_last_active' );
 
+
 /**
  * Helper function for setting the customer cookie content and expiration
  *
@@ -37,14 +38,21 @@ function wpsc_create_customer_id() {
 	if ( $cached_current_customer_id === false ) {
 
 		if ( $is_a_bot_user = wpsc_is_bot_user() ) {
-			$username = '_wpsc_bot';
-			$wp_user = get_user_by( 'login', $username );
-			if ( $wp_user === false ) {
-				$password = wp_generate_password( 12, false );
-				$id = wp_create_user( $username, $password );
+			$cached_bot_user_id = get_transient( 'wpsc_bot_user_id');
+			if ( $cached_bot_user_id == false ) {
+				$username = '_wpsc_bot';
+				$wp_user = get_user_by( 'login', $username );
+				if ( $wp_user === false ) {
+					$password = wp_generate_password( 12, false );
+					$id = wp_create_user( $username, $password );
+					set_transient( 'wpsc_bot_user_id' , $id);
+				} else {
+					$id = $wp_user->ID;
+				}
 			} else {
-				$id = $wp_user->ID;
+				$id = $cached_bot_user_id;
 			}
+
 		} else {
 			$id = _wpsc_get_customer_wp_user_id();
 
@@ -55,6 +63,8 @@ function wpsc_create_customer_id() {
 
 			// store ID, expire and hash to validate later
 			_wpsc_set_customer_cookie( $cookie, $expire );
+
+			bling_log( 'id ' . $id . ' setting cookie ' . $cookie );
 
 		}
 
@@ -113,6 +123,7 @@ function wpsc_validate_customer_cookie() {
  * @return mixed        User ID (if logged in) or customer cookie ID
  */
 function wpsc_get_current_customer_id() {
+
 	// if the user is logged in and the cookie is still there, delete the cookie
 	if ( is_user_logged_in() && isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) )
 		_wpsc_set_customer_cookie( '', time() - 3600 );
@@ -291,20 +302,45 @@ function wpsc_get_all_customer_meta( $id = false ) {
 }
 
 /**
+ * Return an the customer cart
+ *
+ * @access public
+ * @since 3.8.9
+ * @param  mixed $id Customer ID. Default to the current user ID.
+ * @return WP_Error|array Return an array of metadata if no error occurs, WP_Error
+ *                        if otherwise.
+ */
+function wpsc_get_customer_cart( $id = false  ) {
+
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	$cart = maybe_unserialize( base64_decode( wpsc_get_customer_meta( 'cart', $id ) ) );
+
+	if ( !( is_object( $cart ) && ! is_wp_error( $cart ) ) ) {
+		$cart = new wpsc_cart();
+	}
+
+	return $cart;
+}
+
+
+/**
  * Update the customer's last active time
  *
  * @access private
  * @since  3.8.13
  */
-function _wpsc_update_customer_last_active() {
+function _wpsc_update_customer_last_active( $hours = 48 ) {
 	$id = wpsc_get_current_customer_id();
 	update_user_meta( $id, '_wpsc_last_active', time() );
 
 	// if this is a temporary user reset the ticker for how long the temporary profile
 	// is kept before purging
 	$meta_value = get_user_meta($id, '_wpsc_temporary_profile', true);
-	if ( !empty( $meta_value ) )
-		update_user_meta( $id, '_wpsc_temporary_profile', 48 );
+	if ( !empty( $meta_value ) && ( intval($meta_value) < $hours ) ) {
+		update_user_meta( $id, '_wpsc_temporary_profile', $hours );
+	}
 }
 
 
@@ -321,6 +357,11 @@ function wpsc_is_bot_user() {
 	if ( $is_a_bot_user !== null )
 		return $is_a_bot_user;
 
+	if ( is_404() ) {
+		$is_a_bot_user = true;
+		return true;
+	}
+
 	if ( is_user_logged_in() ) {
 		$is_a_bot_user = false;
 		return false;
@@ -332,12 +373,6 @@ function wpsc_is_bot_user() {
 	}
 
 	if ( preg_match( '|/feed/$|i', $_SERVER['REQUEST_URI'] ) === 1) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
-	// Cron jobs are not flesh originated
-	if ( defined('DOING_CRON') && DOING_CRON ) {
 		$is_a_bot_user = true;
 		return true;
 	}
@@ -502,60 +537,84 @@ function _wpsc_get_customer_wp_user_id() {
 	$avoid_infinite_loop    = 0;
 	$password               = wp_generate_password( 12, false );
 	$user_id                = false;
+	$existing_user			= false;
+	$create_user_result     = '';
+
 
 	while( $user_id === false) {
 
+		$result = $wpdb->query('START TRANSACTION');
+
 		$user_name_to_look_for = $user_name_prefix . $user_name_suffix;
-		$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
-		$users_with_this_login_name_count = $wpdb->get_var( $sql );
+		$sql = 'SELECT ID, user_registered FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
+
+		$users_with_this_login_name = $wpdb->get_results( $sql );
+		if ( empty ( $users_with_this_login_name ) ) {
+			$users_with_this_login_name_count = 0;
+		} else {
+			$users_with_this_login_name_count = count( $users_with_this_login_name );
+		}
 
 		if ( $users_with_this_login_name_count > 1 ) {
 			bling_log( 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
 		}
 
-		$result = $wpdb->query('START TRANSACTION');
-
 		if ( $users_with_this_login_name_count == 0 ) {
-			$create_user_result = wp_create_user( $user_name_to_look_for, $password );
-		}
+			//$create_user_result = wp_create_user( $user_name_to_look_for, $password );
+			$user_registered = gmdate('Y-m-d H:i:s');
+			$db_result = $wpdb->insert(
+										$wpdb->users,
+										array(
+												'user_login'      => $user_name_to_look_for,
+												'user_pass'       => $password,
+												'user_registered' => $user_registered
+										),
+										array(
+												'%s',
+												'%s',
+												'%s'
+										)
+									);
 
-		if ( $users_with_this_login_name_count || ( is_wp_error($create_user_result) &&  ($create_user_result->get_error_code() == 'existing_user_login') ) ) {
-
-			$existing_user = get_user_by( 'login', $user_name_to_look_for );
-
-			if  ( $existing_user !== false )
-				$user_registered_time = strtotime( $existing_user->user_registered );
-			else
-				$user_registered_time = 0;
-
-			$how_long_ago = abs ( time() - $user_registered_time );
-
-			if ( $how_long_ago < 20 ) { // users created with within 20 seconds are treated as this user
-				$create_user_result = $existing_user->ID;
+			if ( $db_result !== false ) {
+				$create_user_result = (int) $wpdb->insert_id;
+				$existing_user = $create_user_result;
 			} else {
+				$create_user_result = '';
+			}
+
+		} elseif ( $users_with_this_login_name_count ) {
+
+			bling_log( 'checking for near user create, ' . $users_with_this_login_name_count . ' users to check');
+
+			$existing_user = false;
+
+			foreach ( $users_with_this_login_name as $user ) {
+
+				$existing_user_to_check = $user->ID;//get_user_by( 'login', $user_name_to_look_for );
+
+				//$wordpress_user = new WP_User( $existing_user_to_check );
+				//bling_log( $wordpress_user );
+
+				if  ( !empty( $user->user_registered ) )
+					$user_registered_time = strtotime( $user->user_registered );
+				else
+					$user_registered_time = 0;
+
+				$how_long_ago = abs ( time() - $user_registered_time );
+
+				bling_log( 'user id ' . $existing_user_to_check. ' with login ' . $user_name_to_look_for . ' created ' . $how_long_ago . ' seconds ago' );
+				if ( $how_long_ago < 200 ) { // users created with within 20 seconds are treated as this user
+					$existing_user = $existing_user_to_check;
+					break;
+				}
+			}
+
+			if ( !$existing_user ) {
 				$user_name_check_count++;
 				$user_name_suffix = ('_' . str_pad( $user_name_check_count, 2, "0", STR_PAD_LEFT ) );
 				$create_user_result = '';
 			}
-		} else {
-
-			$wordpress_user = new WP_User( $create_user_result );
-
-			// we created a user, let's do some initialization
-			$role = $wp_roles->get_role( 'wpsc_anonymous' );
-
-			if ( ! $role )
-				$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
-
-			$wordpress_user->set_role( 'wpsc_anonymous' );
-
-			update_user_meta( $create_user_result, '_wpsc_last_active', time() );
-
-			// we set the delete ticker low knowing it will be set to a bigger number on the first user
-			// action.  this will cause profiles that only a single page view to be deleted sooner
-			// uncluttering our user table and cache.
-			update_user_meta( $create_user_result, '_wpsc_temporary_profile', 2 );
-
 		}
 
 		// At this point we check to see if there is more than one user with our user login name.  This can happen
@@ -567,19 +626,78 @@ function _wpsc_get_customer_wp_user_id() {
 		$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
 		$user_count = $wpdb->get_var( $sql );
 
+		// if we created a user and the user count count is more than one we should fail this transaction
+		if ( $user_count > 1 && !empty( $create_user_result) ) {
+			bling_log( 'created user ' . $create_user_result . ' but count was ' . $user_count . ', rolling back transaction' );
+			$existing_user = '';
+		}
+
 		// If there is only one user wit the login we are considering then we are good to go,
 		// if there is more than one, and it is the same number as existed hwne we started we can also
 		// move on.  This second condition should never happen, but we can't risk not checking.
-		if ( !empty( $create_user_result ) && ($user_count == 1 ) ){
-			$user_id = $create_user_result;
+		if ( !empty( $existing_user ) ){
 			$result = $wpdb->query('COMMIT');
+
+			if ( !empty( $create_user_result) ) {
+				// one last check
+				$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
+				$user_count = $wpdb->get_var( $sql );
+
+				if ( $user_count == 1) {
+					bling_log( 'One user with login ' . $user_name_to_look_for . ' exists, id is   ' . $existing_user );
+				} else {
+					bling_log( 'CREATE USER ERROR: ' . $user_count . ' user with login ' . $user_name_to_look_for . ' exists, deleting id ' . $create_user_result );
+					$delete_result = $wpdb->delete( $wpdb->users, array( 'ID' => $create_user_result ) );
+					bling_log( 'CREATE USER ERROR: delete result is '. $delete_result . ' for user id ' . $create_user_result );
+					bling_log( 'existing user: ' . $existing_user );
+					$create_user_result = '';
+					continue;
+				}
+			}
+
+			if ( !empty( $create_user_result) ) {
+
+				$wordpress_user = new WP_User( $create_user_result );
+
+				// we created a user, let's do some initialization
+				$role = $wp_roles->get_role( 'wpsc_anonymous' );
+
+				if ( ! $role )
+					$wp_roles->add_role( 'wpsc_anonymous', __( 'Anonymous', 'wpsc' ) );
+
+				$wordpress_user->set_role( 'wpsc_anonymous' );
+
+				update_user_meta( $create_user_result, '_wpsc_last_active', time() );
+
+				// we set the delete ticker low knowing it will be set to a bigger number on the first user
+				// action.  this will cause profiles that only a single page view to be deleted sooner
+				// uncluttering our user table and cache.
+				update_user_meta( $create_user_result, '_wpsc_temporary_profile', 2 );
+			}
+
 
 			if ( ($users_with_this_login_name_count == 0) && ($user_count == 1) ) {
 				do_action( 'wpsc_created_user_profile', $user_id );
 			}
 
+			$user_id = $existing_user;
+
+			bling_log( 'identified user ' . $user_name_to_look_for . ' with id ' . $existing_user );
+
 		} else {
 			$result = $wpdb->query('ROLLBACK');
+
+			if ( !empty( $existing_user ) ) {
+				wp_cache_delete($user_id, 'users');
+			}
+
+			if ( !empty( $create_user_result ) ) {
+				wp_cache_delete($user_id, 'users');
+			}
+
+			if ( !empty( $user_name_to_look_for ) ) {
+				wp_cache_delete($user_name_to_look_for, 'userlogins');
+			}
 
 			if (time_nanosleep(0, 100000000)) {
 				bling_log ( "Slept for one tenth a second after finding login " . $user_name_to_look_for );
@@ -591,7 +709,6 @@ function _wpsc_get_customer_wp_user_id() {
 			exit(0);
 
 	}
-
 
 	return $user_id;
 

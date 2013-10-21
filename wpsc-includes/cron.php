@@ -31,12 +31,15 @@ function _wpsc_clear_customer_meta() {
 
 	$sql = 'UPDATE ' . $wpdb->usermeta . '
 		SET
-			meta_value = meta_value - 1,
-			meta_key = IF (meta_value < 0, "_wpsc_temporary_profile_to_delete", meta_key )
+			meta_value =  IF ( CAST( meta_value AS UNSIGNED) > 1, CAST( meta_value AS UNSIGNED) - 1, 0 ),
+			meta_key = IF (meta_value = 0, "_wpsc_temporary_profile_to_delete", meta_key )
 		WHERE
 			meta_key = "_wpsc_temporary_profile"';
 
-	$wpdb->get_results( $sql );
+	bling_log( $sql );
+
+	$results = $wpdb->query( $sql );
+	bling_log( $results );
 
 	$sql = "
 		SELECT user_id

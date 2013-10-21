@@ -1,26 +1,3 @@
-if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) == 0;
-  };
-}
-
-function isNumber(n) {
-	  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function refresh_checkout_errors() {
-	jQuery( ".checkout-error-messages" ).each( function() {
-		jQuery( this ).trigger('refreshCheckoutErrors');
-	});
-}
-
-function new_checkout_error( message ) {
-	jQuery( ".checkout-error-messages").each( function() {
-		jQuery( this ).trigger('newCheckoutError',  message );
-	});
-}
-
 //get current cart checkout messages for display on the checkout pages
 function wpsc_update_customer_data(meta_key,meta_value) {
 	
@@ -37,117 +14,6 @@ function wpsc_update_customer_data(meta_key,meta_value) {
 		},
 	});			
 }		
-
-
-function wpsc_get_customer_data() {
-		
-	var fieldsToGet = new Array();
-	
-	jQuery("input[title^=billing]").each( function() {
-		fieldsToGet.push( jQuery( this ).attr( "title" ) );
-	});	
-	
-	jQuery("input[title^=shipping]").each( function() {
-		var meta_key = jQuery( this ).attr( "title" );
-		fieldsToGet.push( meta_key );
-	});
-	
-	jQuery("textarea[title^=billing]").each( function() {
-		fieldsToGet.push( jQuery( this ).attr( "title" ) );
-	});	
-	
-	jQuery("textarea[title^=shipping]").each( function() {
-		var meta_key = jQuery( this ).attr( "title" );
-		fieldsToGet.push( meta_key );
-	});
-
-	jQuery("select[title^=billing]").each( function() {
-		var meta_key = jQuery( this ).attr( "title" );
-		
-		if ( meta_key == 'billingstate' ) {
-			meta_key = 'billing_region';
-		} else if ( meta_key == 'billingcountry' ) {
-			meta_key = 'billing_country';
-		} else if ( meta_key == 'shippingcountry' ) {
-			meta_key = 'shipping_country';
-		} else if ( meta_key == 'shippingstate' ) {
-			meta_key = 'shipping_region';
-		}
-		
-		fieldsToGet.push( meta_key );
-	});
-	
-	
-	jQuery("select[title^=shipping]").each( function() {
-		var meta_key = jQuery( this ).attr( "title" );
-		
-		if ( meta_key == 'billingstate' ) {
-			meta_key = 'billing_region';
-		} else if ( meta_key == 'billingcountry' ) {
-			meta_key = 'billing_country';
-		} else if ( meta_key == 'shippingcountry' ) {
-			meta_key = 'shipping_country';
-		} else if ( meta_key == 'shippingstate' ) {
-			meta_key = 'shipping_region';
-		}
-		
-		fieldsToGet.push( meta_key );
-	});
-	
-	
-	if ( jQuery("#shippingSameBilling").length ) {
-		fieldsToGet.push("shippingSameBilling");
-	}
-
-	jQuery.ajax({
-		type : "post",
-		dataType : "json",
-		cache : false,
-		url : wpsc_ajax.ajaxurl,
-		data : {action: 'wpsc_get_customer_data', meta_keys : fieldsToGet },
-		success: function (response) {
-			var shipping_same_as_billing_updated = false;
-
-			for ( var meta_key in response ) {
-				var ctrl_name = meta_key;
-				var ctrl_type = '';
-				
-				var meta_value = response[meta_key];
-				
-				if ( meta_key == 'billing_region' ) {
-					ctrl_name =  'billingstate';
-					ctrl_type = 'select';
-				} else if ( meta_key == 'billing_country' ) {
-					ctrl_name = 'billingcountry';
-					ctrl_type = 'select';
-				} else if ( meta_key == 'shipping_region') {
-					ctrl_name = 'shippingstate' ;
-					ctrl_type = 'select';
-				} else if ( meta_key == 'shipping_country' ) {
-					ctrl_name = 'shippingcountry';
-					ctrl_type = 'select';
-				} else if ( meta_key == 'shippingSameBilling' ) {
-					jQuery('#shippingSameBilling').prop('checked', meta_value );
-					shipping_same_as_billing_updated = true;
-					continue;
-				}
-
-				var ctrl = jQuery(ctrl_type+"[title='" + ctrl_name + "']");				
-				ctrl.val( meta_value );
-			}
-			
-			if ( shipping_same_as_billing_updated ) {
-				wpsc_shipping_same_as_billing();
-			}
-			
-			schedule_update_shipping_quotes();
-		},
-		error: function (response) { 
-			;
-		},
-	});			
-}
-
 
 // For shipping and billing fields find the name associated with the other field
 function other_field_name ( shipping_billing_field ) {
@@ -222,7 +88,7 @@ function update_shipping_quotes_timer_callback() {
     unschedule_update_shipping_quotes();  
 
     // insert your code here...
-    wpsc_update_shipping_quotes();
+    //wpsc_update_shipping_quotes();
     
 }
 
@@ -367,6 +233,7 @@ function wpsc_shipping_same_as_billing() {
  */
 function wpsc_update_shipping_quotes() {
 
+	return;
 	if ( jQuery('#checkout-in-progress-indicator').length )
 		return;
 	
