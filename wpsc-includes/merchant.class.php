@@ -280,8 +280,6 @@ class wpsc_merchant {
 	 * go to transaction results, if this changes and you extend this, your merchant module may go to the wrong place
 	 */
 	function go_to_transaction_results( $session_id ) {
-		global $wpdb, $purchase_log;
-
 		$purchase_log = new WPSC_Purchase_Log( $this->purchase_id );
 
 		//Now to do actions once the payment has been attempted
