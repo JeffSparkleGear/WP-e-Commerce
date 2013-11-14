@@ -13,7 +13,7 @@ add_action( 'update_option_single_view_image_height', 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_width'    , 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_height'   , 'wpsc_cache_to_upload' );
 add_action('template_redirect', 'wpsc_all_products_on_page');
-add_action('post_thumbnail_html','wpsc_the_featured_image_fix');
+//add_action('post_thumbnail_html','wpsc_the_featured_image_fix');
 add_filter( 'aioseop_description', 'wpsc_set_aioseop_description' );
 add_filter('request', 'wpsc_remove_page_from_query_string');
 

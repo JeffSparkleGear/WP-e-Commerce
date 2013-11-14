@@ -1,9 +1,12 @@
 <?php
 
-add_action( 'wpsc_set_cart_item'         , '_wpsc_update_customer_last_active' );
-add_action( 'wpsc_add_item'              , '_wpsc_update_customer_last_active' );
-add_action( 'wpsc_before_submit_checkout', '_wpsc_update_customer_last_active' );
+add_action( 'wpsc_set_cart_item'         , '_wpsc_update_customer_last_active_wrapper' );
+add_action( 'wpsc_add_item'              , '_wpsc_update_customer_last_active_wrapper' );
+add_action( 'wpsc_before_submit_checkout', '_wpsc_update_customer_last_active_wrapper' );
 
+function _wpsc_update_customer_last_active_wrapper() {
+	_wpsc_update_customer_last_active();
+}
 
 /**
  * Helper function for setting the customer cookie content and expiration
@@ -63,9 +66,6 @@ function wpsc_create_customer_id() {
 
 			// store ID, expire and hash to validate later
 			_wpsc_set_customer_cookie( $cookie, $expire );
-
-			bling_log( 'id ' . $id . ' setting cookie ' . $cookie );
-
 		}
 
 		$cached_current_customer_id = $id;
@@ -325,6 +325,38 @@ function wpsc_get_customer_cart( $id = false  ) {
 }
 
 
+function _wpsc_user_has_role( $roles, $id = false ) {
+
+	$user_in_role = false;
+
+	if ( !empty( $roles ) ) {
+
+		if ( ! $id )
+			$id = wpsc_get_current_customer_id();
+
+		$user = get_userdata( $id );
+
+		if ( !empty( $user ) ) {
+
+			if ( !is_array( $roles ) ) {
+				$roles = array( $roles );
+			}
+
+			// Loop through user roles
+			foreach ( $user->roles as $role ) {
+				// Does user have role?
+				if ( in_array( $role, $roles ) ) {
+					$user_in_role = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return $user_in_role;
+}
+
+
 /**
  * Update the customer's last active time
  *
@@ -335,11 +367,21 @@ function _wpsc_update_customer_last_active( $hours = 48 ) {
 	$id = wpsc_get_current_customer_id();
 	update_user_meta( $id, '_wpsc_last_active', time() );
 
-	// if this is a temporary user reset the ticker for how long the temporary profile
-	// is kept before purging
-	$meta_value = get_user_meta($id, '_wpsc_temporary_profile', true);
-	if ( !empty( $meta_value ) && ( intval($meta_value) < $hours ) ) {
-		update_user_meta( $id, '_wpsc_temporary_profile', $hours );
+	if ( _wpsc_user_has_role( $id ,  'wpsc_anonymous' ) ) {
+		// handle the expiration of the temporary customer profiles
+		$current_expire_time = get_user_meta( $id, '_wpsc_temporary_profile', true );
+		if ( empty( $current_expire_time ) )
+			$current_expire_time = 0;
+
+		$keep_profile_until = time() +  $hours * 60 * 60;
+
+		// if the expire time is being advanced by more htan an hour do the update, otherwise
+		// don't do anything.  No reason to have another database hit on every http request!
+		if ( ($keep_profile_until - $current_expire_time) > 3600 ) {
+			update_user_meta( $id, '_wpsc_temporary_profile', $keep_profile_until );
+		}
+	} else {
+		delete_user_meta( $id, '_wpsc_temporary_profile' );
 	}
 }
 
@@ -367,56 +409,62 @@ function wpsc_is_bot_user() {
 		return false;
 	}
 
-	if ( strpos( $_SERVER['REQUEST_URI'], '?wpsc_action=rss' ) !== false) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
-	if ( preg_match( '|/feed/$|i', $_SERVER['REQUEST_URI'] ) === 1) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
 	// XML RPC requests are probably from cybernetic beasts
 	if ( defined('XMLRPC_REQUEST') && XMLRPC_REQUEST ) {
 		$is_a_bot_user = true;
 		return true;
 	}
 
-	// coming to login first, after the user logs in or registers we know they are a live being, until
-	// then they are something else
-	if ( (stripos( $_SERVER['REQUEST_URI'], 'wp-login' ) !== false )
-			|| ( stripos( $_SERVER['REQUEST_URI'], 'wp-register' ) !== false )
-	) {
-		$is_a_bot_user = true;
-		return true;
+	// request uri checks
+	if ( !empty($_SERVER['REQUEST_URI']) ) {
+		// coming to login first, after the user logs in or registers we know they are a live being, until
+		// then they are something else
+		if ( (stripos( $_SERVER['REQUEST_URI'], 'wp-login' ) !== false )
+				|| ( stripos( $_SERVER['REQUEST_URI'], 'wp-register' ) !== false )
+		) {
+			$is_a_bot_user = true;
+			return true;
+		}
+
+		// a cron request from a uri?
+		if ( strpos( $_SERVER['REQUEST_URI'], 'wp-cron.php' ) !== false ) {
+			$is_a_bot_user = true;
+			return true;
+		}
+
+		if ( strpos( $_SERVER['REQUEST_URI'], '?wpsc_action=rss' ) !== false) {
+			$is_a_bot_user = true;
+			return true;
+		}
+
+		if ( preg_match( '|/feed/$|i', $_SERVER['REQUEST_URI'] ) === 1) {
+			$is_a_bot_user = true;
+			return true;
+		}
 	}
 
-	// a cron request from a uri?
-	if ( strpos( $_SERVER['REQUEST_URI'], 'wp-cron.php' ) !== false ) {
-		$is_a_bot_user = true;
-		return true;
-	}
+	// user agent checks
+	if ( !empty($_SERVER['HTTP_USER_AGENT']) ) {
+		// even web servers talk to themselves when they think no one is listening
+		if ( (stripos( $_SERVER['HTTP_USER_AGENT'], 'wordpress' ) !== false) ) {
+			$is_a_bot_user = true;
+			return true;
+		}
 
-	// even web servers talk to themselves when they think no one is listening
-	if ( stripos( $_SERVER['HTTP_USER_AGENT'], 'wordpress' ) !== false ) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
-	// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the
-	// string 'bot|spider|crawler|preview' in them, there are bots that don't do us the kindness of identifying themselves as such,
-	// check for the user being logged in in a real user is using a bot to access content from our site
-	if ( ( stripos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
-			|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
-				|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
-					|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'preview' ) !== false )
-						|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'squider' ) !== false )
-							|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'slurp' ) !== false )
-								|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'pinterest.com' ) !== false )
-	) {
-		$is_a_bot_user = true;
-		return true;
+		// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the
+		// string 'bot|spider|crawler|preview' in them, there are bots that don't do us the kindness of identifying themselves as such,
+		// check for the user being logged in in a real user is using a bot to access content from our site
+		if ( ( stripos( $_SERVER['HTTP_USER_AGENT'], 'bot' ) !== false )
+				|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'crawler' ) !== false )
+					|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'spider' ) !== false )
+						|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'preview' ) !== false )
+							|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'squider' ) !== false )
+								|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'slurp' ) !== false )
+									|| ( stripos( $_SERVER['HTTP_USER_AGENT'], 'pinterest.com' ) !== false )
+		) {
+			$is_a_bot_user = true;
+			return true;
+		}
 	}
 
 	// Are we feeding the masses?
@@ -477,7 +525,8 @@ if ( !is_user_logged_in() ) {
  * @since  3.8.13
  */
 function _wpsc_user_hash_meta_key() {
-	$user_hash_meta_key = '_wpsc_' . md5( $_SERVER['REMOTE_ADDR'] .  $_SERVER['HTTP_USER_AGENT'] );
+	$agent = empty( $_SERVER['HTTP_USER_AGENT'] ) ? '(unknown agent)' : $_SERVER['HTTP_USER_AGENT'] ;
+	$user_hash_meta_key = '_wpsc_' . md5( $_SERVER['REMOTE_ADDR'] .  $agent );
 	return $user_hash_meta_key;
 }
 
@@ -556,11 +605,10 @@ function _wpsc_get_customer_wp_user_id() {
 		}
 
 		if ( $users_with_this_login_name_count > 1 ) {
-			bling_log( 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
+			wpsc_doing_it_wrong( __FUNCTION__, 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
 		}
 
 		if ( $users_with_this_login_name_count == 0 ) {
-			//$create_user_result = wp_create_user( $user_name_to_look_for, $password );
 			$user_registered = gmdate('Y-m-d H:i:s');
 			$db_result = $wpdb->insert(
 										$wpdb->users,
@@ -585,16 +633,11 @@ function _wpsc_get_customer_wp_user_id() {
 
 		} elseif ( $users_with_this_login_name_count ) {
 
-			bling_log( 'checking for near user create, ' . $users_with_this_login_name_count . ' users to check');
-
 			$existing_user = false;
 
 			foreach ( $users_with_this_login_name as $user ) {
 
 				$existing_user_to_check = $user->ID;//get_user_by( 'login', $user_name_to_look_for );
-
-				//$wordpress_user = new WP_User( $existing_user_to_check );
-				//bling_log( $wordpress_user );
 
 				if  ( !empty( $user->user_registered ) )
 					$user_registered_time = strtotime( $user->user_registered );
@@ -603,7 +646,6 @@ function _wpsc_get_customer_wp_user_id() {
 
 				$how_long_ago = abs ( time() - $user_registered_time );
 
-				bling_log( 'user id ' . $existing_user_to_check. ' with login ' . $user_name_to_look_for . ' created ' . $how_long_ago . ' seconds ago' );
 				if ( $how_long_ago < 200 ) { // users created with within 20 seconds are treated as this user
 					$existing_user = $existing_user_to_check;
 					break;
@@ -628,7 +670,7 @@ function _wpsc_get_customer_wp_user_id() {
 
 		// if we created a user and the user count count is more than one we should fail this transaction
 		if ( $user_count > 1 && !empty( $create_user_result) ) {
-			bling_log( 'created user ' . $create_user_result . ' but count was ' . $user_count . ', rolling back transaction' );
+			wpsc_doing_it_wrong( __FUNCTION__,  'created user ' . $create_user_result . ' but count was ' . $user_count . ', rolling back transaction');
 			$existing_user = '';
 		}
 
@@ -643,13 +685,9 @@ function _wpsc_get_customer_wp_user_id() {
 				$sql = 'SELECT count(*) FROM ' . $wpdb->users . ' WHERE user_login = "' . $user_name_to_look_for . '"';
 				$user_count = $wpdb->get_var( $sql );
 
-				if ( $user_count == 1) {
-					bling_log( 'One user with login ' . $user_name_to_look_for . ' exists, id is   ' . $existing_user );
-				} else {
-					bling_log( 'CREATE USER ERROR: ' . $user_count . ' user with login ' . $user_name_to_look_for . ' exists, deleting id ' . $create_user_result );
+				if ( $user_count != 1) {
+					wpsc_doing_it_wrong( __FUNCTION__,  'CREATE USER ERROR: ' . $user_count . ' user with login ' . $user_name_to_look_for . ' exists, deleting id ' . $create_user_result );
 					$delete_result = $wpdb->delete( $wpdb->users, array( 'ID' => $create_user_result ) );
-					bling_log( 'CREATE USER ERROR: delete result is '. $delete_result . ' for user id ' . $create_user_result );
-					bling_log( 'existing user: ' . $existing_user );
 					$create_user_result = '';
 					continue;
 				}
@@ -672,35 +710,29 @@ function _wpsc_get_customer_wp_user_id() {
 				// we set the delete ticker low knowing it will be set to a bigger number on the first user
 				// action.  this will cause profiles that only a single page view to be deleted sooner
 				// uncluttering our user table and cache.
-				update_user_meta( $create_user_result, '_wpsc_temporary_profile', 2 );
+				_wpsc_update_customer_last_active( $create_user_result, 2);
 			}
-
 
 			if ( ($users_with_this_login_name_count == 0) && ($user_count == 1) ) {
 				do_action( 'wpsc_created_user_profile', $user_id );
 			}
 
+			// at this point we have identified the user we are looking for, the id is $existing_user
 			$user_id = $existing_user;
-
-			bling_log( 'identified user ' . $user_name_to_look_for . ' with id ' . $existing_user );
-
 		} else {
+			// here we do some cleanup to make sure all of our data is in sync, we'll loop back and try again
 			$result = $wpdb->query('ROLLBACK');
 
 			if ( !empty( $existing_user ) ) {
-				wp_cache_delete($user_id, 'users');
+				wp_cache_delete($existing_user, 'users');
 			}
 
 			if ( !empty( $create_user_result ) ) {
-				wp_cache_delete($user_id, 'users');
+				wp_cache_delete($create_user_result, 'users');
 			}
 
 			if ( !empty( $user_name_to_look_for ) ) {
 				wp_cache_delete($user_name_to_look_for, 'userlogins');
-			}
-
-			if (time_nanosleep(0, 100000000)) {
-				bling_log ( "Slept for one tenth a second after finding login " . $user_name_to_look_for );
 			}
 		}
 
@@ -713,3 +745,49 @@ function _wpsc_get_customer_wp_user_id() {
 	return $user_id;
 
 }
+
+
+/** get the count of posts by the customer
+ * @param string $id
+ * @return unknown
+ */
+function wpsc_customer_post_count( $id = false ) {
+
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	return count_user_posts( $id );
+}
+
+
+/** get the count of comments by the customer
+ * @param string $id
+ * @return unknown
+ */
+function wpsc_customer_comment_count( $id = false ) {
+
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	global $wpdb;
+	$count = $wpdb->get_var('SELECT COUNT(comment_ID) FROM ' . $wpdb->comments. ' WHERE user_id = "' . $id . '"');
+	return $count;
+}
+
+
+/** get the count of purchases by the customer
+ * @param string $id
+ * @return unknown
+ */
+function wpsc_customer_purchase_count( $id = false ) {
+
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	global $wpdb;
+	$count = $wpdb->get_var('SELECT COUNT(user_ID) FROM ' . WPSC_TABLE_PURCHASE_LOGS. ' WHERE user_id = "' . $id . '"');
+	return $count;
+}
+
+
+

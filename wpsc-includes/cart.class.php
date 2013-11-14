@@ -652,7 +652,7 @@ class wpsc_cart {
 
     if(($parameters['quantity'] > 0) && ($this->check_remaining_quantity($product_id, $parameters['variation_values'], $parameters['quantity']) == true)) {
          $new_cart_item = new wpsc_cart_item($product_id,$parameters, $this);
-         do_action('wpsc_set_cart_item' , $product_id , $parameters , $this);
+         do_action('wpsc_set_cart_item' , $product_id , $parameters , $this, $new_cart_item);
          $add_item = true;
          $edit_item = false;
          if((count($this->cart_items) > 0) && ($new_cart_item->is_donation != 1)) {
@@ -660,9 +660,11 @@ class wpsc_cart {
             foreach($this->cart_items as $key => $cart_item) {
                // compare product ids and variations.
                if(($cart_item->product_id == $new_cart_item->product_id) &&
-                 ($cart_item->product_variations == $new_cart_item->product_variations) &&
-                 ($cart_item->custom_message == $new_cart_item->custom_message) &&
-                 ($cart_item->custom_file == $new_cart_item->custom_file)) {
+                  	($cart_item->product_variations == $new_cart_item->product_variations) &&
+                  		($cart_item->custom_message == $new_cart_item->custom_message) &&
+                  			($cart_item->custom_file == $new_cart_item->custom_file) &&
+                  				$cart_item->item_meta_equal($new_cart_item) ) {
+
                   // if they are the same, increment the count, and break out;
                   if(!$updater){
                      $this->cart_items[$key]->quantity  += $new_cart_item->quantity;
@@ -677,7 +679,6 @@ class wpsc_cart {
 
                }
             }
-
          }
 
          // if we are still adding the item, add it

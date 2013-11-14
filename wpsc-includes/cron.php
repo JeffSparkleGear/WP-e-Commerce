@@ -29,18 +29,18 @@ function _wpsc_clear_customer_meta() {
 
 	require_once( ABSPATH . 'wp-admin/includes/user.php' );
 
+	$now = time();
+
+	// find all WPEC temporary users that are ready to delete, doing this as one query saves roundtrips to the database
 	$sql = 'UPDATE ' . $wpdb->usermeta . '
 		SET
-			meta_value =  IF ( CAST( meta_value AS UNSIGNED) > 1, CAST( meta_value AS UNSIGNED) - 1, 0 ),
-			meta_key = IF (meta_value = 0, "_wpsc_temporary_profile_to_delete", meta_key )
+			meta_key = "_wpsc_temporary_profile_to_delete"
 		WHERE
-			meta_key = "_wpsc_temporary_profile"';
-
-	bling_log( $sql );
+			meta_key = "_wpsc_temporary_profile" AND (CAST(meta_value AS UNSIGNED) < ' . $now . ' )';
 
 	$results = $wpdb->query( $sql );
-	bling_log( $results );
 
+	// get the list of all WPEC temporary users that are ready to delete
 	$sql = "
 		SELECT user_id
 		FROM {$wpdb->usermeta}
@@ -49,7 +49,19 @@ function _wpsc_clear_customer_meta() {
 	";
 
 	$ids = $wpdb->get_col( $sql );
+
+	// For each of the ids double check to be sure there isn't any important data associated with the temporary user.
+	// If important data is found the user is no longer temporary.
 	foreach ( $ids as $id ) {
-		wp_delete_user( $id );
+		// for extra safety
+		if ( ( wpsc_customer_purchase_count( $id ) == 0 ) && ( wpsc_customer_post_count( $id ) == 0 ) && ( wpsc_customer_comment_count( $id ) == 0 ) ) {
+			wp_delete_user( $id );
+		} else {
+			// user should not be temporary
+			delete_user_meta( $id, '_wpsc_temporary_profile_to_delete' );
+		}
 	}
 }
+
+
+
