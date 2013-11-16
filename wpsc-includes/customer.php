@@ -26,6 +26,22 @@ function _wpsc_set_customer_cookie( $cookie, $expire ) {
 		$_COOKIE[WPSC_CUSTOMER_COOKIE] = $cookie;
 }
 
+
+/** A string unique to this installation of WPEC that we use to protect customer cookies
+ * @return string a unique key
+ */
+function _wpsc_customer_id_validation_key() {
+
+	$customer_id_validation_key = get_option( 'wpsc_customer_id_validation_key' , false);
+	if ( !$customer_id_validation_key ) {
+		// store a unique string to use as the key, the current PHP session identifier
+		// should be as good as anything else we can come up with
+		update_option( 'wpsc_customer_id_validation_key' , $customer_id_validation_key = session_id() );
+	}
+
+	return $customer_id_validation_key;
+}
+
 /**
  * In case the user is not logged in, create a new user account and store its ID
  * in a cookie
@@ -35,8 +51,12 @@ function _wpsc_set_customer_cookie( $cookie, $expire ) {
  * @return string Customer ID
  */
 function wpsc_create_customer_id() {
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// NOTE: the customer id is statically cached so that if the customer cookie is manipulated
+	// after the id is retrieved the customer id will still remain the same for the remainder
+	// of the request's processing.
 	static $cached_current_customer_id = false;
-	global $wp_roles;
 
 	if ( $cached_current_customer_id === false ) {
 
@@ -60,7 +80,13 @@ function wpsc_create_customer_id() {
 			$id = _wpsc_get_customer_wp_user_id();
 
 			$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
-			$data = $id . $expire;
+			/////////////////////////////////////////////////////////////////////////////////////////
+			// NOTE: a unique string (in this case the php session id) is combined to the data being
+			// hashed so the customer cookie is more difficult to fake.  Brute force sequential
+			// faking of the customer cookie could be used to gain access to the customers profile
+			// data.  The profile data could contain personal information that we don't want exposed.
+			// The session id is stored in the customer profile and used to validate the customer cookie.
+			$data = $id . $expire . _wpsc_customer_id_validation_key();
 			$hash = hash_hmac( 'md5', $data, wp_hash( $data ) );
 			$cookie = $id . '|' . $expire . '|' . $hash;
 
@@ -91,7 +117,14 @@ function wpsc_validate_customer_cookie() {
 
 	$cookie = $_COOKIE[WPSC_CUSTOMER_COOKIE];
 	list( $id, $expire, $hash ) = $x = explode( '|', $cookie );
-	$data = $id . $expire;
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// NOTE: a unique string (in this case the php session id) is combined to the data being
+	// hashed so the customer cookie is more difficult to fake.  Brute force sequential
+	// faking of the customer cookie could be used to gain access to the customers profile
+	// data.  The profile data could contain personal information that we don't want exposed.
+	// The session id is stored in the customer profile and used to validate the customer cookie.
+	$data = $id . $expire . _wpsc_customer_id_validation_key();
 	$hmac = hash_hmac( 'md5', $data, wp_hash( $data ) );
 
 	if ( ($hmac != $hash) || empty( $id ) || !is_numeric($id)) {

@@ -290,7 +290,7 @@ class wpsc_checkout {
      		$billing_country_id = wpsc_get_country_form_id_by_type( 'country' );
 		}
 
-		$saved_form_data = empty( $wpsc_customer_checkout_details[$this->checkout_item->id] ) ? null : $wpsc_customer_checkout_details[$this->checkout_item->id];
+		$saved_form_data = empty( $wpsc_customer_checkout_details[$this->checkout_item->id] ) ?  wpsc_get_customer_meta( $this->checkout_item->unique_name ) : $wpsc_customer_checkout_details[$this->checkout_item->id];
 		$an_array = '';
 		if ( function_exists( 'wpsc_get_ticket_checkout_set' ) ) {
 			if ( $this->checkout_item->checkout_set == wpsc_get_ticket_checkout_set() )
