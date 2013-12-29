@@ -461,7 +461,7 @@ function wpsc_serialize_shopping_cart() {
 
 	return true;
 }
-add_action( 'shutdown', 'wpsc_serialize_shopping_cart' );
+//add_action( 'shutdown', 'wpsc_serialize_shopping_cart' );
 
 /**
  * wpsc_get_page_post_names function.

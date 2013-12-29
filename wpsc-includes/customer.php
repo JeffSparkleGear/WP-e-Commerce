@@ -17,8 +17,9 @@ function _wpsc_update_customer_last_active_wrapper() {
  * @param  int   $expire  Expiration timestamp
  */
 function _wpsc_set_customer_cookie( $cookie, $expire ) {
-	$secure = is_ssl();
-	setcookie( WPSC_CUSTOMER_COOKIE, $cookie, $expire, WPSC_CUSTOMER_COOKIE_PATH, COOKIE_DOMAIN, $secure, true );
+	// we set the cookie to non-secure so that it is available to shoppers on both secure an non-secure pages
+	$secure = false;
+	$success = setcookie( WPSC_CUSTOMER_COOKIE, $cookie, $expire, WPSC_CUSTOMER_COOKIE_PATH, COOKIE_DOMAIN, $secure, true );
 
 	if ( $expire < time() )
 		unset( $_COOKIE[WPSC_CUSTOMER_COOKIE] );
@@ -55,7 +56,6 @@ function wpsc_create_customer_id() {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: the customer id is statically cached so that if the customer cookie is manipulated
 	// after the id is retrieved the customer id will still remain the same for the remainder
-	// of the request's processing.
 	static $cached_current_customer_id = false;
 
 	if ( $cached_current_customer_id === false ) {
@@ -72,9 +72,12 @@ function wpsc_create_customer_id() {
 				} else {
 					$id = $wp_user->ID;
 				}
+
 			} else {
 				$id = $cached_bot_user_id;
 			}
+
+			$cached_current_customer_id = $id;
 
 		} else {
 			$id = _wpsc_get_customer_wp_user_id();
@@ -95,6 +98,10 @@ function wpsc_create_customer_id() {
 		}
 
 		$cached_current_customer_id = $id;
+	}
+
+	if ( ( $current_user_id = get_current_user_id() ) !== 0 ) {
+		return $current_user_id;
 	}
 
 	return $cached_current_customer_id;
@@ -156,22 +163,29 @@ function wpsc_validate_customer_cookie() {
  * @return mixed        User ID (if logged in) or customer cookie ID
  */
 function wpsc_get_current_customer_id() {
+	static $cached_customer_id = false;
 
-	// if the user is logged in and the cookie is still there, delete the cookie
-	if ( is_user_logged_in() && isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) )
-		_wpsc_set_customer_cookie( '', time() - 3600 );
+	if ( $cached_customer_id === false ) {
 
-	// if the user is logged in we use the user id
-	if ( is_user_logged_in() ) {
-		return get_current_user_id();
-	} elseif ( isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
-		// check the customer cookie, get the id, or if that doesn't work move on and create the user
-		$id = wpsc_validate_customer_cookie();
-		if ( $id != false )
-			return $id;
+		// if the user is logged in we use the user id
+		if ( is_user_logged_in() ) {
+			$cached_customer_id = get_current_user_id();
+		} elseif ( isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
+			// check the customer cookie, get the id, or if that doesn't work move on and create the user
+			$id = wpsc_validate_customer_cookie();
+			if ( $id != false ) {
+				$cached_customer_id = $id;
+			}
+		}
+
+		if ( $cached_customer_id == false ) {
+			$cached_customer_id = wpsc_create_customer_id();
+		}
+
+		do_action( 'wpsc_have_customer_id', $cached_customer_id );
 	}
 
-	return wpsc_create_customer_id();
+	return $cached_customer_id;
 }
 
 /**
@@ -240,7 +254,19 @@ function wpsc_delete_customer_meta( $key, $id = false ) {
 	if ( ! $id )
 		$id = wpsc_get_current_customer_id();
 
-	return delete_user_meta( $id, _wpsc_get_customer_meta_key( $key ) );
+	$success = delete_user_meta( $id, _wpsc_get_customer_meta_key( $key ) );
+
+	// notification when any meta item has changed
+	if ( $success && has_action( $action = 'wpsc_deleted_customer_meta' ) ) {
+		do_action( $action, $key, $id );
+	}
+
+	// notification when a specific meta item has changed
+	if ( $success && has_action( $action = 'wpsc_deleted_customer_meta_' . $key  ) ) {
+		do_action( $action, $key, $id );
+	}
+
+	return $success;
 }
 
 /**
@@ -258,7 +284,19 @@ function wpsc_update_customer_meta( $key, $value, $id = false ) {
 	if ( ! $id )
 		$id = wpsc_get_current_customer_id();
 
-	return update_user_meta( $id, _wpsc_get_customer_meta_key( $key ), $value );
+	$success = update_user_meta( $id, _wpsc_get_customer_meta_key( $key ), $value );
+
+	// notification when any meta item has changed
+	if ( $success && has_action( $action = 'wpsc_updated_customer_meta' ) ) {
+		do_action( $action, $value, $key, $id );
+	}
+
+	// notification when a specific meta item has changed
+	if ( $success && has_action( $action = 'wpsc_updated_customer_meta_' . $key  ) ) {
+		do_action( $action, $value, $key, $id );
+	}
+
+	return $success;
 }
 
 /**
@@ -299,7 +337,19 @@ function wpsc_get_customer_meta( $key = '', $id = false ) {
 	if ( ! $id )
 		$id = wpsc_get_current_customer_id();
 
-	return get_user_meta( $id, _wpsc_get_customer_meta_key( $key ), true );
+	$meta_value = get_user_meta( $id, _wpsc_get_customer_meta_key( $key ), true );
+
+	// notification when any meta item has changed
+	if ( has_filter( $filter = 'wpsc_get_customer_meta' ) ) {
+		$meta_value = apply_filters( $filter,  $meta_value, $key, $id );
+	}
+
+	// notification when a specific meta item has changed
+	if ( has_filter( $filter = 'wpsc_get_customer_meta_' . $key  ) ) {
+		$meta_value = apply_filters( $filter,  $meta_value, $key, $id );
+	}
+
+	return $meta_value;
 }
 
 /**
@@ -323,12 +373,23 @@ function wpsc_get_all_customer_meta( $id = false ) {
 
 	$return = array();
 
+	// if a meta item is being aliases or emulated this gives the logic the chance to adjust the keys and values
+	// in bulk
+	if ( has_filter( 'wpsc_get_all_customer_meta' ) ) {
+		$meta = apply_filters( 'wpsc_get_all_customer_meta', $meta , $id );
+	}
+
 	foreach ( $meta as $key => $value ) {
 		if ( strpos( $key, $key_pattern ) === FALSE )
 			continue;
 
 		$short_key = str_replace( $key_pattern, '', $key );
 		$return[$short_key] = $value[0];
+
+		// notification when a specific meta item has changed
+		if ( has_filter( $filter = 'wpsc_get_customer_meta_' . $short_key  ) ) {
+			$return[$short_key] = apply_filters( $filter,  $return[$short_key], $short_key, $id );
+		}
 	}
 
 	return $return;
@@ -356,6 +417,28 @@ function wpsc_get_customer_cart( $id = false  ) {
 
 	return $cart;
 }
+
+
+function wpsc_update_customer_cart( $id = false, $cart ) {
+	global $wpdb, $wpsc_start_time, $wpsc_cart;
+
+	if ( !is_a( $cart,'wpsc_cart' ) )
+		return false;
+
+	if ( $id == wpsc_get_current_customer_id() ) {
+		$wpsc_cart = $cart;
+	}
+
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	wpsc_update_customer_meta( 'cart', base64_encode( serialize( $cart ) ) , $id );
+
+	$wpsc_cart->clear_cache(); // do this to fire off actions that happen when a cart is changed
+
+	return true;
+}
+
 
 
 function _wpsc_user_has_role( $roles, $id = false ) {
@@ -396,25 +479,32 @@ function _wpsc_user_has_role( $roles, $id = false ) {
  * @access private
  * @since  3.8.13
  */
-function _wpsc_update_customer_last_active( $hours = 48 ) {
-	$id = wpsc_get_current_customer_id();
-	update_user_meta( $id, '_wpsc_last_active', time() );
+function _wpsc_update_customer_last_active( $hours = 48, $id = false ) {
 
-	if ( _wpsc_user_has_role( $id ,  'wpsc_anonymous' ) ) {
+	if ( ! $id )
+		$id = wpsc_get_current_customer_id();
+
+	wpsc_update_customer_meta( 'last_active', time(), $id );
+
+	if ( _wpsc_user_has_role(  'wpsc_anonymous', $id  ) ) {
 		// handle the expiration of the temporary customer profiles
-		$current_expire_time = get_user_meta( $id, '_wpsc_temporary_profile', true );
+		$current_expire_time = wpsc_get_customer_meta( 'temporary_profile', $id,  true );
 		if ( empty( $current_expire_time ) )
 			$current_expire_time = 0;
 
 		$keep_profile_until = time() +  $hours * 60 * 60;
 
-		// if the expire time is being advanced by more htan an hour do the update, otherwise
+		// if the expire time is being advanced by more than an hour do the update, otherwise
 		// don't do anything.  No reason to have another database hit on every http request!
 		if ( ($keep_profile_until - $current_expire_time) > 3600 ) {
-			update_user_meta( $id, '_wpsc_temporary_profile', $keep_profile_until );
+			wpsc_update_customer_meta( 'temporary_profile', $keep_profile_until,  $id );
 		}
 	} else {
-		delete_user_meta( $id, '_wpsc_temporary_profile' );
+		$temp_value = wpsc_get_customer_meta( 'temporary_profile', $id );
+		if ( !empty( $temp_value ) ) {
+			bling_log( 'Delete _wpsc_temporary_profile for user id ' . $id );
+			wpsc_delete_customer_meta( 'temporary_profile', $id );
+		}
 	}
 }
 
@@ -429,12 +519,8 @@ function wpsc_is_bot_user() {
 
 	static $is_a_bot_user = null;
 
-	if ( $is_a_bot_user !== null )
+	if ( $is_a_bot_user !== null ) {
 		return $is_a_bot_user;
-
-	if ( is_404() ) {
-		$is_a_bot_user = true;
-		return true;
 	}
 
 	if ( is_user_logged_in() ) {
@@ -499,13 +585,6 @@ function wpsc_is_bot_user() {
 			return true;
 		}
 	}
-
-	// Are we feeding the masses?
-	if ( is_feed() ) {
-		$is_a_bot_user = true;
-		return true;
-	}
-
 
 	$hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 	if ( ( stripos( $hostname, 'search.msn.com' ) !== false )
@@ -622,6 +701,9 @@ function _wpsc_get_customer_wp_user_id() {
 	$existing_user			= false;
 	$create_user_result     = '';
 
+	if ( is_user_logged_in() && ( $current_user_id = get_current_user_id() ) !== 0 ) {
+		return $current_user_id;
+	}
 
 	while( $user_id === false) {
 
@@ -638,7 +720,7 @@ function _wpsc_get_customer_wp_user_id() {
 		}
 
 		if ( $users_with_this_login_name_count > 1 ) {
-			wpsc_doing_it_wrong( __FUNCTION__, 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
+			;//_wpsc_doing_it_wrong( __FUNCTION__, 'Too many users with the login '. $user_name_to_look_for . ' loop count is: ' . $avoid_infinite_loop );
 		}
 
 		if ( $users_with_this_login_name_count == 0 ) {
@@ -703,7 +785,6 @@ function _wpsc_get_customer_wp_user_id() {
 
 		// if we created a user and the user count count is more than one we should fail this transaction
 		if ( $user_count > 1 && !empty( $create_user_result) ) {
-			wpsc_doing_it_wrong( __FUNCTION__,  'created user ' . $create_user_result . ' but count was ' . $user_count . ', rolling back transaction');
 			$existing_user = '';
 		}
 
@@ -719,7 +800,6 @@ function _wpsc_get_customer_wp_user_id() {
 				$user_count = $wpdb->get_var( $sql );
 
 				if ( $user_count != 1) {
-					wpsc_doing_it_wrong( __FUNCTION__,  'CREATE USER ERROR: ' . $user_count . ' user with login ' . $user_name_to_look_for . ' exists, deleting id ' . $create_user_result );
 					$delete_result = $wpdb->delete( $wpdb->users, array( 'ID' => $create_user_result ) );
 					$create_user_result = '';
 					continue;
@@ -738,12 +818,12 @@ function _wpsc_get_customer_wp_user_id() {
 
 				$wordpress_user->set_role( 'wpsc_anonymous' );
 
-				update_user_meta( $create_user_result, '_wpsc_last_active', time() );
+				wpsc_update_customer_meta( 'last_active', time(), $create_user_result );
 
 				// we set the delete ticker low knowing it will be set to a bigger number on the first user
 				// action.  this will cause profiles that only a single page view to be deleted sooner
 				// uncluttering our user table and cache.
-				_wpsc_update_customer_last_active( $create_user_result, 2);
+				_wpsc_update_customer_last_active( 2, $create_user_result );
 			}
 
 			if ( ($users_with_this_login_name_count == 0) && ($user_count == 1) ) {
@@ -822,5 +902,29 @@ function wpsc_customer_purchase_count( $id = false ) {
 	return $count;
 }
 
+wpsc_get_current_customer_id();
 
+function _wpsc_copy_cart_from_anonymous_user() {
 
+	// if the user is logged in and the cookie is still there, delete the cookie
+	if ( is_user_logged_in() && isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
+
+		// if the cart from the wpec customer cookie has items, and the cart
+		// for the wordpressd user is empty, copy the cart over so the shopper
+		// does not use thier work if they register before checking out
+		$anonymous_id = wpsc_validate_customer_cookie();
+		$wp_id = get_current_user_id();
+
+		if ( $anonymous_id ) {
+			$anonymous_cart = wpsc_get_customer_cart( $anonymous_id );
+			$wp_cart = wpsc_get_customer_cart( $wp_id );
+			if ( $anonymous_cart->cart_item_count && !$wp_cart->cart_item_count ) {
+				wpsc_update_customer_cart( $wp_id, $anonymous_cart );
+			}
+		}
+
+		_wpsc_set_customer_cookie( '', time() - 3600 );
+	}
+}
+
+add_action( 'wpsc_init', '_wpsc_copy_cart_from_anonymous_user' );

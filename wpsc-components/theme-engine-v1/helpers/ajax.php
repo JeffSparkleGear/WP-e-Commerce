@@ -334,7 +334,7 @@ function wpsc_update_item_quantity() {
 		}
 	}
 	$die = ! ( ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'true' == $_REQUEST['wpsc_ajax_action'] ) || ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) );
-
+	wpsc_serialize_shopping_cart();
 	_wpsc_ajax_get_cart( $die );
 }
 
@@ -935,6 +935,7 @@ function wpsc_change_tax() {
 	echo json_encode( $json_response );
 	exit();
 }
+
 function _wpsc_change_profile_country() {
 	global $wpdb;
 

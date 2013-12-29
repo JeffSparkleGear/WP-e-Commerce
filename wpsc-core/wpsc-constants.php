@@ -254,13 +254,14 @@ function wpsc_core_constants_uploads() {
 function wpsc_core_setup_cart() {
 	if ( 2 == get_option( 'cart_location' ) )
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
-
 	$cart = maybe_unserialize( base64_decode( wpsc_get_customer_meta( 'cart' ) ) );
-
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
 		$GLOBALS['wpsc_cart'] = $cart;
 	else
 		$GLOBALS['wpsc_cart'] = new wpsc_cart();
+
+	add_action( 'shutdown', 'wpsc_serialize_shopping_cart' );
+
 }
 
 /**
@@ -273,7 +274,6 @@ function wpsc_core_setup_cart() {
  */
 function wpsc_recalc_cart_shipping() {
 	global $wpsc_cart;
-
 	$wpsc_cart->get_shipping_method();
 }
 
@@ -289,7 +289,6 @@ add_action ( 'init', 'wpsc_recalc_cart_shipping', PHP_INT_MAX );
  */
 function wpsc_core_setup_globals() {
 	global $wpsc_query_vars, $wpsc_cart, $wpec_ash;
-
 	// Setup some globals
 	$wpsc_query_vars = array();
     require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');

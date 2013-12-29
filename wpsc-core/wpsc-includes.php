@@ -2,15 +2,14 @@
 
 if ( defined( 'WPEC_LOAD_DEPRECATED' ) )
 	require_once( WPSC_FILE_PATH . '/wpsc-core/wpsc-deprecated.php' );
-
 // Start including the rest of the plugin here
+require_once( WPSC_FILE_PATH . '/wpsc-includes/cart.class.php'                      );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/customer.php'                       );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/product-template.php'                );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/variations.class.php'                );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/ajax.functions.php'                  );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/misc.functions.php'                  );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/mimetype.php'                        );
-require_once( WPSC_FILE_PATH . '/wpsc-includes/cart.class.php'                      );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/cart-item.class.php'                 );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/checkout.class.php'                  );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/display.functions.php'               );
@@ -30,7 +29,6 @@ require_once( WPSC_FILE_PATH . '/wpsc-includes/purchase-log-notification.class.p
 require_once( WPSC_FILE_PATH . '/wpsc-includes/purchase-log.class.php'              );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/checkout-form.class.php'             );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/checkout-form-data.class.php'        );
-
 // Taxes
 require_once( WPSC_FILE_PATH . '/wpsc-taxes/taxes_module.php' );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/upgrades.php' );
@@ -58,5 +56,4 @@ if ( is_admin() )
 	include_once( WPSC_FILE_PATH . '/wpsc-admin/admin.php' );
 
 require_once( WPSC_FILE_PATH . '/wpsc-includes/cron.php' );
-
 ?>

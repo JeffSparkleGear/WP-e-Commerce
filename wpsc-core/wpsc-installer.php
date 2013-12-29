@@ -30,6 +30,11 @@ function wpsc_auto_update() {
 }
 
 function wpsc_install() {
+
+	$already_done = get_transient( __FUNCTION__ . '-done' );
+	if ( $already_done )
+		return;
+
 	global $wpdb, $user_level, $wp_rewrite, $wp_version, $wpsc_page_titles;
 
 	$table_name    = $wpdb->prefix . "wpsc_product_list";
@@ -325,6 +330,8 @@ You ordered these items:
 		wpsc_update_categorymeta( $category_id, 'order', '0' );
 	}
 	flush_rewrite_rules( false );
+
+	set_transient( __FUNCTION__ . '-done' , $time() , 60*60 );
 }
 
 function wpsc_product_files_htaccess() {

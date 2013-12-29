@@ -27,6 +27,7 @@ function wpsc_clear_stock_claims() {
 function _wpsc_clear_customer_meta() {
 	global $wpdb;
 
+	bling_log( __FUNCTION__ );
 	require_once( ABSPATH . 'wp-admin/includes/user.php' );
 
 	$now = time();
@@ -36,9 +37,10 @@ function _wpsc_clear_customer_meta() {
 		SET
 			meta_key = "_wpsc_temporary_profile_to_delete"
 		WHERE
-			meta_key = "_wpsc_temporary_profile" AND (CAST(meta_value AS UNSIGNED) < ' . $now . ' )';
+			meta_key = "' .  _wpsc_get_customer_meta_key( 'temporary_profile' ) . '" AND (CAST(meta_value AS UNSIGNED) < ' . $now . ' )';
 
 	$results = $wpdb->query( $sql );
+
 
 	// get the list of all WPEC temporary users that are ready to delete
 	$sql = "
@@ -55,13 +57,13 @@ function _wpsc_clear_customer_meta() {
 	foreach ( $ids as $id ) {
 		// for extra safety
 		if ( ( wpsc_customer_purchase_count( $id ) == 0 ) && ( wpsc_customer_post_count( $id ) == 0 ) && ( wpsc_customer_comment_count( $id ) == 0 ) ) {
+			bling_log( 'Deleting user ID ' . $id );
 			wp_delete_user( $id );
+			delete_user_meta( $id, '_wpsc_temporary_profile_to_delete' ); // just in case of orphaned meta
 		} else {
 			// user should not be temporary
 			delete_user_meta( $id, '_wpsc_temporary_profile_to_delete' );
 		}
 	}
 }
-
-
 

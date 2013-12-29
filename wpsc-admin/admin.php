@@ -1152,7 +1152,7 @@ add_filter( 'favorite_actions', 'wpsc_fav_action' );
 function wpsc_admin_enqueue_user_dynamic() {
 
 	$version_identifier = WPSC_VERSION . "." . WPSC_MINOR_VERSION;
-	wp_enqueue_script( 'wp-e-commerce-dynamic', WPSC_CORE_JS_URL . '/wpsc-user-dynamic.js', false,  $version_identifier );
+	wp_enqueue_script( 'wp-e-commerce-dynamic', WPSC_CORE_JS_URL . '/wpsc-user-dynamic.js',  array('jquery'),  $version_identifier, true );
 
 	$user_dynamic_data = array(
 			'ajaxurl'             => admin_url( 'admin-ajax.php' ),
