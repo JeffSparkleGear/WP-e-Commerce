@@ -17,6 +17,7 @@ add_filter( 'post_type_link', 'wpsc_product_link', 10, 3 );
  */
 function wpsc_product_link( $permalink, $post, $leavename ) {
 	global $wp_query, $wpsc_page_titles, $wpsc_query, $wp_current_filter;
+
 	$rewritecode = array(
 		'%wpsc_product_category%',
 		$leavename ? '' : '%postname%',
@@ -34,6 +35,19 @@ function wpsc_product_link( $permalink, $post, $leavename ) {
 	// Fixes http://code.google.com/p/wp-e-commerce/issues/detail?id=271
 	if ($post->post_type != 'wpsc-product')
 		return $permalink;
+
+	// Return permalink to parent product when a permalink is requested for a child product
+	if ( ($post->post_status = 'inherit') && ($post->post_parent != 0) ) {
+		$post_id = $post->post_parent;
+		$post = get_post( $post_id );
+	}
+
+	$cached_permalink = false ;//get_transient( 'wpsc_product_permalink-' . $post_id  );
+	if ( $cached_permalink !== false ) {
+		$permalink = apply_filters( 'wpsc_product_permalink', $cached_permalink, $post->ID );
+		//bling_log( 'found cached permalink' );
+		return $permalink;
+	}
 
 	$permalink_structure = get_option( 'permalink_structure' );
 
@@ -109,7 +123,11 @@ function wpsc_product_link( $permalink, $post, $leavename ) {
 
 		$permalink = home_url( $permalink );
 	}
-	return apply_filters( 'wpsc_product_permalink', $permalink, $post->ID );
+
+	$permalink = apply_filters( 'wpsc_product_permalink', $permalink, $post->ID );
+	//set_transient( 'wpsc_product_permalink-' . $post_id , $permalink, 60*60*24 );
+	//bling_log( 'saved permalink' );
+	return $permalink;
 }
 
 /**

@@ -448,7 +448,7 @@ class wpsc_cart {
    * @access public
    */
   function get_shipping_method() {
-      global $wpdb, $wpsc_shipping_modules;
+      global $wpdb, $wpsc_shipping_modules,$wpsc_cart;
       // Reset all the shipping data in case the destination has changed
       $this->selected_shipping_method = null;
       $this->selected_shipping_option = null;
@@ -458,13 +458,25 @@ class wpsc_cart {
       $this->shipping_quotes = array();
       $this->shipping_quote = null;
       $this->shipping_method_count = 0;
-     // set us up with a shipping method.
+
+      do_action( 'wpsc_before_get_shipping_method' );
+
+
+      $shippingfirstname = wpsc_get_customer_meta( 'shippingfirstname');
+      $shippinglastname = wpsc_get_customer_meta( 'shippinglastname');
+      $shippingaddress = wpsc_get_customer_meta( 'shippingaddress');
+      $shippingcity = wpsc_get_customer_meta( 'shippingcity');
+      $shippingpostcode = wpsc_get_customer_meta( 'shippingpostcode');
+
+      $have_minimum_shipping_fields = !( empty($shippingfirstname) || empty($shippinglastname) || empty($shippingaddress) || empty($shippingcity) || empty($shippingpostcode) );
+
+      // set us up with a shipping method.
      $custom_shipping = get_option('custom_shipping_options');
 
      $this->shipping_methods = get_option('custom_shipping_options');
      $this->shipping_method_count = count($this->shipping_methods);
 
-      if((get_option('do_not_use_shipping') != 1) && (count($this->shipping_methods) > 0)  ) {
+      if((get_option('do_not_use_shipping') != 1) && (count($this->shipping_methods) > 0)  && $have_minimum_shipping_fields ) {
          $shipping_quotes = null;
          if($this->selected_shipping_method != null) {
             // use the selected shipping module
@@ -499,6 +511,8 @@ class wpsc_cart {
             }
          }
       }
+
+      do_action( 'wpsc_after_get_shipping_method' );
   }
 
   /**
@@ -520,7 +534,8 @@ class wpsc_cart {
       }
 
       if(($this->shipping_quotes != null) && (array_search($this->selected_shipping_option, array_keys($this->shipping_quotes)) === false)) {
-         $this->selected_shipping_option = apply_filters ( 'wpsc_default_shipping_quote', array_pop( array_keys( array_slice ($this->shipping_quotes, 0, 1 ) ) ), $this->shipping_quotes );
+      	$keys = array_keys( $this->shipping_quotes );
+         $this->selected_shipping_option = apply_filters ( 'wpsc_default_shipping_quote', $keys[0], $this->shipping_quotes );
       }
   }
 
@@ -637,7 +652,7 @@ class wpsc_cart {
 
     if(($parameters['quantity'] > 0) && ($this->check_remaining_quantity($product_id, $parameters['variation_values'], $parameters['quantity']) == true)) {
          $new_cart_item = new wpsc_cart_item($product_id,$parameters, $this);
-         do_action('wpsc_set_cart_item' , $product_id , $parameters , $this);
+         do_action('wpsc_set_cart_item' , $product_id , $parameters , $this, $new_cart_item);
          $add_item = true;
          $edit_item = false;
          if((count($this->cart_items) > 0) && ($new_cart_item->is_donation != 1)) {
@@ -645,9 +660,11 @@ class wpsc_cart {
             foreach($this->cart_items as $key => $cart_item) {
                // compare product ids and variations.
                if(($cart_item->product_id == $new_cart_item->product_id) &&
-                 ($cart_item->product_variations == $new_cart_item->product_variations) &&
-                 ($cart_item->custom_message == $new_cart_item->custom_message) &&
-                 ($cart_item->custom_file == $new_cart_item->custom_file)) {
+                  	($cart_item->product_variations == $new_cart_item->product_variations) &&
+                  		($cart_item->custom_message == $new_cart_item->custom_message) &&
+                  			($cart_item->custom_file == $new_cart_item->custom_file) &&
+                  				$cart_item->item_meta_equal($new_cart_item) ) {
+
                   // if they are the same, increment the count, and break out;
                   if(!$updater){
                      $this->cart_items[$key]->quantity  += $new_cart_item->quantity;
@@ -662,7 +679,6 @@ class wpsc_cart {
 
                }
             }
-
          }
 
          // if we are still adding the item, add it

@@ -290,7 +290,7 @@ class wpsc_checkout {
      		$billing_country_id = wpsc_get_country_form_id_by_type( 'country' );
 		}
 
-		$saved_form_data = empty( $wpsc_customer_checkout_details[$this->checkout_item->id] ) ? null : $wpsc_customer_checkout_details[$this->checkout_item->id];
+		$saved_form_data = empty( $wpsc_customer_checkout_details[$this->checkout_item->id] ) ?  wpsc_get_customer_meta( $this->checkout_item->unique_name ) : $wpsc_customer_checkout_details[$this->checkout_item->id];
 		$an_array = '';
 		if ( function_exists( 'wpsc_get_ticket_checkout_set' ) ) {
 			if ( $this->checkout_item->checkout_set == wpsc_get_ticket_checkout_set() )
@@ -301,6 +301,27 @@ class wpsc_checkout {
 		$billing_country  = wpsc_get_customer_meta( 'billing_country'  );
 		$delivery_region  = wpsc_get_customer_meta( 'shipping_region'  );
 		$billing_region   = wpsc_get_customer_meta( 'billing_region'   );
+
+		if ( empty( $delivery_country ) ) {
+			$delivery_country = get_option( 'base_country' );
+			wpsc_update_customer_meta( 'shipping_country', $delivery_country );
+		}
+
+		if ( empty( $delivery_region ) ) {
+			$delivery_region = get_option( 'base_region' );
+			wpsc_update_customer_meta( 'shipping_region', $delivery_region  );
+		}
+
+		if ( empty( $billing_country ) ) {
+			$billing_country = get_option( 'base_country' );
+			wpsc_update_customer_meta( 'billing_country', $billing_country );
+		}
+
+		if ( empty( $billing_region ) ) {
+			$billing_region = get_option( 'base_region' );
+			wpsc_update_customer_meta( 'billing_region', $billing_region  );
+		}
+
 		switch ( $this->checkout_item->type ) {
 			case "address":
 			case "delivery_address":
@@ -329,11 +350,11 @@ class wpsc_checkout {
 				break;
 
 			case "delivery_country":
-				if ( wpsc_uses_shipping ( ) ) {
+				if ( !wpsc_uses_shipping ( ) ) {
 					$country_name = $wpdb->get_var( $wpdb->prepare( "SELECT `country` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `isocode`= %s LIMIT 1", $delivery_country ) );
 					$output = "<input title='" . $this->checkout_item->unique_name . "' type='hidden' id='" . $this->form_element_id() . "' class='shipping_country' name='collected_data[{$this->checkout_item->id}]' value='" . esc_attr( $delivery_country ) . "' size='4' /><span class='shipping_country_name'>" . $country_name . "</span> ";
 				} else {
-					$checkoutfields = true;
+					$checkoutfields = true; // TODO: what's this all about????? change to false to get array name on form $checkoutfields = true;
 					$output = wpsc_country_region_list( $this->checkout_item->id, false, $delivery_country, $delivery_region, $this->form_element_id(), $checkoutfields );
 				}
 				break;
@@ -370,7 +391,8 @@ class wpsc_checkout {
 			default:
 				$placeholder = apply_filters( 'wpsc_checkout_field_placeholder', apply_filters( 'wpsc_checkout_field_name', $this->checkout_item->name ), $this->checkout_item );
 				if ( $this->checkout_item->unique_name == 'shippingstate' ) {
-					if ( wpsc_uses_shipping() && wpsc_has_regions($delivery_country) ) {
+					//if ( wpsc_uses_shipping() && wpsc_has_regions($delivery_country) ) {
+					if ( wpsc_has_regions($delivery_country) ) {
 						$region_name = $wpdb->get_var( $wpdb->prepare( "SELECT `name` FROM `" . WPSC_TABLE_REGION_TAX . "` WHERE `id`= %d LIMIT 1", $delivery_region ) );
 						$output = "<input title='" . $this->checkout_item->unique_name . "' type='hidden' id='" . $this->form_element_id() . "' class='shipping_region' name='collected_data[{$this->checkout_item->id}]' placeholder='" . esc_attr( $placeholder ) . "' value='" . esc_attr( $delivery_region ) . "' size='4' /><span class='shipping_region_name'>" . esc_html( $region_name ) . "</span> ";
 					} else {

@@ -45,13 +45,11 @@ class WP_eCommerce {
 	function init() {
 		// Previous to initializing
 		do_action( 'wpsc_pre_init' );
-
 		// Initialize
 		$this->start();
 		$this->constants();
 		$this->includes();
 		$this->load();
-
 		// Finished initializing
 		do_action( 'wpsc_init' );
 	}
@@ -122,8 +120,6 @@ class WP_eCommerce {
 		$wpdb->wpsc_also_bought         = WPSC_TABLE_ALSO_BOUGHT;
 		$wpdb->wpsc_region_tax          = WPSC_TABLE_REGION_TAX;
 		$wpdb->wpsc_coupon_codes        = WPSC_TABLE_COUPON_CODES;
-		$wpdb->wpsc_visitormeta         = WPSC_TABLE_VISITOR_META; // required for _get_meta_table()
-		$wpdb->wpsc_visitor_meta        = WPSC_TABLE_VISITOR_META;
 		$wpdb->wpsc_cart_contents       = WPSC_TABLE_CART_CONTENTS;
 		$wpdb->wpsc_claimed_stock       = WPSC_TABLE_CLAIMED_STOCK;
 		$wpdb->wpsc_currency_list       = WPSC_TABLE_CURRENCY_LIST;
@@ -189,6 +185,7 @@ class WP_eCommerce {
 		require_once( WPSC_FILE_PATH . '/wpsc-core/wpsc-includes.php' );
 
 		$this->components = apply_filters( 'wpsc_components', $this->components );
+		unset( $this->components['marketplace'] );
 
 		foreach ( $this->components as $type => $registered ) {
 			foreach ( $registered as $component ) {

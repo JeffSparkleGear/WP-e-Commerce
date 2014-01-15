@@ -13,7 +13,7 @@ function wpsc_core_load_session() {
 	if ( ! isset( $_SESSION ) )
 		$_SESSION = null;
 
-	if ( session_id() != '' )
+	if ( session_status() !== PHP_SESSION_ACTIVE && session_id() != '' )
 		session_start();
 
 	return;
@@ -162,7 +162,6 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_REGION_TAX',             "{$wp_table_prefix}wpsc_region_tax" );
 
 	define( 'WPSC_TABLE_CART_ITEM_META',         "{$wp_table_prefix}wpsc_cart_item_meta" );
-	define( 'WPSC_TABLE_VISITOR_META',           "{$wp_table_prefix}wpsc_visitor_meta" );
 }
 
 /**
@@ -255,16 +254,31 @@ function wpsc_core_constants_uploads() {
 function wpsc_core_setup_cart() {
 	if ( 2 == get_option( 'cart_location' ) )
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
-
-	$cart = maybe_unserialize( wpsc_get_customer_data( 'cart' ) );
-
+	$cart = maybe_unserialize( base64_decode( wpsc_get_customer_meta( 'cart' ) ) );
 	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
 		$GLOBALS['wpsc_cart'] = $cart;
 	else
 		$GLOBALS['wpsc_cart'] = new wpsc_cart();
 
-	$GLOBALS['wpsc_cart']->get_shipping_method();
+	add_action( 'shutdown', 'wpsc_serialize_shopping_cart' );
+
 }
+
+/**
+ * wpsc_recalc_cart_shipping()
+ *
+ * The cart was setup at the beginning of the init sequence, and that's
+ * too early to do shipping calculations because custom taxonomies, types
+ * and other plugins may not have been initialized.  So we save the shipping
+ * method initialization for the end of the init sequence.
+ */
+function wpsc_recalc_cart_shipping() {
+	global $wpsc_cart;
+	$wpsc_cart->get_shipping_method();
+}
+
+add_action ( 'init', 'wpsc_recalc_cart_shipping', PHP_INT_MAX );
+
 
 /***
  * wpsc_core_setup_globals()
@@ -275,7 +289,6 @@ function wpsc_core_setup_cart() {
  */
 function wpsc_core_setup_globals() {
 	global $wpsc_query_vars, $wpsc_cart, $wpec_ash;
-
 	// Setup some globals
 	$wpsc_query_vars = array();
     require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');

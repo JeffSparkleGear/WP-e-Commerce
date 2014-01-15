@@ -8,7 +8,7 @@
  * @since 3.8.13
  */
 
-jQuery.noConflict();
+//jQuery.noConflict();
 
 /* For backwards compatibility we are assigning the 'var' values from the structure created
  * with wp_localize_script

@@ -890,3 +890,4 @@ function wpsc_show_terms_and_conditions() {
 	echo wpautop( wp_kses_post( get_option( 'terms_and_conditions' ) ) );
 	die();
 }
+

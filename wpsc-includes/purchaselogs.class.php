@@ -169,7 +169,7 @@ function wpsc_the_purchaselog_item() {
 
 function wpsc_purchaselog_details_SKU() {
    global $purchlogitem;
-   $meta_value = wpsc_get_cartmeta( $purchlogitem->purchitem->id, 'sku' );
+   $meta_value = wpsc_get_cart_item_meta( $purchlogitem->purchitem->id, 'sku', true );
    if ( $meta_value != null ) {
 	  return esc_attr( $meta_value );
    } else {
@@ -346,6 +346,10 @@ function wpsc_display_purchlog_buyers_state_and_postcode() {
 		 $state = wpsc_get_region($purchlogitem->extrainfo->billing_region);
    else
 		 $state = $purchlogitem->userinfo['billingstate']['value'];
+
+   if ( is_numeric( $state ) ) {
+   	$state = wpsc_get_region( intval($state) );
+   }
 
    $output = esc_html( $state );
 

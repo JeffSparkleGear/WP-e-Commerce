@@ -3,6 +3,11 @@
  * SVN : UPS Trunk :
  * Version : 1.1.0 : December 21, 2010
  */
+
+
+add_filter('https_ssl_verify', '__return_false');
+add_filter('https_local_ssl_verify', '__return_false');
+
 class ash_ups {
 	var $internal_name, $name;
 	var $service_url = "";
@@ -14,7 +19,7 @@ class ash_ups {
 	function ash_ups () {
 		global $wpec_ash;
 		$this->internal_name = "ups";
-		$this->name = _x( "UPS", 'Shipping Module', 'wpsc' );
+		$this->name = 'UPS';
 		$this->is_external = true;
 		$this->requires_curl = true;
 		$this->requires_weight = true;
@@ -546,6 +551,7 @@ class ash_ups {
 
 	private function _makeRateRequest( $message ){
 		// Make the XML request to the server and retrieve the response
+		/*
 		$ch = curl_init();
 
 		curl_setopt( $ch, CURLOPT_URL, $this->service_url );
@@ -555,6 +561,32 @@ class ash_ups {
 
 		$data = curl_exec( $ch );
 		curl_close( $ch );
+		if ( $data == false ) {
+			$data = curl_error ( $ch );
+		}
+		*/
+
+
+		$args = array(
+				'method' => 'POST',
+				'timeout' => 45,
+				'redirection' => 5,
+				'httpversion' => '1.0',
+				'blocking' => true,
+				'headers' => array(),
+				'body' => $message,
+				'cookies' => array()
+		);
+
+		$result = wp_remote_post( $this->service_url, $args );
+
+		//file_put_contents("h:/msg.xml", $message);
+
+		if ( $result['response']['code'] == 200 )
+			$data = $result['body'];
+		else
+			$data = $result['response']['message'];
+
 		return $data;
 	}
 
@@ -584,7 +616,7 @@ class ash_ups {
 		global $wpdb;
 
 		$config = get_option( 'wpsc_ups_settings', array() );
-		$debug = ( array_key_exists( 'upsenvironment', $config) ) ? $config['upsenvironment'] : "";
+		$debug = false;//( array_key_exists( 'upsenvironment', $config) ) ? $config['upsenvironment'] : "";
 
 		$rate_table = array();
 		$wpsc_ups_services = get_option( "wpsc_ups_services" );
@@ -774,13 +806,16 @@ class ash_ups {
 
 		// If ths zip code is provided via a form post use it!
 		$args['dest_pcode'] = (string) wpsc_get_customer_meta( 'shipping_zip' );
+
 		if ( isset( $_POST['zipcode'] ) && ( $_POST['zipcode'] != __( "Your Zipcode", 'wpsc' ) && $_POST['zipcode'] != "YOURZIPCODE" ) )
 		  $args['dest_pcode'] = esc_attr( $_POST['zipcode'] );
 
 		if ( in_array( $args['dest_pcode'], array( __( 'Your Zipcode', 'wpsc' ), 'YOURZIPCODE' ) ) )
 			$args['dest_pcode'] = '';
 
-		wpsc_update_customer_meta( 'shipping_zip', $args['dest_pcode'] );
+		//wpsc_update_customer_meta( 'shipping_zip', $args['dest_pcode'] );
+		$args['dest_pcode'] = wpsc_get_customer_meta( 'shipping_zip' );
+		$all_meta = wpsc_get_all_customer_meta();
 
 		if ( empty ( $args['dest_pcode'] ) ) {
 			// We cannot get a quote without a zip code so might as well return!

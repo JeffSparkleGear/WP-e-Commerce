@@ -73,7 +73,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$selects = array( 'p.id', 'p.totalprice AS amount', 'p.processed AS status', 'p.track_id', 'p.date' );
 		$selects[] = '
 			(
-				SELECT COUNT(*) FROM ' . WPSC_TABLE_CART_CONTENTS . ' AS c
+				SELECT SUM(quantity) FROM ' . WPSC_TABLE_CART_CONTENTS . ' AS c
 				WHERE c.purchaseid = p.id
 			) AS item_count';
 
@@ -327,7 +327,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		return $views;
 	}
 
-	public function months_dropdown() {
+	public function months_dropdown( $post_type = 'wpsc-product') {
 		global $wp_locale;
 
 		$m = isset( $_REQUEST['m'] ) ? $_REQUEST['m'] : 0;

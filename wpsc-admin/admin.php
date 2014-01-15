@@ -25,6 +25,7 @@ require_once( WPSC_FILE_PATH . '/wpsc-admin/ajax-and-init.php' );
 require_once( WPSC_FILE_PATH . '/wpsc-admin/display-options-settings.page.php' );
 require_once( WPSC_FILE_PATH . '/wpsc-admin/db-upgrades/upgrade.php' );
 require_once( WPSC_FILE_PATH . '/wpsc-admin/media.php' );
+require_once( WPSC_FILE_PATH . '/wpsc-admin/users.php' );
 
 if ( ( isset( $_SESSION['wpsc_activate_debug_page'] ) && ( $_SESSION['wpsc_activate_debug_page'] == true ) ) || ( defined( 'WPSC_ADD_DEBUG_PAGE' ) && ( constant( 'WPSC_ADD_DEBUG_PAGE' ) == true ) ) )
 	require_once( WPSC_FILE_PATH . '/wpsc-admin/display-debug.page.php' );
@@ -1064,7 +1065,7 @@ function wpsc_dashboard_4months_widget() {
 	$timeranges[2]["start"] = mktime( 0, 0, 0, $this_month - 1, 1, $this_year );
 	$timeranges[2]["end"] = mktime( 0, 0, 0, $this_month, 1, $this_year );
 	$timeranges[3]["start"] = mktime( 0, 0, 0, $this_month, 1, $this_year );
-	$timeranges[3]["end"] = mktime();
+	$timeranges[3]["end"] = time();//mktime();
 
 	$prod_data = array( );
 	foreach ( (array)$products as $product ) { //run through products and get each product income amounts and name
@@ -1150,7 +1151,8 @@ add_filter( 'favorite_actions', 'wpsc_fav_action' );
  */
 function wpsc_admin_enqueue_user_dynamic() {
 
-	wp_enqueue_script( 'wp-e-commerce-dynamic', WPSC_CORE_JS_URL . '/wpsc-user-dynamic.js', false,  $version_identifier );
+	$version_identifier = WPSC_VERSION . "." . WPSC_MINOR_VERSION;
+	wp_enqueue_script( 'wp-e-commerce-dynamic', WPSC_CORE_JS_URL . '/wpsc-user-dynamic.js',  array('jquery'),  $version_identifier, true );
 
 	$user_dynamic_data = array(
 			'ajaxurl'             => admin_url( 'admin-ajax.php' ),
