@@ -205,7 +205,7 @@ function wpsc_admin_pages() {
 
 	// Add Settings pages
 	$page_hooks[] = $edit_options_page = add_options_page( __( 'Store Settings', 'wpsc' ), __( 'Store', 'wpsc' ), 'administrator', 'wpsc-settings', 'wpsc_display_settings_page' );
-	add_action( 'admin_print_scripts-' . $edit_options_page , 'wpsc_admin_enqueue_user_dynamic' );
+	add_action( 'admin_print_scripts-' . $edit_options_page , 'wpsc_print_admin_scripts' );
 
 	// Debug Page
 	if ( ( defined( 'WPSC_ADD_DEBUG_PAGE' ) && ( WPSC_ADD_DEBUG_PAGE == true ) ) || ( isset( $_SESSION['wpsc_activate_debug_page'] ) && ( true == $_SESSION['wpsc_activate_debug_page'] ) ) )
@@ -497,18 +497,24 @@ function wpsc_meta_boxes() {
 	//if a variation page do not show these metaboxes
 	if ( is_object( $post ) && $post->post_parent == 0 ) {
 		add_meta_box( 'wpsc_product_variation_forms'    , __( 'Variations', 'wpsc' )           , 'wpsc_product_variation_forms'    , $pagename, 'normal', 'high' );
+		add_meta_box( 'wpsc_product_external_link_forms', __( 'Off Site Product link', 'wpsc' ), 'wpsc_product_external_link_forms', $pagename, 'normal', 'high' );
 	} else if( is_object( $post ) && $post->post_status == "inherit" ) {
 		remove_meta_box( 'tagsdiv-product_tag'             , 'wpsc-product', 'core' );
+		remove_meta_box( 'wpsc_product_external_link_forms', 'wpsc-product', 'core' );
 		remove_meta_box( 'wpsc_product_categorydiv'        , 'wpsc-product', 'core' );
 	}
 
-	add_meta_box( 'wpsc_price_control_forms', __('Product Pricing', 'wpsc'), 'wpsc_price_control_forms', $pagename, 'side', 'low' );
-	add_meta_box( 'wpsc_stock_control_forms', __('Stock Inventory', 'wpsc'), 'wpsc_stock_control_forms', $pagename, 'side', 'low' );
+	add_meta_box( 'wpsc_product_gallery', __( 'Product Gallery', 'wpsc' ), 'wpsc_product_gallery', $pagename, 'side', 'low' );
+	add_meta_box( 'wpsc_price_control_forms', __('Price Control', 'wpsc'), 'wpsc_price_control_forms', $pagename, 'side', 'low' );
+	add_meta_box( 'wpsc_stock_control_forms', __('Stock Control', 'wpsc'), 'wpsc_stock_control_forms', $pagename, 'side', 'low' );
 	add_meta_box( 'wpsc_product_taxes_forms', __('Taxes', 'wpsc'), 'wpsc_product_taxes_forms', $pagename, 'side', 'low' );
-	add_meta_box( 'wpsc_product_delivery_forms', __('Product Delivery', 'wpsc'), 'wpsc_product_delivery_forms', $pagename, 'normal', 'high' );
-	add_meta_box( 'wpsc_product_details_forms', __('Product Details', 'wpsc'), 'wpsc_product_details_forms', $pagename, 'normal', 'high' );
-}
+	add_meta_box( 'wpsc_additional_desc', __('Additional Description', 'wpsc'), 'wpsc_additional_desc', $pagename, 'normal', 'high' );
+	add_meta_box( 'wpsc_product_download_forms', __('Product Download', 'wpsc'), 'wpsc_product_download_forms', $pagename, 'normal', 'high' );
 
+	if ( ! empty( $post->ID ) && ! wpsc_product_has_variations( $post->ID ) )
+		add_meta_box( 'wpsc_product_shipping_forms', __('Shipping', 'wpsc'), 'wpsc_product_shipping_forms_metabox', $pagename, 'normal', 'high' );
+	add_meta_box( 'wpsc_product_advanced_forms', __('Advanced Settings', 'wpsc'), 'wpsc_product_advanced_forms', $pagename, 'normal', 'high' );
+}
 add_action( 'admin_footer', 'wpsc_meta_boxes' );
 add_action( 'admin_enqueue_scripts', 'wpsc_admin_include_css_and_js_refac' );
 
@@ -1060,7 +1066,7 @@ function wpsc_dashboard_4months_widget() {
 	$timeranges[2]["start"] = mktime( 0, 0, 0, $this_month - 1, 1, $this_year );
 	$timeranges[2]["end"] = mktime( 0, 0, 0, $this_month, 1, $this_year );
 	$timeranges[3]["start"] = mktime( 0, 0, 0, $this_month, 1, $this_year );
-	$timeranges[3]["end"] = time();//mktime();
+	$timeranges[3]["end"] = time(); // using mktime here can generate a php runtime warning
 
 	$prod_data = array( );
 	foreach ( (array)$products as $product ) { //run through products and get each product income amounts and name
@@ -1140,40 +1146,15 @@ function wpsc_fav_action( $actions ) {
 add_filter( 'favorite_actions', 'wpsc_fav_action' );
 
 /**
- * Enqueue the user admin scripts into the admin interface
+ * Prits out the admin scripts
  *
+ * @uses is_ssl()                 Defines if SSL is true
  * @uses wp_enqueue_script()      Enqueues scripts
+ * @uses home_url()               Returns the base url for the site
  */
-function wpsc_admin_enqueue_user_dynamic() {
-
-	$version_identifier = WPSC_VERSION . "." . WPSC_MINOR_VERSION;
-	wp_enqueue_script( 'wp-e-commerce-dynamic', WPSC_CORE_JS_URL . '/wpsc-user-dynamic.js',  array('jquery'),  $version_identifier, true );
-
-	$user_dynamic_data = array(
-			'ajaxurl'             => admin_url( 'admin-ajax.php' ),
-			'spinner'             => esc_url( admin_url( 'images/wpspin_light.gif' ) ),
-			'no_quotes'           => __( 'It appears that there are no shipping quotes for the shipping information provided.  Please check the information and try again.', 'wpsc' ),
-			'ajax_get_cart_error' => __( 'There was a problem getting the current contents of the shopping cart.', 'wpsc' ),
-
-			/* wpsc user dynamic fields */
-			'base_url'             => site_url(),
-			'WPSC_URL'             => WPSC_URL,
-			'WPSC_IMAGE_URL'       => WPSC_IMAGE_URL,
-			'WPSC_DIR_NAME'        => WPSC_DIR_NAME,
-			'WPSC_CORE_IMAGES_URL' => WPSC_CORE_IMAGES_URL,
-
-			/* LightBox Configuration start*/
-			'fileLoadingImage'         => WPSC_CORE_IMAGES_URL . '/loading.gif',
-			'fileBottomNavCloseImage'  => WPSC_CORE_IMAGES_URL . '/closelabel.gif',
-			'fileThickboxLoadingImage' => WPSC_CORE_IMAGES_URL . '/loadingAnimation.gif',
-			'resizeSpeed'              => 9,  // controls the speed of the image resizing (1=slowest and 10=fastest)
-			'borderSize'               => 10, //if you adjust the padding in the CSS, you will need to update this variable
-	);
-
-	$user_dynamic_data = apply_filters( 'WPSC_USER_DYNAMIC_DATA', $user_dynamic_data );
-
-	wp_localize_script( 'wp-e-commerce-dynamic', 'wpsc_ajax', $user_dynamic_data );
-
+function wpsc_print_admin_scripts() {
+	$scheme = is_ssl() ? 'https' : 'http';
+	wp_enqueue_script( 'wp-e-commerce-dynamic', home_url( "/index.php?wpsc_user_dynamic_js=true", $scheme ) );
 }
 
 /**
