@@ -25,17 +25,16 @@ function wpsc_core_load_session() {
  * The core WPEC constants necessary to start loading
  */
 function wpsc_core_constants() {
-	if ( ! defined( 'WPSC_URL' ) )
-		define( 'WPSC_URL', plugins_url( '', __FILE__ ) );
-
+	if(!defined('WPSC_URL'))
+		define( 'WPSC_URL',       plugins_url( '', __FILE__ ) );
 	// Define Plugin version
-	define( 'WPSC_VERSION'            , '3.8.14-dev' );
-	define( 'WPSC_MINOR_VERSION'      , 'e8a508c011' );
-	define( 'WPSC_PRESENTABLE_VERSION', '3.8.14-dev' );
-	define( 'WPSC_DB_VERSION'         , 9 );
+	define( 'WPSC_VERSION', '3.8.13-dev' );
+	define( 'WPSC_MINOR_VERSION', '819b5037cc' );
+	define( 'WPSC_PRESENTABLE_VERSION', '3.8.13-dev' );
+	define( 'WPSC_DB_VERSION', 6 );
 
 	// Define Debug Variables for developers
-	define( 'WPSC_DEBUG'        , false );
+	define( 'WPSC_DEBUG', false );
 	define( 'WPSC_GATEWAY_DEBUG', false );
 
 	// Images URL
@@ -163,7 +162,6 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_REGION_TAX',             "{$wp_table_prefix}wpsc_region_tax" );
 
 	define( 'WPSC_TABLE_CART_ITEM_META',         "{$wp_table_prefix}wpsc_cart_item_meta" );
-	define( 'WPSC_TABLE_PURCHASE_META',          "{$wp_table_prefix}wpsc_purchase_meta" );
 }
 
 /**
@@ -256,23 +254,14 @@ function wpsc_core_constants_uploads() {
 function wpsc_core_setup_cart() {
 	if ( 2 == get_option( 'cart_location' ) )
 		add_filter( 'the_content', 'wpsc_shopping_cart', 14 );
-	$GLOBALS['wpsc_cart'] = wpsc_get_customer_cart();
-}
-/**
- * _wpsc_action_init_shipping_method()
- *
- * The cart was setup at the beginning of the init sequence, and that's
- * too early to do shipping calculations because custom taxonomies, types
- * and other plugins may not have been initialized.  So we save the shipping
- * method initialization for the end of the init sequence.
- */
-function _wpsc_action_init_shipping_method() {
-	global $wpsc_cart;
+	$cart = maybe_unserialize( base64_decode( wpsc_get_customer_meta( 'cart' ) ) );
+	if ( is_object( $cart ) && ! is_wp_error( $cart ) )
+		$GLOBALS['wpsc_cart'] = $cart;
+	else
+		$GLOBALS['wpsc_cart'] = new wpsc_cart();
 
 	add_action( 'shutdown', 'wpsc_serialize_shopping_cart' );
 
-	if ( ! is_object( $wpsc_cart ) ) {
-		wpsc_core_setup_cart();
 }
 
 /**
@@ -286,14 +275,7 @@ function _wpsc_action_init_shipping_method() {
 function wpsc_recalc_cart_shipping() {
 	global $wpsc_cart;
 	$wpsc_cart->get_shipping_method();
-	}
-
-	if ( empty( $wpsc_cart->selected_shipping_method ) ) {
-		$wpsc_cart->get_shipping_method();
-	}
 }
-
-add_action( 'wpsc_init', '_wpsc_action_init_shipping_method' );
 
 add_action ( 'init', 'wpsc_recalc_cart_shipping', PHP_INT_MAX );
 
@@ -306,7 +288,7 @@ add_action ( 'init', 'wpsc_recalc_cart_shipping', PHP_INT_MAX );
  * Starting it in wp_query results in intractable infinite loops in 3.0
  */
 function wpsc_core_setup_globals() {
-	global $wpsc_query_vars, $wpsc_cart, $wpec_ash;
+	global $wpsc_query_vars, $wpec_ash;
 	// Setup some globals
 	$wpsc_query_vars = array();
     require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');
