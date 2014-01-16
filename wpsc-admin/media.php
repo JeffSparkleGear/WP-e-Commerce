@@ -15,15 +15,15 @@ function _wpsc_action_enqueue_media_scripts() {
 			$id = $post->ID;
 
 		$gallery = _wpsc_get_product_gallery_json( $id );
-
-		wp_enqueue_script( 'wpsc-media', WPSC_URL . '/wpsc-admin/js/media.js', array( 'media-editor', 'wp-e-commerce-admin' ), WPSC_VERSION );
+		wp_enqueue_script( 'wpsc-media', WPSC_URL . '/wpsc-admin/js/media.js', array( 'media-editor', 'wp-e-commerce-admin', 'post' ), WPSC_VERSION );
 		wp_localize_script( 'wpsc-media', 'WPSC_Media', array(
 			'l10n' => array(
-				'productMediaTitle' => __( 'Product Images', 'wpsc' ),
+				'productMediaTitle' => __( 'Add Images to Product Gallery', 'wpsc' ),
 				'saveGallery'       => __( 'Set Product Images', 'wpsc' ),
 			),
 			'gallery' => $gallery,
 			'updateGalleryNonce' => wp_create_nonce( 'wpsc_ajax_update_gallery_' . $id ),
+			'getGalleryNonce'    => wp_create_nonce( 'wpsc_ajax_get_gallery_' . $id )
 		) );
 	}
 }
@@ -66,10 +66,14 @@ function _wpsc_ajax_verify_save_product_gallery() {
 	return _wpsc_ajax_verify_nonce( 'update_gallery_' . absint( $_REQUEST['postId'] ) );
 }
 
+function _wpsc_ajax_verify_get_product_gallery() {
+	return _wpsc_ajax_verify_nonce( 'get_gallery_' . absint( $_REQUEST['postId'] ) );
+}
+
 function _wpsc_ajax_save_product_gallery() {
 	$id = absint( $_REQUEST['postId'] );
 	$items = array_map( 'absint', $_REQUEST['items'] );
-	$thumb = wpsc_the_product_thumbnail_id( $id );
+	$thumb = get_post_thumbnail_id( $id );
 
 	// always make sure the thumbnail is included
 	if ( $thumb && ! in_array( $thumb, $items ) )
@@ -78,49 +82,14 @@ function _wpsc_ajax_save_product_gallery() {
 	$result = wpsc_set_product_gallery( $id, $items );
 
 	return _wpsc_get_product_gallery_json( $id );
+}
 
+function _wpsc_ajax_get_product_gallery() {
+	$id = absint( $_REQUEST['postId'] );
+	return _wpsc_get_product_gallery_json( $id );
 }
 
 function _wpsc_get_product_gallery_json( $id ) {
 	$attachments = wpsc_get_product_gallery( $id );
 	return array_map( 'wp_prepare_attachment_for_js', $attachments );
-}
-
-function wpsc_get_product_gallery( $id ) {
-	$ids = get_post_meta( $id, '_wpsc_product_gallery', true );
-	if ( ! is_array( $ids ) )
-		$ids = array();
-
-	$thumb_id = wpsc_the_product_thumbnail_id( $id );
-
-	// always make sure post thumbnail is included in the gallery
-	if ( $thumb_id && ! in_array( $thumb_id, $ids ) )
-		$ids[] = $thumb_id;
-
-
-	if ( ! is_array( $ids ) || empty( $ids ) )
-		return array();
-
-	$attachments = get_posts( array(
-		'nopaging' => true,
-		'post__in' => $ids,
-		'orderby'  => 'menu_order',
-		'post_status' => 'all',
-		'post_type' => 'attachment'
-	) );
-
-
-	return $attachments;
-}
-
-function wpsc_set_product_gallery( $id, $attachments ) {
-	$attachment_ids = array();
-	foreach ( $attachments as $attachment ) {
-		if ( is_object( $attachment ) )
-			$attachment_ids[] = $attachment->ID;
-		elseif ( is_numeric( $attachment ) )
-			$attachment_ids[] = absint( $attachment );
-	}
-
-	return update_post_meta( $id, '_wpsc_product_gallery', $attachment_ids );
 }

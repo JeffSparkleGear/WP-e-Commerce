@@ -1,7 +1,6 @@
 <?php
 
 /**
- * @author: Jeremy Smith - www.dnawebagency.com
  * @description: wpec_taxes_controller contains all of the functions necessary
  *               to communicate with the taxes system.
  * */
@@ -618,7 +617,7 @@ class wpec_taxes_controller {
 						}
 					} // if
 				?>
-				<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-feedback" title="" alt="" />
+				<img src="<?php echo esc_url( wpsc_get_ajax_spinner() ); ?>" class="ajax-feedback" title="" alt="" />
 			</td>
 
 

@@ -62,6 +62,10 @@ function schedule_update_shipping_quotes() {
 		update_shipping_quotes_timer = setTimeout('update_shipping_quotes_timer_callback()', 200 );
 	}
 }
+		}
+
+	});
+
 
 function unschedule_update_shipping_quotes() {
     if ( update_shipping_quotes_timer != null ) 
@@ -216,7 +220,7 @@ jQuery(document).ready(function ($) {
 	// update the price when the variations are altered.
 	jQuery( 'div.wpsc_variation_forms' ).on( 'change', '.wpsc_select_variation', function() {
 		jQuery('option[value="0"]', this).attr('disabled', 'disabled');
-		self = this;
+		var self = this;
 		var parent_form = jQuery(this).closest("form.product_form");
 		if ( parent_form.length === 0 )
 			return;
@@ -225,6 +229,7 @@ jQuery(document).ready(function ($) {
 		var form_values = jQuery("input[name='product_id'], .wpsc_select_variation",parent_form).serialize() + '&action=update_product_price';
 
 		jQuery.post( wpsc_ajax.ajaxurl, form_values, function(response) {
+			var variation_display = jQuery('div#variation_display_' + prod_id );
 			var stock_display = jQuery('div#stock_display_' + prod_id),
 				price_field = jQuery('input#product_price_' + prod_id),
 				price_span = jQuery('#product_price_' + prod_id + '.pricedisplay, #product_price_' + prod_id + ' .currentprice'),
@@ -241,6 +246,9 @@ jQuery(document).ready(function ($) {
 				} else {
 					stock_display.addClass('out_of_stock').removeClass('in_stock');
 				}
+				variation_display.removeClass('no_variation').addClass('is_variation');
+			} else {
+				variation_display.removeClass('is_variation').addClass('no_variation');
 			}
 
 			stock_display.html(response.variation_msg);
@@ -344,12 +352,19 @@ function switchmethod( key, key1 ) {
 		} else {
 			jQuery( '.pricedisplay.checkout-shipping' ).html( response.shipping );
 		}
+
 		if ( jQuery( '#coupons_amount .pricedisplay' ).size() > 0 ) {
 			jQuery( '#coupons_amount .pricedisplay' ).html( response.coupon );
 		} else {
 			jQuery( '#coupons_amount' ).html( response.coupon );
 		}
+
+		if ( jQuery( '#checkout_tax.pricedisplay' ).size() > 0 ) {
+			jQuery( '.pricedisplay.checkout-tax' ).html( response.tax );
+		}
+
 		jQuery( '.pricedisplay.checkout-total' ).html( response.cart_total );
+
 	}, 'json' );
 }
 
@@ -533,6 +548,18 @@ function wpsc_handle_country_change( response ) {
 		jQuery( wpsc_checkout_table_selector + ' input.shipping_region' ).removeAttr( 'disabled' );
 		jQuery( wpsc_checkout_table_selector + ' .billing_region' ).parent().parent().show();
 		jQuery( wpsc_checkout_table_selector + ' .shipping_region' ).parent().parent().show();
+	}
+
+	if ( 'US' !== response.delivery_country && 'CA' !== response.delivery_country ) {
+		var shipping_state = jQuery( wpsc_checkout_table_selector + ' input[title="shippingstate"]' );
+		shipping_state.parents( 'tr' ).show();
+		shipping_state.val( '' ).prop( 'disabled', false );
+	}
+
+	if ( 'US' !== response.billing_country && 'CA' !== response.billing_country ) {
+		var billing_state = jQuery( wpsc_checkout_table_selector + ' input[title="billingstate"]' );
+		billing_state.parents( 'tr' ).show();
+		billing_state.val( '' ).prop( 'disabled', false );
 	}
 
 	if ( response.tax > 0 ) {

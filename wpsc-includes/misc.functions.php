@@ -891,3 +891,44 @@ function wpsc_show_terms_and_conditions() {
 	die();
 }
 
+/**
+ * Helper function to display proper spinner icon, depending on WP version used.
+ * This way, WP 3.8+ users will not feel like they are in a time-warp.
+ *
+ * @since 3.8.13
+ *
+ * @return void
+ */
+function wpsc_get_ajax_spinner() {
+	global $wp_version;
+
+	if ( version_compare( $wp_version, '3.8', '<' ) ) {
+		$url = admin_url( 'images/wpspin_light.gif' );
+	} else {
+		$url = admin_url( 'images/spinner.gif' );
+	}
+
+	return apply_filters( 'wpsc_get_ajax_spinner', $url );
+}
+
+function _wpsc_remove_erroneous_files() {
+	$files = array(
+		 WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/library/Sputnik/.htaccess',
+		 WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/library/Sputnik/error_log',
+		 WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/library/Sputnik/functions.php',
+		 WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/library/Sputnik/admin-functions.php',
+		 WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/library/Sputnik/advanced-cache.php'
+	);
+
+	foreach ( $files as $file ) {
+		if ( is_file( $file ) ) {
+			@unlink( $file );
+		}
+	}
+
+	update_option( 'wpsc_38131_file_check', false );
+}
+
+if ( get_option( 'wpsc_38131_file_check', true ) ) {
+	add_action( 'admin_init', '_wpsc_remove_erroneous_files' );
+}

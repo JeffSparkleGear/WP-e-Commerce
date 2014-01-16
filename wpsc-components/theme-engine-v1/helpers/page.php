@@ -13,7 +13,6 @@ add_action( 'update_option_single_view_image_height', 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_width'    , 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_height'   , 'wpsc_cache_to_upload' );
 add_action('template_redirect', 'wpsc_all_products_on_page');
-//add_action('post_thumbnail_html','wpsc_the_featured_image_fix');
 add_filter( 'aioseop_description', 'wpsc_set_aioseop_description' );
 add_filter('request', 'wpsc_remove_page_from_query_string');
 
@@ -70,7 +69,11 @@ function wpsc_register_core_theme_files() {
 	wpsc_register_theme_file( 'wpsc-featured_product.php' );
 	wpsc_register_theme_file( 'wpsc-category-list.php' );
 	wpsc_register_theme_file( 'wpsc-category_widget.php' );
-	// Let other plugins register their theme files
+	wpsc_register_theme_file( 'wpsc-account-downloads.php' );
+	wpsc_register_theme_file( 'wpsc-account-edit-profile.php' );
+	wpsc_register_theme_file( 'wpsc-account-purchase-history.php' );
+
+	/* Let other plugins register their theme files */
 	do_action( 'wpsc_register_core_theme_files' );
 }
 
@@ -347,7 +350,7 @@ function wpsc_enqueue_user_script_and_css() {
 
 		$user_dynamic_data = array(
 				'ajaxurl'             => admin_url( 'admin-ajax.php' ),
-				'spinner'             => esc_url( admin_url( 'images/wpspin_light.gif' ) ),
+			'spinner'   => esc_url( wpsc_get_ajax_spinner() ),
 				'no_quotes'           => __( 'It appears that there are no shipping quotes for the shipping information provided.  Please check the information and try again.', 'wpsc' ),
 				'ajax_get_cart_error' => __( 'There was a problem getting the current contents of the shopping cart.', 'wpsc' ),
 
@@ -524,7 +527,7 @@ function wpsc_display_products_page( $query ) {global $wpdb, $wpsc_query,$wp_que
 		$display_type = 'default';
 
 	$saved_display = wpsc_get_customer_meta( 'display_type' );
-	$display_type  = ! empty( $saved_display ) ? $saved_display : wpsc_check_display_type();
+	$display_type  = ! empty( $saved_display ) ? $saved_display : $display_type;
 
 	ob_start();
 	if( 'wpsc-product' == $wp_query->post->post_type && !is_archive() && $wp_query->post_count <= 1 )
@@ -651,12 +654,8 @@ function wpsc_products_page( $content = '' ) {
 		$GLOBALS['nzshpcrt_activateshpcrt'] = true;
 
 		// get the display type for the productspage
-		$display_type = wpsc_check_display_type();
-		if ( get_option( 'show_search' ) && get_option( 'show_advanced_search' ) ) {
-			$saved_display = wpsc_get_customer_meta( 'display_type' );
-			if ( ! empty( $saved_display ) )
-				$display_type = $saved_display;
-		}
+		$saved_display = wpsc_get_customer_meta( 'display_type' );
+		$display_type  = ! empty( $saved_display ) ? $saved_display : wpsc_check_display_type();
 
 		ob_start();
 		wpsc_include_products_page_template($display_type);
@@ -1194,6 +1193,9 @@ function wpsc_remove_page_from_query_string($query_string)
 function is_products_page(){
 	global $post;
 
+	if ( empty( $post ) || ! is_object( $post ) || empty( $post->ID ) )
+		return false;
+
 	$product_page_id = wpsc_get_the_post_id_by_shortcode( '[productspage]' );
 
 	return $post->ID == $product_page_id;
@@ -1241,17 +1243,6 @@ function wpsc_display_featured_products_page() {
 function wpsc_hidesubcatprods_init() {
 	$hide_subcatsprods = new WPSC_Hide_subcatsprods_in_cat;
 	add_action( 'pre_get_posts', array( &$hide_subcatsprods, 'get_posts' ) );
-}
-
-function wpsc_the_featured_image_fix($stuff){
-	global $wp_query;
-	remove_action('post_thumbnail_html','wpsc_the_featured_image_fix');
-	if(isset($wp_query->query_vars['wpsc-product'])){
-		$stuff ='';	?>
-		<img src="<?php header_image(); ?>" width="<?php echo HEADER_IMAGE_WIDTH; ?>" height="<?php echo HEADER_IMAGE_HEIGHT; ?>" alt="" /><?php
-	}
-	return $stuff;
-
 }
 
 // check for all in one SEO pack and the is_static_front_page function

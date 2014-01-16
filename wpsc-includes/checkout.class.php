@@ -56,11 +56,15 @@ function wpsc_check_purchase_processed($processed){
  */
 function wpsc_get_buyers_email($purchase_id){
 	global $wpdb;
-	$email_form_field = $wpdb->get_var( "SELECT `id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `type` IN ('email') AND `active` = '1' ORDER BY `checkout_order` ASC LIMIT 1" );
+	$email_form_field = $wpdb->get_col( "SELECT `id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `type` IN ('email') AND `active` = '1' ORDER BY `checkout_order` ASC" );
 
-	if ( ! $email_form_field )
+	if ( empty( $email_form_field ) )
 		return '';
-	$email = $wpdb->get_var( $wpdb->prepare( "SELECT `value` FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` WHERE `log_id` = %d AND `form_id` = %d LIMIT 1", $purchase_id, $email_form_field ) );
+
+	$email_in = '(' . implode( ',', array_map( 'absint', $email_form_field ) ) . ')';
+
+	$email = $wpdb->get_var( $wpdb->prepare( "SELECT `value` FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` WHERE `log_id` = %d AND `form_id` IN {$email_in} LIMIT 1", $purchase_id ) );
+
 	return $email;
 }
 
@@ -513,7 +517,13 @@ class wpsc_checkout {
 				// dirty hack
 				if ( $form_data->unique_name == 'billingstate' && empty( $value ) ) {
 					$billing_country_id = $wpdb->get_var( "SELECT `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `unique_name` = 'billingcountry' AND active = '1' " );
-					$value = $_POST['collected_data'][$billing_country_id][1];
+
+					if ( isset( $_POST['collected_data'][ $billing_country_id ][1] ) ) {
+						$value = $_POST['collected_data'][ $billing_country_id ][1];
+					} else {
+						$any_bad_inputs = true;
+						$bad_input      = true;
+					}
 				}
 
 				switch ( $form_data->type ) {

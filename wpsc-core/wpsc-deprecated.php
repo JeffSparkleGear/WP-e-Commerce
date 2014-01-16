@@ -505,7 +505,7 @@ function wpec_get_the_post_id_by_shortcode( $shortcode ) {
  * @3.8
  * @returns nothing
  */
-function wpsc_update_permalinks(  $return = '' ) {
+function wpsc_update_permalinks( $return = '' ) {
 	_wpsc_deprecated_function( __FUNCTION__, '3.8.9', '_wpsc_action_permalink_structure_changed' );
 	_wpsc_action_permalink_structure_changed();
 }
@@ -1697,11 +1697,80 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && ( 'wpsc_display_invoice' == $_RE
  * @return resource $ch
  **/
 function wpsc_curl_ssl( $ch ) {
-	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', __( "add_filter( 'https_ssl_verify', '__return_false' )", 'wpsc' ) );
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', "add_filter( 'https_ssl_verify', '__return_false' )" );
 
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 	return $ch;
+}
+
+
+/**
+ * Get cart item meta
+ * @access public
+ *
+ * @deprecated since 3.8.13
+ */
+function wpsc_get_cartmeta( $cart_item_id, $meta_key ) {
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_get_cart_item_meta');
+	return wpsc_get_cart_item_meta( $cart_item_id, $meta_key, true );
+}
+
+/**
+ * Update cart item meta
+ * @access public
+ *
+ * @deprecated since 3.8.13
+ */
+function wpsc_update_cartmeta( $cart_item_id, $meta_key, $meta_value ) {
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_update_cart_item_meta');
+	return wpsc_update_cart_item_meta( $cart_item_id, $meta_key, $meta_value );
+}
+
+/**
+ * Delete cart item meta
+ * @access public
+ *
+ * @deprecated since 3.8.13
+ */
+function wpsc_delete_cartmeta( $cart_item_id, $meta_key, $meta_value = '' ) {
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_delete_cart_item_meta');
+	return wpsc_delete_cart_item_meta( $cart_item_id, $meta_key, $meta_value );
+}
+
+function wpsc_get_exchange_rate( $from, $to ) {
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13' );
+	return _wpsc_get_exchange_rate( $from, $to );
+}
+
+
+/**
+ * @access public
+ * @param unknown $stuff
+ * @param unknown $post_ID
+ * @return string
+ * @deprecated since 3.8.13.3
+ */
+function wpsc_the_featured_image_fix( $stuff, $post_ID ){
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.13.2', 'wpsc_the_featured_image_fix');
+	global $wp_query;
+
+	$is_tax = is_tax( 'wpsc_product_category' );
+
+	$queried_object = get_queried_object();
+	$is_single = is_single() && $queried_object->ID == $post_ID && get_post_type() == 'wpsc-product';
+
+	if ( $is_tax || $is_single ) {
+		$header_image = get_header_image();
+		$stuff = '';
+
+		if ( $header_image )
+			$stuff = '<img src="' . esc_url( $header_image ) . '" width="' . HEADER_IMAGE_WIDTH . '" height="' . HEADER_IMAGE_HEIGHT . '" alt="" />';
+	}
+
+	remove_action('post_thumbnail_html','wpsc_the_featured_image_fix');
+
+	return $stuff;
 }
 
 

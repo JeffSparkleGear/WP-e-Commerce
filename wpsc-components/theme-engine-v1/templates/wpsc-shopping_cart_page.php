@@ -84,6 +84,8 @@ endif;
 	  <?php do_action ( "wpsc_after_checkout_cart_row" ); ?>
    <?php endwhile; ?>
    <?php //this HTML displays coupons if there are any active coupons to use ?>
+   <?php do_action ( 'wpsc_after_checkout_cart_rows' ); ?>
+
    <?php
 
    if(wpsc_uses_coupons()): ?>
@@ -230,7 +232,7 @@ endif;
 					<?php
 					$args = array(
 						'remember' => false,
-                    	'redirect' => home_url( $_SERVER['REQUEST_URI'] )
+                    	'redirect' => get_option( 'shopping_cart_url' )
 					);
 					wp_login_form( $args );
 					?>

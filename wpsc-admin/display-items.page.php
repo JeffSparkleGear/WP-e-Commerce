@@ -540,7 +540,9 @@ function wpsc_update_featured_products() {
 		$status = array_values( $status );
 	}
 
-	update_option( 'sticky_products', $status );
+	$update	= update_option( 'sticky_products', $status );
+
+	do_action( 'wpsc_after_featured_product_update', $update, $status );
 
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 		$json_response = array(
@@ -558,7 +560,7 @@ function wpsc_update_featured_products() {
 	exit;
 }
 
-add_filter( 'page_row_actions','my_action_row', 10, 2 );
+add_filter( 'page_row_actions','wpsc_action_row', 10, 2 );
 
 /**
  * @param $actions
@@ -570,7 +572,7 @@ add_filter( 'page_row_actions','my_action_row', 10, 2 );
  * @uses esc_url()              Makes sure the URL is safe, we like safe
  * @uses esc_html_x()           Displays translated string with gettext context
  */
-function my_action_row( $actions, $post ) {
+function wpsc_action_row( $actions, $post ) {
 
 	if ( $post->post_type != "wpsc-product" )
 			return $actions;

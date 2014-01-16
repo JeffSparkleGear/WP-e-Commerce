@@ -166,6 +166,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$total_sql = "
 			SELECT SUM(totalprice)
 			FROM " . WPSC_TABLE_PURCHASE_LOGS . " AS p
+			{$this->joins}
 			WHERE {$total_where}
 		";
 
@@ -238,6 +239,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$sql = "
 			SELECT DISTINCT YEAR(FROM_UNIXTIME(date)) AS year, MONTH(FROM_UNIXTIME(date)) AS month
 			FROM " . WPSC_TABLE_PURCHASE_LOGS . " AS p
+			{$this->joins}
 			WHERE {$this->where_no_filter}
 			ORDER BY date DESC
 		";
@@ -488,7 +490,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		echo '<select class="wpsc-purchase-log-status" data-log-id="' . $item->id . '">';
 		echo $dropdown_options;
 		echo '</select>';
-		echo '<img src="' . esc_url( admin_url( 'images/wpspin_light.gif' ) ) . '" class="ajax-feedback" title="" alt="" />';
+		echo '<img src="' . esc_url( wpsc_get_ajax_spinner() ) . '" class="ajax-feedback" title="" alt="" />';
 	}
 
 	public function column_tracking( $item ) {
@@ -499,7 +501,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 				<a class="add" href="#"><?php echo esc_html_x( 'Add Tracking ID', 'add purchase log tracking id', 'wpsc' ); ?></a>
 				<input type="text" class="wpsc-purchase-log-tracking-id" value="<?php echo esc_attr( $item->track_id ); ?>" />
 				<a class="button save" href="#"><?php echo esc_html_x( 'Save', 'save sales log tracking id', 'wpsc' ); ?></a>
-				<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-feedback" title="" alt="" /><br class="clear" />
+				<img src="<?php echo esc_url( wpsc_get_ajax_spinner() ); ?>" class="ajax-feedback" title="" alt="" /><br class="clear" />
 				<small class="send-email"><a href="#"><?php echo esc_html_x( 'Send Email', 'sales log', 'wpsc' ); ?></a></small>
 			</div>
 		<?php

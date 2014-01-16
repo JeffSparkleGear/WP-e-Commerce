@@ -3,12 +3,17 @@ add_action( 'wpsc_hourly_cron_task', 'wpsc_clear_stock_claims' );
 add_action( 'wpsc_hourly_cron_task', '_wpsc_clear_customer_meta' );
 
 /**
- * wpsc_clear_stock_claims, clears the stock claims, runs using wp-cron and when editing purchase log statuses via the dashboard
+ * Clears the stock claims, runs on hourly WP_Cron event and when editing purchase log statuses.
+ *
+ * @since 3.8.9
+ * @access public
+ *
+ * @return void
  */
 function wpsc_clear_stock_claims() {
 	global $wpdb;
 
-	$time = (float) get_option( 'wpsc_stock_keeping_time', 1 );
+	$time     = (float) get_option( 'wpsc_stock_keeping_time', 1 );
 	$interval = get_option( 'wpsc_stock_keeping_interval', 'day' );
 
 	// we need to convert into seconds because we're allowing decimal intervals like 1.5 days
@@ -18,12 +23,20 @@ function wpsc_clear_stock_claims() {
 		'week' => 604800,
 	);
 
-	$seconds = floor( $time * $convert[$interval] );
+	$seconds = floor( $time * $convert[ $interval ] );
 
 	$sql = $wpdb->prepare( "DELETE FROM " . WPSC_TABLE_CLAIMED_STOCK . " WHERE last_activity < UTC_TIMESTAMP() - INTERVAL %d SECOND", $seconds );
 	$wpdb->query( $sql );
 }
 
+/**
+ * Purges customer meta that is older than WPSC_CUSTOMER_DATA_EXPIRATION on an hourly WP_Cron event.
+ *
+ * @since 3.8.9.2
+ * @access public
+ *
+ * @return void
+ */
 function _wpsc_clear_customer_meta() {
 	global $wpdb;
 
@@ -48,13 +61,18 @@ function _wpsc_clear_customer_meta() {
 		FROM {$wpdb->usermeta}
 		WHERE
 			meta_key = '_wpsc_temporary_profile_to_delete'
+		LIMIT {$purge_count}
 	";
 
-	$ids = $wpdb->get_col( $sql );
+	/* Do this in batches of 200 to avoid memory issues when there are too many anonymous users */
+	@set_time_limit( 0 ); // no time limit
+
+	do {
+		$ids = $wpdb->get_col( $sql );
 
 	// For each of the ids double check to be sure there isn't any important data associated with the temporary user.
 	// If important data is found the user is no longer temporary.
-	foreach ( $ids as $id ) {
+		foreach ( $ids as $id ) {
 		// for extra safety
 		if ( ( wpsc_customer_purchase_count( $id ) == 0 ) && ( wpsc_customer_post_count( $id ) == 0 ) && ( wpsc_customer_comment_count( $id ) == 0 ) ) {
 			bling_log( 'Deleting user ID ' . $id );
@@ -64,6 +82,7 @@ function _wpsc_clear_customer_meta() {
 			// user should not be temporary
 			delete_user_meta( $id, '_wpsc_temporary_profile_to_delete' );
 		}
-	}
+		}
+	} while ( count( $ids ) == $purge_count );
 }
 

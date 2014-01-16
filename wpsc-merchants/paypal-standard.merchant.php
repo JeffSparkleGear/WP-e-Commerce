@@ -393,6 +393,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 		$options = array(
 			'timeout' => 20,
 			'body' => $received_values,
+			'httpversion' => '1.1',
 			'user-agent' => ( 'WP e-Commerce/' . WPSC_PRESENTABLE_VERSION )
 		);
 
@@ -532,7 +533,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 						$altered_count = 0;
 						if ( (bool)$cart_row['is_recurring'] == true ) {
 							$altered_count++;
-							wpsc_update_cartmeta( $cart_row['cart_item_id'], 'is_subscribed', 0 );
+							wpsc_update_cart_item_meta( $cart_row['cart_item_id'], 'is_subscribed', 0 );
 						}
 					}
 					break;

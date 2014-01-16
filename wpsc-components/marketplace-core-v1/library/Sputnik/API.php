@@ -42,7 +42,9 @@ class Sputnik_API {
 			$params['user'] = $user;
 		}
 
-		return self::request('/info', $params);
+		$uri = "/info/{$name}/";
+
+		return self::request( $uri );
 	}
 
 	public static function rate_product($name, $rating) {
@@ -66,6 +68,7 @@ class Sputnik_API {
 
 	protected static function authenticate() {
 		$token = get_option('sputnik_oauth_access', false);
+
 		if ($token == false) {
 			throw new Exception('Need to authenticate first', 1);
 		}
@@ -104,18 +107,19 @@ class Sputnik_API {
 
 			update_option('sputnik_oauth_access', $access);
 
-			$return_url = Sputnik_Admin::build_url();
+			$args = array();
+			if ( ! empty( $_REQUEST['oauth_buy']  ) )
+				$args['oauth_buy'] = $_REQUEST['oauth_buy'];
+			$return_url = Sputnik_Admin::build_url( $args );
 		}
-
-		delete_option('sputnik_oauth_request');
 
 		// Close the authentication popup ?>
 <!DOCTYPE html><html>
 	<head>
 		<title><?php _e( 'Redirecting ...', 'wpsc' ); ?></title>
 		<script type="text/javascript">
-		parent.location = '<?php echo $return_url; ?>';
-		window.close();
+			parent.location = '<?php echo $return_url; ?>';
+			window.close();
 		</script>
 	</head>
 	<body>&nbsp;</body>
@@ -167,14 +171,13 @@ class Sputnik_API {
 
 	/* Purchase Methods */
 
-	public static function get_checkout_token( $product_slug ) {
+	public static function get_checkout_token( $product ) {
 		self::authenticate();
 
-		$url = '/purchase/get_checkout_token';
+		$url = '/purchase/get_checkout_token/' . $product->client_product_id;
 
 		$request = self::$auth->sign( $url, 'GET', array(
-			'product_slug' => $product_slug,
-			'redirect_uri' => Sputnik_Admin::build_url( array( '_wpnonce' => wp_create_nonce( 'sputnik_install-plugin_' . $product_slug ) ) )
+			'redirect_uri' => Sputnik_Admin::build_url( array( '_wpnonce' => wp_create_nonce( 'sputnik_install-plugin_' . $product->slug ) ) )
 			)
 		);
 
@@ -185,7 +188,6 @@ class Sputnik_API {
 
 
 	/* Helper Methods */
-
 	public static function request($url, $params = null, $args = array()) {
 		if ( ! empty( $params ) )
 			$url = add_query_arg( $params, $url );
@@ -207,11 +209,11 @@ class Sputnik_API {
 			throw new Exception($request->get_error_message());
 		}
 
-		if ($request['response']['code'] !== 200) {
+		if ($request['response']['code'] != 200) {
 			throw new Exception($request['body'], $request['response']['code']);
 		}
-
 		$result = json_decode($request['body']);
+
 		if ($result === null) {
 			throw new Exception($request['body'], $request['response']['code']);
 		}
