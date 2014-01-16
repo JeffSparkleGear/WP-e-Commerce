@@ -1772,38 +1772,3 @@ function wpsc_the_featured_image_fix( $stuff, $post_ID ){
 
 	return $stuff;
 }
-
-
-/**
- * Get cart item meta
- * @access public
- *
- * @deprecated since 3.8.13
- */
-function wpsc_get_cartmeta( $cart_item_id, $meta_key ) {
-	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_get_cart_item_meta');
-	return wpsc_get_cart_item_meta( $cart_item_id, $meta_key, true );
-}
-
-/**
- * Update cart item meta
- * @access public
- *
- * @deprecated since 3.8.13
- */
-function wpsc_update_cartmeta( $cart_item_id, $meta_key, $meta_value ) {
-	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_update_cart_item_meta');
-	return wpsc_update_cart_item_meta( $cart_item_id, $meta_key, $meta_value );
-}
-
-/**
- * Delete cart item meta
- * @access public
- *
- * @deprecated since 3.8.13
- */
-function wpsc_delete_cartmeta( $cart_item_id, $meta_key, $meta_value = '' ) {
-	_wpsc_deprecated_function( __FUNCTION__, '3.8.13', 'wpsc_delete_cart_item_meta');
-	return wpsc_delete_cart_item_meta( $cart_item_id, $meta_key, $meta_value );
-}
-
