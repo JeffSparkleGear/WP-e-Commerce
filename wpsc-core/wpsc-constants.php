@@ -33,14 +33,7 @@ function _wpsc_is_session_started() {
  */
 function wpsc_core_load_session() {
 
-<<<<<<< HEAD
-	if ( ! isset( $_SESSION ) )
-		$_SESSION = null;
-
-	if ( session_status() !== PHP_SESSION_ACTIVE && session_id() != '' )
-=======
 	if ( !_wpsc_is_session_started()  ) {
->>>>>>> origin/session-start
 		session_start();
 	}
 
