@@ -84,6 +84,7 @@ endif;
 	  <?php do_action ( "wpsc_after_checkout_cart_row" ); ?>
    <?php endwhile; ?>
    <?php //this HTML displays coupons if there are any active coupons to use ?>
+
    <?php do_action ( 'wpsc_after_checkout_cart_rows' ); ?>
 
    <?php
@@ -102,7 +103,7 @@ endif;
          <td  colspan="4" class="coupon_code">
             <form  method="post" action="<?php echo esc_url( get_option( 'shopping_cart_url' ) ); ?>">
                <input type="text" name="coupon_num" id="coupon_num" value="<?php echo $wpsc_cart->coupons_name; ?>" />
-               <input type="submit" value="<?php _e('Apply Coupon', 'wpsc') ?>" />
+               <input type="submit" value="<?php _e('Update', 'wpsc') ?>" />
             </form>
          </td>
       </tr>
@@ -312,6 +313,7 @@ endif;
                <p class='validation-error'><?php echo $user_error; ?></p>
                <?php } ?>
          </div>
+
       <?php
       endif;
       ?>
