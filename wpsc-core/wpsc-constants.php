@@ -3,7 +3,6 @@
 $wpsc_currency_data = array();
 $wpsc_title_data    = array();
 
-
 /**
  * _wpsc_is_session_started()
  *
@@ -76,7 +75,7 @@ function wpsc_core_constants() {
 		define( 'WPSC_CUSTOMER_COOKIE_PATH', COOKIEPATH );
 
 	if ( ! defined( 'WPSC_CUSTOMER_DATA_EXPIRATION' ) )
-		define( 'WPSC_CUSTOMER_DATA_EXPIRATION', 48 * 3600 );
+    	define( 'WPSC_CUSTOMER_DATA_EXPIRATION', 48 * 3600 );
 }
 
 /**
@@ -220,16 +219,16 @@ function wpsc_core_constants_uploads() {
 
 	// Sub directories inside the WPEC folder
 	$sub_dirs = array(
-			'downloadables',
-			'previews',
-			'product_images',
-			'product_images/thumbnails',
-			'category_images',
-			'user_uploads',
-			'cache',
-			'upgrades',
-			'theme_backup',
-			'themes'
+		'downloadables',
+		'previews',
+		'product_images',
+		'product_images/thumbnails',
+		'category_images',
+		'user_uploads',
+		'cache',
+		'upgrades',
+		'theme_backup',
+		'themes'
 	);
 
 	// Upload DIR constants
@@ -305,16 +304,16 @@ add_action( 'wpsc_init', '_wpsc_action_init_shipping_method' );
 
 /***
  * wpsc_core_setup_globals()
-*
-* Initialize the wpsc query vars, must be a global variable as we
-* cannot start it off from within the wp query object.
-* Starting it in wp_query results in intractable infinite loops in 3.0
-*/
+ *
+ * Initialize the wpsc query vars, must be a global variable as we
+ * cannot start it off from within the wp query object.
+ * Starting it in wp_query results in intractable infinite loops in 3.0
+ */
 function wpsc_core_setup_globals() {
 	global $wpsc_query_vars, $wpsc_cart, $wpec_ash;
 
 	// Setup some globals
 	$wpsc_query_vars = array();
-	require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');
-	$wpec_ash = new ASH();
+    require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');
+    $wpec_ash = new ASH();
 }
