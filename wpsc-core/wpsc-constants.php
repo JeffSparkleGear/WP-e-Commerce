@@ -3,20 +3,48 @@
 $wpsc_currency_data = array();
 $wpsc_title_data    = array();
 
+
+/**
+ * _wpsc_is_session_started()
+ *
+ * Check if PHP session is started using method suggested on php.net
+ * @return boolean
+ */
+function _wpsc_is_session_started() {
+
+	if ( version_compare( phpversion(), '5.4.0', '>=' ) ) {
+		return session_status() === PHP_SESSION_ACTIVE ? true : false;
+	} else {
+		if ( ! isset( $_SESSION ) ) {
+			$_SESSION = null;
+		}
+
+		return session_id() === '' ? false : true;
+	}
+
+	return false;
+}
+
 /**
  * wpsc_core_load_session()
  *
  * Load up the WPEC session
+ * @return boolean
  */
 function wpsc_core_load_session() {
 
+<<<<<<< HEAD
 	if ( ! isset( $_SESSION ) )
 		$_SESSION = null;
 
 	if ( session_status() !== PHP_SESSION_ACTIVE && session_id() != '' )
+=======
+	if ( !_wpsc_is_session_started()  ) {
+>>>>>>> origin/session-start
 		session_start();
+	}
 
-	return;
+	return _wpsc_is_session_started();
 }
 
 /**
