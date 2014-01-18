@@ -64,6 +64,7 @@ if ( is_admin() ) {
 	add_filter( 'editable_roles'             , '_wpsc_filter_editable_roles'                      );
 }
 
+
 /**
  * Helper function for setting the customer cookie content and expiration
  *
