@@ -3,6 +3,7 @@
 $wpsc_currency_data = array();
 $wpsc_title_data    = array();
 
+
 /**
  * _wpsc_is_session_started()
  *
@@ -207,11 +208,7 @@ function wpsc_core_constants_uploads() {
 
 	// Upload DIR
 	if ( isset( $wp_upload_dir_data['baseurl'] ) )
-		$upload_url = $wp_upload_dir_data['baseurl'];
-
-	// SSL Check for URL
-	if ( is_ssl() )
-		$upload_url = str_replace( 'http://', 'https://', $upload_url );
+		$upload_url = set_url_scheme( $wp_upload_dir_data['baseurl'] );
 
 	// Set DIR and URL strings
 	$wpsc_upload_sub_dir = '/wpsc/';
