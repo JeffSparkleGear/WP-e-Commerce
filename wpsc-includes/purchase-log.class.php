@@ -597,12 +597,13 @@ class WPSC_Purchase_Log {
 	public function get_cart_contents() {
 		global $wpdb;
 
-		if ( $this->fetched && !empty( $this->cart_contents ) )
+		if ( $this->fetched && ! empty( $this->cart_contents ) ) {
 			return $this->cart_contents;
+		}
 
 		$id = $this->get( 'id' );
 
-		$sql = $wpdb->prepare( "SELECT * FROM " . WPSC_TABLE_CART_CONTENTS . " WHERE purchaseid = %d", $id );
+		$sql = $wpdb->prepare( 'SELECT * FROM ' . WPSC_TABLE_CART_CONTENTS . ' WHERE purchaseid = %d', $id );
 		$this->cart_contents = $wpdb->get_results( $sql );
 
 		return $this->cart_contents;
