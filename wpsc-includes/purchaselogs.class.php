@@ -37,6 +37,9 @@ function wpsc_check_uniquenames() {
    }
 }
 
+/** Does the purchaselog have tracking information
+ * @return boolean
+ */
 function wpsc_purchlogs_has_tracking() {
 	global $purchlogitem;
 	if ( ! empty( $purchlogitem->extrainfo->track_id ) ) {
@@ -46,16 +49,22 @@ function wpsc_purchlogs_has_tracking() {
 	}
 }
 
+/**
+ * * @return string  current tracking id or or empty string if there isn't a tracking id
+ */
 function wpsc_purchlogitem_trackid() {
 	global $purchlogitem;
-	return esc_attr( $purchlogitem->extrainfo->track_id );
+	return esc_attr( empty( $purchlogitem->extrainfo->track_id ) ? '' : $purchlogitem->extrainfo->track_id );
 }
 
+/** Purchase shipping status
+ * @return string shipping status or empty string
+ */
 function wpsc_purchlogitem_trackstatus() {
 	global $wpsc_shipping_modules, $purchlogitem;
 
-	if ( is_callable( $wpsc_shipping_modules[$purchlogitem->extrainfo->shipping_method]->getStatus ) && ! empty( $purchlogitem->extrainfo->track_id ) ) {
-		$status = $wpsc_shipping_modules[$purchlogitem->extrainfo->shipping_method]->getStatus( $purchlogitem->extrainfo->track_id );
+	if ( is_callable( $wpsc_shipping_modules [$purchlogitem->extrainfo->shipping_method]->getStatus ) && ! empty( $purchlogitem->extrainfo->track_id ) ) {
+		$status = $wpsc_shipping_modules [$purchlogitem->extrainfo->shipping_method]->getStatus( $purchlogitem->extrainfo->track_id );
 	} else {
 		$status = '';
 	}
@@ -63,10 +72,13 @@ function wpsc_purchlogitem_trackstatus() {
 	return $status;
 }
 
+/** Tracking history for purchase
+ * @return string tracking history or empty string
+ */
 function wpsc_purchlogitem_trackhistory() {
 	global $purchlogitem;
 
-	if ( ( 'nzpost' == $purchlogitem->extrainfo->shipping_method ) && ! empty ( $purchlogitem->extrainfo->track_id ) ) {
+	if ( ( 'nzpost' == $purchlogitem->extrainfo->shipping_method ) && ! empty( $purchlogitem->extrainfo->track_id ) ) {
 
 		$output = '<ul>';
 		foreach ( ( array ) $_SESSION ['wpsc_nzpost_parsed'] [0] ['children'] [0] ['children'] [1] ['children'] as $history ) {
@@ -84,6 +96,36 @@ function wpsc_purchlogitem_trackhistory() {
 		// TODO: If there isn't one already, we should add a tracking callback to the shipping API
 		return '';
 	}
+}
+
+
+
+/** Weight of current or specified purchase
+ * @param string $id
+ * @return boolean|number
+ */
+function wpsc_purchlogs_get_weight( $id = '' ) {
+	global $purchlogitem;
+	$weight = 0.0;
+
+	if ( empty( $id ) ) {
+		$thepurchlogitem = $purchlogitem;
+	} else {
+		$thepurchlogitem = new wpsc_purchaselogs_items( $id );
+	}
+
+	if ( empty( $thepurchlogitem ) ) {
+		return false;
+	}
+
+	foreach ( ( array ) $thepurchlogitem->allcartcontent as $cartitem ) {
+		$product_meta = get_product_meta( $cartitem->prodid, 'product_metadata', true );
+		if ( ! empty( $product_meta ['weight'] ) ) {
+			$weight += $product_meta ['weight'] * $cartitem->quantity;
+		}
+	}
+
+	return $weight;
 }
 
 function wpsc_purchlogs_has_customfields( $id = '' ) {
