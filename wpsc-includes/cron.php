@@ -247,3 +247,4 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX && ( $_SERVER['SERVER_ADDR'] == $_SER
 	}
 
 }
+
