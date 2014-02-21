@@ -202,12 +202,8 @@ function wpsc_purchlogs_get_weight_text( $id = '' ) {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param  float  $weight                 calculated cart weight
+	 * @param  string weight of purchase as text string with both KG and pounds/ounces
 	 * @param  object wpsc_purchaselogs_items purchase log item being used
-	 * @param  int    purchase log item id
-	 * @param  int    $items_count            how many items are in the cart, useful for
-	 *                                        cases where packaging weight changes as more items are
-	 *                                        added
 	 */
 	return apply_filters( 'wpsc_purchlogs_get_weight_text', $weight_string, $id  );
 
