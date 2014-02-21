@@ -99,16 +99,16 @@ function wpsc_purchlogitem_trackhistory() {
 }
 
 
-
 /**
  * Weight of current or specified purchase
  *
  * @since 3.8.14
  *
+ *
  * @param string $id
  * @return float $weight in '$out_unit' of shipment
  */
-
+function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 	global $purchlogitem;
 	$weight = 0.0;
@@ -120,12 +120,17 @@ function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 		$thepurchlogitem = new wpsc_purchaselogs_items( $id );
 	}
 
-	/** Filter wpsc_purchlogs_before_get_weight
+	/**
+	 * Filter wpsc_purchlogs_before_get_weight
+	 *
 	 * Allow the weight to be overridden, can be used to persistantly save weight and recall it rather than recalculate
-	 * @param  float  $weight
+	 *
+	 * @since 3.8.14
+	 *
+	 * @param  float  $weight, purchase calculation will not continue if value is returned
 	 * @param  object wpsc_purchaselogs_items purchase log item being used
 	 * @param  int    purchase log item id
-	 * @return float  $weight                 cart weight, calculation will not continue if value is returned
+	 * @return float  $weight
 	 */
 	$weight_override = apply_filters( 'wpsc_purchlogs_before_get_weight', false, $thepurchlogitem, $thepurchlogitem->purchlogid );
 	if ( $weight_override !== false ) {
@@ -148,22 +153,33 @@ function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 		}
 	}
 
-	/** Filter wpsc_purchlogs_get_weight
-	 * Allow the weight to be overridden,
+	/**
+	 * Filter wpsc_purchlogs_get_weight
+	 *
+	 * Allow the weight to be overridden
+	 *
+	 * @since 3.8.14
+	 *
 	 * @param  float  $weight                 calculated cart weight
 	 * @param  object wpsc_purchaselogs_items purchase log item being used
 	 * @param  int    purchase log item id
 	 * @param  int    $items_count            how many items are in the cart, useful for
 	 *                                        cases where packaging weight changes as more items are
 	 *                                        added
-	 * @return float  $weight                 changed product weight
 	 */
 	$weight = apply_filters( 'wpsc_purchlogs_get_weight', $weight, $thepurchlogitem, $thepurchlogitem->purchlogid, $items_count );
 
 	return $weight;
 }
 
-
+/**
+ * Weight of current or specified purchase formatted as text with units
+ *
+ * @since 3.8.14
+ *
+ * @param string $id
+ * @return string $weight in KG and lbs and ounces
+ */
 function wpsc_purchlogs_get_weight_text( $id = '' ) {
 
 	$weight_in_pounds = wpsc_purchlogs_get_weight( $id, 'pound' );
@@ -179,6 +195,20 @@ function wpsc_purchlogs_get_weight_text( $id = '' ) {
 		$id = $purchlogitem->purchlogid;
 	}
 
+	/**
+	 * Filter wpsc_purchlogs_get_weight_text
+	 *
+	 * Format weight as text suitable to inform user of purchase shipping weight
+	 *
+	 * @since 3.8.14
+	 *
+	 * @param  float  $weight                 calculated cart weight
+	 * @param  object wpsc_purchaselogs_items purchase log item being used
+	 * @param  int    purchase log item id
+	 * @param  int    $items_count            how many items are in the cart, useful for
+	 *                                        cases where packaging weight changes as more items are
+	 *                                        added
+	 */
 	return apply_filters( 'wpsc_purchlogs_get_weight_text', $weight_string, $id  );
 
 }
