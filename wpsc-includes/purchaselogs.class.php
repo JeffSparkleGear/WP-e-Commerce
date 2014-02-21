@@ -37,43 +37,122 @@ function wpsc_check_uniquenames() {
    }
 }
 
+/** Does the purchaselog have tracking information
+ * @return boolean
+ */
 function wpsc_purchlogs_has_tracking() {
-   global $wpdb, $wpsc_shipping_modules, $purchlogitem;
-   $custom_shipping = get_option( 'custom_shipping_options' );
-   if ( in_array( 'nzpost', (array)$custom_shipping ) && $purchlogitem->extrainfo->track_id != '' ) {
-	  return true;
-   } else {
-	  return false;
-   }
+	global $purchlogitem;
+	if ( ! empty( $purchlogitem->extrainfo->track_id ) ) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
+/**
+ * * @return string  current tracking id or or empty string if there isn't a tracking id
+ */
 function wpsc_purchlogitem_trackid() {
-   global $purchlogitem;
-   return esc_attr( $purchlogitem->extrainfo->track_id );
+	global $purchlogitem;
+	return esc_attr( empty( $purchlogitem->extrainfo->track_id ) ? '' : $purchlogitem->extrainfo->track_id );
 }
 
+/** Purchase shipping status
+ * @return string shipping status or empty string
+ */
 function wpsc_purchlogitem_trackstatus() {
-   global $wpdb, $wpsc_shipping_modules, $purchlogitem;
-   $custom_shipping = get_option( 'custom_shipping_options' );
-   if ( in_array( 'nzpost', (array)$custom_shipping ) && $purchlogitem->extrainfo->track_id != '' ) {
-	  $status = $wpsc_shipping_modules['nzpost']->getStatus( $purchlogitem->extrainfo->track_id );
-   }
+	global $wpsc_shipping_modules, $purchlogitem;
 
-   return $status;
+	if ( is_callable( $wpsc_shipping_modules [$purchlogitem->extrainfo->shipping_method]->getStatus ) && ! empty( $purchlogitem->extrainfo->track_id ) ) {
+		$status = $wpsc_shipping_modules [$purchlogitem->extrainfo->shipping_method]->getStatus( $purchlogitem->extrainfo->track_id );
+	} else {
+		$status = '';
+	}
+
+	return $status;
 }
 
+/** Tracking history for purchase
+ * @return string tracking history or empty string
+ */
 function wpsc_purchlogitem_trackhistory() {
-   global $purchlogitem;
-   $output = '<ul>';
-   foreach ( (array)$_SESSION['wpsc_nzpost_parsed'][0]['children'][0]['children'][1]['children'] as $history ) {
-	  $outputs[] = '<li>' . $history['children'][0]['tagData'] . " : " . $history['children'][1]['tagData'] . " </li>";
-   }
-   $outputs = array_reverse( $outputs );
-   foreach ( $outputs as $o ) {
-	  $output .= $o;
-   }
-   $output .='</ul>';
-   return $output;
+	global $purchlogitem;
+
+	if ( ( 'nzpost' == $purchlogitem->extrainfo->shipping_method ) && ! empty( $purchlogitem->extrainfo->track_id ) ) {
+
+		$output = '<ul>';
+		foreach ( ( array ) $_SESSION ['wpsc_nzpost_parsed'] [0] ['children'] [0] ['children'] [1] ['children'] as $history ) {
+			$outputs [] = '<li>' . $history ['children'] [0] ['tagData'] . ' : ' . $history ['children'] [1] ['tagData'] . ' </li>';
+		}
+
+		$outputs = array_reverse( $outputs );
+		foreach ( $outputs as $o ) {
+			$output .= $o;
+		}
+
+		$output .= '</ul>';
+		return $output;
+	} else {
+		// TODO: If there isn't one already, we should add a tracking callback to the shipping API
+		return '';
+	}
+}
+
+
+
+/** Weight of current or specified purchase
+ * @param string $id
+ * @return boolean|number
+ */
+function wpsc_purchlogs_get_weight( $id = '' ) {
+	global $purchlogitem;
+	$weight = 0.0;
+	$items_count = 0;
+
+	if ( empty( $id ) ) {
+		$thepurchlogitem = $purchlogitem;
+	} else {
+		$thepurchlogitem = new wpsc_purchaselogs_items( $id );
+	}
+
+	/** Filter wpsc_purchlogs_before_get_weight
+	 * Allow the weight to be overridden, can be used to persistantly save weight and recall it rather than recalculate
+	 * @param  float  $weight
+	 * @param  object wpsc_purchaselogs_items purchase log item being used
+	 * @param  int    purchase log item id
+	 * @return float  $weight                 cart weight, calculation will not continue if value is returned
+	 */
+	$weight_override = apply_filters( 'wpsc_purchlogs_before_get_weight', false, $thepurchlogitem, $thepurchlogitem->id );
+	if ( $weight_override !== false ) {
+		return $weight_override;
+	}
+
+	// if there isn't a purchase log item we are done
+	if ( empty( $thepurchlogitem ) ) {
+		return false;
+	}
+
+	foreach ( ( array ) $thepurchlogitem->allcartcontent as $cartitem ) {
+		$product_meta = get_product_meta( $cartitem->prodid, 'product_metadata', true );
+		if ( ! empty( $product_meta ['weight'] ) ) {
+			$weight += $product_meta ['weight'] * $cartitem->quantity;
+			$items_count += $cartitem->quantity;
+		}
+	}
+
+	/** Filter wpsc_purchlogs_get_weight
+	 * Allow the weight to be overridden,
+	 * @param  float  $weight                 calculated cart weight
+	 * @param  object wpsc_purchaselogs_items purchase log item being used
+	 * @param  int    purchase log item id
+	 * @param  int    $items_count            how many items are in the cart, useful for
+	 *                                        cases where packaging weight changes as more items are
+	 *                                        added
+	 * @return float  $weight                 changed product weight
+	 */
+	$weight = apply_filters( 'wpsc_purchlogs_get_weight', $weight, $thepurchlogitem, $thepurchlogitem->id, $items_count );
+
+	return $weight;
 }
 
 function wpsc_purchlogs_has_customfields( $id = '' ) {
