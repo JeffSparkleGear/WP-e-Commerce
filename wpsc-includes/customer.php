@@ -17,7 +17,7 @@ if ( ! defined( 'WPSC_BOT_VISITOR_ID' ) ) {
  * @since 3.8.9
  * @return mixed        User ID (if logged in) or customer cookie ID
  */
-function wpsc_get_current_customer_id() {
+function wpsc_get_current_customer_id( $visitor_id_to_set = false ) {
 	// once we determine the current customer id it will remain in effect for
 	// the remainder of the current request.  This helps performance, but also
 	// makes it possible to manipulate the visitor database and cookie without
@@ -26,16 +26,28 @@ function wpsc_get_current_customer_id() {
 	// midway through the HTTP request processing
 	static $visitor_id = false;
 
+	if ( $visitor_id_to_set ) {
+		$visitor_id = $visitor_id_to_set;
+	}
+
 	if ( $visitor_id !== false ) {
 		return $visitor_id;
 	}
 
 	if ( _wpsc_is_bot_user() ) {
 		$visitor_id = WPSC_BOT_VISITOR_ID;
-	} elseif ( is_user_logged_in() ) {
+	}
+
+	if ( ! $visitor_id && is_user_logged_in() ) {
 		// if the user is logged in we use the user id
 		$visitor_id = _wpsc_get_wp_user_visitor_id();
-	} elseif ( isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
+		if ( $visitor_id == WPSC_BOT_VISITOR_ID ) {
+			// it is not allowed to have the bot visitor id
+			$visitor_id = false;
+		}
+	}
+
+	if ( ! $visitor_id && isset( $_COOKIE[WPSC_CUSTOMER_COOKIE] ) ) {
 		list( $id, $expire, $hash ) = explode( '|', $_COOKIE[WPSC_CUSTOMER_COOKIE] );
 		$visitor_id = $id;
 	}

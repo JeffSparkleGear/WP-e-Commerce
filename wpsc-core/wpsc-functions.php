@@ -336,12 +336,13 @@ function wpsc_register_post_types() {
 	$labels = array(
 		'name'          => _x( 'Product Tags'        , 'taxonomy general name' , 'wpsc' ),
 		'singular_name' => _x( 'Product Tag'         , 'taxonomy singular name', 'wpsc' ),
-		'search_items'  => __( 'Product Search Tags' , 'wpsc' ),
+		'search_items'  => __( 'Search Product Tags' , 'wpsc' ),
 		'all_items'     => __( 'All Product Tags'    , 'wpsc' ),
 		'edit_item'     => __( 'Edit Tag'            , 'wpsc' ),
 		'update_item'   => __( 'Update Tag'          , 'wpsc' ),
-		'add_new_item'  => __( 'Add new Product Tag' , 'wpsc' ),
+		'add_new_item'  => __( 'Add New Product Tag' , 'wpsc' ),
 		'new_item_name' => __( 'New Product Tag Name', 'wpsc' ),
+		'choose_from_most_used' => __('Choose from most used Product Tags', 'wpsc' ),
 	);
 
 	$args = array(
@@ -447,21 +448,17 @@ function wpsc_serialize_shopping_cart() {
 	if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) )
 		return;
 
-	// avoid flooding transients with bots hitting feeds
-	if ( is_feed() ) {
-		wpsc_delete_all_customer_meta();
-		return;
-	}
-
-	if ( is_object( $wpsc_cart ) )
+	if ( is_object( $wpsc_cart ) ) {
 		$wpsc_cart->errors = array();
+	}
 
 	// need to prevent set_cookie from being called at this stage in case the user just logged out
 	// because by now, some output must have been printed out
 	$customer_id = wpsc_get_current_customer_id();
 
-	if ( $customer_id )
-		wpsc_update_customer_meta( 'cart', base64_encode( serialize( $wpsc_cart ) ) );
+	if ( $customer_id ) {
+		wpsc_update_customer_cart( $wpsc_cart, $customer_id );
+	}
 
 	return true;
 }
