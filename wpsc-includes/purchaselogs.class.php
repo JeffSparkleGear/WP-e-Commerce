@@ -100,16 +100,21 @@ function wpsc_purchlogitem_trackhistory() {
 
 
 
-/** Weight of current or specified purchase
+/**
+ * Weight of current or specified purchase
+ *
+ * @since 3.8.14
+ *
  * @param string $id
- * @return boolean|number
+ * @return float $weight in '$out_unit' of shipment
  */
-function wpsc_purchlogs_get_weight( $id = '' ) {
+
+function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 	global $purchlogitem;
 	$weight = 0.0;
 	$items_count = 0;
 
-	if ( empty( $id ) ) {
+	if ( empty( $id ) || $id == $thepurchlogitem->purchlogid ) {
 		$thepurchlogitem = $purchlogitem;
 	} else {
 		$thepurchlogitem = new wpsc_purchaselogs_items( $id );
@@ -135,7 +140,10 @@ function wpsc_purchlogs_get_weight( $id = '' ) {
 	foreach ( ( array ) $thepurchlogitem->allcartcontent as $cartitem ) {
 		$product_meta = get_product_meta( $cartitem->prodid, 'product_metadata', true );
 		if ( ! empty( $product_meta ['weight'] ) ) {
-			$weight += $product_meta ['weight'] * $cartitem->quantity;
+
+			$converted_weight = wpsc_convert_weight( $product_meta ['weight'], $product_meta['weight_unit'], $out_unit, true );
+
+			$weight += $converted_weight * $cartitem->quantity;
 			$items_count += $cartitem->quantity;
 		}
 	}
@@ -153,6 +161,26 @@ function wpsc_purchlogs_get_weight( $id = '' ) {
 	$weight = apply_filters( 'wpsc_purchlogs_get_weight', $weight, $thepurchlogitem, $thepurchlogitem->purchlogid, $items_count );
 
 	return $weight;
+}
+
+
+function wpsc_purchlogs_get_weight_text( $id = '' ) {
+
+	$weight_in_pounds = wpsc_purchlogs_get_weight( $id, 'pound' );
+
+	$pound = floor( $weight_in_pounds );
+	$ounce = ( $weight_in_pounds - $pound ) * 16;
+
+	$weight_in_kg = wpsc_purchlogs_get_weight( $id, 'KG' );
+
+	$weight_string = number_format( $weight_in_kg , 2 ) . __( 'KG' , 'wpsc' ) . ' / ' .  $pound . ' ' .  __( 'lb', 'wpsc' ) . ' ' . $ounce . ' ' . __( 'oz', 'wpsc' );
+
+	if ( empty( $id ) ) {
+		$id = $purchlogitem->purchlogid;
+	}
+
+	return apply_filters( 'wpsc_purchlogs_get_weight_text', $weight_string, $id  );
+
 }
 
 function wpsc_purchlogs_has_customfields( $id = '' ) {
