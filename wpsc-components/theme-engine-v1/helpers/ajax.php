@@ -46,8 +46,7 @@ if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_location' == $_REQUEST['w
 	add_action( 'init', 'wpsc_update_location' );
 }
 
-// TODO: This action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST
-if ( ! isset( $_REQUEST['wpsc_ajax_action'] ) && ! isset( $_REQUEST['wpsc_action'] ) && isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_shipping_price' == $_REQUEST['wpsc_ajax_action'] ) {
+if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_shipping_price' == $_REQUEST['wpsc_ajax_action'] ) {
 	add_action( 'init', 'wpsc_update_shipping_price' );
 }
 
