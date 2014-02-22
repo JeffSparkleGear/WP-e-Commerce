@@ -28,25 +28,34 @@ if ( isset( $_REQUEST['wpsc_ajax_action'] ) && (($_REQUEST['wpsc_ajax_action'] =
 if ( isset( $_POST['coupon_num'] ) )
 	add_action( 'init', 'wpsc_coupon_price' );
 
-if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'add_to_cart' == $_REQUEST['wpsc_ajax_action'] )
-    add_action( 'init', 'wpsc_add_to_cart' );
+if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'add_to_cart' == $_REQUEST['wpsc_ajax_action'] ) {
+	add_action( 'init', 'wpsc_add_to_cart' );
+}
 
-if ( isset( $_REQUEST['wpsc_update_quantity'] ) && ($_REQUEST['wpsc_update_quantity'] == 'true') )
+// TODO: This action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST
+if ( ! isset( $_REQUEST['wpsc_ajax_action'] ) && ! isset( $_REQUEST['wpsc_action'] )
+		&& isset( $_REQUEST['wpsc_update_quantity'] ) && ($_REQUEST['wpsc_update_quantity'] == 'true') ) {
 	add_action( 'init', 'wpsc_update_item_quantity', 9 );
+}
 
-if ( isset( $_REQUEST['wpsc_ajax_action'] ) && ($_REQUEST['wpsc_ajax_action'] == 'rate_product') )
+if ( isset( $_REQUEST['wpsc_ajax_action'] ) && ($_REQUEST['wpsc_ajax_action'] == 'rate_product') ) {
 	add_action( 'init', 'wpsc_update_product_rating' );
+}
 
-if ( isset( $_REQUEST['wpsc_ajax_actions'] ) && 'update_location' == $_REQUEST['wpsc_ajax_actions'] ) {
+if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_location' == $_REQUEST['wpsc_ajax_action'] ) {
 	add_action( 'init', 'wpsc_update_location' );
 }
 
-if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_shipping_price' == $_REQUEST['wpsc_ajax_action'] ) {
-    add_action( 'init', 'wpsc_update_shipping_price' );
+// TODO: This action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST
+if ( ! isset( $_REQUEST['wpsc_ajax_action'] ) && ! isset( $_REQUEST['wpsc_action'] ) && isset( $_REQUEST['wpsc_ajax_action'] ) && 'update_shipping_price' == $_REQUEST['wpsc_ajax_action'] ) {
+	add_action( 'init', 'wpsc_update_shipping_price' );
 }
 
-if ( isset( $_REQUEST['update_product_price'] ) && 'true' == $_REQUEST['update_product_price'] && ! empty( $_POST['product_id'] ) && is_numeric( $_POST['product_id'] ) ) {
-    add_action( 'init', 'wpsc_update_product_price' );
+// TODO: This action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST
+if ( ! isset( $_REQUEST['wpsc_ajax_action'] ) && ! isset( $_REQUEST['wpsc_action'] )
+		&& isset( $_REQUEST['update_product_price'] ) && 'true' == $_REQUEST['update_product_price']
+			&& ! empty( $_POST['product_id'] ) && is_numeric( $_POST['product_id'] ) ) {
+	add_action( 'init', 'wpsc_update_product_price' );
 }
 
 add_action( 'wp_ajax_add_to_cart'       , 'wpsc_add_to_cart' );
