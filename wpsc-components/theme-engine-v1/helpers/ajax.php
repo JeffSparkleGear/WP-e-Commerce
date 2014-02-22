@@ -32,7 +32,9 @@ if ( isset( $_REQUEST['wpsc_ajax_action'] ) && 'add_to_cart' == $_REQUEST['wpsc_
 	add_action( 'init', 'wpsc_add_to_cart' );
 }
 
-// TODO: This action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST
+
+// TODO: As of 3.8.14 this action should be changed in the templates to follow the standard of setting the wpsc_ajax_action property in $_REQUEST,
+// the extra logic here is to handle older templates that do not set the wpsc_ajax_action $_REQUEST property.
 if ( ( isset( $_REQUEST['wpsc_ajax_action'] ) && ( 'wpsc_update_quantity' != $_REQUEST['wpsc_ajax_action'] ) ) ||
 		( ! isset( $_REQUEST['wpsc_ajax_action'] ) && ! isset( $_REQUEST['wpsc_action'] )
 			&& isset( $_REQUEST['wpsc_update_quantity'] ) && ($_REQUEST['wpsc_update_quantity'] == 'true') ) ) {
