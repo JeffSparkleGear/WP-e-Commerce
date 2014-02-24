@@ -88,18 +88,26 @@ function wpsc_core_constants() {
 		define( 'WPSC_CUSTOMER_DATA_EXPIRATION', 48 * 3600 );
 	}
 
-	if ( ! defined( 'WPSC_DONT_CACHE' ) ) {
+	/*
+	 * When caching is true, the cart needs to be loaded using AJAX.
+	 * Caching is false then the cart can be generated in-line with the page.content.
+	 *
+	 * In the case of the cart widget, true would always load the widget using AJAX
+	 * That would mean that one user would not see another users cart because the
+	 * other user's request filled the page cache.
+	 */
+	if ( ! defined( 'WPSC_PAGE_CACHE_IN_USE' ) ) {
 		// if the do not cache constant is set behave as if there was a page cache in place and
 		// don't cache generated results
 		if ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) {
-			define( 'WPSC_DONT_CACHE', true );
+			define( 'WPSC_PAGE_CACHE_IN_USE', true );
 		} elseif ( defined( 'WP_CACHE' ) ) {
-			define( 'WPSC_DONT_CACHE', WP_CACHE );
+			define( 'WPSC_PAGE_CACHE_IN_USE', WP_CACHE );
 		} else {
 			// default to assuming a cache is there if we don't know otherwise,
 			// this should prevent one user's data from being used to generate pages
 			// that other user may see, for example cat contents.
-			define( 'WPSC_DONT_CACHE', true );
+			define( 'WPSC_PAGE_CACHE_IN_USE', true );
 		}
 	}
 }
