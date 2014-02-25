@@ -78,93 +78,101 @@ if ( ! empty( $wpsc_ajax_action ) ) {
 		////////////////////////////////////////////////////////////////////////////////////////////
 		// Checkout AJAX Actions
 		case 'termsandconds':
+		case 'wpsc_termsandconds':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_show_terms_and_conditions', 'init' );
 			break;
 
+		case 'submit_checkout':
 		case 'wpsc_submit_checkout':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_submit_checkout', 'init' );
 			break;
 
+		case 'cart_html_page':
 		case 'wpsc_cart_html_page':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_cart_html_page', 'init', 110 );
 			break;
 
+		case 'update_location':
 		case 'wpsc_update_location':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_location', 'init' );
 			break;
 
+		case 'update_shipping_price':
 		case 'wpsc_update_shipping_price':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_shipping_price', 'init' );
 			break;
 
+		case 'update_quantity':
 		case 'wpsc_update_quantity':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_item_quantity', 'init' );
 			break;
 
-		case 'wpsc_submit_checkout':
-			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_submit_checkout' );
-			break;
-
 		case 'update_shipping_price':
+		case 'wpsc_update_shipping_price':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_shipping_price' );
 			break;
 
-		case 'update_location':
-			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_location' );
-			break;
-
 		case 'change_tax':
+		case 'wpsc_change_tax':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_change_tax' );
 			break;
 
 		case 'change_profile_country':
+		case 'wpsc_change_profile_country':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, '_wpsc_change_profile_country' );
 			break;
 
 		case 'shipping_same_as_billing_update':
+		case 'wpsc_shipping_same_as_billing_update':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_shipping_quotes_on_shipping_same_as_billing' );
 			break;
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 		// Product AJAX Actions
+		case 'get_rating_count':
 		case 'wpsc_get_rating_count':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_get_rating_count', 'init' );
 			break;
 
+		case 'update_product_rating':
 		case 'wpsc_update_product_rating':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_product_rating', 'init' );
 			break;
 
 		case 'update_product_price':
+		case 'wpsc_update_product_price':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_update_product_price' );
 			break;
 
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 		// Cart AJAX Actions
+		case 'empty_cart':
 		case 'wpsc_empty_cart':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_empty_cart', 'init' );
 			break;
 
+		case 'add_to_cart':
 		case 'wpsc_add_to_cart':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_add_to_cart', 'init' );
 			break;
 
 		case 'add_to_cart':
+		case 'wpsc_add_to_cart':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_add_to_cart' );
 			break;
 
 		case 'get_cart':
+		case 'wpsc_get_cart':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_get_cart' );
 			break;
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 		// Widget AJAX Actions
+		case 'special_widget':
 		case 'wpsc_special_widget':
 			_wpsc_add_ajax_action( $wpsc_ajax_action, 'wpsc_special_widget', 'init' );
 			break;
-
-
 	}
 }
 // End of action setup
