@@ -169,7 +169,6 @@ function _wpsc_create_customer_id_cookie( $id, $fake_it = false ) {
 	$expire = time() + WPSC_CUSTOMER_DATA_EXPIRATION; // valid for 48 hours
 	$data   = $id . $expire;
 
-	$user = get_user_by( 'id', $id );
 	$key = wp_hash( _wpsc_visitor_security_key( $id ) . '|' . $expire );
 
 	$hash   = hash_hmac( 'md5', $data, $key );
@@ -252,15 +251,13 @@ function _wpsc_set_purchase_log_customer_id( $wpsc_purchase_log ) {
 	wpsc_delete_customer_meta( 'temporary_profile' );
 
 	// connect the purchase to the visitor id
-	wpsc_update_purchase_meta( $wpsc_purchase_log->id, 'visitor_id', wpsc_get_current_customer_id(), true );
+	wpsc_update_purchase_meta( $wpsc_purchase_log->get( 'id' ), 'visitor_id', wpsc_get_current_customer_id(), true );
 
 	// connect the visitor to purchase
-	wpsc_add_visitor_meta( wpsc_get_current_customer_id(), 'purchase_id',  $wpsc_purchase_log->id, false );
-
-	return $data;
+	wpsc_add_visitor_meta( wpsc_get_current_customer_id(), 'purchase_id',  $wpsc_purchase_log->get( 'id' ), false );
 }
 
-add_filter( 'wpsc_purchase_log_insert', '_wpsc_set_purchase_log_customer_id', 10, 1 );
+add_action( 'wpsc_purchase_log_insert', '_wpsc_set_purchase_log_customer_id', 10, 1 );
 
 /**
  * Return the internal customer meta key, which depends on the blog prefix
