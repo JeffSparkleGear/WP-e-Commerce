@@ -65,8 +65,6 @@ abstract class WPSC_Purchase_Log_Notification {
 		$log_id   = $this->purchase_log->get( 'id' );
 		$log_data = $this->purchase_log->get_data();
 		$rows     = array();
-		error_log( __FUNCTION__ . ':' . __LINE__  . ' : purchase_log' );
-		error_log( var_export( $this->purchase_log, true ) );
 
 		$headings = array(
 			_x( 'Name'       , 'purchase log notification table heading', 'wpsc' ) => 'left',
@@ -167,9 +165,6 @@ abstract class WPSC_Purchase_Log_Notification {
 			$output .= wpautop( esc_html( $cart_item->custom_message ) );
 		}
 
-		error_log( __FUNCTION__ . ':' . __LINE__ );
-		error_log( var_export( $output, true ) );
-
 		$links = wpsc_get_downloadable_links( $this->purchase_log );
 		if ( empty( $links ) )
 			return $output;
@@ -251,13 +246,6 @@ abstract class WPSC_Purchase_Log_Notification {
 		}
 
 		$msg = str_replace( $tokens, $values, $this->raw_message );
-
-		error_log( ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> process_args' );
-		error_log( 'args: ' . var_export( $args, true ) );
-		error_log( 'tokens: ' . var_export( $tokens, true ) );
-		error_log( 'values: ' . var_export( $values, true ) );
-		error_log( 'raw: ' . var_export(  $this->raw_message, true ) );
-		error_log( 'msg: ' . var_export( $msg, true ) );
 
 		return $msg;
 	}
