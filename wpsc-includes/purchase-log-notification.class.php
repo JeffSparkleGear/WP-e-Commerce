@@ -245,9 +245,7 @@ abstract class WPSC_Purchase_Log_Notification {
 			$token = "%{$token}%";
 		}
 
-		$msg = str_replace( $tokens, $values, $this->raw_message );
-
-		return $msg;
+		return str_replace( $tokens, $values, $this->raw_message );
 	}
 
 	protected function process_plaintext_args() {
