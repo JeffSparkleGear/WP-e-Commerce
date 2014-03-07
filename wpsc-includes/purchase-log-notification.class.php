@@ -45,12 +45,12 @@ abstract class WPSC_Purchase_Log_Notification {
 			'discount'        => sprintf( __( 'Discount Amount: %s (%s)', 'wpsc' ), $discount, $this->purchase_log->get( 'discount_data' ) ) . "\r\n",
 
 			// New tags
-			'coupon_code'     => $this->purchase_log->get( 'discount_data'        ),
-			'transaction_id'  => $this->purchase_log->get( 'transactid'           ),
-			'purchase_log_id' => $this->purchase_log->get( 'id'                   ),
-			'payment_method'  => $this->purchase_log->get( 'gateway_name'         ),
-			'shipping_method' => $this->purchase_log->get( 'shipping_method_name' ),
-			'shipping_option' => $this->purchase_log->get( 'shipping_option_name' ),
+			'coupon_code'     => $this->purchase_log->get( 'discount_data'   ),
+			'transaction_id'  => $this->purchase_log->get( 'transactid'      ),
+			'purchase_log_id' => $this->purchase_log->get( 'id'              ),
+			'payment_method'  => $this->purchase_log->get( 'gateway'         ),
+			'shipping_method' => $this->purchase_log->get( 'shipping_method' ),
+			'shipping_option' => $this->purchase_log->get( 'shipping_option' ),
 			'discount_amount' => $discount,
 			'tax'             => $tax,
 			'shipping'        => $shipping,
@@ -65,6 +65,8 @@ abstract class WPSC_Purchase_Log_Notification {
 		$log_id   = $this->purchase_log->get( 'id' );
 		$log_data = $this->purchase_log->get_data();
 		$rows     = array();
+		error_log( __FUNCTION__ . ':' . __LINE__  . ' : purchase_log' );
+		error_log( var_export( $this->purchase_log, true ) );
 
 		$headings = array(
 			_x( 'Name'       , 'purchase log notification table heading', 'wpsc' ) => 'left',
@@ -165,6 +167,9 @@ abstract class WPSC_Purchase_Log_Notification {
 			$output .= wpautop( esc_html( $cart_item->custom_message ) );
 		}
 
+		error_log( __FUNCTION__ . ':' . __LINE__ );
+		error_log( var_export( $output, true ) );
+
 		$links = wpsc_get_downloadable_links( $this->purchase_log );
 		if ( empty( $links ) )
 			return $output;
@@ -245,7 +250,16 @@ abstract class WPSC_Purchase_Log_Notification {
 			$token = "%{$token}%";
 		}
 
-		return str_replace( $tokens, $values, $this->raw_message );
+		$msg = str_replace( $tokens, $values, $this->raw_message );
+
+		error_log( ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> process_args' );
+		error_log( 'args: ' . var_export( $args, true ) );
+		error_log( 'tokens: ' . var_export( $tokens, true ) );
+		error_log( 'values: ' . var_export( $values, true ) );
+		error_log( 'raw: ' . var_export(  $this->raw_message, true ) );
+		error_log( 'msg: ' . var_export( $msg, true ) );
+
+		return $msg;
 	}
 
 	protected function process_plaintext_args() {
