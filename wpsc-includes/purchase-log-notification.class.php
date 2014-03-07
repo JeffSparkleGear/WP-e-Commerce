@@ -45,12 +45,12 @@ abstract class WPSC_Purchase_Log_Notification {
 			'discount'        => sprintf( __( 'Discount Amount: %s (%s)', 'wpsc' ), $discount, $this->purchase_log->get( 'discount_data' ) ) . "\r\n",
 
 			// New tags
-			'coupon_code'     => $this->purchase_log->get( 'discount_data'   ),
-			'transaction_id'  => $this->purchase_log->get( 'transactid'      ),
-			'purchase_log_id' => $this->purchase_log->get( 'id'              ),
-			'payment_method'  => $this->purchase_log->get( 'gateway'         ),
-			'shipping_method' => $this->purchase_log->get( 'shipping_method' ),
-			'shipping_option' => $this->purchase_log->get( 'shipping_option' ),
+			'coupon_code'     => $this->purchase_log->get( 'discount_data'        ),
+			'transaction_id'  => $this->purchase_log->get( 'transactid'           ),
+			'purchase_log_id' => $this->purchase_log->get( 'id'                   ),
+			'payment_method'  => $this->purchase_log->get( 'gateway_name'         ),
+			'shipping_method' => $this->purchase_log->get( 'shipping_method_name' ),
+			'shipping_option' => $this->purchase_log->get( 'shipping_option_name' ),
 			'discount_amount' => $discount,
 			'tax'             => $tax,
 			'shipping'        => $shipping,
