@@ -105,28 +105,30 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$title = 'billingcountry';
 	}
 
-	$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
-	$additional_attributes = "title='{$title}' {$js}";
+	//$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
+	$additional_attributes = 'data-wpsc-meta-key="' . $title . '" title="' . $title . '" ' . $js;
 	$output .= "<div id='$html_form_id'>\n\r";
-	$output .= wpsc_get_country_dropdown( array(
-		'id'                    => $supplied_form_id,
-		'name'                  => "collected_data[{$form_id}][0]",
-		'class'                 => 'current_country',
-		'selected'              => $selected_country,
-		'additional_attributes' => $additional_attributes,
-		'placeholder'           => '',
-	) );
+	$output .= wpsc_get_country_dropdown(
+		array(
+				'id'                    => $supplied_form_id,
+				'name'                  => "collected_data[{$form_id}][0]",
+				'class'                 => 'current_country wpsc-visitor-meta',
+				'selected'              => $selected_country,
+				'additional_attributes' => $additional_attributes,
+				'placeholder'           => '',
+		)
+	);
 
 	$region_list    = $wpdb->get_results( $wpdb->prepare( "SELECT `" . WPSC_TABLE_REGION_TAX . "`.* FROM `" . WPSC_TABLE_REGION_TAX . "`, `" . WPSC_TABLE_CURRENCY_LIST . "`  WHERE `" . WPSC_TABLE_CURRENCY_LIST . "`.`isocode` IN(%s) AND `" . WPSC_TABLE_CURRENCY_LIST . "`.`id` = `" . WPSC_TABLE_REGION_TAX . "`.`country_id` ORDER BY name ASC", $selected_country ), ARRAY_A );
 	$sql            = "SELECT `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `unique_name` = 'shippingstate' ";
 	$region_form_id = $wpdb->get_var( $sql );
 
 	if ( $checkoutfields ) {
-		$namevalue = "name='collected_data[" . $region_form_id . "]'";
-		$js = "onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");'";
+		$namevalue = ' name="collected_data["' . $region_form_id . ']" ';
+		$js = " onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");' ";
 		$title = 'shippingstate';
 	} else {
-		$namevalue = "name='collected_data[" . $form_id . "][1]'";
+		$namevalue = ' name="collected_data[' . $form_id . '][1]" ';
 		$js = "onchange='set_billing_country(\"$html_form_id\", \"$form_id\");'";
 		$title = 'billingstate';
 	}
@@ -145,8 +147,8 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$output .= "</select>\n\r";
 	}
 
-	$output .= "</div>";
-	$output .= "</div>\n\r";
+	$output .= '</div>';
+	$output .= '</div>\n\r';
 
 	return $output;
 }

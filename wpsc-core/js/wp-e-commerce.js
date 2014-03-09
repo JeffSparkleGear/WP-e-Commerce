@@ -617,7 +617,7 @@ function set_shipping_country(html_form_id, form){
 function wpsc_handle_country_change( response ) {
 	var wpsc_checkout_table_selector;
 
-	if ( response.lock_tax ) {
+	//if ( response.lock_tax ) {
 		jQuery( '#current_country' ).val( response.delivery_country );
 
 		jQuery('.shipping_country').val( response.delivery_country );
@@ -627,7 +627,7 @@ function wpsc_handle_country_change( response ) {
 			jQuery( '#region' ).remove();
 			jQuery( '#change_country' ).append( response.shipping_region_list );
 		}
-	}
+	//}
 
 	jQuery.each( response.shipping_keys, function( key, shipping ) {
 		jQuery( '#shipping_' + key ).html( shipping );
@@ -644,9 +644,9 @@ function wpsc_handle_country_change( response ) {
 			jQuery( wpsc_checkout_table_selector + ' .billing_region' ).parent().parent().hide();
 			jQuery( wpsc_checkout_table_selector + ' .shipping_region' ).parent().parent().hide();
 	} else {
-		if ( response.lock_tax ) {
+		//if ( response.lock_tax ) {
 			jQuery( '#region' ).hide();
-		}
+		//}
 
 		jQuery( '#region_select_' + response.form_id ).html( '' );
 

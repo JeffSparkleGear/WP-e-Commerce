@@ -819,7 +819,7 @@ function wpsc_change_tax() {
 	$json_response['total']            = $total;
 	$json_response['total_input']      = $total_input;
 
-	if ( get_option( 'lock_tax' ) == 1 ) {
+	//if ( get_option( 'lock_tax' ) == 1 ) {
 
 		$json_response['lock_tax']     = get_option( 'lock_tax' );
 		$json_response['country_name'] = wpsc_get_country( $delivery_country );
@@ -829,7 +829,7 @@ function wpsc_change_tax() {
 			$output = str_replace( array( "\n", "\r" ), '', $output );
 			$json_response['shipping_region_list'] = $output;
 		}
-	}
+	//}
 
 	foreach ( $wpsc_cart->cart_items as $key => $cart_item ) {
 		$json_response['shipping_keys'][ $key ] = wpsc_currency_display( $cart_item->shipping );
