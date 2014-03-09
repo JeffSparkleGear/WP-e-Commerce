@@ -96,7 +96,7 @@ function _wpsc_validate_visitor_meta_key( $visitor_meta_key ) {
 		$build_in_checkout_names = wpsc_checkout_unique_names();
 
 		// the built in checkout names cannot be aliased to something else
-		if ( ! isset( $build_in_checkout_names[$visitor_meta_key] ) ) {
+		if ( ! in_array( $visitor_meta_key, $build_in_checkout_names ) ) {
 
 			/**
 			 * Filter wpsc_visitor_meta_key_replacements
@@ -111,7 +111,7 @@ function _wpsc_validate_visitor_meta_key( $visitor_meta_key ) {
 			 */
 			$aliased_meta_keys = apply_filters( 'wpsc_visitor_meta_key_replacements', array() );
 
-			if ( in_array( $visitor_meta_key, $aliased_meta_keys ) ) {
+			if ( isset( $aliased_meta_keys[$visitor_meta_key] ) ) {
 				$visitor_meta_key = $aliased_meta_keys[$visitor_meta_key];
 			}
 		}
@@ -163,11 +163,6 @@ function _wpsc_replace_visitor_meta_keys( $replacements ) {
 }
 
 
-
-
-
-
-
 /** Create visitors that we expect to be in the table
  *
  */
@@ -196,7 +191,7 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		$sql = 'SELECT ID FROM '. $wpdb->users . ' WHERE user_login LIKE "\_%" AND user_email = "" AND user_login = user_nicename AND user_login = display_name LIMIT 100';
 		$user_ids = $wpdb->get_col( $sql, 0 );
-		
+
 		// Create an array to store users to be removed.
 		$bin = array();
 
@@ -233,11 +228,11 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 				$bin[] = $user_id;
 			}
 		}
-		
+
 		// Remove users.
 		if ( ! empty( $bin ) ) {
 			// Convert $bin to string.
-			$bin = implode(',', $bin);
+			$bin = implode( ',', $bin );
 			$wpdb->query( 'DELETE FROM ' . $wpdb->users . ' WHERE ID IN (' . $bin . ')' );
 			$wpdb->query( 'DELETE FROM ' . $wpdb->usermeta . ' WHERE user_id IN (' . $bin . ')' );
 		}
@@ -270,3 +265,79 @@ function _wpsc_meta_migrate_anonymous_user_cron() {
 	}
 }
 
+/**
+ * when visitor meta is updated we need to check if the shipping same as billing
+ * option is selected.  If so we need to update the corresponding meta value.
+ *
+ * @since 3.8.14
+ * @access private
+ * @param $meta_value any value being stored
+ * @param $meta_key string name of the attribute being stored
+ * @param $visitor_id int id of the visitor to which the attribute applies
+ * @return n/a
+ */
+function _wpsc_vistor_shipping_same_as_billing_meta_update(  $meta_value, $meta_key, $visitor_id ) {
+
+	// remove the action so we don't cause an infinite loop
+	remove_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10 );
+
+	$shipping_same_as_billing = wpsc_get_visitor_meta( $visitor_id, 'shippingSameBilling', true );
+
+	if ( $shipping_same_as_billing ) {
+
+		$meta_key_starts_with_billing = strpos( $meta_key, 'billing', 0 ) === 0;
+		$meta_key_starts_with_shipping = strpos( $meta_key, 'shipping', 0 ) === 0;
+
+		if ( $meta_key_starts_with_billing ) {
+			$built_in_checkout_names = wpsc_checkout_unique_names();
+
+			$other_meta_key_name = 'shipping' . substr( $meta_key, strlen( 'billing' ) );
+
+			if ( in_array( $other_meta_key_name, $built_in_checkout_names ) ) {
+				wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+			}
+		} elseif ( $meta_key_starts_with_shipping ) {
+			$built_in_checkout_names = wpsc_checkout_unique_names();
+
+			$other_meta_key_name = 'billing' . substr( $meta_key, strlen( 'shipping' ) );
+
+			if ( in_array( $other_meta_key_name, $built_in_checkout_names ) ) {
+				wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+			}
+		}
+	}
+
+	// restore the action we removed at the start
+	add_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10, 3 );
+
+}
+
+add_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10, 3 );
+
+
+/**
+ * custmer/visitor/user meta has been known by different identifiers. we are trying to standardize on using
+ * the uniquename value in the form definition for well known shopper meta.  this function allows
+ * old meta keys to return the proper meta value from the database
+ *
+ * @since 3.8.14
+ * @access private
+ * @param unknown $meta_keys
+ * @return string
+ */
+function _wpsc_visitor_meta_key_replacements( $meta_keys ) {
+
+	$meta_keys['billing_region']           = 'billingregion';
+	$meta_keys['billing_country']          = 'billingcountry';
+	$meta_keys['shipping_region']          = 'shippingregion';
+	$meta_keys['shipping_country']         = 'shippingcountry';
+	$meta_keys['shipping_zip']             = 'shippingpostcode';
+	$meta_keys['billing_zip']              = 'billingpostcode';
+	$meta_keys['shippingzip']              = 'shippingpostcode';
+	$meta_keys['billingzip']               = 'billingpostcode';
+	$meta_keys['shipping_same_as_billing'] = 'shippingSameBilling';
+	$meta_keys['delivertoafriend']         = 'shippingSameBilling';
+	return $meta_keys;
+}
+
+add_filter( 'wpsc_visitor_meta_key_replacements', '_wpsc_visitor_meta_key_replacements' );

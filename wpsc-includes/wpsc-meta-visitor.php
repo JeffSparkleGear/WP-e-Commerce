@@ -821,7 +821,19 @@ function wpsc_delete_visitor_meta( $visitor_id, $meta_key, $meta_value = '' ) {
 	// Allow central validation (and possibly transformation) of visitor meta prior to it being saved
 	$meta_key = _wpsc_validate_visitor_meta_key( $meta_key );
 
-	return delete_metadata( 'wpsc_visitor', $visitor_id , $meta_key , $meta_value );
+	$success = delete_metadata( 'wpsc_visitor', $visitor_id , $meta_key , $meta_value );
+
+	// notification after any meta item has been deleted
+	if ( $success && has_action( $action = 'wpsc_deleted_visitor_meta' ) ) {
+		do_action( $action, $meta_key, $id );
+	}
+
+	// notification after a specific meta item has been deleted
+	if ( $success && has_action( $action = 'wpsc_deleted_visitor_meta_' . $meta_key  ) ) {
+		do_action( $action, $meta_key, $visitor_id );
+	}
+
+	return $success;
 }
 
 /**
@@ -844,8 +856,19 @@ function wpsc_get_visitor_meta( $visitor_id, $meta_key = '', $single = false ) {
 	// Allow central validation (and possibly transformation) of visitor meta prior to it being saved
 	$meta_key = _wpsc_validate_visitor_meta_key( $meta_key );
 
+	$meta_value = get_metadata( 'wpsc_visitor' , $visitor_id , $meta_key, $single );
 
-	return get_metadata( 'wpsc_visitor' , $visitor_id , $meta_key, $single );
+	// notification when any meta item is retrieved
+	if ( has_filter( $filter = 'wpsc_got_visitor_meta' ) ) {
+		$meta_value = apply_filters( $filter,  $meta_value, $meta_key, $visitor_id );
+	}
+
+	// notification when a specific meta item is retrieved
+	if ( has_filter( $filter = 'wpsc_got_visitor_meta_' . $meta_key  ) ) {
+		$meta_value = apply_filters( $filter,  $meta_value, $meta_key, $visitor_id );
+	}
+
+	return $meta_value;
 }
 
 /**
@@ -897,7 +920,20 @@ function wpsc_update_visitor_meta( $visitor_id, $meta_key, $meta_value, $prev_va
 	// Allow central validation (and possibly transformation) of visitor meta prior to it being saved
 	$meta_key = _wpsc_validate_visitor_meta_key( $meta_key );
 
-	return update_metadata( 'wpsc_visitor' , $visitor_id , $meta_key , $meta_value , $prev_value );
+	$result = update_metadata( 'wpsc_visitor' , $visitor_id , $meta_key , $meta_value , $prev_value );
+
+
+	// notification after any meta item has been updated
+	if ( $result && has_action( $action = 'wpsc_updated_visitor_meta' ) ) {
+		do_action( $action, $meta_value, $meta_key, $visitor_id );
+	}
+
+	// notification after a specific meta item has been updated
+	if ( $result && has_action( $action = 'wpsc_updated_visitor_meta_' . $meta_key  ) ) {
+		do_action( $action, $meta_value, $meta_key, $visitor_id );
+	}
+
+	return $result;
 }
 
 /**
