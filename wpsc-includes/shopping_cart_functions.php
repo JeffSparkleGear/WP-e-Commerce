@@ -133,12 +133,12 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 
 	$output .= "<div id='region_select_$form_id'>";
 	if ( $region_list != null ) {
-		$output .= "<select title='$title' " . $namevalue . " class='current_region' " . $js . ">\n\r";
+		$output .= '<select class="current_region wpsc-visitor-meta" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
 		foreach ( $region_list as $region ) {
 			if ( $selected_region == $region['id'] ) {
 				$selected = "selected='selected'";
 			} else {
-				$selected = "";
+				$selected = '';
 			}
 			$output .= "<option value='" . $region['id'] . "' $selected>" . esc_html( $region['name'] ) . "</option>\n\r";
 		}
