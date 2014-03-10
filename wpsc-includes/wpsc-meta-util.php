@@ -294,7 +294,8 @@ function _wpsc_vistor_shipping_same_as_billing_meta_update(  $meta_value, $meta_
 				if ( $meta_key_starts_with_billing ) {
 					$other_meta_key_name = 'shipping' . substr( $meta_key, strlen( 'billing' ) );
 					if ( in_array( $other_meta_key_name, $checkout_names ) ) {
-						wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+						$billing_meta_value = wpsc_get_customer_meta( $meta_key );
+						wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $billing_meta_value );
 					}
 				}
 			}
@@ -333,6 +334,22 @@ function _wpsc_vistor_shipping_same_as_billing_meta_update(  $meta_value, $meta_
 }
 
 add_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10, 3 );
+
+
+function _wpsc_update_visitor_billingregion( $meta_value, $meta_key, $visitor_id ) {
+	global $wpdb;
+	$region_name = $wpdb->get_var( $wpdb->prepare( 'SELECT `name` FROM `' . WPSC_TABLE_REGION_TAX . '` WHERE `id`= %d LIMIT 1', $meta_value ) );
+	wpsc_update_visitor_meta( $visitor_id, 'billingstate', $region_name );
+}
+
+function _wpsc_update_visitor_shippingregion( $meta_value, $meta_key, $visitor_id ) {
+	global $wpdb;
+	$region_name = $wpdb->get_var( $wpdb->prepare( 'SELECT `name` FROM `' . WPSC_TABLE_REGION_TAX . '` WHERE `id`= %d LIMIT 1', $meta_value ) );
+	wpsc_update_visitor_meta( $visitor_id, 'shippingstate', $region_name );
+}
+
+add_action( 'wpsc_updated_visitor_meta_billingregion', '_wpsc_update_visitor_billingregion', 10, 3 );
+add_action( 'wpsc_updated_visitor_meta_shippingregion', '_wpsc_update_visitor_shippingregion', 10, 3 );
 
 
 /**

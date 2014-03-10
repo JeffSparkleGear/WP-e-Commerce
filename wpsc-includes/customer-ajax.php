@@ -198,11 +198,15 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 
 		if ( isset( $_POST['meta_keys'] ) && ! empty( $_POST['meta_keys']) ) {
 			$meta_keys = $_POST['meta_keys'];
-
-			foreach ( $meta_keys as $meta_key ) {
-				$response[$meta_key] = wpsc_get_customer_meta( $meta_key );
-			}
+		} else {
+			$meta_keys = wpsc_checkout_unique_names();
 		}
+
+		foreach ( $meta_keys as $meta_key ) {
+			$response[$meta_key] = wpsc_get_customer_meta( $meta_key );
+		}
+
+		$response['type'] = 'success';
 
 		echo json_encode( $response );
 		die();

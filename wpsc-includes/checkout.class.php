@@ -376,7 +376,7 @@ class wpsc_checkout {
 				if ( $this->checkout_item->unique_name == 'shippingstate' ) {
 					if ( wpsc_uses_shipping() && wpsc_has_regions( $delivery_country ) ) {
 						$region_name = $wpdb->get_var( $wpdb->prepare( 'SELECT `name` FROM `' . WPSC_TABLE_REGION_TAX . '` WHERE `id`= %d LIMIT 1', $delivery_region ) );
-						$output = '<input title="' . $this->checkout_item->unique_name . '" type="hidden" id="' . $this->form_element_id() . '" class="shipping_region wpsc-visitor-meta" name="collected_data[' . $this->checkout_item->id . ']" placeholder="' . esc_attr( $placeholder ) . '" value="' . esc_attr( $delivery_region ) . '" size="4" /><span class="shipping_region_name">' . esc_html( $region_name ) . '</span> ';
+						$output = '<input data-wpsc-meta-key="' . $this->checkout_item->unique_name. '" title="' . $this->checkout_item->unique_name . '" type="hidden" id="' . $this->form_element_id() . '" class="shipping_region wpsc-visitor-meta" name="collected_data[' . $this->checkout_item->id . ']" placeholder="' . esc_attr( $placeholder ) . '" value="' . esc_attr( $delivery_region ) . '" size="4" /><span class="shipping_region_name">' . esc_html( $region_name ) . '</span> ';
 					} else {
 						$disabled = '';
 						if ( wpsc_disregard_shipping_state_fields() ) {
@@ -713,8 +713,11 @@ class wpsc_checkout {
 	function the_checkout_item() {
 		$this->in_the_loop = true;
 		$this->checkout_item = $this->next_checkout_item();
-		if ( $this->current_checkout_item == 0 ) // loop has just started
+		if ( $this->current_checkout_item == 0 ) {
+			// loop has just started
 			do_action( 'wpsc_checkout_loop_start' );
+		}
+		return $this->checkout_item;
 	}
 
 	function have_checkout_items() {

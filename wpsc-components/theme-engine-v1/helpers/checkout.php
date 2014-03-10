@@ -169,7 +169,7 @@ function wpsc_the_checkout_item_error_class( $as_attribute = true ) {
 	if ( ($as_attribute == true ) ) {
 		$output = "class='" . $class_name . wpsc_shipping_details() . "'";
 	} else {
-		$output = $class_name;
+		$output = $class_name . wpsc_shipping_details();
 	}
 	return $output;
 }
