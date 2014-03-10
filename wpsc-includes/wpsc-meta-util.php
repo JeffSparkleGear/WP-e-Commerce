@@ -281,28 +281,48 @@ function _wpsc_vistor_shipping_same_as_billing_meta_update(  $meta_value, $meta_
 	// remove the action so we don't cause an infinite loop
 	remove_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10 );
 
-	$shipping_same_as_billing = wpsc_get_visitor_meta( $visitor_id, 'shippingSameBilling', true );
 
-	if ( $shipping_same_as_billing ) {
+	// if the shipping same as billing option is being checked then copy meta from billing to shipping
+	if ( $meta_key == 'shippingSameBilling' ) {
+		if ( $meta_value == 1 ) {
 
-		$meta_key_starts_with_billing = strpos( $meta_key, 'billing', 0 ) === 0;
-		$meta_key_starts_with_shipping = strpos( $meta_key, 'shipping', 0 ) === 0;
+			$checkout_names = wpsc_checkout_unique_names();
 
-		if ( $meta_key_starts_with_billing ) {
-			$built_in_checkout_names = wpsc_checkout_unique_names();
+			foreach ( $checkout_names as $meta_key ) {
+				$meta_key_starts_with_billing = strpos( $meta_key, 'billing', 0 ) === 0;
 
-			$other_meta_key_name = 'shipping' . substr( $meta_key, strlen( 'billing' ) );
-
-			if ( in_array( $other_meta_key_name, $built_in_checkout_names ) ) {
-				wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+				if ( $meta_key_starts_with_billing ) {
+					$other_meta_key_name = 'shipping' . substr( $meta_key, strlen( 'billing' ) );
+					if ( in_array( $other_meta_key_name, $checkout_names ) ) {
+						wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+					}
+				}
 			}
-		} elseif ( $meta_key_starts_with_shipping ) {
-			$built_in_checkout_names = wpsc_checkout_unique_names();
+		}
+	} else {
+		$shipping_same_as_billing = wpsc_get_visitor_meta( $visitor_id, 'shippingSameBilling', true );
 
-			$other_meta_key_name = 'billing' . substr( $meta_key, strlen( 'shipping' ) );
+		if ( $shipping_same_as_billing ) {
 
-			if ( in_array( $other_meta_key_name, $built_in_checkout_names ) ) {
-				wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+			$meta_key_starts_with_billing = strpos( $meta_key, 'billing', 0 ) === 0;
+			$meta_key_starts_with_shipping = strpos( $meta_key, 'shipping', 0 ) === 0;
+
+			if ( $meta_key_starts_with_billing ) {
+				$checkout_names = wpsc_checkout_unique_names();
+
+				$other_meta_key_name = 'shipping' . substr( $meta_key, strlen( 'billing' ) );
+
+				if ( in_array( $other_meta_key_name, $checkout_names ) ) {
+					wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+				}
+			} elseif ( $meta_key_starts_with_shipping ) {
+				$checkout_names = wpsc_checkout_unique_names();
+
+				$other_meta_key_name = 'billing' . substr( $meta_key, strlen( 'shipping' ) );
+
+				if ( in_array( $other_meta_key_name, $checkout_names ) ) {
+					wpsc_update_visitor_meta( $visitor_id, $other_meta_key_name, $meta_value );
+				}
 			}
 		}
 	}

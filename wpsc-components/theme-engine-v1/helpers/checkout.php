@@ -331,14 +331,19 @@ function wpsc_shipping_country_list( $shippingdetails = false ) {
 
 	$acceptable_countries = wpsc_get_acceptable_countries();
 
-	$output .= wpsc_get_country_dropdown( array(
-		'name'                  => 'country',
-		'id'                    => 'current_country',
-		'additional_attributes' => $js,
-		'acceptable_ids'        => $acceptable_countries,
-		'selected'              => $selected_country,
-		'placeholder'           => '',
-	) );
+	$additional_attributes = 'data-wpsc-meta-key="shippingcountry" ' . $js;
+
+	$output .= wpsc_get_country_dropdown(
+											array(
+												'name'                  => 'country',
+												'id'                    => 'current_country',
+												'additional_attributes' => $additional_attributes,
+												'acceptable_ids'        => $acceptable_countries,
+												'selected'              => $selected_country,
+												'class'                 => 'wpsc-visitor-meta',
+												'placeholder'           => '',
+											)
+									);
 
 	$output .= wpsc_shipping_region_list( $selected_country, $selected_region, $shippingdetails );
 

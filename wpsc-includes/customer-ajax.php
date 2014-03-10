@@ -59,7 +59,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			$response['value'] = '';
 			$response['type']  = __( 'error', 'wpsc' );
 			$response['error'] = __( 'no meta key', 'wpsc' );
-			_wpsc_doing_it_wrong( __FUNCTION, __( 'missing meta key', 'wpsc' ), '3.8.14' );
+			_wpsc_doing_it_wrong( __FUNCTION__, __( 'missing meta key', 'wpsc' ), '3.8.14' );
 		}
 
 		$response = json_encode( $response );
@@ -129,7 +129,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		if ( ! empty( $meta_key ) ) {
 			$success = wpsc_update_customer_meta( $meta_key, $meta_value  );
 		} else {
-			_wpsc_doing_it_wrong( __FUNCTION, __( 'missing meta key', 'wpsc' ), '3.8.14' );
+			_wpsc_doing_it_wrong( __FUNCTION__, __( 'missing meta key', 'wpsc' ), '3.8.14' );
 		}
 
 		$response['meta_key'] = $meta_key;
@@ -139,7 +139,13 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			$response['type']          = __( 'success', 'wpsc' );
 			$response['error']         = '';
 
-			$response = apply_filters( 'customer_meta_response_' . $meta_key, $response, $meta_key, $meta_value );
+			$meta_keys = wpsc_checkout_unique_names();
+
+			foreach ( $meta_keys as $meta_key ) {
+				$response[$meta_key] = wpsc_get_customer_meta( $meta_key );
+			}
+
+			$response = apply_filters( 'wpsc_customer_meta_response_' . $meta_key, $response, $meta_key, $meta_value );
 		} else {
 			$response['meta_value']      = wpsc_get_customer_meta( $meta_key );
 			$response['type']       = __( 'error', 'wpsc' );
@@ -149,6 +155,8 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		echo json_encode( $response );
 		die();
 	}
+
+
 
 	/**
 	 * Delete a customer meta
@@ -171,7 +179,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			$response['value'] = '';
 			$response['type']  = __( 'error', 'wpsc' );
 			$response['error'] = __( 'no meta key', 'wpsc' );
-			_wpsc_doing_it_wrong( __FUNCTION, __( 'missing meta key', 'wpsc' ), '3.8.14' );
+			_wpsc_doing_it_wrong( __FUNCTION__, __( 'missing meta key', 'wpsc' ), '3.8.14' );
 		}
 
 		$response = json_encode( $response );

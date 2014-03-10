@@ -100,9 +100,11 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	if ( $checkoutfields ) {
 		$js = "onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");'";
 		$title = 'shippingcountry';
+		$id = 'shippingcountry';
 	} else {
 		$js = "onchange='set_billing_country(\"$html_form_id\", \"$form_id\");'";
 		$title = 'billingcountry';
+		$id = 'billingcountry';
 	}
 
 	//$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
@@ -110,7 +112,7 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	$output .= "<div id='$html_form_id'>\n\r";
 	$output .= wpsc_get_country_dropdown(
 		array(
-				'id'                    => $supplied_form_id,
+				'id'                    => $id,
 				'name'                  => "collected_data[{$form_id}][0]",
 				'class'                 => 'current_country wpsc-visitor-meta',
 				'selected'              => $selected_country,
@@ -126,16 +128,18 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	if ( $checkoutfields ) {
 		$namevalue = ' name="collected_data["' . $region_form_id . ']" ';
 		$js = " onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");' ";
-		$title = 'shippingstate';
+		$title = 'shippingregion';
+		$id = 'shippingregion';
 	} else {
 		$namevalue = ' name="collected_data[' . $form_id . '][1]" ';
 		$js = "onchange='set_billing_country(\"$html_form_id\", \"$form_id\");'";
-		$title = 'billingstate';
+		$title = 'billingregion';
+		$id = 'billingregion';
 	}
 
 	$output .= "<div id='region_select_$form_id'>";
 	if ( $region_list != null ) {
-		$output .= '<select class="current_region wpsc-visitor-meta" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
+		$output .= '<select id="' . $id . '" class="current_region wpsc-visitor-meta" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
 		foreach ( $region_list as $region ) {
 			if ( $selected_region == $region['id'] ) {
 				$selected = "selected='selected'";
@@ -148,7 +152,7 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	}
 
 	$output .= '</div>';
-	$output .= '</div>\n\r';
+	$output .= "</div>\n\r";
 
 	return $output;
 }
