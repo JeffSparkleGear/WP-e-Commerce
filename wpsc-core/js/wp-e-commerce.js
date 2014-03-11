@@ -114,9 +114,6 @@ function wpsc_get_customer_data( response_callback ) {
 	});			
 }		
 
-
-
-
 /**
  * common callback to update checkout fields based on response from ajax processing.  All fields that set 
  * are present to make it easier to see where the plugin can be extended 
@@ -150,6 +147,15 @@ function wpsc_meta_item_change_response( response ) {
 				}
 			});
 		});
+		
+		// Whatever replacements have been sent for the checkout form can be efficiently
+		// put into view
+		if ( response.hasOwnProperty('replacements') ) {
+			jQuery.each( response.replacements, function( elementname, replacement ) {
+				jQuery( '#'+replacement.elementid ).replaceWith( replacement.element );
+			});
+		}		
+
 			
 		// TODO: this is where we can rely on the PHP application to generate and format the content for the 
 		// checkout screen rather than doing lot's of work in this js.  If we update the PHP application top
@@ -219,7 +225,11 @@ function wpsc_meta_item_change() {
 	wpsc_update_customer_data( meta_key, meta_value, wpsc_meta_item_change_response );
 } 
 
-
+/**
+ * ready to setup the events for user actions that casuse meta item changes 
+ * 
+ * @since 3.8.14
+ */
 jQuery(document).ready(function ($) {
 	wpsc_get_customer_data( wpsc_meta_item_change_response );
 	jQuery( "#shippingSameBilling" ).change( wpsc_shipping_same_as_billing );
@@ -227,6 +237,7 @@ jQuery(document).ready(function ($) {
 	
 	wpsc_shipping_same_as_billing();
 });
+
 
 function wpsc_shipping_same_as_billing(){
 

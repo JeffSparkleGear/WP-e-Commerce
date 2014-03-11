@@ -332,9 +332,39 @@ function _wpsc_vistor_shipping_same_as_billing_meta_update(  $meta_value, $meta_
 	add_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10, 3 );
 
 }
-
 add_action( 'wpsc_updated_visitor_meta', '_wpsc_vistor_shipping_same_as_billing_meta_update', 10, 3 );
 
+
+function _wpsc_shipping_same_as_billing_ajax_response( $response, $meta_key, $meta_value ) {
+
+	if ( $meta_value == 1 ) {
+		global $wpsc_checkout;
+		if ( empty( $wpsc_checkout ) ) {
+			$wpsc_checkout = new WPSC_Checkout();
+		}
+
+		$replacements = array();
+		while ( wpsc_have_checkout_items() ) {
+			$checkoutitem = wpsc_the_checkout_item();
+
+			if ( $checkoutitem->unique_name == 'shippingcountry' ) {
+				$replacement = array( 'elementid' => wpsc_checkout_form_element_id(), 'element' => wpsc_checkout_form_field() );
+				$replacements['shippingcountry'] = $replacement;
+			}
+
+			if ( $checkoutitem->unique_name == 'billingcountry' ) {
+				$replacement = array( 'elementid' => wpsc_checkout_form_element_id(), 'element' => wpsc_checkout_form_field() );
+				$replacements['billingcountry'] = $replacement;
+			}
+		}
+
+		$response['replacements']  = $replacements;
+	}
+
+	return $response;
+}
+
+add_filter( 'wpsc_customer_meta_response_shippingSameBilling', '_wpsc_shipping_same_as_billing_ajax_response', 10, 3 );
 
 function _wpsc_update_visitor_billingregion( $meta_value, $meta_key, $visitor_id ) {
 	global $wpdb;
