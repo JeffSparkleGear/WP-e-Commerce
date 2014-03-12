@@ -78,31 +78,34 @@ function wpsc_shopping_basket_internals( $deprecated = false, $quantity_limit = 
 
 	include_once( wpsc_get_template_file_path( 'wpsc-cart_widget.php' ) );
 
-	echo "    </div>";
+	echo '    </div>';
 }
 
-function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_country = null, $selected_region = null, $supplied_form_id = null, $checkoutfields = false ) {
+function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_country = null, $selected_region = null, $supplied_form_id = null, $shippingfields = false ) {
 	global $wpdb;
 
 	$output = '';
 
-	if ( $selected_country == null )
+	if ( $selected_country == null ) {
 		$selected_country = get_option( 'base_country' );
+	}
 
-	if ( $selected_region == null )
-		$selected_region = get_option( 'base_region' );
+	if ( $selected_region == null ) {
+		//$selected_region = get_option( 'base_region' );
+	}
 
-	if ( $form_id != null )
+	if ( $form_id != null ) {
 		$html_form_id = "region_country_form_$form_id";
-	else
+	} else {
 		$html_form_id = 'region_country_form';
+	}
 
-	if ( $checkoutfields ) {
-		$js = "onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");'";
+	if ( $shippingfields ) {
+		$js = '';
 		$title = 'shippingcountry';
 		$id = 'shippingcountry';
 	} else {
-		$js = "onchange='set_billing_country(\"$html_form_id\", \"$form_id\");'";
+		$js = '';
 		$title = 'billingcountry';
 		$id = 'billingcountry';
 	}
@@ -125,14 +128,14 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	$sql            = "SELECT `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `unique_name` = 'shippingstate' ";
 	$region_form_id = $wpdb->get_var( $sql );
 
-	if ( $checkoutfields ) {
+	if ( $shippingfields ) {
 		$namevalue = ' name="collected_data["' . $region_form_id . ']" ';
-		$js = " onchange='set_shipping_country(\"$html_form_id\", \"$form_id\");' ";
+		$js = '';
 		$title = 'shippingregion';
 		$id = 'shippingregion';
 	} else {
 		$namevalue = ' name="collected_data[' . $form_id . '][1]" ';
-		$js = "onchange='set_billing_country(\"$html_form_id\", \"$form_id\");'";
+		$js = '';
 		$title = 'billingregion';
 		$id = 'billingregion';
 	}

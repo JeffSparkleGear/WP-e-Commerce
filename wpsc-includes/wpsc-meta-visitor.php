@@ -1103,3 +1103,128 @@ function wpsc_get_visitor_meta_by_timestamp( $timestamp = 0, $comparison = '>', 
 	return wpsc_get_meta_by_timestamp( 'wpsc_visitor', $timestamp , $comparison , $meta_key );
 }
 
+/**************************************************************************************************
+ *
+* There are some built in business and data consistency rules rules related to well-known
+* customer meta.  We use the customer meta actions to implement these rules
+*
+**************************************************************************************************/
+
+/**
+ * Update any values dependant on shipping region
+ *
+ * @since 3.8.14
+ *
+ * @access private
+ * @param mixed $meta_value Optional. Metadata value.
+ * @param string $meta_key Metadata name.
+ * @param int $visitor_id visitor ID
+ * @return none
+ */
+function _wpsc_updated_visitor_meta_shippingregion( $meta_value, $meta_key, $visitor_id ) {
+
+	if ( ! empty( $meta_value ) ) {
+		$shippingstate = wpsc_get_state_by_id( $meta_value, 'name' );
+	} else {
+		$shippingstate = '';
+	}
+
+	wpsc_update_visitor_meta( $visitor_id, 'shippingstate', $shippingstate );
+}
+
+add_action( 'wpsc_updated_visitor_meta_shippingregion', '_wpsc_updated_visitor_meta_shippingregion' , 1 , 3 );
+
+/**
+ * Update any values dependant on shipping country
+ *
+ * @since 3.8.14
+ *
+ * @access private
+ * @param mixed $meta_value Optional. Metadata value.
+ * @param string $meta_key Metadata name.
+ * @param int $visitor_id visitor ID
+ * @return none
+ */
+function _wpsc_updated_visitor_meta_shippingcountry( $meta_value, $meta_key, $visitor_id ) {
+
+	if ( ! empty( $meta_value ) ) {
+		$shippingstate = wpsc_get_state_by_id( $meta_value, 'name' );
+	} else {
+		$shippingstate = '';
+	}
+
+	wpsc_update_visitor_meta( $visitor_id, 'shippingregion', '' );
+	wpsc_update_visitor_meta( $visitor_id, 'shippingstate', '' );
+}
+
+add_action( 'wpsc_updated_visitor_meta_shippingcountry', '_wpsc_updated_visitor_meta_shippingcountry' , 1 , 3 );
+
+/**
+ * Update any values dependant on billing region
+ *
+ * @since 3.8.14
+ *
+ * @access private
+ * @param mixed $meta_value Optional. Metadata value.
+ * @param string $meta_key Metadata name.
+ * @param int $visitor_id visitor ID
+ * @return none
+ */
+function _wpsc_updated_visitor_meta_billingregion( $meta_value, $meta_key, $visitor_id ) {
+
+	if ( ! empty( $meta_value ) ) {
+		$billingstate = wpsc_get_state_by_id( $meta_value, 'name' );
+	} else {
+		$billingstate = '';
+	}
+
+	wpsc_update_visitor_meta( $visitor_id, 'billingstate', $billingstate );
+}
+
+add_action( 'wpsc_updated_visitor_meta_billingregion', '_wpsc_updated_visitor_meta_billingregion' , 1 , 3 );
+
+/**
+ * Update any values dependant on billing country
+ *
+ * @since 3.8.14
+ *
+ * @access private
+ * @param mixed $meta_value Optional. Metadata value.
+ * @param string $meta_key Metadata name.
+ * @param int $visitor_id visitor ID
+ * @return none
+*/
+function _wpsc_updated_visitor_meta_billingcountry( $meta_value, $meta_key, $visitor_id ) {
+	wpsc_update_visitor_meta( $visitor_id, 'billingregion', '' );
+	wpsc_update_visitor_meta( $visitor_id, 'billingstate', '' );
+}
+
+add_action( 'wpsc_updated_visitor_meta_billingcountry', '_wpsc_updated_visitor_meta_billingcountry' , 1 , 3 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_action( 'wpsc_updated_visitor_meta_shippingcountry',  '_wpsc_customer_shipping_quotes_need_recalc' , 1 , 3 );
+add_action( 'wpsc_updated_visitor_meta_shippingpostcode',  '_wpsc_customer_shipping_quotes_need_recalc' , 1 , 3 );
+add_action( 'wpsc_updated_visitor_meta_shippingstate', '_wpsc_customer_shipping_quotes_need_recalc' , 1 , 3 );
+

@@ -276,6 +276,11 @@ function wpsc_checkout_form_element_id() {
 	return $wpsc_checkout->form_element_id();
 }
 
+function wpsc_checkout_form_item_id() {
+	global $wpsc_checkout;
+	return $wpsc_checkout->form_item_id();
+}
+
 function wpsc_checkout_form_field() {
 	global $wpsc_checkout;
 	return $wpsc_checkout->form_field();
@@ -284,25 +289,30 @@ function wpsc_checkout_form_field() {
 function wpsc_shipping_region_list( $selected_country, $selected_region, $shippingdetails = false ) {
 	global $wpdb;
 	$output = '';
-	$region_data = $wpdb->get_results( $wpdb->prepare( "SELECT `regions`.* FROM `" . WPSC_TABLE_REGION_TAX . "` AS `regions` INNER JOIN `" . WPSC_TABLE_CURRENCY_LIST . "` AS `country` ON `country`.`id` = `regions`.`country_id` WHERE `country`.`isocode` IN(%s) ORDER BY name ASC", $selected_country ), ARRAY_A );
-	$js = '';
-	if ( !$shippingdetails ) {
-		$js = "onchange='submit_change_country();'";
-	}
+
+	$region_data = $wpdb->get_results(
+					$wpdb->prepare(
+										'SELECT `regions`.* FROM `' . WPSC_TABLE_REGION_TAX . '` AS `regions` INNER JOIN `'
+										. WPSC_TABLE_CURRENCY_LIST . '` AS `country` ON `country`.`id` = `regions`.`country_id` '
+										. 'WHERE `country`.`isocode` IN(%s) ORDER BY name ASC', $selected_country
+								),
+					ARRAY_A
+				);
+
 	if ( count( $region_data ) > 0 ) {
-		$output .= "<select name='region'  id='region' " . $js . " >";
+		$output .= '<select class="wpsc-visitor-meta" data-wpsc-meta-key="shippingregion" name="region"  id="region" ' . $js . ">\n\r";
 		foreach ( $region_data as $region ) {
 			$selected = '';
 			if ( $selected_region == $region['id'] ) {
 				$selected = "selected='selected'";
 			}
-			$output .= "<option $selected value='{$region['id']}'>" . esc_attr( htmlspecialchars( $region['name'] ) ). "</option>";
+			$output .= "<option $selected value='{$region['id']}'>" . esc_attr( htmlspecialchars( $region['name'] ) ). "</option>\n\r";
 		}
-		$output .= "";
+		$output .= '';
 
-		$output .= "</select>";
+		$output .= '</select>';
 	} else {
-		$output .= " ";
+		$output .= ' ';
 	}
 	return $output;
 }
@@ -311,12 +321,13 @@ function wpsc_shipping_country_list( $shippingdetails = false ) {
 	global $wpdb, $wpsc_shipping_modules, $wpsc_country_data;
 	$js = '';
 	$output = '';
-	if ( !$shippingdetails ) {
+	if ( ! $shippingdetails ) {
 		$output = "<input type='hidden' name='wpsc_ajax_actions' value='update_location' />";
-		$js = "  onchange='submit_change_country();'";
+		$js = '';
 	}
-	$selected_country = (string) wpsc_get_customer_meta( 'shipping_country' );
-	$selected_region  = (string) wpsc_get_customer_meta( 'shipping_region'  );
+
+	$selected_country = (string) wpsc_get_customer_meta( 'shippingcountry' );
+	$selected_region  = (string) wpsc_get_customer_meta( 'shippingregion'  );
 
 	if ( empty( $selected_country ) )
 		$selected_country = esc_attr( get_option( 'base_country' ) );
