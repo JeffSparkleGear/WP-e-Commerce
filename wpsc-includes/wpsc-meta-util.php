@@ -142,7 +142,7 @@ function _wpsc_validate_visitor_meta_key( $visitor_meta_key ) {
 		$build_in_checkout_names = wpsc_checkout_unique_names();
 
 		// the built in checkout names cannot be aliased to something else
-		if ( ! isset( $build_in_checkout_names[$visitor_meta_key] ) ) {
+		if ( ! in_array( $visitor_meta_key, $build_in_checkout_names ) ) {
 
 			/**
 			 * Filter wpsc_visitor_meta_key_replacements
@@ -157,7 +157,7 @@ function _wpsc_validate_visitor_meta_key( $visitor_meta_key ) {
 			 */
 			$aliased_meta_keys = apply_filters( 'wpsc_visitor_meta_key_replacements', array() );
 
-			if ( in_array( $visitor_meta_key, $aliased_meta_keys ) ) {
+			if ( isset( $aliased_meta_keys[$visitor_meta_key] ) ) {
 				$visitor_meta_key = $aliased_meta_keys[$visitor_meta_key];
 			}
 		}
@@ -207,11 +207,6 @@ function _wpsc_replace_visitor_meta_keys( $replacements ) {
 
 	return $total_count_updated;
 }
-
-
-
-
-
 
 
 /** Create visitors that we expect to be in the table
@@ -314,3 +309,32 @@ function _wpsc_meta_migrate_anonymous_user_cron() {
 	}
 }
 
+
+/**
+ * custmer/visitor/user meta has been known by different identifiers. we are trying to standardize on using
+ * the uniquename value in the form definition for well known shopper meta.  this function allows
+ * old meta keys to return the proper meta value from the database
+ *
+ * @since 3.8.14
+ * @access private
+ * @param unknown $meta_keys
+ * @return string
+ */
+function _wpsc_visitor_meta_key_replacements( $meta_keys ) {
+
+	$meta_keys['billing_region']           = 'billingregion';
+	$meta_keys['billing_country']          = 'billingcountry';
+	$meta_keys['shipping_region']          = 'shippingregion';
+	$meta_keys['shipping_country']         = 'shippingcountry';
+	$meta_keys['shipping_zip']             = 'shippingpostcode';
+	$meta_keys['shipping_zipcode']         = 'shippingpostcode';
+	$meta_keys['billing_zip']              = 'billingpostcode';
+	$meta_keys['billing_zipcode']          = 'billingpostcode';
+	$meta_keys['shippingzip']              = 'shippingpostcode';
+	$meta_keys['billingzip']               = 'billingpostcode';
+	$meta_keys['shipping_same_as_billing'] = 'shippingSameBilling';
+	$meta_keys['delivertoafriend']         = 'shippingSameBilling';
+	return $meta_keys;
+}
+
+add_filter( 'wpsc_visitor_meta_key_replacements', '_wpsc_visitor_meta_key_replacements' );
