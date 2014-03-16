@@ -1,33 +1,4 @@
 <?php
-
-/**
- * Get all object ids that have the meta value
- *
- * @since 3.8.14
- *
- * @param string $meta_object_type the WordPress meta object type
- * @param string $meta_key ids with the specified meta key
- * @return array of int 	meta object type object ids that match have the meta key
- */
-function wpsc_get_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
-	global $wpdb;
-
-	$meta_table = wpsc_meta_table_name( $meta_object_type );
-	$id_field_name = $meta_object_type . '_id';
-
-	$sql = 'SELECT %s FROM `%s` where meta_key = "%s"';
-	$sql = $wpdb->prepare( $sql , $id_field_name, $meta_table, $meta_key );
-
-	$meta_rows = $wpdb->get_results( $sql, OBJECT_K  );
-
-	$ids = array_keys( $meta_rows );
-
-	$ids = apply_filters( 'wpsc_get_ids_by_meta_key', $ids, $meta_object_type, $meta_key );
-
-	return $ids;
-}
-
-
 /**
  * Get all object ids that have the meta value
  *
@@ -313,6 +284,7 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 		wp_suspend_cache_addition( false );
 		exit( 0 );
 	}
+
 }
 
 add_action( 'wpsc_migrate_anonymous_user_cron', '_wpsc_meta_migrate_anonymous_user_cron' );
