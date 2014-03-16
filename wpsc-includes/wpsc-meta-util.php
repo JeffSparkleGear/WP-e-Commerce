@@ -29,6 +29,33 @@ function wpsc_get_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
 
 
 /**
+ * Get all object ids that have the meta value
+ *
+ * @since 3.8.14
+ *
+ * @param string $meta_object_type the WordPress meta object type
+ * @param string $meta_key ids with the specified meta key
+ * @return array of int 	meta object type object ids that match have the meta key
+ */
+function wpsc_get_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
+	global $wpdb;
+
+	$meta_table = wpsc_meta_table_name( $meta_object_type );
+	$id_field_name = $meta_object_type . '_id';
+
+	$sql = 'SELECT '. $id_field_name . ' FROM `' . $meta_table . '` where meta_key = "%s"';
+	$sql = $wpdb->prepare( $sql , $meta_key );
+
+	$meta_rows = $wpdb->get_results( $sql, OBJECT_K  );
+
+	$ids = array_keys( $meta_rows );
+
+	$ids = apply_filters( 'wpsc_get_ids_by_meta_key', $ids, $meta_object_type, $meta_key );
+
+	return $ids;
+}
+
+/**
  * Calls function for each meta matching the timestamp criteria.  Callback function
  * will get a single parameter that is an object representing the meta.
  *
@@ -48,19 +75,19 @@ function wpsc_get_meta_by_timestamp( $meta_object_type, $timestamp = 0, $compari
 	$id_field_name = $meta_object_type . '_id';
 
 	if ( ($timestamp == 0) || empty( $timestamp ) ) {
-		$sql = 'SELECT $id_field_name as id FROM `$meta_table` ';
+		$sql = 'SELECT ' . $id_field_name . ' AS id FROM ` ' . $meta_table . '` ';
 	} else {
 		// validate the comparison operator
-		if ( ! in_array( $comparison, array( '=', '>=', '>', '<=', '<', '<>', '!='	) ) )
+		if ( ! in_array( $comparison, array( '=', '>=', '>', '<=', '<', '<>', '!='	) ) ) {
 			return false;
+		}
 
-		if ( is_int( $timestamp ) )
+		if ( is_int( $timestamp ) ) {
 			$timestamp = date( 'Y-m-d H:i:s', $timestamp );
-
+		}
 
 		$sql = 'SELECT ' . $id_field_name . ' as id FROM `' . $meta_table. '` where meta_timestamp ' . $comparison . ' "%s"';
 		$sql = $wpdb->prepare( $sql , $timestamp );
-
 	}
 
 	if ( ! empty ($meta_key ) ) {
