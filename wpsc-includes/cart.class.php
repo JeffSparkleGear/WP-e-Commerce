@@ -23,7 +23,7 @@
  * @since 3.8.14
  *
  */
-function wpsc_need_to_recompute_shipping_quotes() {
+function wpsc_cart_need_to_recompute_shipping_quotes() {
 	global $wpsc_cart;
 
 	if ( empty( $wpsc_cart ) ) {
@@ -39,7 +39,7 @@ function wpsc_need_to_recompute_shipping_quotes() {
  * @since 3.8.14
  *
  */
-function wpsc_clear_cart_shipping_info() {
+function wpsc_cart_clear_shipping_info() {
 	global $wpsc_cart;
 
 	if ( empty( $wpsc_cart ) ) {
@@ -500,15 +500,15 @@ class wpsc_cart {
 	function clear_shipping_info() {
 		$this->selected_shipping_method = null;
 		$this->selected_shipping_option = null;
-		$this->shipping_option = null;
-		$this->shipping_method = null;
-		$this->shipping_methods = array();
-		$this->shipping_quotes = array();
-		$this->shipping_quote = null;
-		$this->shipping_method_count = 0;
-		$this->base_shipping = null;
-		$this->total_item_shipping = null;
-		$this->total_shipping = null;
+		$this->shipping_option          = null;
+		$this->shipping_method          = null;
+		$this->shipping_methods         = array();
+		$this->shipping_quotes          = array();
+		$this->shipping_quote           = null;
+		$this->shipping_method_count    = 0;
+		$this->base_shipping            = null;
+		$this->total_item_shipping      = null;
+		$this->total_shipping           = null;
 	}
 
 

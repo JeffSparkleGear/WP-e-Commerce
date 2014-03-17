@@ -553,7 +553,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 
 
 	function _wpsc_customer_shipping_quotes_need_recalc( $meta_value, $meta_key, $customer_id ) {
-		wpsc_clear_cart_shipping_info();
+		wpsc_cart_clear_shipping_info();
 	}
 
 	add_action( 'wpsc_updated_customer_meta_shippinggregion', '_wpsc_customer_shipping_quotes_need_recalc' , 10 , 3 );
@@ -637,7 +637,7 @@ function _wpsc_get_checkout_info() {
 	$checkout_info['country_name']     = wpsc_get_country( $checkout_info['delivery_country'] );
 	$checkout_info['lock_tax']         = get_option( 'lock_tax' );  // TODO:this is set anywhere, probably deprecated
 
-	$checkout_info['needs_shipping_recalc'] = wpsc_need_to_recompute_shipping_quotes();
+	$checkout_info['needs_shipping_recalc'] = wpsc_cart_need_to_recompute_shipping_quotes();
 
 	$checkout_info['shipping_keys']    = array();
 
