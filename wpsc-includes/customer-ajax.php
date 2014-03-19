@@ -92,7 +92,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 
 		$response = array( 'request' => $_REQUEST );
 
-		if ( ! emtpy( $customer_meta ) ) {
+		if ( ! empty( $customer_meta ) ) {
 
 			foreach ( $customer_meta as $meta_key => $meta_value ) {
 
@@ -106,6 +106,12 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 				}
 			}
 
+			// loop through a second time so that all of the meta has been set, tht way if there are
+			// dependencies in response calculation
+			foreach ( $customer_meta as $meta_key => $meta_value ) {
+				$response = apply_filters( 'wpsc_customer_meta_response_' . $meta_key, $response, $meta_key, $meta_value );
+			}
+
 			if ( $success ) {
 				$response['type']          = __( 'success', 'wpsc' );
 				$response['error']         = '';
@@ -117,6 +123,8 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 				$response['type']       = __( 'error', 'wpsc' );
 				$response['error']      = __( 'invalid paramters, meta array or meta key value pair required', 'wpsc' );
 		}
+
+
 
 		$response = _wpsc_add_customer_meta_to_response( $response );
 		wp_send_json_success( $response );
