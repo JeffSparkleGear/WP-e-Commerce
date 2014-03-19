@@ -127,6 +127,7 @@ function wpsc_purchlogs_get_weight( $id = '', $out_unit = 'pound' ) {
 	 * @since 3.8.14
 	 *
 	 * @param  float  $weight, purchase calculation will not continue if value is returned
+	 * @param  string, weight unit to use for return falue
 	 * @param  object wpsc_purchaselogs_items purchase log item being used
 	 * @param  int    purchase log item id
 	 * @return float  $weight
