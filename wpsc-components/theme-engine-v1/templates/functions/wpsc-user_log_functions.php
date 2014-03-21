@@ -108,6 +108,7 @@ function validate_form_data() {
 	return apply_filters( 'wpsc_profile_message', $message );
 }
 
+
 /**
  * wpsc_display_form_fields()
  *
