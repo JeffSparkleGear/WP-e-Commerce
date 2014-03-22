@@ -36,16 +36,15 @@
  *
  */
 
+add_action( 'wpsc_ready', '_wpsc_cleanup_customer_meta_checkout_details' );
+
+
 //////////////////// Deprecation Handling Control //////////////////////////
 
 // meta deprecations for 3.8.14
 
 // enable deprecation handling for customer meta with key 'checkout_details'
 define( '_wpsc_depcrecate_customer_checkout_details', true );
-
-
-// meta deprecations for 3.9
-/* tbd */
 
 //
 //////////////////// End deprecation Handling Control //////////////////////////
@@ -62,7 +61,31 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 	 * @return array        checkout details array
 	 */
 	function _wpsc_cleanup_customer_meta_checkout_details() {
-		// tbd
+		remove_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+
+		$meta_item_ids = wpsc_get_ids_by_meta_key( 'visitor', 'checkout_details' );
+
+		foreach ( $meta_item_ids as $meta_item_id ) {
+			$meta_item = _wpsc_get_meta_by_id( 'visitor', $meta_item_id );
+			$old_meta_timestamp = strtotime( $meta_item->meta_timestamp );
+
+			$new_meta_ids = _wpsc_get_meta_ids( 'customer', $meta_item->wpsc_vsitor_id, 'billingfirstname' );
+
+			if ( ! empty ( $new_meta_ids ) ) {
+				$new_meta_timestamp = strtotime( wpsc_get_metadata_timestamp( 'customer', $meta_item_ids[0] ) );
+
+			} else {
+				$new_meta_timestamp = 0;
+			}
+
+			if ( $old_meta_timestamp > $new_meta_timestamp ) {
+				$meta_data_in_old_format = _wpsc_get_deprecated_customer_meta_checkout_details( false, 'checkout_details', $meta_item->wpsc_vsitor_id );
+				_wpsc_update_deprecated_customer_meta_checkout_details( $meta_data_in_old_format, 'checkout_details', $meta_item->wpsc_vsitor_id );
+			}
+		}
+
+
+		add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
 	}
 
 
@@ -74,7 +97,7 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 	 * @return array        checkout details array
 	 */
 	function _wpsc_get_deprecated_customer_meta_checkout_details(  $meta_value, $key = 'checkout_details', $id = null ) {
-		remove_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 10, 3 );
+		remove_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
 
 		global $wpdb;
 
@@ -117,12 +140,12 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 			wpsc_delete_customer_meta( $key );
 		}
 
-		add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 10, 3 );
+		add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
 
 		return $meta_data_in_old_format;
 	}
 
-	add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 10, 3 );
+	add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
 
 	/**
 	 * Get a deprecated customer meta value that mirrors what was once "checkout_details".
