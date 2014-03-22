@@ -1,6 +1,6 @@
 <?php
 /**
- * Get all object ids that have the meta value
+ * Get all meta ids that have the meta value
  *
  * @since 3.8.14
  *
@@ -8,13 +8,13 @@
  * @param string $meta_key ids with the specified meta key
  * @return array of int 	meta object type object ids that match have the meta key
  */
-function wpsc_get_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
+function wpsc_get_meta_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
 	global $wpdb;
 
-	$meta_table    = wpsc_meta_table_name( 'visitor' );
+	$meta_table    = _wpsc_meta_table_name( 'visitor' );
 	$id_field_name = _wpsc_meta_key_name( 'visitor' );
 
-	$sql = 'SELECT '. $id_field_name . ' FROM `' . $meta_table . '` where meta_key = "%s"';
+	$sql = 'SELECT meta_id FROM `' . $meta_table . '` where meta_key = "%s"';
 	$sql = $wpdb->prepare( $sql , $meta_key );
 
 	$meta_rows = $wpdb->get_results( $sql, OBJECT_K  );
@@ -42,8 +42,8 @@ function wpsc_get_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
 function wpsc_get_meta_by_timestamp( $meta_object_type, $timestamp = 0, $comparison = '>', $meta_key = '' ) {
 	global $wpdb;
 
-	$meta_table = wpsc_meta_table_name( $meta_object_type );
-	$id_field_name = $meta_object_type . '_id';
+	$meta_table    = _wpsc_meta_table_name( $meta_object_type );
+	$id_field_name = _wpsc_meta_key_name( 'visitor' );
 
 	if ( ($timestamp == 0) || empty( $timestamp ) ) {
 		$sql = 'SELECT ' . $id_field_name . ' AS id FROM ` ' . $meta_table . '` ';
@@ -97,16 +97,16 @@ function wpsc_get_metadata_timestamp( $meta_object_type, $meta_id, $meta_key = '
 	$meta_id = intval( $meta_id );
 
 	if ( ! empty($meta_object_type) && ! empty( $meta_id )  && ! empty( $meta_key ) ) {
-		$wpdb_property = $meta_object_type.'meta';
-
-		if ( ! empty( $wpdb->$wpdb_property ) ) {
-			$sql = 'SELECT meta_timestamp FROM '.wpsc_meta_table_name( $meta_object_type ).' WHERE meta_id = %d ORDER BY meta_timestamp DESC LIMIT 1';
+		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
+		if ( ! empty( $meta_table_name ) ) {
+			$sql = 'SELECT meta_timestamp FROM '. $meta_table_name .' WHERE meta_id = %d ORDER BY meta_timestamp DESC LIMIT 1';
 			$timestamp = $wpdb->get_row( $wpdb->prepare( $sql , $meta_id ) );
 		}
 	}
 
-	if ( empty( $timestamp ) )
+	if ( empty( $timestamp ) ) {
 		$timestamp = false;
+	}
 
 	return $timestamp;
 }
@@ -121,17 +121,25 @@ function wpsc_get_metadata_timestamp( $meta_object_type, $meta_id, $meta_key = '
  	* @param int $meta_id ID for a specific meta row
  * @return object Meta object or false.
  */
-function _wpsc_get_meta_by_id( $meta_object_type, $meta_id  ) {
+function _wpsc_get_meta_by_meta_id( $meta_object_type, $meta_id  ) {
 	global $wpdb;
+	$meta_item = false;
 
 	$meta_id = intval( $meta_id );
 
 	if ( ! empty($meta_object_type) && ! empty( $meta_id ) ) {
-		$sql = 'SELECT * FROM '.wpsc_meta_table_name( $meta_object_type ).' WHERE meta_id = %d';
-		$meta_item = $wpdb->get_row( $wpdb->prepare( $sql , $meta_id ), OBJECT );
+		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
 
-		if ( $meta_item === null ) {
-			$meta_item = false;
+		if ( ! empty( $meta_table_name ) ) {
+			$sql = 'SELECT * FROM '.wpsc_meta_table_name( $meta_object_type ).' WHERE meta_id = %d';
+			$sql = $wpdb->prepare( $sql , $meta_id );
+			$meta_item = $wpdb->get_row( $sql, OBJECT );
+
+			$meta_item->meta_value = maybe_unserialize( $meta_item->meta_value );
+
+			if ( $meta_item === null ) {
+				$meta_item = false;
+			}
 		}
 	}
 
@@ -140,25 +148,38 @@ function _wpsc_get_meta_by_id( $meta_object_type, $meta_id  ) {
 
 
 /**
- * Get the meta associated with a specific meta type, object id and meta key
+ * Get the meta ids associated with a specific meta type, object id and meta key
  * the timestamp of the newest record is returned
+ *
+ * @acess private
  * @since 3.8.14
  *
  * @param string $meta_object_type Type of object metadata is for (e.g., variation. cart, etc)
- 	* @param int $meta_id ID for a specific meta row
- * @return object Meta object or false.
+ * @param int $meta_id ID for a specific meta row
+ * @return array array of meta ids
  */
 function _wpsc_get_meta_ids( $meta_object_type, $object_id, $meta_key  ) {
 	global $wpdb;
+	$meta_item_ids = array();
 
-	$meta_id = intval( $meta_id );
+	$object_id = intval( $object_id );
 
-	if ( ! empty($meta_object_type) && ! empty( $meta_id )  && ! empty( $meta_key ) ) {
-		$wpdb_property = $meta_object_type.'meta';
+	if ( ! empty($meta_object_type) && ! empty( $object_id )  && ! empty( $meta_key ) ) {
+		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
 
-		if ( ! empty( $wpdb->$wpdb_property ) ) {
-			$sql = 'SELECT meta_id FROM '.wpsc_meta_table_name( $meta_object_type ).' WHERE $object_id = %d AND  `' . $wpdb_property . '` = "%s"';
-			$meta_item_ids = $wpdb->get_col( $wpdb->prepare( $sql , $meta_id, $meta_key  ), 0 );
+		if ( ! empty( $meta_table_name ) ) {
+			$sql = 'SELECT meta_id '
+					. ' FROM '. $meta_table_name
+					. ' WHERE `' . _wpsc_meta_key_name( $meta_object_type )  . '` = %d '
+					. ' AND meta_key = %s';
+
+			$sql = $wpdb->prepare( $sql , $object_id, $meta_key );
+
+			$meta_item_ids = $wpdb->get_col( $sql, 0 );
+
+			if ( ! empty( $meta_item_ids ) ) {
+				$meta_item_ids = array_map( 'intval', $meta_item_ids );
+			}
 		}
 	}
 
@@ -211,11 +232,11 @@ function _wpsc_validate_meta_object_type( $meta_object_type ) {
  *  Note: that function call does not check if the table exits, it only give back the name,
  *
  * @since 3.8.12
- *
+ * @access private
  * @param string $meta_object_type Type of object metadata is for (e.g., variation. cart, etc)
  * @return string Name of the custom meta table defined in $wpdb, or the name as it would be defined
  */
-function wpsc_meta_table_name( $meta_object_type ) {
+function _wpsc_meta_table_name( $meta_object_type ) {
 	global $wpdb;
 
 	$meta_table_name_property = _wpsc_wpdb_meta_table( $meta_object_type );
@@ -261,7 +282,7 @@ function _wpsc_meta_key_name( $meta_object_type ) {
 	global $wpdb;
 
 	if ( $meta_object_type = _wpsc_validate_meta_object_type( $meta_object_type ) ) {
-		$id_field_name = $meta_object_type . '_id';
+		$id_field_name = 'wpsc_' . $meta_object_type . '_id';
 	} else {
 		$id_field_name = '';
 	}

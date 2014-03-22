@@ -36,7 +36,7 @@
  *
  */
 
-add_action( 'wpsc_ready', '_wpsc_cleanup_customer_meta_checkout_details' );
+add_action( 'wpsc_ready', '_wpsc_cleanup_visitor_meta_checkout_details' );
 
 
 //////////////////// Deprecation Handling Control //////////////////////////
@@ -60,32 +60,32 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 	 * @param  string|int $id Customer ID. Optional. Defaults to current customer
 	 * @return array        checkout details array
 	 */
-	function _wpsc_cleanup_customer_meta_checkout_details() {
-		remove_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+	function _wpsc_cleanup_visitor_meta_checkout_details() {
+		remove_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 
-		$meta_item_ids = wpsc_get_ids_by_meta_key( 'visitor', 'checkout_details' );
+		$meta_item_ids = wpsc_get_meta_ids_by_meta_key( 'visitor', 'checkout_details' );
 
 		foreach ( $meta_item_ids as $meta_item_id ) {
-			$meta_item = _wpsc_get_meta_by_id( 'visitor', $meta_item_id );
-			$old_meta_timestamp = strtotime( $meta_item->meta_timestamp );
+			if ( $meta_item = _wpsc_get_meta_by_meta_id( 'visitor', $meta_item_id ) ) {
+				$old_meta_timestamp = strtotime( $meta_item->meta_timestamp );
 
-			$new_meta_ids = _wpsc_get_meta_ids( 'customer', $meta_item->wpsc_vsitor_id, 'billingfirstname' );
+				$new_meta_visitor_ids = _wpsc_get_meta_ids( 'visitor', $meta_item->wpsc_visitor_id, 'billingfirstname' );
 
-			if ( ! empty ( $new_meta_ids ) ) {
-				$new_meta_timestamp = strtotime( wpsc_get_metadata_timestamp( 'customer', $meta_item_ids[0] ) );
+				if ( ! empty ( $new_meta_visitor_ids ) ) {
+					$new_meta_timestamp = strtotime( wpsc_get_metadata_timestamp( 'visitor', $new_meta_visitor_ids[0] ) );
 
-			} else {
-				$new_meta_timestamp = 0;
-			}
+				} else {
+					$new_meta_timestamp = 0;
+				}
 
-			if ( $old_meta_timestamp > $new_meta_timestamp ) {
-				$meta_data_in_old_format = _wpsc_get_deprecated_customer_meta_checkout_details( false, 'checkout_details', $meta_item->wpsc_vsitor_id );
-				_wpsc_update_deprecated_customer_meta_checkout_details( $meta_data_in_old_format, 'checkout_details', $meta_item->wpsc_vsitor_id );
+				if ( $old_meta_timestamp > $new_meta_timestamp ) {
+					_wpsc_update_deprecated_customer_meta_checkout_details( $meta_data_in_old_format, 'checkout_details', $meta_item->wpsc_visitor_id );
+				}
 			}
 		}
 
 
-		add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+		add_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 	}
 
 
@@ -96,8 +96,13 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 	 * @param  string|int $id Customer ID. Optional. Defaults to current customer
 	 * @return array        checkout details array
 	 */
-	function _wpsc_get_deprecated_customer_meta_checkout_details(  $meta_value, $key = 'checkout_details', $id = null ) {
-		remove_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+	function _wpsc_get_deprecated_visitor_meta_checkout_details(  $meta_value, $key = 'checkout_details', $id = null ) {
+
+		if ( ! $id ) {
+			$id = wpsc_get_current_customer_id();
+		}
+
+		remove_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 
 		global $wpdb;
 
@@ -109,7 +114,7 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 		foreach ( $form_data as $index => $form_field ) {
 			if ( ! empty ( $form_field['unique_name'] ) ) {
 				$meta_key   = $form_field['unique_name'];
-				$meta_value = wpsc_get_customer_meta( $meta_key );
+				$meta_value = wpsc_get_visitor_meta( $meta_key, $id );
 
 				switch ( $form_field['type'] ) {
 					case 'delivery_country':
@@ -135,17 +140,17 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 			}
 		}
 
-		$deprecated_meta_value = wpsc_get_customer_meta( $key );
+		$deprecated_meta_value = wpsc_get_visitor_meta( $key, $id );
 		if ( ! empty( $deprecated_meta_value ) ) {
-			wpsc_delete_customer_meta( $key );
+			wpsc_delete_visitor_meta( $key, $id );
 		}
 
-		add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+		add_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 
 		return $meta_data_in_old_format;
 	}
 
-	add_filter( 'wpsc_got_customer_meta_checkout_details', '_wpsc_get_deprecated_customer_meta_checkout_details', 1, 3 );
+	add_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 
 	/**
 	 * Get a deprecated customer meta value that mirrors what was once "checkout_details".
@@ -154,57 +159,62 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 	 * @param  string|int $id Customer ID. Optional. Defaults to current customer
 	 * @return array        checkout details array
 	 */
-	function _wpsc_update_deprecated_customer_meta_checkout_details(  $meta_data_in_old_format, $key = 'checkout_details', $id = null ) {
+	function _wpsc_update_deprecated_visitor_meta_checkout_details(  $meta_data_in_old_format, $key = 'checkout_details', $id = null ) {
 		global $wpdb;
+
+		if ( ! $id ) {
+			$id = wpsc_get_current_customer_id();
+		}
 
 		$form_sql = 'SELECT * FROM `' . WPSC_TABLE_CHECKOUT_FORMS . '` WHERE `active` = "1" ORDER BY `checkout_set`, `checkout_order`;';
 		$form_data = $wpdb->get_results( $form_sql, ARRAY_A );
 
 		foreach ( $form_data as $form_field ) {
 			if (  isset( $meta_data_in_old_format[$form_field['id']] ) ) {
+
 				$meta_key = $form_field['unique_name'];
 				$meta_value = $meta_data_in_old_format[$form_field['id']];
 
 				switch ( $form_field['type'] ) {
 					case 'delivery_country':
 						if ( is_array( $meta_value ) ) {
-							wpsc_update_customer_meta( 'shippingcountry', $meta_value[0] );
-							wpsc_update_customer_meta( 'shippingregion', $meta_value[1] );
+							wpsc_update_visitor_meta( 'shippingcountry', $meta_value[0], $id );
+							wpsc_update_visitor_meta( 'shippingregion', $meta_value[1], $id );
 						} else {
-							wpsc_update_customer_meta( 'shippingcountry', $meta_value );
-							wpsc_delete_customer_meta( 'shippingregion' );
+							wpsc_update_visitor_meta( 'shippingcountry', $meta_value, $id );
+							wpsc_update_visitor_meta( 'shippingregion', $id );
 						}
 
 						break;
 
 					case 'country':
 						if ( is_array( $meta_value ) ) {
-							wpsc_update_customer_meta( 'billingcountry', $meta_value[0] );
-							wpsc_update_customer_meta( 'billingregion', $meta_value[1] );
+							wpsc_update_visitor_meta( 'billingcountry', $meta_value[0], $id );
+							wpsc_update_visitor_meta( 'billingregion', $meta_value[1], $id );
 						} else {
-							wpsc_update_customer_meta( 'billingcountry', $meta_value );
-							wpsc_delete_customer_meta( 'billingregion' );
+							wpsc_update_visitor_meta( 'billingcountry', $meta_value, $id );
+							wpsc_update_visitor_meta( 'billingregion', $id );
 						}
 
 						break;
 
 					default:
-						wpsc_update_customer_meta( $meta_key, $meta_value );
+						wpsc_update_visitor_meta( $meta_key, $meta_value, $id );
 						break;
 				}
 			}
 		}
 
-		$deprecated_meta_value = wpsc_get_customer_meta( $key );
+		$deprecated_meta_value = wpsc_get_visitor_meta( $key, $id );
 		if ( ! empty( $deprecated_meta_value ) ) {
-			wpsc_delete_customer_meta( $key );
+			wpsc_delete_visitor_meta( $key, $id );
 		}
 
 		return $meta_data_in_old_format;
 
 	}
 
-	add_filter( 'wpsc_updated_customer_meta_checkout_details', '_wpsc_update_deprecated_customer_meta_checkout_details', 10, 3 );
+	add_filter( 'wpsc_updated_visitor_meta_checkout_details', '_wpsc_update_deprecated_visitor_meta_checkout_details', 10, 3 );
 
 }
 
