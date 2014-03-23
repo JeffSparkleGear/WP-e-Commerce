@@ -69,17 +69,19 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 			if ( $meta_item = _wpsc_get_meta_by_meta_id( 'visitor', $meta_item_id ) ) {
 				$old_meta_timestamp = strtotime( $meta_item->meta_timestamp );
 
+				// we use the  timestamp from the billing first name field as a proxy for the freshness of customer meta data set
+				// the billing first name is required in all of the data collection cases
 				$new_meta_visitor_ids = _wpsc_get_meta_ids( 'visitor', $meta_item->wpsc_visitor_id, 'billingfirstname' );
 
 				if ( ! empty ( $new_meta_visitor_ids ) ) {
-					$new_meta_timestamp = strtotime( wpsc_get_metadata_timestamp( 'visitor', $new_meta_visitor_ids[0] ) );
-
+					$new_meta_timestamp = strtotime( wpsc_get_meta_id_timestamp( 'visitor', $new_meta_visitor_ids[0] ) );
 				} else {
 					$new_meta_timestamp = 0;
 				}
 
+				// if the old data is newer than any new data we can replace it
 				if ( $old_meta_timestamp > $new_meta_timestamp ) {
-					_wpsc_update_deprecated_customer_meta_checkout_details( $meta_data_in_old_format, 'checkout_details', $meta_item->wpsc_visitor_id );
+					_wpsc_update_deprecated_visitor_meta_checkout_details( $meta_item->meta_value, 'checkout_details', $meta_item->wpsc_visitor_id );
 				}
 			}
 		}
@@ -87,7 +89,6 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 
 		add_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
 	}
-
 
 	/**
 	 * Update the meta values from the contents of a meta value that mirrors what was once "checkout_details".

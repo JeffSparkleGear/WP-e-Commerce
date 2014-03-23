@@ -17,13 +17,12 @@ function wpsc_get_meta_ids_by_meta_key( $meta_object_type, $meta_key = '' ) {
 	$sql = 'SELECT meta_id FROM `' . $meta_table . '` where meta_key = "%s"';
 	$sql = $wpdb->prepare( $sql , $meta_key );
 
-	$meta_rows = $wpdb->get_results( $sql, OBJECT_K  );
+	$meta_item_ids = $wpdb->get_col( $sql, 0  );
+	$meta_item_ids = array_map( 'intval', $meta_item_ids );
 
-	$ids = array_keys( $meta_rows );
+	$ids = apply_filters( 'wpsc_get_ids_by_meta_key', $meta_item_ids, $meta_object_type, $meta_key );
 
-	$ids = apply_filters( 'wpsc_get_ids_by_meta_key', $ids, $meta_object_type, $meta_key );
-
-	return $ids;
+	return $meta_item_ids;
 }
 
 /**
@@ -66,15 +65,14 @@ function wpsc_get_meta_by_timestamp( $meta_object_type, $timestamp = 0, $compari
 		$sql = $wpdb->prepare( $sql , $meta_key );
 	}
 
-	$meta_rows = $wpdb->get_results( $sql, OBJECT_K  );
+	$meta_item_ids = $wpdb->get_col( $sql, 0  );
+	$meta_item_ids = array_map( 'intval', $meta_item_ids );
 
-	$ids = array_keys( $meta_rows );
-
-	$ids = apply_filters( 'wpsc_get_meta_by_timestamp', $ids, $meta_object_type, $meta_key, $timestamp, $comparison );
+	$ids = apply_filters( 'wpsc_get_meta_by_timestamp', $meta_item_ids, $meta_object_type, $meta_key, $timestamp, $comparison );
 
 	$metas = array();
 
-	foreach ( $ids as $id ) {
+	foreach ( $meta_item_ids as $id ) {
 		$metas[$id] = get_metadata( $meta_object_type , $id , $meta_key );
 	}
 
@@ -84,23 +82,69 @@ function wpsc_get_meta_by_timestamp( $meta_object_type, $timestamp = 0, $compari
 
 /**
  * Get meta timestamp of the by object type, meta id and key, if multiple records exist
- * the timestamp of the newest record is returned
+ * the timestamp of the most recently updated record is returned
  * @since 3.8.12
  *
  * @param string $meta_object_type Type of object metadata is for (e.g., variation. cart, etc)
- 	* @param int $meta_id ID for a specific meta row
+ * @param int $object_id ID for a specific meta item
  * @return object Meta object timestamp or false.
  */
-function wpsc_get_metadata_timestamp( $meta_object_type, $meta_id, $meta_key = '' ) {
+function wpsc_get_metadata_timestamp( $meta_object_type, $object_id, $meta_key = '' ) {
+	global $wpdb;
+
+	$object_id = intval( $object_id );
+
+	if ( ! empty($meta_object_type) && ! empty( $meta_id )  && ! empty( $meta_key ) ) {
+		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
+		$id_field_name = _wpsc_meta_key_name( 'visitor' );
+		if ( ! empty( $meta_table_name ) ) {
+			if ( ! empty ( $meta_key ) ) {
+				$sql = 'SELECT meta_timestamp '
+						. ' FROM '. $meta_table_name
+						. ' WHERE meta_key = %s AND `' . $id_field_name . '` = %d '
+						. ' ORDER BY meta_timestamp DESC LIMIT 1';
+
+				$wpdb->prepare( $sql , $meta_key, $object_id );
+			} else {
+				$sql = 'SELECT meta_timestamp '
+						. ' FROM '. $meta_table_name
+						. ' WHERE ' . $id_field_name . '` = %d '
+						. ' ORDER BY meta_timestamp DESC LIMIT 1';
+
+				$wpdb->prepare( $sql , $meta_key, $object_id );
+			}
+
+			$timestamp = $wpdb->get_row( $sql );
+		}
+	}
+
+	if ( empty( $timestamp ) ) {
+		$timestamp = false;
+	}
+
+	return $timestamp;
+}
+
+
+/**
+ * Get meta timestamp of the by meta object id
+ *
+ * @since 3.8.14
+ *
+ * @param string $meta_object_type Type of object metadata is for (e.g., variation. cart, etc)
+ * @param int $meta_id ID for a specific meta row
+ * @return object Meta object timestamp or false.
+ */
+function wpsc_get_meta_id_timestamp( $meta_object_type, $meta_id ) {
 	global $wpdb;
 
 	$meta_id = intval( $meta_id );
 
-	if ( ! empty($meta_object_type) && ! empty( $meta_id )  && ! empty( $meta_key ) ) {
+	if ( ! empty($meta_object_type) && ! empty( $meta_id ) ) {
 		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
 		if ( ! empty( $meta_table_name ) ) {
-			$sql = 'SELECT meta_timestamp FROM '. $meta_table_name .' WHERE meta_id = %d ORDER BY meta_timestamp DESC LIMIT 1';
-			$timestamp = $wpdb->get_row( $wpdb->prepare( $sql , $meta_id ) );
+			$sql = 'SELECT meta_timestamp FROM '. $meta_table_name .' WHERE meta_id = %d';
+			$timestamp = $wpdb->get_var( $wpdb->prepare( $sql , $meta_id ), 0 );
 		}
 	}
 
@@ -131,8 +175,9 @@ function _wpsc_get_meta_by_meta_id( $meta_object_type, $meta_id  ) {
 		$meta_table_name = _wpsc_meta_table_name( $meta_object_type );
 
 		if ( ! empty( $meta_table_name ) ) {
-			$sql = 'SELECT * FROM '.wpsc_meta_table_name( $meta_object_type ).' WHERE meta_id = %d';
+			$sql = 'SELECT * FROM ' . $meta_table_name . ' WHERE meta_id = %d';
 			$sql = $wpdb->prepare( $sql , $meta_id );
+
 			$meta_item = $wpdb->get_row( $sql, OBJECT );
 
 			$meta_item->meta_value = maybe_unserialize( $meta_item->meta_value );
