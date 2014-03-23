@@ -115,7 +115,7 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 		foreach ( $form_data as $index => $form_field ) {
 			if ( ! empty ( $form_field['unique_name'] ) ) {
 				$meta_key   = $form_field['unique_name'];
-				$meta_value = wpsc_get_visitor_meta( $meta_key, $id );
+				$meta_value = wpsc_get_visitor_meta( $id , $meta_key, true );
 
 				switch ( $form_field['type'] ) {
 					case 'delivery_country':
@@ -141,9 +141,9 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 			}
 		}
 
-		$deprecated_meta_value = wpsc_get_visitor_meta( $key, $id );
+		$deprecated_meta_value = wpsc_get_visitor_meta( $id, $key, true );
 		if ( ! empty( $deprecated_meta_value ) ) {
-			wpsc_delete_visitor_meta( $key, $id );
+			wpsc_delete_visitor_meta( $id, $key );
 		}
 
 		add_filter( 'wpsc_got_visitor_meta_checkout_details', '_wpsc_get_deprecated_visitor_meta_checkout_details', 1, 3 );
@@ -206,9 +206,9 @@ if ( _wpsc_depcrecate_customer_checkout_details ) {
 			}
 		}
 
-		$deprecated_meta_value = wpsc_get_visitor_meta( $key, $id );
+		$deprecated_meta_value = wpsc_get_visitor_meta( $id, $key, true );
 		if ( ! empty( $deprecated_meta_value ) ) {
-			wpsc_delete_visitor_meta( $key, $id );
+			wpsc_delete_visitor_meta( $id, $key );
 		}
 
 		return $meta_data_in_old_format;
