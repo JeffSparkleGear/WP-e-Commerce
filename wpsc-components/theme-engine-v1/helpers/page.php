@@ -343,7 +343,16 @@ function wpsc_enqueue_user_script_and_css() {
 		}
 
 		wp_enqueue_script( 'jQuery' );
-		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $version_identifier );
+
+		// To help devs who are working on WPeC, and anyone who may deploy a site on WPeC and want to
+		// make a change to the WPeC javascript, add a file timestamp on to the version information
+		// for the javascript file.  This will force browesers and caches to use the new version of the
+		// file when it changes, even though the WPEC version is not changing. This should also eliminate
+		// nearly all cases of having to ask a user "did you clear your browser cache?" when they report
+		// an unusual behavior.
+		$wp_ecommerce_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wp-e-commerce.js' );
+
+		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $wp_ecommerce_js_version );
 
 		if ( defined( WPEC_LOAD_DEPRECATED ) && WPEC_LOAD_DEPRECATED ) {
 			wp_enqueue_script( 'wpsc-deprecated', WPSC_CORE_JS_URL . '/wpsc-deprecated.js', false, $version_identifier );
@@ -1148,7 +1157,7 @@ function wpsc_remove_page_from_query_string( $query_string ) {
 
 	if ( false === strpos( implode( ' ', $query_string ), 'wpsc' ) ) {
 		return $query_string;
-	}	
+	}
 
 	if ( isset( $query_string['name'] ) && $query_string['name'] == 'page' && isset( $query_string['page'] ) ) {
 		unset( $query_string['name'] );
@@ -1185,7 +1194,7 @@ function wpsc_remove_page_from_query_string( $query_string ) {
 		unset( $query_string['term'] );
 		unset( $query_string['taxonomy'] );
 	}
-	
+
 	return $query_string;
 }
 
