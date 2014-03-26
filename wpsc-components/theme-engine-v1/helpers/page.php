@@ -350,12 +350,13 @@ function wpsc_enqueue_user_script_and_css() {
 		// file when it changes, even though the WPEC version is not changing. This should also eliminate
 		// nearly all cases of having to ask a user "did you clear your browser cache?" when they report
 		// an unusual behavior.
-		$wp_ecommerce_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wp-e-commerce.js' );
+		$wpec_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wp-e-commerce.js' );
 
-		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $wp_ecommerce_js_version );
+		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $wpec_js_version );
 
 		if ( defined( 'WPEC_LOAD_DEPRECATED' ) && WPEC_LOAD_DEPRECATED ) {
-			wp_enqueue_script( 'wpsc-deprecated', WPSC_CORE_JS_URL . '/wpsc-deprecated.js', false, $version_identifier );
+			$wpec_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wpsc-deprecated.js' );
+			wp_enqueue_script( 'wpsc-deprecated', WPSC_CORE_JS_URL . '/wpsc-deprecated.js', 'wp-e-commerce', $wpec_js_version );
 		}
 
 		wp_enqueue_script( 'wp-e-commerce-dynamic', home_url( '/index.php?wpsc_user_dynamic_js=true' ), false, $version_identifier );
