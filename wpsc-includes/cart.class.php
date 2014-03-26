@@ -568,27 +568,19 @@ class wpsc_cart {
 	 * @return boolean true on sucess, false on failure
 	 */
 	function check_remaining_quantity( $product_id, $variations = array(), $quantity = 1 ) {
-		global $wpdb;
+
 		$stock = get_post_meta( $product_id, '_wpsc_stock', true );
 		$stock = apply_filters( 'wpsc_product_stock', $stock, $product_id );
-		// check to see if the product uses stock
+
+		$result = true;
+
 		if ( is_numeric( $stock ) ) {
-			$claimed_query = new WPSC_Claimed_Stock( array( 'product_id' => $product_id ) );
-			$claimed_stock = $claimed_query->get_claimed_stock_count();
-			if ( $stock > 0 ) {
-				$claimed_stock = $wpdb->get_var( $wpdb->prepare( 'SELECT SUM(`stock_claimed`) FROM `' . WPSC_TABLE_CLAIMED_STOCK . '` WHERE `product_id` IN(%d) AND `variation_stock_id` IN("%d")', $product_id, $priceandstock_id ) );
-				if ( ( $claimed_stock + $quantity ) <= $stock ) {
-					$output = true;
-				} else {
-					$output = false;
-				}
-			} else {
-				$output = false;
+			$remaining_quantity = wpsc_get_remaining_quantity( $product_id, $variations, $quantity );
+			if ( $remaining_quantity < $quantity ) {
+				$result = false;
 			}
-		} else {
-			$output = true;
 		}
-		return $output;
+		return $result;
 	}
 
 	/**
