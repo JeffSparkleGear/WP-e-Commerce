@@ -1784,7 +1784,6 @@ function wpsc_meta_table_name( $meta_object_type ) {
 	return _wpsc_meta_table_name( $meta_object_type );
 }
 
-
 /**
  * Google checkout not longer available or supported, so we are deprecating this function
  *
