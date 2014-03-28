@@ -379,7 +379,7 @@ function wpsc_paypal_express_convert( $amt ) {
 	if ( empty( $rate ) ) {
 		$rate = 1;
 		if ( empty( $local_currency_code ) ) {
-			$local_currency_code = $wpdb->get_var( "SELECT `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id`='" . get_option( 'currency_type' ) . "' LIMIT 1" );
+			$local_currency_code = WPSC_Country_Region::currency_code( get_option( 'currency_type' ) );
 		}
 		if ( empty( $paypal_currency_code ) ) {
 			global $wpsc_gateways;
@@ -514,7 +514,8 @@ function form_paypal_express() {
   	</tr>\n";
 
 	$paypal_ipn = get_option( 'paypal_ipn' );
-	$store_currency_code = $wpdb->get_var( "SELECT `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id` IN ('" . absint( get_option( 'currency_type' ) ) . "')" );
+	$store_currency_code = WPSC_Country_Region::currency_code( absint( get_option( 'currency_type' ) ) );
+
 	$current_currency = get_option( 'paypal_curcode' );
 
 	if ( ( $current_currency == '' ) && in_array( $store_currency_code, $wpsc_gateways['wpsc_merchant_paypal_express']['supported_currencies']['currency_list'] ) ) {
@@ -571,7 +572,7 @@ function form_paypal_express() {
 
 function wpsc_get_paypal_currency_code() {
 	global $wpdb, $wpsc_gateways;
-	$paypal_currency_code = $wpdb->get_var( $wpdb->prepare( "SELECT `code` FROM `".WPSC_TABLE_CURRENCY_LIST."` WHERE `id`= %d LIMIT 1", get_option( 'currency_type' ) ) );
+	$paypal_currency_code = WPSC_Country_Region::currency_code( get_option( 'currency_type' ) );
 	if ( ! in_array( $paypal_currency_code, $wpsc_gateways['wpsc_merchant_paypal_express']['supported_currencies']['currency_list'] ) )
 		$paypal_currency_code = get_option( 'paypal_curcode', 'USD' );
 
