@@ -18,14 +18,8 @@
  * @param $country (string) isocode for a country
  * @return (boolean) true is country has regions else false
  */
-function wpsc_has_regions($country){
-	global $wpdb;
-	$country_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `isocode` IN(%s) LIMIT 1", $country ), ARRAY_A );
-	if ($country_data['has_regions'] == 1)
-		return true;
-	else
-		return false;
-
+function wpsc_has_regions( $country ){
+	return WPSC_Country_Region::country_has_regions( $country );
 }
 
 /**
@@ -147,9 +141,10 @@ function wpsc_get_acceptable_countries() {
 		$target_market_ids = $target_market_ids[0];
 	}
 
-	$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `visible`= '1' ORDER BY `country` ASC", ARRAY_A );
+	$country_data = WPSC_Country_Region::countries( true );
+
 	$have_target_market = $have_target_market && count( $country_data ) != count( $target_market_ids );
-	$GLOBALS['wpsc_country_data'] = $country_data;
+	$GLOBALS['wpsc_country_data'] = $country_data; // TODO Is this ever used?
 
 	$conflict_error = wpsc_get_customer_meta( 'category_shipping_conflict' );
 	$target_conflict = wpsc_get_customer_meta( 'category_shipping_target_market_conflict' );

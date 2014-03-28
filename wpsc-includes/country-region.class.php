@@ -2,6 +2,276 @@
 
 class WPSC_Country_Region {
 
+
+	/**
+	 * Change an country ISO code into a country id, if a country id is passed it is returned intact
+	 *
+	 * @access public
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 */
+	public static function country_id( $country ) {
+		$country_id = false;
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		if ( is_numeric( $country ) ) {
+			if ( isset( self::$country_iso_code_map[intval( $country )] ) ) {
+				$country_id = intval( $country );
+			}
+		} else {
+			if ( isset( self::$country_iso_code_map[$country] ) ) {
+				$country_id = self::$country_iso_code_map[$country];
+			}
+		}
+
+		return $country_id;
+	}
+
+	/**
+	 * How many regions does the country have
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string country being check, if non-numeric country is treated as an isocode, number is the country id
+	 */
+	public static function country_name( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$region_count = 0;
+
+		if ( $country_id_or_isocode = self::country_id( $country_id_or_isocode ) ) {
+			if ( self::$countries[$country_id_or_isocode]->has_regions
+				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
+					&& is_array(  self::$countries[$country_id_or_isocode]->regions ) ) {
+						$region_count = count( self::$countries[$country_id_or_isocode]->regions );
+			}
+		}
+
+		return $region_count;
+	}
+
+	/**
+	 * The country information
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 * @param boolean return the result as an array, default is to return the result as an object
+	 *
+	 * @return object|array country information
+	 */
+	public static function country( $country_id_or_isocode, $as_array = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$country_id = self::country_id( $country_id_or_isocode );
+
+		$country = 0;
+
+		if ( $country_id ) {
+			if ( self::$countries[$country_id]->has_regions
+				&& property_exists(  self::$countries[$country_id], 'regions' )
+					&& is_array(  self::$countries[$country_id]->regions )
+			) {
+				$region_count = count( self::$countries[$country_id]->regions );
+			}
+		}
+
+		if ( $as_array ) {
+			$json  = json_encode( $country );
+			$country = json_decode( $json, true );
+		}
+
+		return $country;
+	}
+
+	/**
+	 * The currency for a country
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return string  currency code for the specified country
+	 */
+	public static function currency_code( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$country_id = self::country_id( $country_id_or_isocode );
+
+		$currency_code = '';
+
+		if ( $country_id ) {
+			$currency_code = self::$countries[$country_id]->code;
+		}
+
+		return $currency_code;
+	}
+
+	/**
+	 * The currency symbol for a country
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return string  currency symbol for the specified country
+	 */
+	public static function currency_symbol( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$country_id = self::country_id( $country_id_or_isocode );
+
+		$currency_symbol = '';
+
+		if ( $country_id ) {
+			$currency_symbol = self::$countries[$country_id]->symbol;
+		}
+
+		return $currency_symbol;
+	}
+
+	/**
+	 * The currency_code
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return string  currency symbol html for the specified country
+	 */
+	public static function currency_symbol_html( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$country_id = self::country_id( $country_id_or_isocode );
+
+		$currency_symbol = '';
+
+		if ( $country_id ) {
+			$currency_symbol = self::$countries[$country_id]->symbol_html;
+		}
+
+		return $currency_symbol;
+	}
+
+	/**
+	 * The currency_code
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return string  currency symbol html for the specified country
+	 */
+	public static function currency_data( $country_id_or_isocode, $as_array = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$country_id = self::country_id( $country_id_or_isocode );
+
+		if ( $as_array ) {
+			$currency_data                = array();
+			$currency_data['code']        = self::$countries[$country_id]->code;
+			$currency_data['symbol']      = self::$countries[$country_id]->symbol;
+			$currency_data['symbol_html'] = self::$countries[$country_id]->symbol_html;
+		} else {
+			$currency_data                 = new stdClass();
+			$currency_data->code           = self::$countries[$country_id]->code;
+			$currency_data->symbol         = self::$countries[$country_id]->symbol;
+			$currency_data->symbol_html    = self::$countries[$country_id]->symbol_html;
+		}
+
+		return $currency_data;
+	}
+
+
+	/**
+	 * The regions for a country
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return array of region objects index by region id
+	 */
+	public static function regions( $country_id_or_isocode, $as_array = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$regions = array();
+
+		if ( $country = self::country_id( $country_id_or_isocode ) ) {
+			if ( self::$countries[$country_id_or_isocode]->has_regions
+				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
+					&& is_array(  self::$countries[$country_id_or_isocode]->regions ) ) {
+				$regions = self::$countries[$country_id_or_isocode]->regions;
+			}
+		}
+
+		if ( $as_array ) {
+			$json  = json_encode( $regions );
+			$regions = json_decode( $json, true );
+		}
+
+		return $regions;
+	}
+
+	/**
+	 * The Countries
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param boolean return the results as an associative array rather than an object
+	 *
+	 * @return array of region objects index by region id
+	 */
+	public static function countries( $as_array = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$countries = self::$countries;
+
+		if ( $as_array ) {
+			$json  = json_encode( $countries );
+			$countries = json_decode( $json, true );
+		}
+
+		return $countries;
+	}
+
 	/**
 	 * How many regions does the country have
 	 *
@@ -9,35 +279,58 @@ class WPSC_Country_Region {
 	 * @since 3.8.14
 	 *
 	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return int count of regions in a country, if region is invalid 0 is returned
 	 */
-	public static function region_count( $country ) {
+	public static function region_count( $country_id_or_isocode ) {
 
 		if ( ! self::confirmed_initialization() ) {
 			return 0;
 		}
 
-		$country_index = -1;
-
-		if ( is_numeric( $country ) ) {
-			$country_index = intval( $country );
-		} else {
-			if ( isset( self::$country_iso_code_map[$country] ) ) {
-				$country_index = self::$country_iso_code_map[$country];
-			}
-		}
-
 		$region_count = 0;
 
-		if ( self::$countries[$country_index]->has_regions
-				&& property_exists(  self::$countries[$country_index], 'regions' )
-					&& is_array(  self::$countries[$country_index]->regions )
-		) {
-			$region_count = count( self::$countries[$country_index]->regions );
+		if ( $country = self::country_id( $country_id_or_isocode ) ) {
+			if ( self::$countries[$country_id_or_isocode]->has_regions
+				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
+					&& is_array(  self::$countries[$country_id_or_isocode]->regions )
+			) {
+				$region_count = count( self::$countries[$country_id_or_isocode]->regions );
+			}
 		}
 
 		return $region_count;
 	}
 
+
+	/**
+	 * Does the country have regions
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return true if th country has regions, false otherwise
+	 */
+	public static function country_has_regions( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$has_regions = false;
+
+		if ( $country_id_or_isocode = self::country_id( $country_id_or_isocode ) ) {
+			if ( property_exists( self::$countries[$country_id_or_isocode], 'regions' ) ) {
+				if ( count( self::$countries[$country_id_or_isocode]->regions ) ) {
+					$has_regions = self::$countries[$country_id_or_isocode]->has_regions && count( self::$countries[$country_id_or_isocode]->regions );
+				}
+			}
+		}
+
+		return $has_regions;
+	}
 
 	/**
 	 * Get the list of countries,
@@ -127,7 +420,6 @@ class WPSC_Country_Region {
 			global $wpdb;
 
 			$sql = 'SELECT * FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "1" ORDER BY country ASC';
-			$country_data = $wpdb->get_results( $sql );
 
 			// now countries is a list with the key being the integer country id, the value is the country data
 			self::$countries = $wpdb->get_results( $sql, OBJECT_K );

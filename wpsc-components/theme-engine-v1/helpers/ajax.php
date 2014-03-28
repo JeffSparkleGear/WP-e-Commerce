@@ -498,11 +498,11 @@ function wpsc_update_location() {
 		$shipping_zipcode = $_POST['zipcode'];
 	}
 
-	$delivery_region_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(`regions`.`id`) FROM `" . WPSC_TABLE_REGION_TAX . "` AS `regions` INNER JOIN `" . WPSC_TABLE_CURRENCY_LIST . "` AS `country` ON `country`.`id` = `regions`.`country_id` WHERE `country`.`isocode` IN('%s')",  $delivery_country ) );
+	$delivery_region_count = WPSC_Country_Region::region_count( $delivery_country );
 	if ( $delivery_region_count < 1 )
 		$delivery_region = '';
 
-	$selected_region_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(`regions`.`id`) FROM `" . WPSC_TABLE_REGION_TAX . "` AS `regions` INNER JOIN `" . WPSC_TABLE_CURRENCY_LIST . "` AS `country` ON `country`.`id` = `regions`.`country_id` WHERE `country`.`isocode` IN('%s')", $billing_country ) );
+	$selected_region_count = WPSC_Country_Region::region_count( $billing_country );
 	if ( $selected_region_count < 1 )
 		$billing_region = '';
 
@@ -622,7 +622,9 @@ function wpsc_submit_checkout( $collected_data = true ) {
 		$error_messages = array();
 	}
 
-	$selectedCountry = $wpdb->get_results( $wpdb->prepare( "SELECT id, country FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE isocode = '%s' ", wpsc_get_customer_meta( 'shipping_country' ) ), ARRAY_A );
+	$country_id = WPSC_Country_Region::country_id( wpsc_get_customer_meta( 'shipping_country' ) );
+	$country_name = WPSC_Country_Region::country_name( $country_id );
+
 	foreach ( $wpsc_cart->cart_items as $cartitem ) {
 		if( ! empty( $cartitem->meta[0]['no_shipping'] ) ) continue;
 		$categoriesIDs = $cartitem->category_id_list;
@@ -632,8 +634,8 @@ function wpsc_submit_checkout( $collected_data = true ) {
 			else
 				$countries = wpsc_get_meta( $catid, 'target_market', 'wpsc_category' );
 
-			if ( !empty($countries) && !in_array( $selectedCountry[0]['id'], (array)$countries ) ) {
-				$errormessage = sprintf( __( '%s cannot be shipped to %s. To continue with your transaction please remove this product from the list below.', 'wpsc' ), $cartitem->get_title(), $selectedCountry[0]['country'] );
+			if ( ! empty($countries) && ! in_array( $country_id, (array)$countries ) ) {
+				$errormessage = sprintf( __( '%s cannot be shipped to %s. To continue with your transaction please remove this product from the list below.', 'wpsc' ), $cartitem->get_title(), $country_name );
 				wpsc_update_customer_meta( 'category_shipping_conflict', $errormessage );
 				$is_valid = false;
 			}
@@ -766,8 +768,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'billingregion', $wpsc_selected_region );
 	}
 
-
-	$check_country_code = $wpdb->get_var( $wpdb->prepare( "SELECT `country`.`isocode` FROM `" . WPSC_TABLE_REGION_TAX . "` AS `region` INNER JOIN `" . WPSC_TABLE_CURRENCY_LIST . "` AS `country` ON `region`.`country_id` = `country`.`id` WHERE `region`.`id` = %d LIMIT 1", wpsc_get_customer_meta( 'billing_region' ) ) );
+	$check_country_code = WPSC_Country_Region::country_id( wpsc_get_customer_meta( 'billing_region' ) );
 
 	if ( wpsc_get_customer_meta( 'billingcountry' ) != $check_country_code ) {
 		$wpsc_selected_region = null;
@@ -782,8 +783,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'shippingregion', $wpsc_delivery_region );
 	}
 
-	$check_country_code = $wpdb->get_var( $wpdb->prepare( "SELECT `country`.`isocode` FROM `" . WPSC_TABLE_REGION_TAX . "` AS `region` INNER JOIN `" . WPSC_TABLE_CURRENCY_LIST . "` AS `country` ON `region`.`country_id` = `country`.`id` WHERE `region`.`id` = %d LIMIT 1", $wpsc_delivery_region ) );
-
+	$check_country_code = WPSC_Country_Region::country_id( $wpsc_delivery_region );
 	if ( $wpsc_delivery_country != $check_country_code ) {
 		$wpsc_delivery_region = null;
 	}
