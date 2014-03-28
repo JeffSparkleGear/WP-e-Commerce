@@ -386,6 +386,17 @@ class WPSC_Country_Region {
 	private static $country_names = array();
 
 	/**
+	 * Array of unique known currencies, indexed by corrency code
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	 */
+	private static $currencies = array();
+
+	/**
 	 * Returns an instance of the form with a particular ID
 	 *
 	 * @access public
@@ -419,9 +430,8 @@ class WPSC_Country_Region {
 		if ( self::$countries == null ) {
 			global $wpdb;
 
-			$sql = 'SELECT * FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "1" ORDER BY country ASC';
-
 			// now countries is a list with the key being the integer country id, the value is the country data
+			$sql = 'SELECT * FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "1" ORDER BY country ASC';
 			self::$countries = $wpdb->get_results( $sql, OBJECT_K );
 
 			// build an array to map from iso code to country, while we do this get any region data for the country
@@ -448,6 +458,10 @@ class WPSC_Country_Region {
 					}
 				}
 			}
+
+			// now countries is a list with the key being the integer country id, the value is the country data
+			$sql = 'SELECT DISTINCT code, symbol, symbol_html, currency FROM `' . WPSC_TABLE_CURRENCY_LIST . '` ORDER BY code ASC';
+			self::$currencies = $wpdb->get_results( $sql, OBJECT_K );
 
 			self::save_myself();
 		}
@@ -495,6 +509,7 @@ class WPSC_Country_Region {
 		$mydata['country_iso_code_map'] = self::$country_iso_code_map;
 		$mydata['countries']            = self::$countries;
 		$mydata['country_names']        = self::$country_names;
+		$mydata['currencies']           = self::$currencies;
 
 		set_transient( self::transient_name(), $mydata, WEEK_IN_SECONDS );
 	}
@@ -512,9 +527,20 @@ class WPSC_Country_Region {
 
 		$mydata = get_transient(  self::transient_name() );
 
-		self::$country_iso_code_map = $mydata['country_iso_code_map'];
-		self::$countries            = $mydata['countries'];
-		self::$country_names        = $mydata['country_names'];
+		if ( count( $mydata ) == 4 ) {
+
+			if (
+				is_array( $mydata['country_iso_code_map'] )
+					&& is_array( $mydata['countries'] )
+						&& is_array( $mydata['country_names'] )
+							&& is_array( $mydata['currencies'] )
+				) {
+					self::$country_iso_code_map = $mydata['country_iso_code_map'];
+					self::$countries            = $mydata['countries'];
+					self::$country_names        = $mydata['country_names'];
+					self::$currencies           = $mydata['currencies'];
+			}
+		}
 
 		return $this;
 	}
