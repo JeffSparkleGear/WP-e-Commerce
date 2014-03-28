@@ -36,12 +36,13 @@ function wpsc_currency_display( $price_in, $args = null ) {
 		// Get currency settings
 		$currency_type = get_option( 'currency_type' );
 
+		// TODO can deprecate this caching because the WPSC_Country_Region class already caches the data
 		if ( ! $wpsc_currency_data = wp_cache_get( $currency_type, 'wpsc_currency_id' ) ) {
-			$wpsc_currency_data = $wpdb->get_row( $wpdb->prepare( "SELECT `symbol`, `symbol_html`, `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id` = %d LIMIT 1", $currency_type ), ARRAY_A );
+			$wpsc_currency_data = WPSC_Country_Region::currency_data( $currency_type, true );
 			wp_cache_set( $currency_type, $wpsc_currency_data, 'wpsc_currency_id' );
 		}
 	} elseif ( ! $wpsc_currency_data = wp_cache_get( $query['isocode'], 'wpsc_currency_isocode' ) ) {
-		$wpsc_currency_data = $wpdb->get_row( $wpdb->prepare( "SELECT `symbol`, `symbol_html`, `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `isocode` = %s LIMIT 1", $query['isocode'] ), ARRAY_A );
+		$wpsc_currency_data = WPSC_Country_Region::currency_data( $currency_type, true );
 		wp_cache_set( $query['isocode'], $wpsc_currency_data, 'wpsc_currency_isocode' );
 	}
 
