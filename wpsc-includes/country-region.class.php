@@ -12,20 +12,18 @@ class WPSC_Country_Region {
 	 *
 	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
 	 */
-	public static function country_id( $country ) {
+	public static function country_id( $country_id_or_isocode ) {
 		$country_id = false;
 
 		if ( ! self::confirmed_initialization() ) {
 			return 0;
 		}
 
-		if ( is_numeric( $country ) ) {
-			if ( isset( self::$country_iso_code_map[intval( $country )] ) ) {
-				$country_id = intval( $country );
-			}
+		if ( is_numeric( $country_id_or_isocode ) ) {
+			$country_id = intval( $country_id_or_isocode );
 		} else {
-			if ( isset( self::$country_iso_code_map[$country] ) ) {
-				$country_id = self::$country_iso_code_map[$country];
+			if ( isset( self::$country_iso_code_map[$country_id_or_isocode] ) ) {
+				$country_id = self::$country_iso_code_map[$country_id_or_isocode];
 			}
 		}
 
@@ -48,11 +46,11 @@ class WPSC_Country_Region {
 
 		$region_count = 0;
 
-		if ( $country_id_or_isocode = self::country_id( $country_id_or_isocode ) ) {
-			if ( self::$countries[$country_id_or_isocode]->has_regions
-				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
-					&& is_array(  self::$countries[$country_id_or_isocode]->regions ) ) {
-						$region_count = count( self::$countries[$country_id_or_isocode]->regions );
+		if ( $country_id = self::country_id( $country_id_or_isocode ) ) {
+			if ( self::$countries[$country_id]->has_regions
+				&& property_exists(  self::$countries[$country_id], 'regions' )
+					&& is_array(  self::$countries[$country_id]->regions ) ) {
+						$region_count = count( self::$countries[$country_id]->regions );
 			}
 		}
 
@@ -196,17 +194,19 @@ class WPSC_Country_Region {
 
 		$country_id = self::country_id( $country_id_or_isocode );
 
-		if ( $as_array ) {
-			$currency_data                = array();
-			$currency_data['code']        = self::$countries[$country_id]->code;
-			$currency_data['symbol']      = self::$countries[$country_id]->symbol;
-			$currency_data['symbol_html'] = self::$countries[$country_id]->symbol_html;
-		} else {
-			$currency_data                 = new stdClass();
+		$currency_data = new stdClass();
+
+		if ( $country_id ) {
 			$currency_data->code           = self::$countries[$country_id]->code;
 			$currency_data->symbol         = self::$countries[$country_id]->symbol;
 			$currency_data->symbol_html    = self::$countries[$country_id]->symbol_html;
 		}
+
+		if ( $as_array ) {
+			$json  = json_encode( $currency_data );
+			$currency_data = json_decode( $json, true );
+		}
+
 
 		return $currency_data;
 	}
@@ -228,13 +228,15 @@ class WPSC_Country_Region {
 			return 0;
 		}
 
+		$country_id = self::country_id( $country_id_or_isocode );
+
 		$regions = array();
 
-		if ( $country = self::country_id( $country_id_or_isocode ) ) {
-			if ( self::$countries[$country_id_or_isocode]->has_regions
-				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
-					&& is_array(  self::$countries[$country_id_or_isocode]->regions ) ) {
-				$regions = self::$countries[$country_id_or_isocode]->regions;
+		if ( $country_id ) {
+			if ( self::$countries[$country_id]->has_regions
+				&& property_exists(  self::$countries[$country_id], 'regions' )
+					&& is_array(  self::$countries[$country_id]->regions ) ) {
+				$regions = self::$countries[$country_id]->regions;
 			}
 		}
 
@@ -290,12 +292,12 @@ class WPSC_Country_Region {
 
 		$region_count = 0;
 
-		if ( $country = self::country_id( $country_id_or_isocode ) ) {
-			if ( self::$countries[$country_id_or_isocode]->has_regions
-				&& property_exists(  self::$countries[$country_id_or_isocode], 'regions' )
-					&& is_array(  self::$countries[$country_id_or_isocode]->regions )
+		if ( $country_id = self::country_id( $country_id_or_isocode ) ) {
+			if ( self::$countries[$country_id]->has_regions
+				&& property_exists(  self::$countries[$country_id], 'regions' )
+					&& is_array(  self::$countries[$country_id]->regions )
 			) {
-				$region_count = count( self::$countries[$country_id_or_isocode]->regions );
+				$region_count = count( self::$countries[$country_id]->regions );
 			}
 		}
 
@@ -321,10 +323,10 @@ class WPSC_Country_Region {
 
 		$has_regions = false;
 
-		if ( $country_id_or_isocode = self::country_id( $country_id_or_isocode ) ) {
-			if ( property_exists( self::$countries[$country_id_or_isocode], 'regions' ) ) {
-				if ( count( self::$countries[$country_id_or_isocode]->regions ) ) {
-					$has_regions = self::$countries[$country_id_or_isocode]->has_regions && count( self::$countries[$country_id_or_isocode]->regions );
+		if ( $country_id = self::country_id( $country_id_or_isocode ) ) {
+			if ( property_exists( self::$countries[$country_id], 'regions' ) ) {
+				if ( count( self::$countries[$country_id]->regions ) ) {
+					$has_regions = self::$countries[$country_id]->has_regions && count( self::$countries[$country_id]->regions );
 				}
 			}
 		}
@@ -527,6 +529,8 @@ class WPSC_Country_Region {
 
 		$mydata = get_transient(  self::transient_name() );
 
+		$have_data = false;
+
 		if ( count( $mydata ) == 4 ) {
 
 			if (
@@ -539,7 +543,12 @@ class WPSC_Country_Region {
 					self::$countries            = $mydata['countries'];
 					self::$country_names        = $mydata['country_names'];
 					self::$currencies           = $mydata['currencies'];
+					$have_data = true;
 			}
+		}
+
+		if ( ! $have_data && ( $mydata === false ) ) {
+			self::clear_cache();
 		}
 
 		return $this;
@@ -582,6 +591,8 @@ class WPSC_Country_Region {
 // a little tiny test stub
 if ( true ) {
 	function testit() {
+
+		WPSC_Country_Region::clear_cache();
 
 		$x = WPSC_Country_Region::region_count( 'US' );
 		//error_log( 'US static has ' . $x );
