@@ -160,7 +160,7 @@ class ASHTools {
                 "96661","96662","96663","96664","96665","96666","96667","96668","96669","96670",
                 "96671","96672","96673","96674","96675","96677","96678","96679","96681","96681",
                 "96682","96683","96684","96684","96686","96687","96698");
-        
+
         return in_array( $zipcode, $zips );
     }
 
@@ -171,16 +171,9 @@ class ASHTools {
      * @param string $short_country
      * @return string
      */
-    function get_full_country($short_country){
-        global $wpdb;
-        
-        /* Audit why we're needing to check if $wpdb is set. */
-        if ( ! isset( $wpdb ) ) {
-            return $short_country;
-        }
-
-		$full_name = $wpdb->get_var( $wpdb->prepare( "SELECT country FROM " . WPSC_TABLE_CURRENCY_LIST . " WHERE isocode = %s", $short_country ) );
-        return $full_name;
+    function get_full_country( $short_country ){
+		$full_name = WPSC_Country_Region::country_name( $short_country );
+		return $full_name;
     }
 
     /**
@@ -611,7 +604,7 @@ class ASH{
             $dim_array["width"]  = ( !empty( $dimensions["width"]  ) && is_numeric( $dimensions["width"]  ) ) ? $dimensions["width"]  : 1;
             $dim_array["length"] = ( !empty( $dimensions["length"] ) && is_numeric( $dimensions["length"] ) ) ? $dimensions["length"] : 1;
             $package->set_dimensions($dim_array);
-           
+
             /* Set other meta */
             $package->hazard = ( get_product_meta( $cart_item->product_id, "ship_hazard", TRUE ) === TRUE) ? TRUE : FALSE;			//Fixed ternary evaluation.
             $package->insurance = ( get_product_meta( $cart_item->product_id, "ship_insurance", TRUE ) === TRUE) ? TRUE : FALSE;	//Fixed ternary evaluation.
