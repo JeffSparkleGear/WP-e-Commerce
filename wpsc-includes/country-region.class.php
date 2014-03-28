@@ -12,7 +12,9 @@ class WPSC_Country_Region {
 	 */
 	public static function region_count( $country ) {
 
-		self::confirm_initialization();
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
 
 		$country_index = -1;
 
@@ -34,6 +36,26 @@ class WPSC_Country_Region {
 		}
 
 		return $region_count;
+	}
+
+
+	/**
+	 * Get the list of countries,
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @return array   country list with index as country, value as name, sorted by country name
+	 */
+	public static function get_countries() {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		// we have the return value in our country name to id map, all we have to do is swap the keys with the values
+		return array_flip( self::$country_names );
 	}
 
 
@@ -97,7 +119,11 @@ class WPSC_Country_Region {
 	 * @param string $id Optional. Defaults to 0.
 	 */
 	public function __construct() {
-		if ( empty ( self::$countries ) ) {
+		if ( self::$countries == null ) {
+			self::restore_myself();
+		}
+
+		if ( self::$countries == null ) {
 			global $wpdb;
 
 			$sql = 'SELECT * FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "1" ORDER BY country ASC';
@@ -130,9 +156,9 @@ class WPSC_Country_Region {
 					}
 				}
 			}
-		}
 
-		return self::$countries;
+			self::save_myself();
+		}
 	}
 
 	/**
@@ -145,8 +171,8 @@ class WPSC_Country_Region {
 	 *                                        fields from the output
 	 * @return array
 	 */
-	public function get_countries_count() {
-		return count( $this->get_countries() );
+	static function get_countries_count() {
+		return count( self::get_countries() );
 	}
 
 	/**
@@ -171,14 +197,14 @@ class WPSC_Country_Region {
 	 *
 	 * @return none
 	 */
-	private function cache_myself() {
+	private function save_myself() {
 
 		$mydata = array();
 		$mydata['country_iso_code_map'] = self::$country_iso_code_map;
 		$mydata['countries']            = self::$countries;
 		$mydata['country_names']        = self::$country_names;
 
-		set_transient( _transient_name(), $mydata, WEEK_IN_SECONDS );
+		set_transient( self::transient_name(), $mydata, WEEK_IN_SECONDS );
 	}
 
 	/**
@@ -224,25 +250,26 @@ class WPSC_Country_Region {
 	 *
 	 * @return none
 	 */
-	private static function confirm_initialization() {
+	private static function confirmed_initialization() {
 		if ( self::$countries == null ) {
 			$an_instance = new WPSC_Country_Region();
 		}
+
+		return (self::$countries != null);
 	}
 
 
 }
 
 // a little tiny test stub
-if ( false ) {
+if ( true ) {
 	function testit() {
-		WPSC_Country_Region::clear_cache();
 
 		$x = WPSC_Country_Region::region_count( 'US' );
-		error_log( 'US static has ' . $x );
+		//error_log( 'US static has ' . $x );
 
 		$x = WPSC_Country_Region::region_count( '136' );
-		error_log( '136 static has ' . $x );
+		//error_log( '136 static has ' . $x );
 
 	}
 
