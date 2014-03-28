@@ -110,7 +110,6 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$id = 'billingcountry';
 	}
 
-	//$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
 	$additional_attributes = 'data-wpsc-meta-key="' . $title . '" title="' . $title . '" ' . $js;
 	$output .= "<div id='$html_form_id'>\n\r";
 	$output .= wpsc_get_country_dropdown(
