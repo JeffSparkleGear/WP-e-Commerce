@@ -471,8 +471,6 @@ function form_paypal_pro() {
 
 		$paypal_currency_list = array_map( 'esc_sql', $wpsc_gateways['wpsc_merchant_paypal_pro']['supported_currencies']['currency_list'] );
 
-		$currency_list = $wpdb->get_results("SELECT DISTINCT `code`, `currency` FROM `".WPSC_TABLE_CURRENCY_LIST."` WHERE `code` IN ('".implode("','",$paypal_currency_list)."')", ARRAY_A);
-
 		$currency_list = WPSC_Country_Region::currencies( true );
 		$currency_codes_in_commmon = array_intersect( array_keys( $currency_list ), $paypal_currency_list );
 
