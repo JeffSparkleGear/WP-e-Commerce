@@ -541,15 +541,27 @@ function form_paypal_express() {
 			$wpsc_gateways['wpsc_merchant_paypal_express']['supported_currencies']['currency_list'] = array();
 		}
 
-		$paypal_currency_list = array_map( 'esc_sql', $wpsc_gateways['wpsc_merchant_paypal_express']['supported_currencies']['currency_list'] );
 
-		$currency_list = $wpdb->get_results( "SELECT DISTINCT `code`, `currency` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `code` IN ('" . implode( "','", $paypal_currency_list ) . "')", ARRAY_A );
-		foreach ( $currency_list as $currency_item ) {
-			$selected_currency = '';
-			if( $current_currency == $currency_item['code'] ) {
-				$selected_currency = "selected='selected'";
+		// TODO verify that this query is correct, the WPSC_Country_Region call that repalced it was coded to duplicate the results, but
+		// why are currecies of inactive countries being returned??
+		//$old_currency_list = $wpdb->get_results( "SELECT DISTINCT `code`, `currency` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `code` IN ('" . implode( "','", $paypal_currency_list ) . "')", ARRAY_A );
+		$paypal_currency_list = array_map( 'esc_sql', $wpsc_gateways['wpsc_merchant_paypal_express']['supported_currencies']['currency_list'] );
+		$currency_list = WPSC_Country_Region::currencies( true );
+		$currency_codes_in_commmon = array_intersect( array_keys( $currency_list ), $paypal_currency_list );
+
+		foreach ( $currency_codes_in_commmon as $currency_code ) {
+
+			$currency_item = $currency_list[$currency_code];
+
+			if ( in_array( $currency_code, $paypal_currency_list ) ) {
+				$selected_currency = '';
+
+				if ( $current_currency == $currency_item['code'] ) {
+					$selected_currency = "selected='selected'";
+				}
+
+				$output .= "<option ".$selected_currency." value='{$currency_item['code']}'>{$currency_item['currency']}</option>";
 			}
-			$output .= "<option ".$selected_currency." value='{$currency_item['code']}'>{$currency_item['currency']}</option>";
 		}
 
 		$output .= "

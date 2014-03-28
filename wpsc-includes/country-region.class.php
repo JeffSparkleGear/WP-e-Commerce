@@ -353,6 +353,32 @@ class WPSC_Country_Region {
 		return array_flip( self::$country_names );
 	}
 
+	/**
+	 * Get the list of currencies,
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @return array   country list with index as country, value as name, sorted by country name
+	 */
+	public static function currencies( $as_array = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$currencies = self::$currencies;
+
+		if ( $as_array ) {
+			$json  = json_encode( $currencies );
+			$currencies = json_decode( $json, true );
+		}
+
+		// we have the return value in our country name to id map, all we have to do is swap the keys with the values
+		return $currencies;
+	}
+
 
 	/**
 	 * Contains the countries data, an array of objects indexed by country id
@@ -592,13 +618,16 @@ class WPSC_Country_Region {
 if ( true ) {
 	function testit() {
 
-		WPSC_Country_Region::clear_cache();
+		//WPSC_Country_Region::clear_cache();
 
 		$x = WPSC_Country_Region::region_count( 'US' );
 		//error_log( 'US static has ' . $x );
 
 		$x = WPSC_Country_Region::region_count( '136' );
 		//error_log( '136 static has ' . $x );
+
+
+		//error_log( 'testit done' );
 
 	}
 
