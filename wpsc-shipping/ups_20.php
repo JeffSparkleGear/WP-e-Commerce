@@ -541,7 +541,7 @@ class ash_ups {
 
 		$REQUEST .= $this->array2xml( $RatingServiceRequest );
 		$REQUEST .= "</RatingServiceSelectionRequest>";
-   		
+
 		// Return the final XML document as a string to be used by _makeRateRequest
 		return $REQUEST;
 	}
@@ -724,7 +724,7 @@ class ash_ups {
 		global $wpdb, $wpec_ash, $wpsc_cart, $wpec_ash_tools;
 		// Arguments array for various functions to use
 		$args = array();
-		
+
 		$args['dest_ccode'] = wpsc_get_customer_meta( 'shipping_country' );
 		if ( $args['dest_ccode'] == "UK" ) {
 			// So, UPS is a little off the times
@@ -773,7 +773,7 @@ class ash_ups {
 		} else {
 			$args['dest_state'] = "";
 		}
-		
+
 		if ( ! is_object( $wpec_ash ) ) {
 			$wpec_ash = new ASH();
 		}
@@ -786,17 +786,17 @@ class ash_ups {
 		$args['shipper'] = $this->internal_name;
 		$args["singular_shipping"] = ( array_key_exists( "singular_shipping", $wpsc_ups_settings ) ) ? $wpsc_ups_settings["singular_shipping"]    : "0";
 		if ( $args['weight'] > 150 && ! (boolean) $args["singular_shipping"] ) { // This is where shipping breaks out of UPS if weight is higher than 150 LBS
-				$over_weight_txt = apply_filters( 'wpsc_shipment_over_weight', 
-													__( 'Your order exceeds the standard shipping weight limit. 
-														Please contact us to quote other shipping alternatives.', 'wpsc' ), 
+				$over_weight_txt = apply_filters( 'wpsc_shipment_over_weight',
+													__( 'Your order exceeds the standard shipping weight limit.
+														Please contact us to quote other shipping alternatives.', 'wpsc' ),
 													$args );
 				$shipping_quotes[$over_weight_txt] = 0; // yes, a constant.
 				$wpec_ash->cache_results( $this->internal_name, array( $shipping_quotes ), $this->shipment ); //Update shipment cache.
 				return array( $shipping_quotes );
 		}
-		
+
 		$cache = $wpec_ash->check_cache( $this->internal_name, $this->shipment ); //And now, we're ready to check cache.
-		
+
 		// We do not want to spam UPS (and slow down our process) if we already
 		// have a shipping quote!
 		if ( count( $cache['rate_table'] ) >= 1 ) { //$cache['rate_table'] could be array(0)..
@@ -817,11 +817,11 @@ class ash_ups {
 		$args['DropoffType']       = $wpsc_ups_settings['DropoffType'];
 		$args['packaging']         = $wpsc_ups_settings['48_container'];
 		// Preferred Currency to display
-		$currency_data = $wpdb->get_row( $wpdb->prepare( "SELECT `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `isocode`= %s LIMIT 1", get_option( 'currency_type' ) ), ARRAY_A );
-		if ( $currency_data ) {
-			$args['currency'] = $currency_data['code'];
+		$currency_data = WPSC_Country_Region::currency_code( get_option( 'currency_type' ) );
+		if ( ! empty( $currency_data ) ) {
+			$args['currency'] = $currency_data;
 		} else {
-			$args['currency'] = "USD";
+			$args['currency'] = 'USD';
 		}
 		// Shipping billing / account address
 		$origin_region_data = $wpdb->get_results( $wpdb->prepare( "SELECT `" . WPSC_TABLE_REGION_TAX . "`.* FROM `" . WPSC_TABLE_REGION_TAX . "` WHERE `" . WPSC_TABLE_REGION_TAX . "`.`id` = %d", get_option( 'base_region' ) ), ARRAY_A );

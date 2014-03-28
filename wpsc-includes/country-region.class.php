@@ -149,6 +149,34 @@ class WPSC_Country_Region {
 		return $currency_symbol;
 	}
 
+
+	/**
+	 * The currency symbol for a country
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+	 *
+	 * @return string  currency symbol for the specified country
+	 */
+	public static function continent( $country_id_or_isocode ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		$continent = self::country_id( $country_id_or_isocode );
+
+		$currency_symbol = '';
+
+		if ( $continent ) {
+			$continent = self::$countries[$country_id]->continent;
+		}
+
+		return $continent;
+	}
+
 	/**
 	 * The currency_code
 	 *
