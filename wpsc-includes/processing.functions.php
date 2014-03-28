@@ -166,9 +166,8 @@ function wpsc_decrement_claimed_stock($purchase_log_id) {
  *  @return returns the currency symbol used for the shop
 */
 function wpsc_get_currency_symbol(){
-	global $wpdb;
-	$currency_type = get_option('currency_type');
-	$wpsc_currency_data = $wpdb->get_var( $wpdb->prepare( "SELECT `symbol` FROM `".WPSC_TABLE_CURRENCY_LIST."` WHERE `id` = %d LIMIT 1", $currency_type ) );
+	$currency_type = get_option( 'currency_type' );
+	$wpsc_currency_data = WPSC_Country_Region::currency_symbol( $currency_type );
 	return $wpsc_currency_data;
 }
 
