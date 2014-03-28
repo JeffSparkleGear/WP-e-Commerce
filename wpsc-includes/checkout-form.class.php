@@ -80,7 +80,7 @@ class WPSC_Checkout_Form {
 	 *
 	 * @param string $id Optional. Defaults to 0.
 	 */
-	private function __construct( $id = 0 ) {
+	public function __construct( $id = 0 ) {
 		$this->id = $id;
 		$this->get_fields();
 	}
