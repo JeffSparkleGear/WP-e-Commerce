@@ -498,11 +498,11 @@ function wpsc_update_location() {
 		$shipping_zipcode = $_POST['zipcode'];
 	}
 
-	$delivery_region_count = WPSC_Country_Region::region_count( $delivery_country );
+	$delivery_region_count = WPSC_Geography::region_count( $delivery_country );
 	if ( $delivery_region_count < 1 )
 		$delivery_region = '';
 
-	$selected_region_count = WPSC_Country_Region::region_count( $billing_country );
+	$selected_region_count = WPSC_Geography::region_count( $billing_country );
 	if ( $selected_region_count < 1 )
 		$billing_region = '';
 
@@ -622,8 +622,8 @@ function wpsc_submit_checkout( $collected_data = true ) {
 		$error_messages = array();
 	}
 
-	$country_id = WPSC_Country_Region::country_id( wpsc_get_customer_meta( 'shipping_country' ) );
-	$country_name = WPSC_Country_Region::country_name( $country_id );
+	$country_id = WPSC_Geography::country_id( wpsc_get_customer_meta( 'shipping_country' ) );
+	$country_name = WPSC_Geography::country_name( $country_id );
 
 	foreach ( $wpsc_cart->cart_items as $cartitem ) {
 		if( ! empty( $cartitem->meta[0]['no_shipping'] ) ) continue;
@@ -768,7 +768,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'billingregion', $wpsc_selected_region );
 	}
 
-	$check_country_code = WPSC_Country_Region::country_id( wpsc_get_customer_meta( 'billing_region' ) );
+	$check_country_code = WPSC_Geography::country_id( wpsc_get_customer_meta( 'billing_region' ) );
 
 	if ( wpsc_get_customer_meta( 'billingcountry' ) != $check_country_code ) {
 		$wpsc_selected_region = null;
@@ -783,7 +783,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'shippingregion', $wpsc_delivery_region );
 	}
 
-	$check_country_code = WPSC_Country_Region::country_id( $wpsc_delivery_region );
+	$check_country_code = WPSC_Geography::country_id( $wpsc_delivery_region );
 	if ( $wpsc_delivery_country != $check_country_code ) {
 		$wpsc_delivery_region = null;
 	}
@@ -868,7 +868,7 @@ function wpsc_change_tax() {
 	if ( $form_selected_country != null && $onchange_function != null ) {
 
 		$checkoutfields = 'set_shipping_country' == $onchange_function;
-		$region_list = wpsc_country_region_list( $form_id, false, $form_selected_country, $form_selected_region, $form_id, $checkoutfields );
+		$region_list = WPSC_Geography_list( $form_id, false, $form_selected_country, $form_selected_region, $form_id, $checkoutfields );
 
 		if ( $region_list != null ) {
 			$json_response['region_list'] = str_replace( array( "\n", "\r" ), '', $region_list );

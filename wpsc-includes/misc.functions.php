@@ -42,7 +42,7 @@ function wpsc_get_state_by_id( $id, $return_value ) {
 
 function wpsc_country_has_state( $country_code ){
 	global $wpdb;
-	$country_data = WPSC_Country_Region::country( $country_code, true ); // TODO this function does not seem to do what it's name indicates? What's up with that.
+	$country_data = WPSC_Geography::country( $country_code, true ); // TODO this function does not seem to do what it's name indicates? What's up with that.
 	return $country_data;
 }
 

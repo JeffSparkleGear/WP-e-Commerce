@@ -1,6 +1,46 @@
 <?php
 
-class WPSC_Country_Region {
+
+
+class WPSC_Region {
+
+	private $_id = null;
+	private $_country_id = null;
+	private $_name = null;
+	private $_code = null;
+	private $_tax = 0;
+
+	public function __construct( $country_id_or_isocode, $region_id_or_code ) {
+
+
+
+	}
+}
+
+class WPSC_Nation {
+
+	private $_id = null;
+	private $_country = null;
+	private $_isocode = null;
+	private $_currency = '';
+	private $_currency_symbol = '';
+	private $_currency_symbol_html = '';
+	private $_code = '';
+	private $_has_regions = false;
+	private $_tax = '';
+	private $_continent = '';
+	private $_visible = true;
+
+	public function __construct( $country_id_or_isocode ) {
+
+
+
+	}
+
+
+}
+
+class WPSC_Geography {
 
 
 	/**
@@ -464,7 +504,7 @@ class WPSC_Country_Region {
 	 */
 	public static function &get() {
 		if ( ! self::$countries ) {
-			self::$countries = new WPSC_Country_Region();
+			self::$countries = new WPSC_Geography();
 		}
 
 		return self::$countries;
@@ -633,25 +673,23 @@ class WPSC_Country_Region {
 	 */
 	private static function confirmed_initialization() {
 		if ( self::$countries == null ) {
-			$an_instance = new WPSC_Country_Region();
+			$an_instance = new WPSC_Geography();
 		}
 
 		return (self::$countries != null);
 	}
-
-
 }
 
 // a little tiny test stub
 if ( true ) {
 	function testit() {
 
-		//WPSC_Country_Region::clear_cache();
+		//WPSC_Geography::clear_cache();
 
-		$x = WPSC_Country_Region::region_count( 'US' );
+		$x = WPSC_Geography::region_count( 'US' );
 		//error_log( 'US static has ' . $x );
 
-		$x = WPSC_Country_Region::region_count( '136' );
+		$x = WPSC_Geography::region_count( '136' );
 		//error_log( '136 static has ' . $x );
 
 
@@ -661,3 +699,4 @@ if ( true ) {
 
 	add_action( 'wpsc_setup_customer', 'testit' );
 }
+

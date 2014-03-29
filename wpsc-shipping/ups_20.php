@@ -817,7 +817,7 @@ class ash_ups {
 		$args['DropoffType']       = $wpsc_ups_settings['DropoffType'];
 		$args['packaging']         = $wpsc_ups_settings['48_container'];
 		// Preferred Currency to display
-		$currency_data = WPSC_Country_Region::currency_code( get_option( 'currency_type' ) );
+		$currency_data = WPSC_Geography::currency_code( get_option( 'currency_type' ) );
 		if ( ! empty( $currency_data ) ) {
 			$args['currency'] = $currency_data;
 		} else {

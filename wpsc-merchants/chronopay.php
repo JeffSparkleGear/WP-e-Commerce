@@ -64,7 +64,7 @@ function gateway_chronopay($separator, $sessionid)
     }
 
 	// Get Currency details abd price
-	$currency_code = WPSC_Country_Region::currency_code( get_option( 'currency_type' ) );
+	$currency_code = WPSC_Geography::currency_code( get_option( 'currency_type' ) );
 	$local_currency_code = $currency_code[0]['code'];
 	$chronopay_currency_code = get_option('chronopay_curcode');
 
