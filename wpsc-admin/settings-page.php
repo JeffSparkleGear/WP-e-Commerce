@@ -636,7 +636,7 @@ final class WPSC_Settings_Page {
 				}
 			}
 
-			WPSC_Geography::clear_cache();
+			WPSC_Countries::clear_cache();
 		}
 		$previous_currency = get_option( 'currency_type' );
 

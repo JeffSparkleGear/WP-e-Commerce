@@ -77,7 +77,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 
 	function get_local_currency_code() {
 		if ( empty( $this->local_currency_code ) ) {
-			$this->local_currency_code = WPSC_Geography::currency_code( get_option( 'currency_type' ) );
+			$this->local_currency_code = WPSC_Countries::currency_code( get_option( 'currency_type' ) );
 		}
 
 		return $this->local_currency_code;
@@ -731,7 +731,7 @@ function form_paypal_multiple() {
 		</td>
 	</tr>\n";
 
-	$store_currency_data = WPSC_Geography::currency_data( get_option( 'currency_type' ) );
+	$store_currency_data = WPSC_Countries::currency_data( get_option( 'currency_type' ) );
 	$current_currency = get_option('paypal_curcode');
 	if ( ( $current_currency == '' ) && in_array( $store_currency_data['code'], $wpsc_gateways['wpsc_merchant_paypal_standard']['supported_currencies']['currency_list'] ) ) {
 		update_option( 'paypal_curcode', $store_currency_data['code'] );
@@ -761,7 +761,7 @@ function form_paypal_multiple() {
 				<select name='paypal_curcode'>\n";
 
 		$paypal_currency_list = array_map( 'esc_sql', $wpsc_gateways['wpsc_merchant_paypal_standard']['supported_currencies']['currency_list'] );
-		$currency_list = WPSC_Geography::currencies( true );
+		$currency_list = WPSC_Countries::currencies( true );
 
 		foreach ( $currency_codes_in_commmon as $currency_code ) {
 			$selected_currency = '';

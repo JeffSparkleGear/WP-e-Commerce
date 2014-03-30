@@ -3,7 +3,7 @@
 /*
  * This WPeC geography module provides
  *
- * The WPSC_Geography is a WPeC class used to provide easy access to country, region
+ * The WPSC_Countries is a WPeC class used to provide easy access to country, region
  * and currency information for all of WPeC an any extensions. Because this data is
  * accessed a lot throughout WPeC it is designed to be quick and avoid accessing the database.
  *
@@ -19,7 +19,7 @@
  *
  * Where is the global so I can access this data?
  *  I'm not telling! (just kidding) ... There isn't one because I hate globals (and I want you to hate globals also).
- *  You access geography data through the static methods available in WPSC_Geography, or by instantiating
+ *  You access geography data through the static methods available in WPSC_Countries, or by instantiating
  *  objects of type WPSC_Nation and WPSC_Region.
  *
  * Why is there a WPSC_Nation class not WPSC_Country?
@@ -50,12 +50,10 @@
  *
  * WPSC_Nation      Get anything about a single country you might want to know
  * WPSC_Region      Get anything about a single region you might want to know
- * WPSC_Geography   Get lists of countries, convert key fields to unique ids, and other useful functions,
+ * WPSC_Countries   Get lists of countries, convert key fields to unique ids, and other useful functions,
  * 						Also abstracts data storage mechanism from
  *
- *
- *
- *
+
  */
 
 
@@ -88,12 +86,12 @@ class WPSC_Region {
 	 */
 	public function __construct( $country_id_or_isocode, $region_id_or_code ) {
 
-		$country_id = WPSC_Geography::country_id( $country_id_or_isocode );
-		$region_id = WPSC_Geography::region_id( $country_id_or_isocode, $region_id_or_code );
+		$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
+		$region_id = WPSC_Countries::region_id( $country_id_or_isocode, $region_id_or_code );
 
 		if ( $country_id && $region_id ) {
-			$this->_country_name = WPSC_Geography::country( $country_id_or_isocode )->name;
-			$region = WPSC_Geography::country( $country_id_or_isocode, $region_id_or_code );
+			$this->_country_name = WPSC_Countries::country( $country_id_or_isocode )->name;
+			$region = WPSC_Countries::country( $country_id_or_isocode, $region_id_or_code );
 
 			$this->_copy_properties_from_stdclass( $region );
 		}
@@ -223,9 +221,9 @@ class WPSC_Nation {
 	 */
 	public function __construct( $country_id_or_isocode ) {
 
-		$country_id = WPSC_Geography::country_id( $country_id_or_isocode );
+		$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
 		if ( $country_id ) {
-			$country = WPSC_Geography::country( $country_id_or_isocode );
+			$country = WPSC_Countries::country( $country_id_or_isocode );
 			$this->_copy_properties_from_stdclass( $country );
 		}
 	}
@@ -453,7 +451,7 @@ class WPSC_Nation {
  *
  * @return void
  */
-class WPSC_Geography {
+class WPSC_Countries {
 
 
 	/**
@@ -943,7 +941,7 @@ class WPSC_Geography {
 	 */
 	public static function &get() {
 		if ( ! self::$countries ) {
-			self::$countries = new WPSC_Geography();
+			self::$countries = new WPSC_Countries();
 		}
 
 		return self::$countries;
@@ -1132,7 +1130,7 @@ class WPSC_Geography {
 	 */
 	private static function confirmed_initialization() {
 		if ( self::$countries == null ) {
-			$an_instance = new WPSC_Geography();
+			$an_instance = new WPSC_Countries();
 		}
 
 		return (self::$countries != null);
@@ -1143,12 +1141,12 @@ class WPSC_Geography {
 if ( true ) {
 	function testit() {
 
-		WPSC_Geography::clear_cache();
+		WPSC_Countries::clear_cache();
 
-		$x = WPSC_Geography::region_count( 'US' );
+		$x = WPSC_Countries::region_count( 'US' );
 		//error_log( 'US static has ' . $x );
 
-		$x = WPSC_Geography::region_count( '136' );
+		$x = WPSC_Countries::region_count( '136' );
 		//error_log( '136 static has ' . $x );
 
 		$us = new WPSC_Nation( 'US' );
