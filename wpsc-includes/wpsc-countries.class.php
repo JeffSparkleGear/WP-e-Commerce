@@ -401,7 +401,7 @@ class WPSC_Nation {
 	 *
 	 * @return void
 	 */
-	public function _copy_data_from_stdclass( $region ) {
+	public function _copy_properties_from_stdclass( $country ) {
 		$this->_id 						= $country->id;
 		$this->_name 					= $country->country;
 		$this->_isocode 				= $country->isocode;
