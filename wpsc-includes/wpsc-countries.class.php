@@ -776,7 +776,6 @@ class WPSC_Countries {
 			$currency_data = json_decode( $json, true );
 		}
 
-
 		return $currency_data;
 	}
 
