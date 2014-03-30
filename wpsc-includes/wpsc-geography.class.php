@@ -1,15 +1,89 @@
 <?php
 
+/*
+ * This WPeC geography module provides
+ *
+ * The WPSC_Geography is a WPeC class used to provide easy access to country, region
+ * and currency information for all of WPeC an any extensions. Because this data is
+ * accessed a lot throughout WPeC it is designed to be quick and avoid accessing the database.
+ *
+ * How does it work?
+ *  This class uses the static currency and region information distributed with WPeC to create an
+ *  object that is optimized for access.  A copy of this object is cached.  When WPeC initialized
+ *  this cached object is retrieved and used to service any request for geographical data.
+ *
+ * How is this data refreshed if it is cached?
+ *  If an administrator changes country data in the WPeC admin tool the object will be rebuilt. If
+ *  WPeC is upgraded the object will be rebuilt. And, because the object is stored as a transient, any
+ *  action that would refresh the WordPress object cache would cause the object
+ *
+ * Where is the global so I can access this data?
+ *  I'm not telling! (just kidding) ... There isn't one because I hate globals (and I want you to hate globals also).
+ *  You access geography data through the static methods available in WPSC_Geography, or by instantiating
+ *  objects of type WPSC_Nation and WPSC_Region.
+ *
+ * Why is there a WPSC_Nation class not WPSC_Country?
+ *  At the time this module was created there was already a WPSC_Country class.  WPSC_Country was only used in a
+ *  couple of places, and the module is on the fast track to being deprecated.
+ *
+ * What about the database?
+ *  Can you identify the film this quote comes from? ... Forget about Dave. For our immediate purposes, there is no Dave. Dave does not exist.
+ *
+ * Why is that important?
+ *  Forget about database. For our immediate purposes, there is no database. database does not exist.
+ *  If you use the functionality in this module it is unlikely you will need to find the data storage for the raw
+ *  geography data.
+ *
+ * Before this class existed the direct queries to the database where really simple. Did creating this
+ * module really help?
+ *  uhhh, Yes. The checkout page was used as a benchmark.  When this class was there were almost 200 fewer queries
+ *  to the database on just that page. Besides that there was a lot of duplicated code scattered about WPeC do get
+ *  the data from the database. Much of that code had subtle variations that made it hard to maintain.
+ *
+ * Any other benefits to this module over direct to database
+ *  Going direct the database prevented us from improving the mechanism used to store and distribute country data and
+ *  updates without changing a lot of code.  Now all the database access is centralized we can make some improvements
+ *  when we have time
+ *
+ *
+ * The implementation consists of three class
+ *
+ * WPSC_Nation      Get anything about a single country you might want to know
+ * WPSC_Region      Get anything about a single region you might want to know
+ * WPSC_Geography   Get lists of countries, convert key fields to unique ids, and other useful functions,
+ * 						Also abstracts data storage mechanism from
+ *
+ *
+ *
+ *
+ */
 
 
+
+/**
+ * description
+ *
+ * @access public
+ *
+ * @since 3.9
+ *
+ * @param
+ *
+ * @return void
+ */
 class WPSC_Region {
 
-	private $_id 			= null;
-	private $_country_id 	= null;
-	private $_name 			= null;
-	private $_code 			= null;
-	private $_tax 			= 0;
-
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function __construct( $country_id_or_isocode, $region_id_or_code ) {
 
 		$country_id = WPSC_Geography::country_id( $country_id_or_isocode );
@@ -23,36 +97,141 @@ class WPSC_Region {
 		}
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function name() {
 		return $this->_name;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function id() {
-		return $this->$_name;
+		return $this->_name;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function code() {
-		return $this->$_code;
+		return $this->_code;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function tax() {
-		return $this->$_tax;
+		return $this->_tax;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function country_id() {
-		return $this->$_country_id;
+		return $this->_country_id;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function _copy_properties_from_stdclass( $region ) {
 		$this->_country_id	= $region->country_id;
 		$this->_name 		= $region->name;
 		$this->_code 		= $region->code;
 		$this->_id 			= $region->id;
 	}
+
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
+	private $_id 			= null;
+	private $_country_id 	= null;
+	private $_name 			= null;
+	private $_code 			= null;
+	private $_tax 			= 0;
 }
 
+/**
+ * description
+ *
+ * @access public
+ *
+ * @since 3.9
+ *
+ * @param
+ *
+ * @return void
+ */
 class WPSC_Nation {
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function __construct( $country_id_or_isocode ) {
 
 		$country_id = WPSC_Geography::country_id( $country_id_or_isocode );
@@ -62,66 +241,197 @@ class WPSC_Nation {
 		}
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function name() {
 		return $this->_name;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function id() {
 		return $this->_id;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function isocode() {
 		return $this->_isocode;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function currency_name() {
 		return $this->_currency_name;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function currency_symbol() {
 		return $this->_currency_symbol;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function currency_symbol_html() {
 		return $this->_currency_symbol_html;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function currency_code() {
 		return $this->_currency_code;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function has_regions() {
 		return $this->_has_regions;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function tax() {
 		return $this->_tax;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function continent() {
 		return $this->_continent;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function visible() {
 		return $this->_visible;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function region( $region_id_or_code ) {
 		return new WPSC_Region( $this->_id, $region_id_or_code );
 	}
 
-	private $_id 					= null;
-	private $_name 					= null;
-	private $_isocode 				= null;
-	private $_currency_name 		= '';
-	private $_currency_symbol 		= '';
-	private $_currency_symbol_html 	= '';
-	private $_code 					= '';
-	private $_has_regions 			= false;
-	private $_tax 					= '';
-	private $_continent 			= '';
-	private $_visible 				= true;
-
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
 	public function _copy_data_from_stdclass( $region ) {
 		$this->_id 						= $country->id;
 		$this->_name 					= $country->country;
@@ -136,8 +446,42 @@ class WPSC_Nation {
 		$this->_visible 				= $country->visible;
 	}
 
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.9
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
+	private $_id 					= null;
+	private $_name 					= null;
+	private $_isocode 				= null;
+	private $_currency_name 		= '';
+	private $_currency_symbol 		= '';
+	private $_currency_symbol_html 	= '';
+	private $_code 					= '';
+	private $_has_regions 			= false;
+	private $_tax 					= '';
+	private $_continent 			= '';
+	private $_visible 				= true;
+
 }
 
+/**
+ * description
+ *
+ * @access public
+ *
+ * @since 3.9
+ *
+ * @param
+ *
+ * @return void
+ */
 class WPSC_Geography {
 
 
