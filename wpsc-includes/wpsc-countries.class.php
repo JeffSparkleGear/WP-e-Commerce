@@ -481,6 +481,34 @@ class WPSC_Countries {
 		return $country_id;
 	}
 
+
+	/**
+	 * Change an country ISO code into a country id, if a country id is passed it is returned intact
+	 *
+	 * @access public
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 */
+	public static function country_isocode( $country_id_or_isocode ) {
+		$country_id = false;
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		if ( is_numeric( $country_id_or_isocode ) ) {
+			$country_id = intval( $country_id_or_isocode );
+		} else {
+			if ( isset( self::$country_iso_code_map[$country_id_or_isocode] ) ) {
+				$country_id = self::$country_iso_code_map[$country_id_or_isocode];
+			}
+		}
+
+		return $country_id;
+	}
+
 	/**
 	 * Change an region code into a region id, if a region id is passed it is returned intact
 	 *
@@ -497,13 +525,13 @@ class WPSC_Countries {
 			return 0;
 		}
 
-		$region_id = self::country_id( $country_id_or_isocode );
+		$country_id = self::country_id( $country_id_or_isocode );
 
 		if ( is_numeric( $region_id_or_code ) ) {
 			$region_id = intval( $region_id_or_code );
 		} else {
 			if ( isset( self::$countries[$country_id]->region_id_to_region_code_map[$region_id_or_code] ) ) {
-				$region_id = self::$country_iso_code_map[$region_id_or_code];
+				$region_id = self::$countries[$country_id]->region_id_to_region_code_map[$region_id_or_code];
 			}
 		}
 
@@ -526,7 +554,7 @@ class WPSC_Countries {
 		}
 
 		$country_id = self::country_id( $country_id_or_isocode );
-		$region_id = self::country_id( $region_id_or_code );
+		$region_id = self::region_id( $region_id_or_code );
 
 		if ( $country_id && $region_id ) {
 			$region = self::$countries[$country_id]->regions[$region_id];
