@@ -387,10 +387,17 @@ class WPSC_Nation {
 	 *
 	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return WPSC_Region
+	 * @return WPSC_Region|boolean The region, or false if the region code is not valid for the counry
 	 */
 	public function region( $region_id_or_code ) {
-		return new WPSC_Region( $this->_id, $region_id_or_code );
+
+		$region = false;
+
+		if ( $region_id = WPSC_Countries::region_id( $country_id_or_isocode, $region_id_or_code ) ) {
+			$region = new WPSC_Region( $this->_id, $region_id_or_code );
+		}
+
+		return $region;
 	}
 
 	/**
@@ -685,14 +692,14 @@ class WPSC_Countries {
 
 
 	/**
-	 * The currency symbol for a country
+	 * The content for a country
 	 *
 	 * @access public
 	 * @since 3.8.14
 	 *
 	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
 	 *
-	 * @return string  currency symbol for the specified country
+	 * @return string content for the country, or empty string if it is not defined
 	 */
 	public static function continent( $country_id_or_isocode ) {
 
@@ -700,12 +707,12 @@ class WPSC_Countries {
 			return 0;
 		}
 
-		$continent = self::country_id( $country_id_or_isocode );
+		$country_id = self::country_id( $country_id_or_isocode );
 
-		$currency_symbol = '';
+		$continent = '';
 
 		if ( $continent ) {
-			$continent = self::$countries[$country_id]->continent;
+			$continent = self::$countries[$country_id]->continent();
 		}
 
 		return $continent;
@@ -795,7 +802,7 @@ class WPSC_Countries {
 		$regions = array();
 
 		if ( $country_id ) {
-			if ( self::$countries[$country_id]->has_regions
+			if ( self::$countries[$country_id]->has_regions()
 				&& property_exists(  self::$countries[$country_id], 'regions' )
 					&& is_array(  self::$countries[$country_id]->regions ) ) {
 				$regions = self::$countries[$country_id]->regions;

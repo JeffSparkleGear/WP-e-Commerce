@@ -89,35 +89,33 @@ class wpec_taxes {
 		if ( $returnable !== false )
 			return $returnable;
 
+		$country = new WPSC_Nation( $country_code );
+
 		//first check if the region given is part of the country
 		if ( ! empty( $region_code ) ) {
-			$region = new WPSC_Region( $country_code, $region_code );
-			$region_country_id = $region->country_id();
-			$region_country_code = $region->$this->wpec_taxes_get_country_information( 'isocode', array( 'id' => $region_country_id ) );
-			if ( $region_country_code != $country_code ) {
+			$region = $country->region( $region_code );
+			if ( ! $region ) {
 				//reset region code if region provided not in country provided
 				$region_code = '';
 			}// if
 		}// if
 
-		if ( !empty( $this->taxes_options['wpec_taxes_rates'] ) ) {
+		if ( ! empty( $this->taxes_options['wpec_taxes_rates'] ) ) {
 			foreach ( $this->taxes_options['wpec_taxes_rates'] as $tax_rate ) {
 				//if there is a tax rate defined for all markets use this one unless it's overwritten
-				if('all-markets' == $tax_rate['country_code'])
-				{
+				if ( 'all-markets' == $tax_rate['country_code'] ) {
 					$returnable = $tax_rate;
 				}// if
 
 				//if there is a specific tax rate for the given country use it
 				if ( $tax_rate['country_code'] == $country_code ) {
 					//if there is a tax rate defined for all regions use it, unless it's overwritten
-					if('all-markets' == $tax_rate['region_code'])
-					{
+					if ( 'all-markets' == $tax_rate['region_code'] ) {
 						$returnable = $tax_rate;
 					}
 
 					//if there is a specific tax rate for the given region then use it.
-					if ( ($region_code == '' && !isset( $tax_rate['region_code'] )) || $region_code == $tax_rate['region_code'] ) {
+					if ( ($region_code == '' && ! isset( $tax_rate['region_code'] )) || $region_code == $tax_rate['region_code'] ) {
 						$returnable = $tax_rate;
 						break;
 					}// if
