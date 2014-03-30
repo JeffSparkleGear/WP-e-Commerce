@@ -377,7 +377,6 @@ class wpsc_checkout {
 				$placeholder = apply_filters( 'wpsc_checkout_field_placeholder', apply_filters( 'wpsc_checkout_field_name', $this->checkout_item->name ), $this->checkout_item );
 				if ( $this->checkout_item->unique_name == 'shippingstate' ) {
 					if ( wpsc_uses_shipping() && wpsc_has_regions( $delivery_country ) ) {
-						$region_name = $wpdb->get_var( $wpdb->prepare( 'SELECT `name` FROM `' . WPSC_TABLE_REGION_TAX . '` WHERE `id`= %d LIMIT 1', $delivery_region ) );
 						$output = '<input data-wpsc-meta-key="' . $this->checkout_item->unique_name. '" title="' . $this->checkout_item->unique_name . '" type="hidden" id="' . $this->form_element_id() . '" class="shipping_region wpsc-visitor-meta" name="collected_data[' . $this->checkout_item->id . ']" placeholder="' . esc_attr( $placeholder ) . '" value="' . esc_attr( $delivery_region ) . '" size="4" />';
 					} else {
 						$disabled = '';
