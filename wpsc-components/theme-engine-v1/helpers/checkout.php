@@ -287,19 +287,19 @@ function wpsc_checkout_form_field() {
 }
 
 function wpsc_shipping_region_list( $selected_country, $selected_region, $shippingdetails = false ) {
-	global $wpdb;
 	$output = '';
 
-	$region_data = WPSC_Countries::regions( $selected_country );
+	$country = new WPSC_Nation( $selected_country );
+	$regions = $country->regions();
 
-	if ( count( $region_data ) > 0 ) {
+	if ( count( $regions ) > 0 ) {
 		$output .= "<select class=\"wpsc-visitor-meta\" data-wpsc-meta-key=\"shippingregion\" name=\"region\"  id=\"region\" >\n\r";
-		foreach ( $region_data as $region_id => $region ) {
+		foreach ( $regions as $region_id => $region ) {
 			$selected = '';
 			if ( $selected_region == $region_id ) {
 				$selected = "selected='selected'";
 			}
-			$output .= "<option $selected value='{$region_id}'>" . esc_attr( htmlspecialchars( $region->name ) ). "</option>\n\r";
+			$output .= "<option $selected value='{$region_id}'>" . esc_attr( htmlspecialchars( $region->name() ) ). "</option>\n\r";
 		}
 		$output .= '';
 

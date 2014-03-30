@@ -86,14 +86,16 @@ class WPSC_Region {
 	 */
 	public function __construct( $country_id_or_isocode, $region_id_or_code ) {
 
-		$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
-		$region_id = WPSC_Countries::region_id( $country_id_or_isocode, $region_id_or_code );
+		if ( $country_id_or_isocode && $region_id_or_code ) {
+			$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
+			$region_id = WPSC_Countries::region_id( $country_id_or_isocode, $region_id_or_code );
 
-		if ( $country_id && $region_id ) {
-			$this->_country_name = WPSC_Countries::country( $country_id_or_isocode )->name;
-			$region = WPSC_Countries::country( $country_id_or_isocode, $region_id_or_code );
-			foreach ( $region as $property => $value ) {
-				$this->$property = $value;
+			if ( $country_id && $region_id ) {
+				$this->_country_name = WPSC_Countries::country( $country_id )->name();
+				$region = WPSC_Countries::country( $country_id_or_isocode, $region_id_or_code );
+				foreach ( $region as $property => $value ) {
+					$this->$property = $value;
+				}
 			}
 		}
 	}
@@ -222,11 +224,13 @@ class WPSC_Nation {
 	 */
 	public function __construct( $country_id_or_isocode ) {
 
-		$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
-		if ( $country_id ) {
-			$country = WPSC_Countries::country( $country_id_or_isocode );
-			foreach ( $country as $property => $value ) {
-				$this->$property = $value;
+		if ( $country_id_or_isocode ) {
+			$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
+			if ( $country_id ) {
+				$country = WPSC_Countries::country( $country_id_or_isocode );
+				foreach ( $country as $property => $value ) {
+					$this->$property = $value;
+				}
 			}
 		}
 	}
@@ -393,8 +397,10 @@ class WPSC_Nation {
 
 		$region = false;
 
-		if ( $region_id = WPSC_Countries::region_id( $country_id_or_isocode, $region_id_or_code ) ) {
-			$region = new WPSC_Region( $this->_id, $region_id_or_code );
+		if ( $this->_id ) {
+			if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
+				$region = new WPSC_Region( $this->_id, $region_id_or_code );
+			}
 		}
 
 		return $region;
@@ -414,6 +420,21 @@ class WPSC_Nation {
 	public function region_count() {
 		return count( $this->_regions );
 	}
+
+	/**
+	 * get a list of regions for this country
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 *
+	 * @return array of WPSC_Region
+	 */
+	public function regions() {
+		return $this->_regions;
+	}
+
 
 	/**
 	 * description
@@ -506,11 +527,15 @@ class WPSC_Countries {
 			return 0;
 		}
 
-		if ( is_numeric( $country_id_or_isocode ) ) {
-			$country_id = intval( $country_id_or_isocode );
-		} else {
-			if ( isset( self::$country_iso_code_map[$country_id_or_isocode] ) ) {
-				$country_id = self::$country_iso_code_map[$country_id_or_isocode];
+		if ( $country_id_or_isocode ) {
+			if ( is_numeric( $country_id_or_isocode ) ) {
+				$country_id = intval( $country_id_or_isocode );
+			} elseif ( is_string( $country_id_or_isocode ) ) {
+				if ( isset( self::$country_iso_code_map[$country_id_or_isocode] ) ) {
+					$country_id = self::$country_iso_code_map[$country_id_or_isocode];
+				}
+			} else {
+				_wpsc_doing_it_wrong( 'WPSC_Countries::country_id', __( 'Function "country_id" requires an integer country code or a string ISO code ', 'wpsc' ), '3.8.14' );
 			}
 		}
 
@@ -801,10 +826,8 @@ class WPSC_Countries {
 		$regions = array();
 
 		if ( $country_id ) {
-			if ( self::$countries[$country_id]->has_regions()
-				&& property_exists(  self::$countries[$country_id], 'regions' )
-					&& is_array(  self::$countries[$country_id]->regions ) ) {
-				$regions = self::$countries[$country_id]->regions;
+			if ( self::$countries[$country_id]->has_regions() ) {
+				$regions = self::$countries[$country_id]->regions();
 			}
 		}
 
@@ -887,11 +910,7 @@ class WPSC_Countries {
 		$has_regions = false;
 
 		if ( $country_id = self::country_id( $country_id_or_isocode ) ) {
-			if ( property_exists( self::$countries[$country_id], 'regions' ) ) {
-				if ( count( self::$countries[$country_id]->regions ) ) {
-					$has_regions = self::$countries[$country_id]->has_regions && count( self::$countries[$country_id]->regions );
-				}
-			}
+			$has_regions = self::$countries[$country_id]->has_regions();
 		}
 
 		return $has_regions;

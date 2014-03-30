@@ -94,6 +94,9 @@ function WPSC_Countries_list( $form_id = null, $ajax = false, $selected_country 
 		//$selected_region = get_option( 'base_region' );
 	}
 
+	$selected_country = new WPSC_Nation( $selected_country );
+	$selected_region = $selected_country->region( $selected_region );
+
 	if ( $form_id != null ) {
 		$html_form_id = "region_country_form_$form_id";
 	} else {
@@ -117,13 +120,13 @@ function WPSC_Countries_list( $form_id = null, $ajax = false, $selected_country 
 				'id'                    => $id,
 				'name'                  => "collected_data[{$form_id}][0]",
 				'class'                 => 'current_country wpsc-visitor-meta',
-				'selected'              => $selected_country,
+				'selected'              => $selected_country->isocode(),
 				'additional_attributes' => $additional_attributes,
 				'placeholder'           => '',
 		)
 	);
 
-	$region_list = WPSC_Countries::regions( $selected_country, true );
+	$region_list = $selected_country->regions();
 
 	$checkout_form = new WPSC_Checkout_Form();
 	$region_form_id = $checkout_form->get_field_id_by_unique_name( 'shippingstate' );
@@ -144,12 +147,12 @@ function WPSC_Countries_list( $form_id = null, $ajax = false, $selected_country 
 	if ( $region_list != null ) {
 		$output .= '<select id="' . $id . '" class="current_region wpsc-visitor-meta" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
 		foreach ( $region_list as $region ) {
-			if ( $selected_region == $region['id'] ) {
+			if ( $selected_region && $selected_region->id() == $region->id() ) {
 				$selected = "selected='selected'";
 			} else {
 				$selected = '';
 			}
-			$output .= "<option value='" . $region['id'] . "' $selected>" . esc_html( $region['name'] ) . "</option>\n\r";
+			$output .= "<option value='" . $region->id() . "' $selected>" . esc_html( $region->name() ) . "</option>\n\r";
 		}
 		$output .= "</select>\n\r";
 	}
