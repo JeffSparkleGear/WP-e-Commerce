@@ -92,8 +92,9 @@ class WPSC_Region {
 		if ( $country_id && $region_id ) {
 			$this->_country_name = WPSC_Countries::country( $country_id_or_isocode )->name;
 			$region = WPSC_Countries::country( $country_id_or_isocode, $region_id_or_code );
-
-			$this->_copy_properties_from_stdclass( $region );
+			foreach ( $region as $property => $value ) {
+				$this->$property = $value;
+			}
 		}
 	}
 
@@ -224,7 +225,9 @@ class WPSC_Nation {
 		$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
 		if ( $country_id ) {
 			$country = WPSC_Countries::country( $country_id_or_isocode );
-			$this->_copy_properties_from_stdclass( $country );
+			foreach ( $country as $property => $value ) {
+				$this->$property = $value;
+			}
 		}
 	}
 
@@ -391,28 +394,18 @@ class WPSC_Nation {
 	}
 
 	/**
-	 * description
+	 * how many regions does the nation (country) have
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return void
+	 * @return WPSC_Region
 	 */
-	public function _copy_properties_from_stdclass( $country ) {
-		$this->_id 						= $country->id;
-		$this->_name 					= $country->country;
-		$this->_isocode 				= $country->isocode;
-		$this->_currency_name			= $country->currency;
-		$this->_currency_symbol 		= $country->symbol;
-		$this->_currency_symbol_html	= $country->symbol_html;
-		$this->_currency_code			= $country->code;
-		$this->_has_regions 			= $country->has_regions;
-		$this->_tax 					= $country->tax;
-		$this->_continent 				= $country->continent;
-		$this->_visible 				= $country->visible;
+	public function region_count() {
+		return count( $this->_regions );
 	}
 
 	/**
@@ -426,17 +419,53 @@ class WPSC_Nation {
 	 *
 	 * @return void
 	 */
-	private $_id 					= null;
-	private $_name 					= null;
-	private $_isocode 				= null;
-	private $_currency_name 		= '';
-	private $_currency_symbol 		= '';
-	private $_currency_symbol_html 	= '';
-	private $_code 					= '';
-	private $_has_regions 			= false;
-	private $_tax 					= '';
-	private $_continent 			= '';
-	private $_visible 				= true;
+	public function _copy_properties_from_stdclass( $country ) {
+
+		$this->_id 								= $country->id;
+		$this->_name 							= $country->country;
+		$this->_isocode 						= $country->isocode;
+		$this->_currency_name					= $country->currency;
+		$this->_currency_symbol 				= $country->symbol;
+		$this->_currency_symbol_html			= $country->symbol_html;
+		$this->_currency_code					= $country->code;
+		$this->_has_regions 					= $country->has_regions;
+		$this->_tax 							= $country->tax;
+		$this->_continent 						= $country->continent;
+		$this->_visible 						= $country->visible;
+
+		if ( property_exists( $country, 'region_id_to_region_code_map' ) ) {
+			$this->_region_id_to_region_code_map 	= $country->region_id_to_region_code_map;
+		}
+
+		if ( property_exists( $country, 'regions' ) ) {
+			$this->_regions 						= $country->regions;
+		}
+	}
+
+	/**
+	 * description
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @param
+	 *
+	 * @return void
+	 */
+	private $_id 							= null;
+	private $_name 							= null;
+	private $_isocode 						= null;
+	private $_currency_name 				= '';
+	private $_currency_symbol 				= '';
+	private $_currency_symbol_html 			= '';
+	private $_code 							= '';
+	private $_has_regions 					= false;
+	private $_tax 							= '';
+	private $_continent 					= '';
+	private $_visible 						= true;
+	private $_regions 						= array();
+	private $_region_id_to_region_code_map 	= array();
 
 }
 
@@ -519,7 +548,7 @@ class WPSC_Countries {
 	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
 	 */
 	public static function region_id( $country_id_or_isocode, $region_id_or_code ) {
-		$country_id = false;
+		$region_id = false;
 
 		if ( ! self::confirmed_initialization() ) {
 			return 0;
@@ -530,8 +559,8 @@ class WPSC_Countries {
 		if ( is_numeric( $region_id_or_code ) ) {
 			$region_id = intval( $region_id_or_code );
 		} else {
-			if ( isset( self::$countries[$country_id]->region_id_to_region_code_map[$region_id_or_code] ) ) {
-				$region_id = self::$countries[$country_id]->region_id_to_region_code_map[$region_id_or_code];
+			if ( isset(  self::$countries[$country_id]->regions[$region_id_or_code] ) ) {
+				$region_id = self::$countries[$country_id]->regions[$region_id_or_code];
 			}
 		}
 
@@ -730,9 +759,9 @@ class WPSC_Countries {
 		$currency_data = new stdClass();
 
 		if ( $country_id ) {
-			$currency_data->code           = self::$countries[$country_id]->code;
-			$currency_data->symbol         = self::$countries[$country_id]->symbol;
-			$currency_data->symbol_html    = self::$countries[$country_id]->symbol_html;
+			$currency_data->code           = self::$countries[$country_id]->currency_code();
+			$currency_data->symbol         = self::$countries[$country_id]->currency_symbol();
+			$currency_data->symbol_html    = self::$countries[$country_id]->currency_symbol_html();
 		}
 
 		if ( $as_array ) {
@@ -826,12 +855,7 @@ class WPSC_Countries {
 		$region_count = 0;
 
 		if ( $country_id = self::country_id( $country_id_or_isocode ) ) {
-			if ( self::$countries[$country_id]->has_regions
-				&& property_exists(  self::$countries[$country_id], 'regions' )
-					&& is_array(  self::$countries[$country_id]->regions )
-			) {
-				$region_count = count( self::$countries[$country_id]->regions );
-			}
+			$region_count = self::$countries[$country_id]->region_count();
 		}
 
 		return $region_count;
@@ -976,7 +1000,7 @@ class WPSC_Countries {
 	}
 
 	/**
-	 * Constructor of an WPSC_Checkout_Form instance. Cannot be called publicly
+	 * Constructor of an WPSC_countries instance. Cannot be called publicly
 	 *
 	 * @access private
 	 * @since 3.8.10
@@ -1002,12 +1026,12 @@ class WPSC_Countries {
 			foreach ( self::$countries as $country_id => $country ) {
 
 				// take this opportunity to clean up any types that have been turned into text by the query
-				self::$countries[$country_id]->id          = $country->id          = intval( self::$countries[$country_id]->id );
-				self::$countries[$country_id]->has_regions = $country->has_regions = self::$countries[$country_id]->has_regions == '1';
-				self::$countries[$country_id]->visible     = $country->visible     = self::$countries[$country_id]->visible == '1';
+				$country->id          = intval( self::$countries[$country_id]->id );
+				$country->has_regions = self::$countries[$country_id]->has_regions == '1';
+				$country->visible     = self::$countries[$country_id]->visible == '1';
 
 				if ( ! empty( self::$countries[$country_id]->tax ) && ( is_int( self::$countries[$country_id]->tax ) ) || is_float( self::$countries[$country_id]->tax ) ) {
-					self::$countries[$country_id]->tax = $country->tax = floatval( self::$countries[$country_id]->tax );
+					$country->tax = floatval( self::$countries[$country_id]->tax );
 				}
 
 				self::$country_iso_code_map[$country->isocode] = intval( $country->id );
@@ -1031,10 +1055,19 @@ class WPSC_Countries {
 						$region->tax        = floatval( $region->tax );
 
 						self::$countries[$country_id]->region_id_to_region_code_map[$region->id] = $region->code;
+
+						// create a new empty region object, then copy our region data into it.
+						self::$countries[$country_id]->regions[$region_code] = new WPSC_Region( null, null );
+						self::$countries[$country_id]->regions[$region_code]->_copy_properties_from_stdclass( $region );
+
 					}
 
 					ksort( self::$countries[$country_id]->region_id_to_region_code_map );
 				}
+
+				// create a new empty country object, then copy our region data into it.
+				self::$countries[$country_id] = new WPSC_Nation( null );
+				self::$countries[$country_id]->_copy_properties_from_stdclass( $country );
 			}
 
 			// now countries is a list with the key being the integer country id, the value is the country data
@@ -1179,7 +1212,7 @@ if ( true ) {
 
 		$us = new WPSC_Nation( 'US' );
 
-		$ma = new WPSC_Nation( 'US', 'MA' );
+		$ma = new WPSC_Region( 'US', 'MA' );
 
 		//error_log( 'testit done' );
 
