@@ -61,28 +61,30 @@
 
 
 /**
- * description
+ * a geographic region
  *
  * @access public
  *
- * @since 3.9
+ * @since 3.8.14
  *
- * @param
+ * @param int|string 	required	the country identifier, can be the string ISO code, or the numeric WPeC country id
+ * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
  *
- * @return void
+ * @return object WPSC_Region
  */
 class WPSC_Region {
 
 	/**
-	 * description
+	 * constructor for a geographic region
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param int|string 	required 	the country identifier, can be the string iso code, or the numeric wpec country id
+	 * @param int|string 	required 	the region identifier, can be the text region code, or the numberic region id
 	 *
-	 * @return void
+	 * @return object WPSC_Region
 	 */
 	public function __construct( $country_id_or_isocode, $region_id_or_code ) {
 
@@ -98,73 +100,63 @@ class WPSC_Region {
 	}
 
 	/**
-	 * description
+	 * get region's name
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string region name
 	 */
 	public function name() {
 		return $this->_name;
 	}
 
 	/**
-	 * description
+	 * get region's numeric id
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return int region id
 	 */
 	public function id() {
 		return $this->_name;
 	}
 
 	/**
-	 * description
+	 * get region's code
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string region code
 	 */
 	public function code() {
 		return $this->_code;
 	}
 
 	/**
-	 * description
+	 * get region's tax percentage
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return float tax percentage
 	 */
 	public function tax() {
 		return $this->_tax;
 	}
 
 	/**
-	 * description
+	 * get region's country id
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
-	 *
-	 * @param
+	 * @since 3.8.14
 	 *
 	 * @return void
 	 */
@@ -173,13 +165,13 @@ class WPSC_Region {
 	}
 
 	/**
-	 * description
+	 * a backdoor constructor used to copy data into the class after it is retrieved from the database
 	 *
-	 * @access public
+	 * @access private
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param stdClass 	required	data from WPeC distribution to be put into region
 	 *
 	 * @return void
 	 */
@@ -191,15 +183,12 @@ class WPSC_Region {
 	}
 
 	/**
-	 * description
+	 * private region class properties
 	 *
-	 * @access public
+	 * @access private
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
 	 */
 	private $_id 			= null;
 	private $_country_id 	= null;
@@ -209,28 +198,28 @@ class WPSC_Region {
 }
 
 /**
- * description
+ * a geographic nation
  *
  * @access public
  *
- * @since 3.9
+ * @since 3.8.14
  *
- * @param
+ * @param int|string 	required	the nation (country) identifier, can be the string iso code, or the numeric wpec country id
  *
- * @return void
+ * @return object WPSC_Nation
  */
 class WPSC_Nation {
 
 	/**
-	 * description
+	 * a geographic nation constructor
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param int|string 	required 	the country identifier, can be the string iso code, or the numeric wpec country id
 	 *
-	 * @return void
+	 * @return object WPSC_Nation
 	 */
 	public function __construct( $country_id_or_isocode ) {
 
@@ -242,28 +231,24 @@ class WPSC_Nation {
 	}
 
 	/**
-	 * description
+	 * get nation's(country's) name
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string 	nation name
 	 */
 	public function name() {
 		return $this->_name;
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) id
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
-	 *
-	 * @param
+	 * @since 3.8.14
 	 *
 	 * @return void
 	 */
@@ -272,150 +257,136 @@ class WPSC_Nation {
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) ISO code
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string country ISO code
 	 */
 	public function isocode() {
 		return $this->_isocode;
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) currency name
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string 	nation's (country's) currency name
 	 */
 	public function currency_name() {
 		return $this->_currency_name;
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) currency symbol
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string	currency symbol
 	 */
 	public function currency_symbol() {
 		return $this->_currency_symbol;
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) currency symbol HTML
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string 	nation's (country's) currency symbol HTML
 	 */
 	public function currency_symbol_html() {
 		return $this->_currency_symbol_html;
 	}
 
 	/**
-	 * description
+	 * get nation's (country's) currency code
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return string 	nation's (country's) currency code
 	 */
 	public function currency_code() {
 		return $this->_currency_code;
 	}
 
 	/**
-	 * description
+	 * does the nation use a region list
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
 	 * @param
 	 *
-	 * @return void
+	 * @return boolean	true if we have a region lsit for the nation, false otherwise
 	 */
 	public function has_regions() {
 		return $this->_has_regions;
 	}
 
 	/**
-	 * description
+	 *  get nation's (country's) tax rate
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return float	nations tax rate
 	 */
 	public function tax() {
 		return $this->_tax;
 	}
 
 	/**
-	 * description
+	 *  get nation's (country's) continent
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
 	 * @param
 	 *
-	 * @return void
+	 * @return string	nation's continent
 	 */
 	public function continent() {
 		return $this->_continent;
 	}
 
 	/**
-	 * description
+	 * should the country be displayed to the user
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
-	 *
-	 * @return void
+	 * @return boolean true if the country should be displayed, false otherwise
 	 */
 	public function visible() {
 		return $this->_visible;
 	}
 
 	/**
-	 * description
+	 * get a region that is in a country
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return void
+	 * @return WPSC_Region
 	 */
 	public function region( $region_id_or_code ) {
 		return new WPSC_Region( $this->_id, $region_id_or_code );
@@ -426,7 +397,7 @@ class WPSC_Nation {
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
 	 * @param
 	 *
@@ -451,7 +422,7 @@ class WPSC_Nation {
 	 *
 	 * @access public
 	 *
-	 * @since 3.9
+	 * @since 3.8.14
 	 *
 	 * @param
 	 *
@@ -476,7 +447,7 @@ class WPSC_Nation {
  *
  * @access public
  *
- * @since 3.9
+ * @since 3.8.14
  *
  * @param
  *
