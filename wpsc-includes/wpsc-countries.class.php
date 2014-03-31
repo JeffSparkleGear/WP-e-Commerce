@@ -819,6 +819,25 @@ class WPSC_Countries {
 		return $currencies;
 	}
 
+	/**
+	 * get the country id from a region id,
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @return array   country list with index as country, value as name, sorted by country name
+	 */
+	public static function country_id_from_region_id( $region_id ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return 0;
+		}
+
+		if ( isset( self::$region_id_to_country_id_map[$region_id] ) ) {
+			return self::$region_id_to_country_id_map[$region_id];
+		}
+	}
 
 	/**
 	 * Contains the countries data, an array of objects indexed by country id
@@ -829,7 +848,7 @@ class WPSC_Countries {
 	 *
 	 * @var array
 	 */
-	private static $countries = null;
+	private static $countries = array();
 
 	/**
 	 * An array that maps from country isocode to country id
@@ -863,6 +882,19 @@ class WPSC_Countries {
 	 * @var array
 	 */
 	private static $currencies = array();
+
+
+	/**
+	 * map of unique region id to WPSC_Region objects held within WPSC_Nation objects
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	 */
+	private static $region_id_to_country_id_map = array();
+
 
 	/**
 	 * Returns an instance of the form with a particular ID
@@ -960,6 +992,8 @@ class WPSC_Countries {
 			self::$currencies = $wpdb->get_results( $sql, OBJECT_K );
 
 			self::save_myself();
+
+			self::create_region_id_region_object_map();
 		}
 	}
 
@@ -1046,6 +1080,8 @@ class WPSC_Countries {
 			self::clear_cache();
 		}
 
+		self::create_region_id_region_object_map();
+
 		return $this;
 	}
 
@@ -1061,6 +1097,26 @@ class WPSC_Countries {
 
 	private static function transient_name() {
 		return strtolower( __CLASS__ . '-' . WPSC_DB_VERSION );
+	}
+
+
+	/**
+	 * Create a master map of region ids to region objects
+	 *
+	 * @access public static
+	 *
+	 * @since 3.8.10
+	 *
+	 * @return none
+	 */
+	private static function create_region_id_region_object_map() {
+		self::$region_id_to_country_id_map = array();
+
+		foreach ( self::$countries as $country_id => $country ) {
+			foreach ( $country->regions() as $region_id => $region_code ) {
+				self::$region_id_to_country_id_map[$region_id] = $country_id;
+			}
+		}
 	}
 
 	/**
