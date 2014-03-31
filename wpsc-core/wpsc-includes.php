@@ -34,6 +34,7 @@ require_once( WPSC_FILE_PATH . '/wpsc-includes/meta.functions.php'              
 require_once( WPSC_FILE_PATH . '/wpsc-includes/productfeed.php'                     );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/image_processing.php'                );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/country.class.php'                   );
+require_once( WPSC_FILE_PATH . '/wpsc-includes/country-region-tax-util.php'         );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/currency.helpers.php'                );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/purchase-log.helpers.php'            );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/purchase-log-notification.class.php' );
