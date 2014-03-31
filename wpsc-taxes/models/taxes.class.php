@@ -303,18 +303,15 @@ class wpec_taxes {
 	 *                            Default action is to retrieve the id column.
 	 * @return: int, string, or false
 	 * */
-	function wpec_taxes_get_region_information( $region_code, $column='id' ) {
+	function wpec_taxes_get_region_information( $region_code, $column = 'id' ) {
 		//check for all markets ifset return the string 'All Markets'
-		if('all-markets' == $region_code)
-		{
+		if ( 'all-markets' == $region_code ) {
 			$returnable = __( 'All Markets', 'wpsc' );
-		}
-		else
-		{
+		} else {
 			global $wpdb;
 			$query = $wpdb->prepare( "SELECT " . esc_sql( $column ) . " FROM " . WPSC_TABLE_REGION_TAX . " WHERE code = %s", $region_code );
 			$returnable = $wpdb->get_var( $query );
-		}// if
+		} // if
 
 		return $returnable;
 	} // wpec_taxes_get_region_information

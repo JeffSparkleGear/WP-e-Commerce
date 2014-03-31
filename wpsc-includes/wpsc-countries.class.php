@@ -293,6 +293,45 @@ class WPSC_Nation {
 		return $this->_regions;
 	}
 
+	/**
+	 * get a region code from a region id
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 *
+	 * @return string region code
+	 */
+	public function region_code_from_region_id( $region_id ) {
+		$region_code = false;
+
+		if ( isset( $this->_regions[$region_id] ) ) {
+			$region_code = $this->region_id_to_region_code_map[$region_id];
+		}
+
+		return $region_code;
+	}
+
+	/**
+	 * get a region code from a region id
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 *
+	 * @return int region id
+	 */
+	public function region_id_from_region_code( $region_code ) {
+		$region_id = false;
+
+		if ( isset( $this->_regions[$region_code] ) ) {
+			$region_id = $this->_regions[$region_code]->id();
+		}
+
+		return $region_id;
+	}
 
 	/**
 	 * description
@@ -449,9 +488,8 @@ class WPSC_Countries {
 		if ( is_numeric( $region_id_or_code ) ) {
 			$region_id = intval( $region_id_or_code );
 		} else {
-			if ( isset(  self::$countries[$country_id]->regions[$region_id_or_code] ) ) {
-				$region_id = self::$countries[$country_id]->regions[$region_id_or_code];
-			}
+			$country = self::$countries[$country_id];
+			$region_id = $country->region_id_from_region_code($region_id_or_code);
 		}
 
 		return $region_id;

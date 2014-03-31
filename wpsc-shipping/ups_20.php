@@ -763,15 +763,22 @@ class ash_ups {
 		}
 		// If the region code is provided via a form post use it!
 		if ( isset( $_POST['region'] ) && ! empty( $_POST['region'] ) ) {
-			$query = $wpdb->prepare( "SELECT `" . WPSC_TABLE_REGION_TAX . "`.* FROM `" . WPSC_TABLE_REGION_TAX . "` WHERE `" . WPSC_TABLE_REGION_TAX . "`.`id` = %d", $_POST['region'] );
-			$dest_region_data = $wpdb->get_results( $query, ARRAY_A );
-			$args['dest_state'] = ( is_array( $dest_region_data ) ) ? $dest_region_data[0]['code'] : "";
+
+			$country_id = WPSC_Countries::country_id_from_region_id( $region_id );
+
+			if ( $country_id ) {
+				$region = new WPSC_Region( $country_id, $region_id );
+				$args['dest_state'] = $region->name();
+			} else {
+				$args['dest_state'] = '';
+			}
+
 			wpsc_update_customer_meta( 'shipping_state', $args['dest_state'] ); //Unify state meta.
 		} else if ( $dest_state = wpsc_get_customer_meta( 'shipping_state' ) ) {
 			// Well, we have a zip code in the session and no new one provided
 			$args['dest_state'] = $dest_state;
 		} else {
-			$args['dest_state'] = "";
+			$args['dest_state'] = '';
 		}
 
 		if ( ! is_object( $wpec_ash ) ) {
@@ -824,8 +831,9 @@ class ash_ups {
 			$args['currency'] = 'USD';
 		}
 		// Shipping billing / account address
-		$origin_region_data = $wpdb->get_results( $wpdb->prepare( "SELECT `" . WPSC_TABLE_REGION_TAX . "`.* FROM `" . WPSC_TABLE_REGION_TAX . "` WHERE `" . WPSC_TABLE_REGION_TAX . "`.`id` = %d", get_option( 'base_region' ) ), ARRAY_A );
-		$args['shipr_state'] = ( is_array( $origin_region_data ) ) ? $origin_region_data[0]['code'] : "";
+		$region = new WPSC_Region( get_option( 'base_country' ), get_option( 'base_region' ) );
+
+		$args['shipr_state'] = $region->code();
 		$args['shipr_city']  = get_option( 'base_city' );
 		$args['shipr_ccode'] = get_option( 'base_country' );
 		$args['shipr_pcode'] = get_option( 'base_zipcode' );
