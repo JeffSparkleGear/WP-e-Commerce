@@ -141,7 +141,7 @@ function wpsc_get_acceptable_countries() {
 		$target_market_ids = $target_market_ids[0];
 	}
 
-	$country_data = WPSC_Countries::countries( true );
+	$country_data = WPSC_Countries::countries_array();
 
 	$have_target_market = $have_target_market && count( $country_data ) != count( $target_market_ids );
 	$GLOBALS['wpsc_country_data'] = $country_data; // TODO Is this ever used?

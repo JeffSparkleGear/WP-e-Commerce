@@ -56,343 +56,6 @@
 
  */
 
-/**
- * a geographic nation
- *
- * @access public
- *
- * @since 3.8.14
- *
- * @param int|string 	required	the nation (country) identifier, can be the string iso code, or the numeric wpec country id
- *
- * @return object WPSC_Nation
- */
-class WPSC_Nation {
-
-	/**
-	 * a geographic nation constructor
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param int|string 	required 	the country identifier, can be the string iso code, or the numeric wpec country id
-	 *
-	 * @return object WPSC_Nation
-	 */
-	public function __construct( $country_id_or_isocode ) {
-
-		if ( $country_id_or_isocode ) {
-			$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
-			if ( $country_id ) {
-				$country = WPSC_Countries::country( $country_id_or_isocode );
-				foreach ( $country as $property => $value ) {
-					$this->$property = $value;
-				}
-			}
-		}
-	}
-
-	/**
-	 * get nation's(country's) name
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string 	nation name
-	 */
-	public function name() {
-		return $this->_name;
-	}
-
-	/**
-	 * get nation's (country's) id
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return void
-	 */
-	public function id() {
-		return $this->_id;
-	}
-
-	/**
-	 * get nation's (country's) ISO code
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string country ISO code
-	 */
-	public function isocode() {
-		return $this->_isocode;
-	}
-
-	/**
-	 * get nation's (country's) currency name
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string 	nation's (country's) currency name
-	 */
-	public function currency_name() {
-		return $this->_currency_name;
-	}
-
-	/**
-	 * get nation's (country's) currency symbol
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string	currency symbol
-	 */
-	public function currency_symbol() {
-		return $this->_currency_symbol;
-	}
-
-	/**
-	 * get nation's (country's) currency symbol HTML
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string 	nation's (country's) currency symbol HTML
-	 */
-	public function currency_symbol_html() {
-		return $this->_currency_symbol_html;
-	}
-
-	/**
-	 * get nation's (country's) currency code
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return string 	nation's (country's) currency code
-	 */
-	public function currency_code() {
-		return $this->_currency_code;
-	}
-
-	/**
-	 * does the nation use a region list
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param
-	 *
-	 * @return boolean	true if we have a region lsit for the nation, false otherwise
-	 */
-	public function has_regions() {
-		return $this->_has_regions;
-	}
-
-	/**
-	 *  get nation's (country's) tax rate
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return float	nations tax rate
-	 */
-	public function tax() {
-		return $this->_tax;
-	}
-
-	/**
-	 *  get nation's (country's) continent
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param
-	 *
-	 * @return string	nation's continent
-	 */
-	public function continent() {
-		return $this->_continent;
-	}
-
-	/**
-	 * should the country be displayed to the user
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return boolean true if the country should be displayed, false otherwise
-	 */
-	public function visible() {
-		return $this->_visible;
-	}
-
-	/**
-	 * get a region that is in a country
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
-	 *
-	 * @return WPSC_Region|boolean The region, or false if the region code is not valid for the counry
-	 */
-	public function region( $region_id_or_code ) {
-
-		$region = false;
-
-		if ( $this->_id ) {
-			if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
-				$region = new WPSC_Region( $this->_id, $region_id_or_code );
-			}
-		}
-
-		return $region;
-	}
-
-	/**
-	 * how many regions does the nation (country) have
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
-	 *
-	 * @return WPSC_Region
-	 */
-	public function region_count() {
-		return count( $this->_regions );
-	}
-
-	/**
-	 * get a list of regions for this country
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 *
-	 * @return array of WPSC_Region
-	 */
-	public function regions() {
-		return $this->_regions;
-	}
-
-	/**
-	 * get a region code from a region id
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 *
-	 * @return string region code
-	 */
-	public function region_code_from_region_id( $region_id ) {
-		$region_code = false;
-
-		if ( isset( $this->_regions[$region_id] ) ) {
-			$region_code = $this->region_id_to_region_code_map[$region_id];
-		}
-
-		return $region_code;
-	}
-
-	/**
-	 * get a region code from a region id
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 *
-	 * @return int region id
-	 */
-	public function region_id_from_region_code( $region_code ) {
-		$region_id = false;
-
-		if ( isset( $this->_regions[$region_code] ) ) {
-			$region_id = $this->_regions[$region_code]->id();
-		}
-
-		return $region_id;
-	}
-
-	/**
-	 * description
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param
-	 *
-	 * @return void
-	 */
-	public function _copy_properties_from_stdclass( $country ) {
-
-		$this->_id 								= $country->id;
-		$this->_name 							= $country->country;
-		$this->_isocode 						= $country->isocode;
-		$this->_currency_name					= $country->currency;
-		$this->_currency_symbol 				= $country->symbol;
-		$this->_currency_symbol_html			= $country->symbol_html;
-		$this->_currency_code					= $country->code;
-		$this->_has_regions 					= $country->has_regions;
-		$this->_tax 							= $country->tax;
-		$this->_continent 						= $country->continent;
-		$this->_visible 						= $country->visible;
-
-		if ( property_exists( $country, 'region_id_to_region_code_map' ) ) {
-			$this->_region_id_to_region_code_map 	= $country->region_id_to_region_code_map;
-		}
-
-		if ( property_exists( $country, 'regions' ) ) {
-			$this->_regions 						= $country->regions;
-		}
-	}
-
-	/**
-	 * description
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @param
-	 *
-	 * @return void
-	 */
-	private $_id 							= null;
-	private $_name 							= null;
-	private $_isocode 						= null;
-	private $_currency_name 				= '';
-	private $_currency_symbol 				= '';
-	private $_currency_symbol_html 			= '';
-	private $_code 							= '';
-	private $_has_regions 					= false;
-	private $_tax 							= '';
-	private $_continent 					= '';
-	private $_visible 						= true;
-	private $_regions 						= array();
-	private $_region_id_to_region_code_map 	= array();
-
-}
 
 /**
  * description
@@ -407,6 +70,8 @@ class WPSC_Nation {
  */
 class WPSC_Countries {
 
+	const INCLUDE_INVISIBLE = true;
+	const DO_NOT_INCLUDE_INVISIBLE = false;
 
 	/**
 	 * Change an country ISO code into a country id, if a country id is passed it is returned intact
@@ -489,7 +154,7 @@ class WPSC_Countries {
 			$region_id = intval( $region_id_or_code );
 		} else {
 			$country = self::$countries[$country_id];
-			$region_id = $country->region_id_from_region_code($region_id_or_code);
+			$region_id = $country->region_id_from_region_code( $region_id_or_code );
 		}
 
 		return $region_id;
@@ -736,30 +401,47 @@ class WPSC_Countries {
 	}
 
 	/**
-	 * The Countries
+	 * The Countries as array of WPSC_Countries
+	 *
+	 * @access public
+	 * @since 3.8.14
+	 *
+	 * @param boolean return countries that are set to invisible
+	 *
+	 * @return array of region objects index by region id
+	 */
+	public static function countries( $include_invisible = false ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return array();
+		}
+
+		$countries = self::$countries;
+
+		if ( $include_invisible ) {
+			$countries = array_merge( $countries, self::$invisible_countries );
+		}
+
+		return $countries;
+	}
+
+	/**
+	 * The Countries as arrays of arrays
 	 *
 	 * @access public
 	 * @since 3.8.14
 	 *
 	 * @param boolean return the results as an associative array rather than an object
 	 *
-	 * @return array of region objects index by region id
+	 * @return array of arrays index by region id, each element array index by property
 	 */
-	public static function countries( $as_array = false ) {
-
-		if ( ! self::confirmed_initialization() ) {
-			return 0;
-		}
-
-		$countries = self::$countries;
-
-		if ( $as_array ) {
-			$json  = json_encode( $countries );
-			$countries = json_decode( $json, true );
-		}
-
+	public static function countries_array( $include_invisible = false ) {
+		$countries = self::countries( $include_invisible );
+		$json  = json_encode( $countries );
+		$countries = json_decode( $json, true );
 		return $countries;
 	}
+
 
 	/**
 	 * How many regions does the country have
@@ -821,10 +503,10 @@ class WPSC_Countries {
 	 *
 	 * @return array   country list with index as country, value as name, sorted by country name
 	 */
-	public static function get_countries() {
+	public static function get_country_names() {
 
 		if ( ! self::confirmed_initialization() ) {
-			return 0;
+			return array();
 		}
 
 		// we have the return value in our country name to id map, all we have to do is swap the keys with the values
@@ -887,6 +569,17 @@ class WPSC_Countries {
 	 * @var array
 	 */
 	private static $countries = array();
+
+	/**
+	 * Contains the invisible countries data, an array of objects indexed by country id
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	 */
+	private static $invisible_countries = array();
 
 	/**
 	 * An array that maps from country isocode to country id
@@ -974,56 +667,18 @@ class WPSC_Countries {
 					FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "1" ORDER BY id ASC';
 
 			self::$countries = $wpdb->get_results( $sql, OBJECT_K );
+			self::$countries = self::_convert_country_arrays_to_objects( self::$countries );
 
-			// build an array to map from iso code to country, while we do this get any region data for the country
-			foreach ( self::$countries as $country_id => $country ) {
+			// there are also invisible countries
+			$sql = 'SELECT id,
+						country, isocode, currency, symbol, symbol_html, code, has_regions, tax, continent, visible
+					FROM `' . WPSC_TABLE_CURRENCY_LIST . '` WHERE `visible`= "0" ORDER BY id ASC';
 
-				// take this opportunity to clean up any types that have been turned into text by the query
-				$country->id          = intval( self::$countries[$country_id]->id );
-				$country->has_regions = self::$countries[$country_id]->has_regions == '1';
-				$country->visible     = self::$countries[$country_id]->visible == '1';
+			self::$invisible_countries = $wpdb->get_results( $sql, OBJECT_K );
+			self::$invisible_countries = self::_convert_country_arrays_to_objects( self::$invisible_countries );
 
-				if ( ! empty( self::$countries[$country_id]->tax ) && ( is_int( self::$countries[$country_id]->tax ) ) || is_float( self::$countries[$country_id]->tax ) ) {
-					$country->tax = floatval( self::$countries[$country_id]->tax );
-				}
-
-				self::$country_iso_code_map[$country->isocode] = intval( $country->id );
-				self::$country_names[$country->country] = intval( $country->id );
-
-				if ( $country->has_regions ) {
-					$sql = 'SELECT code, country_id, name, tax, id FROM `' . WPSC_TABLE_REGION_TAX . '` '
-							. ' WHERE `country_id` = %d '
-							. ' ORDER BY code ASC ';
-
-					// put the regions list into our country object
-					self::$countries[$country_id]->regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ) , OBJECT_K );
-
-					self::$countries[$country_id]->region_id_to_region_code_map = array();
-
-					// any properties that came in as text that should be numbers or boolean get adjusted here, we also build
-					// an array to map from region code to region id
-					foreach ( self::$countries[$country_id]->regions as $region_code => $region ) {
-						$region->id         = intval( $region->id );
-						$region->country_id = intval( $region->country_id );
-						$region->tax        = floatval( $region->tax );
-
-						self::$countries[$country_id]->region_id_to_region_code_map[$region->id] = $region->code;
-
-						// create a new empty region object, then copy our region data into it.
-						self::$countries[$country_id]->regions[$region_code] = new WPSC_Region( null, null );
-						self::$countries[$country_id]->regions[$region_code]->_copy_properties_from_stdclass( $region );
-
-					}
-
-					ksort( self::$countries[$country_id]->region_id_to_region_code_map );
-				}
-
-				// create a new empty country object, then copy our region data into it.
-				self::$countries[$country_id] = new WPSC_Nation( null );
-				self::$countries[$country_id]->_copy_properties_from_stdclass( $country );
-			}
-
-			// now countries is a list with the key being the integer country id, the value is the country data
+			// now countries lists are a list with the key being the integer
+			// country id, the value is the country data
 
 			// build a global active currency list
 			$sql = 'SELECT DISTINCT code, symbol, symbol_html, currency FROM `' . WPSC_TABLE_CURRENCY_LIST . '` ORDER BY code ASC';
@@ -1033,6 +688,62 @@ class WPSC_Countries {
 
 			self::create_region_id_region_object_map();
 		}
+	}
+
+	private static function _convert_country_arrays_to_objects( $countries_array ) {
+
+		global $wpdb;
+
+		// build an array to map from iso code to country, while we do this get any region data for the country
+		foreach ( $countries_array as $country_id => $country ) {
+
+			// take this opportunity to clean up any types that have been turned into text by the query
+			$country->id          = intval( $countries_array[$country_id]->id );
+			$country->has_regions = $countries_array[$country_id]->has_regions == '1';
+			$country->visible     = $countries_array[$country_id]->visible == '1';
+
+			if ( ! empty( $countries_array[$country_id]->tax ) && ( is_int( $countries_array[$country_id]->tax ) ) || is_float( $countries_array[$country_id]->tax ) ) {
+				$country->tax = floatval( self::$countries[$country_id]->tax );
+			}
+
+			self::$country_iso_code_map[$country->isocode] = intval( $country->id );
+			self::$country_names[$country->country] = intval( $country->id );
+
+			if ( $country->has_regions ) {
+				$sql = 'SELECT code, country_id, name, tax, id FROM `' . WPSC_TABLE_REGION_TAX . '` '
+						. ' WHERE `country_id` = %d '
+								. ' ORDER BY code ASC ';
+
+				// put the regions list into our country object
+				$countries_array[$country_id]->regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ) , OBJECT_K );
+
+				$countries_array[$country_id]->region_id_to_region_code_map = array();
+
+				// any properties that came in as text that should be numbers or boolean get adjusted here, we also build
+				// an array to map from region code to region id
+				foreach ( $countries_array[$country_id]->regions as $region_code => $region ) {
+					$region->id         = intval( $region->id );
+					$region->country_id = intval( $region->country_id );
+					$region->tax        = floatval( $region->tax );
+
+					$countries_array[$country_id]->region_id_to_region_code_map[$region->id] = $region->code;
+
+					// create a new empty region object, then copy our region data into it.
+					$countries_array[$country_id]->regions[$region_code] = new WPSC_Region( null, null );
+					$countries_array[$country_id]->regions[$region_code]->_copy_properties_from_stdclass( $region );
+
+				}
+
+				ksort( $countries_array[$country_id]->region_id_to_region_code_map );
+			}
+
+			// create a new empty country object, then copy our region data into it.
+			self::$countries[$country_id] = new WPSC_Nation( null );
+			self::$countries[$country_id]->_copy_properties_from_stdclass( $country );
+
+		}
+
+		return $countries_array;
 	}
 
 	/**
@@ -1060,6 +771,14 @@ class WPSC_Countries {
 	 */
 	public static function clear_cache() {
 		delete_transient( self::transient_name() );
+
+		// when we clear the cahched copy of the sdata, we also clear the resident copy of the data
+		// so it is rebuilt and stays in sync
+		self::$country_iso_code_map = array();
+		self::$countries            = array();
+		self::$invisible_countries  = array();
+		self::$country_names        = array();
+		self::$currencies           = array();
 	}
 
 	/**
@@ -1076,6 +795,7 @@ class WPSC_Countries {
 		$mydata = array();
 		$mydata['country_iso_code_map']         = self::$country_iso_code_map;
 		$mydata['countries']                    = self::$countries;
+		$mydata['invisible_countries']          = self::$invisible_countries;
 		$mydata['country_names']                = self::$country_names;
 		$mydata['currencies']                   = self::$currencies;
 
@@ -1097,16 +817,18 @@ class WPSC_Countries {
 
 		$have_data = false;
 
-		if ( count( $mydata ) == 4 ) {
+		if ( count( $mydata ) == 5 ) {
 
 			if (
 				is_array( $mydata['country_iso_code_map'] )
 					&& is_array( $mydata['countries'] )
-						&& is_array( $mydata['country_names'] )
-							&& is_array( $mydata['currencies'] )
+						&& is_array( $mydata['invisible_countries'] )
+							&& is_array( $mydata['country_names'] )
+								&& is_array( $mydata['currencies'] )
 				) {
 					self::$country_iso_code_map         = $mydata['country_iso_code_map'];
 					self::$countries                    = $mydata['countries'];
+					self::$invisible_countries          = $mydata['invisible_countries'];
 					self::$country_names                = $mydata['country_names'];
 					self::$currencies                   = $mydata['currencies'];
 
@@ -1191,6 +913,24 @@ if ( true ) {
 
 		$ma = new WPSC_Region( 'US', 'MA' );
 
+		$country = new WPSC_Country(
+										array(
+										'country'   => 'Grand Fenwick',
+										'isocode'   => 'FG',
+										'currency'  => 'Grand Fenwick Dubloon',
+										'code'      => 'GFD',
+										'continent' => 'europe',
+										'visible'   => 1,
+										)
+								);
+		$country->save();
+
+		// deprecated function test
+		$country_list = $country->get_data();
+
+
+		// should return an array of data
+		WPSC_Country::get_cache( 136 , 'id' );
 		//error_log( 'testit done' );
 
 	}

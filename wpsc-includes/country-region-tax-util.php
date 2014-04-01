@@ -39,7 +39,7 @@ function _wpsc_country_dropdown_options( $args = '' ) {
 	if ( $args['placeholder'] )
 		$output .= "<option value=''>" . esc_html( $args['placeholder'] ) . "</option>\n\r";
 
-	$countries = WPSC_Country::get_all( $args['include_invisible'] );
+	$countries = WPSC_Countries::countries_array( $args['include_invisible'] );
 	$base_country = get_option( 'base_country' );
 
 	foreach ( $countries as $country ) {

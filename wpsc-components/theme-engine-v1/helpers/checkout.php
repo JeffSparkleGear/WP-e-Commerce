@@ -329,7 +329,7 @@ function wpsc_shipping_country_list( $shippingdetails = false ) {
 		$selected_region = esc_attr( get_option( 'base_region' ) );
 
 	if ( empty( $wpsc_country_data ) ) {
-		$country_data = WPSC_Countries::countries( true );
+		$country_data = WPSC_Countries::countries_array();
 	} else {
 		$country_data = $wpsc_country_data;
 	}

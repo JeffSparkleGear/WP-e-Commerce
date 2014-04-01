@@ -164,8 +164,8 @@ function wpsc_get_country_form_id_by_type($type){
 }
 
 function wpsc_get_country( $country_code ) {
-	$country = new WPSC_Country( $country_code, 'isocode' );
-	return $country->get( 'country' );
+	$country = new WPSC_Country( $country_code );
+	return $country->name();
 }
 
 function wpsc_get_region( $region_id ) {
