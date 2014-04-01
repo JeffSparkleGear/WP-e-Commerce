@@ -365,7 +365,6 @@ class WPSC_Country {
 		}
 	}
 
-
 	/**
 	 * saves country data to the databse
 	 *
@@ -428,7 +427,6 @@ class WPSC_Country {
 		return $country_id_from_db;
 	}
 
-
 	/**
 	 * A country's properties, these are private to this class (notice the prefix '_'!).  They are marked as public so that
 	 * object serialization will work properly
@@ -455,6 +453,18 @@ class WPSC_Country {
 	public $_regions 						= array();
 	public $_region_id_to_region_code_map 	= array();
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// As a result of merging the legacy WPSC_Country class we no longer need several of the public class
+	// functions that where in the prior version of this class.
+	//
+	// if deprecated processing is enabled we will give a message, just as if we were allowed to put class
+	// methods in the deprecated file, if deprecated processing is not enabled we exit with the method, much
+	// like would happen with an undefined function call.
+	//
+	// TODO: This processing is added at version 3.8.14 and intended to be removed after a reasonable number
+	// of interim releases. See GitHub Issue https://github.com/wp-e-commerce/WP-e-Commerce/issues/1016
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static function get_outdated_isocodes() {
 		// TODO: Move this to the database
@@ -469,20 +479,6 @@ class WPSC_Country {
 		return $outdated_isocodes;
 	}
 
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// As a result of merging the legacy WPSC_Country class we no longer need several of the public class
-	// functions that where in the prior version of this class.
-	//
-	// if deprecated processing is enabled we will give a message, just as if we were allowed to put class
-	// methods in the deprecated file, if deprecated processing is not enabled we exit with the method, much
-	// like would happen with an undefined function call.
-	//
-	// TODO: This processing is added at version 3.8.14 and intended to be removed after a reasonable number
-	// of interim releases. See GitHub Issue https://github.com/wp-e-commerce/WP-e-Commerce/issues/1016
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*
 	 * deprected since 3.8.14
