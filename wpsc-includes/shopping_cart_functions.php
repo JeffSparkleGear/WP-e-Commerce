@@ -110,7 +110,6 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$id = 'billingcountry';
 	}
 
-	//$country_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
 	$additional_attributes = 'data-wpsc-meta-key="' . $title . '" title="' . $title . '" ' . $js;
 	$output .= "<div id='$html_form_id'>\n\r";
 	$output .= wpsc_get_country_dropdown(
@@ -124,9 +123,10 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		)
 	);
 
-	$region_list    = $wpdb->get_results( $wpdb->prepare( "SELECT `" . WPSC_TABLE_REGION_TAX . "`.* FROM `" . WPSC_TABLE_REGION_TAX . "`, `" . WPSC_TABLE_CURRENCY_LIST . "`  WHERE `" . WPSC_TABLE_CURRENCY_LIST . "`.`isocode` IN(%s) AND `" . WPSC_TABLE_CURRENCY_LIST . "`.`id` = `" . WPSC_TABLE_REGION_TAX . "`.`country_id` ORDER BY name ASC", $selected_country ), ARRAY_A );
-	$sql            = "SELECT `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `unique_name` = 'shippingstate' ";
-	$region_form_id = $wpdb->get_var( $sql );
+	$region_list = WPSC_Country_Region::regions( $selected_country, true );
+
+	$checkout_form = new WPSC_Checkout_Form();
+	$region_form_id = $checkout_form->get_field_id_by_unique_name( 'shippingstate' );
 
 	if ( $shippingfields ) {
 		$namevalue = ' name="collected_data[' . $region_form_id . ']" ';

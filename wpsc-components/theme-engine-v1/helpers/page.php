@@ -344,12 +344,23 @@ function wpsc_enqueue_user_script_and_css() {
 
 		wp_enqueue_script( 'jQuery' );
 
-		if ( defined( WPEC_LOAD_DEPRECATED ) && WPEC_LOAD_DEPRECATED ) {
-			wp_enqueue_script( 'wpsc-deprecated', WPSC_CORE_JS_URL . '/wpsc-deprecated.js', false, $version_identifier );
+		// To help devs who are working on WPeC, and anyone who may deploy a site on WPeC and want to
+		// make a change to the WPeC javascript, add a file timestamp on to the version information
+		// for the javascript file.  This will force browesers and caches to use the new version of the
+		// file when it changes, even though the WPEC version is not changing. This should also eliminate
+		// nearly all cases of having to ask a user "did you clear your browser cache?" when they report
+		// an unusual behavior.
+		$wpec_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wp-e-commerce.js' );
+
+		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $wpec_js_version );
+
+		if ( defined( 'WPEC_LOAD_DEPRECATED' ) && WPEC_LOAD_DEPRECATED ) {
+			$wpec_js_version = $version_identifier . '-' . filemtime( WPSC_CORE_JS_PATH . '/wpsc-deprecated.js' );
+			wp_enqueue_script( 'wpsc-deprecated', WPSC_CORE_JS_URL . '/wpsc-deprecated.js', 'wp-e-commerce', $wpec_js_version );
 		}
 
 		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $version_identifier );
-		wp_localize_script( 'wp-e-commerce', 'wpsc_ajax', _wpsc_javascript_localizations() );
+		wp_localize_script( 'wp-e-commerce', 'wpsc_vars', _wpsc_javascript_localizations() );
 
 		wp_enqueue_script( 'livequery',                   WPSC_URL 			. '/wpsc-admin/js/jquery.livequery.js',   array( 'jquery' ), '1.0.3' );
 		if ( get_option( 'product_ratings' ) == 1 )

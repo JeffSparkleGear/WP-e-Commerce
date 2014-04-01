@@ -1768,7 +1768,7 @@ function wpsc_the_featured_image_fix( $stuff, $post_ID ){
 			$stuff = '<img src="' . esc_url( $header_image ) . '" width="' . HEADER_IMAGE_WIDTH . '" height="' . HEADER_IMAGE_HEIGHT . '" alt="" />';
 	}
 
-	remove_action('post_thumbnail_html','wpsc_the_featured_image_fix');
+	remove_action( 'post_thumbnail_html', 'wpsc_the_featured_image_fix' );
 
 	return $stuff;
 }
@@ -1784,5 +1784,90 @@ function wpsc_meta_table_name( $meta_object_type ) {
 	return _wpsc_meta_table_name( $meta_object_type );
 }
 
+/**
+ * Google checkout not longer available or supported, so we are deprecating this function
+ *
+ * @access public
+
+ * @deprecated since 3.8.14
+ */
+function wpsc_google_checkout(){
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.14', 'wpsc_google_checkout' );
+	$currpage = wpsc_selfURL();
+	if (array_search("google",(array)get_option('custom_gateway_options')) !== false && $currpage != get_option('shopping_cart_url')) {
+		global $nzshpcrt_gateways;
+		foreach($nzshpcrt_gateways as $gateway) {
+			if($gateway['internalname'] == 'google' ) {
+				$gateway_used = $gateway['internalname'];
+				$gateway['function'](true);
+			}
+		}
+	}
+}
+
+/**
+ * Google checkout not longer available or supported, so we are deprecating this function
+ *
+ * @access public
+
+ * @deprecated since 3.8.14
+ */
+function wpsc_empty_google_logs(){
+	global $wpdb;
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.14', 'wpsc_empty_google_logs' );
+	$sql = $wpdb->prepare( "DELETE FROM  `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid` = '%s'", wpsc_get_customer_meta( 'checkout_session_id' ) );
+	$wpdb->query( $sql );
+	wpsc_delete_customer_meta( 'checkout_session_id' );
+}
+
+/**
+ * @access public
+ * @deprecated since 3.8.13.4
+ */
+function wpsc_user_dynamic_js() {
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.14', '_wpsc_javascript_localizations' );
+}
+
+
+/*
+ * Over time certain javascript variables that were once localized into scripts will become obsolete
+ * When they do moving them here will continue to create the variables for older javascript to use.
+ */
+function _wpsc_deprecated_javascript_localization_vars( $localizations = array() ) {
+
+		/**
+		 * @deprecated since 3.8.14
+		 * wpsc_ajax as an object with the properties below has been replaced and each of the properties
+		 * is available as it's own variable, that means devs isntead of referencing "wpsc_ajax.base_url" do
+		 * "base_url"
+		 */
+		$wpsc_ajax = array(
+				'ajaxurl'              => admin_url( 'admin-ajax.php', 'relative' ),
+				'spinner'              => esc_url( wpsc_get_ajax_spinner() ),
+				'no_quotes'            => __( 'It appears that there are no shipping quotes for the shipping information provided.  Please check the information and try again.', 'wpsc' ),
+				'ajax_get_cart_error'  => __( 'There was a problem getting the current contents of the shopping cart.', 'wpsc' ),
+
+				/* base url */
+				'base_url'             => site_url(), //admin-legacy.js
+				'WPSC_URL'             => WPSC_URL,
+				'WPSC_IMAGE_URL'       => WPSC_IMAGE_URL,
+				'WPSC_DIR_NAME'        => WPSC_DIR_NAME,
+				'WPSC_CORE_IMAGES_URL' => WPSC_CORE_IMAGES_URL,
+
+				/* LightBox Configuration start*/
+				'fileLoadingImage'         => WPSC_CORE_IMAGES_URL . '/loading.gif',
+				'fileBottomNavCloseImage'  => WPSC_CORE_IMAGES_URL . '/closelabel.gif',
+				'fileThickboxLoadingImage' => WPSC_CORE_IMAGES_URL . '/loadingAnimation.gif',
+				'resizeSpeed'              => 9,  // controls the speed of the image resizing (1=slowest and 10=fastest)
+				'borderSize'               => 10, //if you adjust the padding in the CSS, you will need to update this variable
+		);
+
+		$localizations['wpsc_ajax'] = $wpsc_ajax;
+
+
+
+		return $localizations;
+
+}
 
 
