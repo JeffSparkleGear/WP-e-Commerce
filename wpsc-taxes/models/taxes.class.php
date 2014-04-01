@@ -89,7 +89,7 @@ class wpec_taxes {
 		if ( $returnable !== false )
 			return $returnable;
 
-		$country = new WPSC_Nation( $country_code );
+		$country = new WPSC_Country( $country_code );
 
 		//first check if the region given is part of the country
 		if ( ! empty( $region_code ) ) {
@@ -326,19 +326,20 @@ class wpec_taxes {
 		//database connection
 		global $wpdb;
 
-		if( isset( $country ) && 'all-markets' == $country ) return;
-		//get the id for the given country code
-		$country_id = $this->wpec_taxes_get_country_information( 'id', array( 'isocode' => $country ) );
+		$wpsc_country = new WPSC_Country( $country );
 
-		//get a list of regions for the country id
-		$query = 'SELECT name, code AS region_code FROM ' . WPSC_TABLE_REGION_TAX . " WHERE country_id=$country_id";
-		$result = $wpdb->get_results( $query, ARRAY_A );
+		$regions = $wpsc_country->regions_array();
+
+		if ( isset( $country ) && 'all-markets' == $country ) {
+			return;
+		}
 
 		//add the all markets option to the list
-		if ( ! empty( $result ) )
-			array_unshift($result, array('region_code'=>'all-markets', 'name' => __( 'All Markets', 'wpsc' ) ) );
+		if ( ! empty( $regions ) ) {
+			array_unshift( $regions , array( 'region_code' => 'all-markets', 'name' => __( 'All Markets', 'wpsc' ), ) );
+		}
 
-		return $result;
+		return $regions;
 	} // wpec_taxes_get_regions
 
 	/**

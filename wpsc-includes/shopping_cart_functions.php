@@ -94,7 +94,7 @@ function WPSC_Countries_list( $form_id = null, $ajax = false, $selected_country 
 		//$selected_region = get_option( 'base_region' );
 	}
 
-	$selected_country = new WPSC_Nation( $selected_country );
+	$selected_country = new WPSC_Country( $selected_country );
 	$selected_region = $selected_country->region( $selected_region );
 
 	if ( $form_id != null ) {

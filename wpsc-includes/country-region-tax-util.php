@@ -3,8 +3,8 @@
 function _wpsc_is_country_disabled( $country, $args ) {
 	extract( $args, EXTR_SKIP );
 
-	$isocode = $country->get( 'isocode' );
-	$id      = $country->get( 'id' );
+	$isocode = $country->isocode();
+	$id      = $country->id();
 
 	if ( is_array( $acceptable ) && ! in_array( $isocode, $acceptable ) )
 		return true;
@@ -39,12 +39,11 @@ function _wpsc_country_dropdown_options( $args = '' ) {
 	if ( $args['placeholder'] )
 		$output .= "<option value=''>" . esc_html( $args['placeholder'] ) . "</option>\n\r";
 
-	$countries = WPSC_Countries::countries_array( $args['include_invisible'] );
-	$base_country = get_option( 'base_country' );
+	$countries = WPSC_Countries::countries( $args['include_invisible'] );
 
 	foreach ( $countries as $country ) {
-		$isocode = $country->get( 'isocode' );
-		$name = $country->get( 'country' );
+		$isocode = $country->isocode();
+		$name = $country->name();
 
 		// if we're in admin area, and the legacy country code "UK" or "TP" is selected as the
 		// base country, we should display both this and the more proper "GB" or "TL" options

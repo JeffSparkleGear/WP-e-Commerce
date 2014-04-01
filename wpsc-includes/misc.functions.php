@@ -164,14 +164,14 @@ function wpsc_get_country_form_id_by_type($type){
 }
 
 function wpsc_get_country( $country_code ) {
-	$country = new WPSC_Country( $country_code );
-	return $country->name();
+	$wpsc_country = new WPSC_Country( $country_code );
+	return $wpsc_country->name();
 }
 
 function wpsc_get_region( $region_id ) {
-	global $wpdb;
-	$region = $wpdb->get_var( $wpdb->prepare( "SELECT `name` FROM `" . WPSC_TABLE_REGION_TAX . "` WHERE `id` IN(%d)", $region_id ) );
-	return $region;
+	$country_id = WPSC_Countries::country_id_from_region_id( $region_id );
+	$wpsc_region = new WPSC_Region( $country_id, $region_id );
+	return $wpsc_region->name();
 }
 
 function nzshpcrt_display_preview_image() {

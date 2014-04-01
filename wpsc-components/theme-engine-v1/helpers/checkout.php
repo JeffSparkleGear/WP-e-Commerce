@@ -289,7 +289,7 @@ function wpsc_checkout_form_field() {
 function wpsc_shipping_region_list( $selected_country, $selected_region, $shippingdetails = false ) {
 	$output = '';
 
-	$country = new WPSC_Nation( $selected_country );
+	$country = new WPSC_Country( $selected_country );
 	$regions = $country->regions();
 
 	if ( count( $regions ) > 0 ) {

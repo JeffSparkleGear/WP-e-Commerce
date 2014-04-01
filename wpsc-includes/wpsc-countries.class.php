@@ -20,9 +20,9 @@
  * Where is the global so I can access this data?
  *  I'm not telling! (just kidding) ... There isn't one because I hate globals (and I want you to hate globals also).
  *  You access geography data through the static methods available in WPSC_Countries, or by instantiating
- *  objects of type WPSC_Nation and WPSC_Region.
+ *  objects of type WPSC_Country and WPSC_Region.
  *
- * Why is there a WPSC_Nation class not WPSC_Country?
+ * Why is there a WPSC_Country class not WPSC_Country?
  *  At the time this module was created there was already a WPSC_Country class.  WPSC_Country was only used in a
  *  couple of places, and the module is on the fast track to being deprecated.
  *
@@ -48,7 +48,7 @@
  *
  * The implementation consists of three class
  *
- * WPSC_Nation      Get anything about a single country you might want to know
+ * WPSC_Country      Get anything about a single country you might want to know
  * WPSC_Region      Get anything about a single region you might want to know
  * WPSC_Countries   Get lists of countries, convert key fields to unique ids, and other useful functions,
  * 						Also abstracts data storage mechanism from
@@ -338,6 +338,7 @@ class WPSC_Countries {
 	 * @since 3.8.14
 	 *
 	 * @param int | string $country_id_or_isocode    country being check, if non-numeric country is treated as an isocode, number is the country id
+ 	 * @param boolean return the result as an array, default is to return the result as an object
 	 *
 	 * @return string  currency symbol html for the specified country
 	 */
@@ -373,6 +374,7 @@ class WPSC_Countries {
 	 * @since 3.8.14
 	 *
 	 * @param int | string country being check, if noon-numeric country is treated as an isocode, number is the country id
+	 * @param boolean return the result as an array, default is to return the result as an object
 	 *
 	 * @return array of region objects index by region id
 	 */
@@ -520,6 +522,8 @@ class WPSC_Countries {
 	 * @static
 	 * @since 3.8.14
 	 *
+	 * @param boolean return the result as an array, default is to return the result as an object
+	 *
 	 * @return array   country list with index as country, value as name, sorted by country name
 	 */
 	public static function currencies( $as_array = false ) {
@@ -560,6 +564,30 @@ class WPSC_Countries {
 	}
 
 	/**
+	 * get the country id from a country code
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @return int|boolean Country id or false on failure
+	 */
+	public static function country_id_from_country_code( $country_code  ) {
+
+		if ( ! self::confirmed_initialization() ) {
+			return false;
+		}
+
+		if ( isset( self::$country_code_map[$country_code] ) ) {
+			return self::$country_code_map[$country_code];
+		}
+
+		return false;
+	}
+
+
+
+	/**
 	 * Contains the countries data, an array of objects indexed by country id
 	 *
 	 * @access private
@@ -580,17 +608,6 @@ class WPSC_Countries {
 	 * @var array
 	 */
 	private static $invisible_countries = array();
-
-	/**
-	 * An array that maps from country isocode to country id
-	 *
-	 * @access private
-	 * @static
-	 * @since 3.8.14
-	 *
-	 * @var array
-	*/
-	private static $country_iso_code_map = array();
 
 	/**
 	 * Country names as key sorted in alpha order, data is country id
@@ -614,9 +631,30 @@ class WPSC_Countries {
 	 */
 	private static $currencies = array();
 
+	/**
+	 * An array that maps from country isocode to country id
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	 */
+	private static $country_iso_code_map = array();
 
 	/**
-	 * map of unique region id to WPSC_Region objects held within WPSC_Nation objects
+	 * An array that maps from country code to country id
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	*/
+	private static $country_code_map = array();
+
+	/**
+	 * map of unique region id to WPSC_Region objects held within WPSC_Country objects
 	 *
 	 * @access private
 	 * @static
@@ -626,24 +664,10 @@ class WPSC_Countries {
 	 */
 	private static $region_id_to_country_id_map = array();
 
+	private static $iso_map = null;
+	private static $code_map = null;
+	private static $region_map = null;
 
-	/**
-	 * Returns an instance of the form with a particular ID
-	 *
-	 * @access public
-	 * @static
-	 * @since 3.8.10
-	 *
-	 * @param int $id Optional. Defaults to 0. The ID of the form
-	 * @return WPSC_Checkout_Form
-	 */
-	public static function &get() {
-		if ( ! self::$countries ) {
-			self::$countries = new WPSC_Countries();
-		}
-
-		return self::$countries;
-	}
 
 	/**
 	 * Constructor of an WPSC_countries instance. Cannot be called publicly
@@ -654,6 +678,11 @@ class WPSC_Countries {
 	 * @param string $id Optional. Defaults to 0.
 	 */
 	public function __construct() {
+
+		self::$iso_map = new WPSC_Id_To_Value_Map( 'iso' );
+		self::$code_map = new WPSC_Id_To_Value_Map( 'code' );
+		self::$region_map = new WPSC_Id_To_Value_Map( 'region' );
+
 		if ( self::$countries == null ) {
 			self::restore_myself();
 		}
@@ -708,6 +737,7 @@ class WPSC_Countries {
 
 			self::$country_iso_code_map[$country->isocode] = intval( $country->id );
 			self::$country_names[$country->country] = intval( $country->id );
+			self::$country_code_map[$country->code] = intval( $country->id );
 
 			if ( $country->has_regions ) {
 				$sql = 'SELECT code, country_id, name, tax, id FROM `' . WPSC_TABLE_REGION_TAX . '` '
@@ -738,8 +768,8 @@ class WPSC_Countries {
 			}
 
 			// create a new empty country object, then copy our region data into it.
-			self::$countries[$country_id] = new WPSC_Nation( null );
-			self::$countries[$country_id]->_copy_properties_from_stdclass( $country );
+			$countries_array[$country_id] = new WPSC_Country( null );
+			$countries_array[$country_id]->_copy_properties_from_stdclass( $country );
 
 		}
 
@@ -775,10 +805,12 @@ class WPSC_Countries {
 		// when we clear the cahched copy of the sdata, we also clear the resident copy of the data
 		// so it is rebuilt and stays in sync
 		self::$country_iso_code_map = array();
+		self::$country_code_map = array();
 		self::$countries            = array();
 		self::$invisible_countries  = array();
 		self::$country_names        = array();
 		self::$currencies           = array();
+
 	}
 
 	/**
@@ -793,11 +825,12 @@ class WPSC_Countries {
 	private function save_myself() {
 
 		$mydata = array();
-		$mydata['country_iso_code_map']         = self::$country_iso_code_map;
-		$mydata['countries']                    = self::$countries;
-		$mydata['invisible_countries']          = self::$invisible_countries;
-		$mydata['country_names']                = self::$country_names;
-		$mydata['currencies']                   = self::$currencies;
+		$mydata['country_iso_code_map']     = self::$country_iso_code_map;
+		$mydata['country_code_map']         = self::$country_code_map;
+		$mydata['country_names']            = self::$country_names;
+		$mydata['countries']                = self::$countries;
+		$mydata['invisible_countries']      = self::$invisible_countries;
+		$mydata['currencies']               = self::$currencies;
 
 		set_transient( self::transient_name(), $mydata, WEEK_IN_SECONDS );
 	}
@@ -817,7 +850,7 @@ class WPSC_Countries {
 
 		$have_data = false;
 
-		if ( count( $mydata ) == 5 ) {
+		if ( count( $mydata ) == 6 ) {
 
 			if (
 				is_array( $mydata['country_iso_code_map'] )
@@ -826,11 +859,12 @@ class WPSC_Countries {
 							&& is_array( $mydata['country_names'] )
 								&& is_array( $mydata['currencies'] )
 				) {
-					self::$country_iso_code_map         = $mydata['country_iso_code_map'];
-					self::$countries                    = $mydata['countries'];
-					self::$invisible_countries          = $mydata['invisible_countries'];
-					self::$country_names                = $mydata['country_names'];
-					self::$currencies                   = $mydata['currencies'];
+					self::$country_iso_code_map = $mydata['country_iso_code_map'];
+					self::$country_code_map    	= $mydata['country_code_map'];
+					self::$countries            = $mydata['countries'];
+					self::$invisible_countries  = $mydata['invisible_countries'];
+					self::$country_names        = $mydata['country_names'];
+					self::$currencies           = $mydata['currencies'];
 
 					$have_data = true;
 			}
@@ -854,11 +888,9 @@ class WPSC_Countries {
 	 *
 	 * @return none
 	 */
-
 	private static function transient_name() {
 		return strtolower( __CLASS__ . '-' . WPSC_DB_VERSION );
 	}
-
 
 	/**
 	 * Create a master map of region ids to region objects
@@ -872,11 +904,21 @@ class WPSC_Countries {
 	private static function create_region_id_region_object_map() {
 		self::$region_id_to_country_id_map = array();
 
+
 		foreach ( self::$countries as $country_id => $country ) {
 			foreach ( $country->regions() as $region_id => $region_code ) {
 				self::$region_id_to_country_id_map[$region_id] = $country_id;
+				self::$region_map->map( $region_id, $country_id );
 			}
 		}
+
+		foreach ( self::$invisible_countries as $country_id => $country ) {
+			foreach ( $country->regions() as $region_id => $region_code ) {
+				self::$region_id_to_country_id_map[$region_id] = $country_id;
+				self::$region_map->map( $region_id, $country_id );
+			}
+		}
+
 	}
 
 	/**
@@ -897,44 +939,71 @@ class WPSC_Countries {
 	}
 }
 
-// a little tiny test stub
-if ( true ) {
-	function testit() {
-
-		WPSC_Countries::clear_cache();
-
-		$x = WPSC_Countries::region_count( 'US' );
-		//error_log( 'US static has ' . $x );
-
-		$x = WPSC_Countries::region_count( '136' );
-		//error_log( '136 static has ' . $x );
-
-		$us = new WPSC_Nation( 'US' );
-
-		$ma = new WPSC_Region( 'US', 'MA' );
-
-		$country = new WPSC_Country(
-										array(
-										'country'   => 'Grand Fenwick',
-										'isocode'   => 'FG',
-										'currency'  => 'Grand Fenwick Dubloon',
-										'code'      => 'GFD',
-										'continent' => 'europe',
-										'visible'   => 1,
-										)
-								);
-		$country->save();
-
-		// deprecated function test
-		$country_list = $country->get_data();
 
 
-		// should return an array of data
-		WPSC_Country::get_cache( 136 , 'id' );
-		//error_log( 'testit done' );
+/*
+ * WPSC_Country_Id_Map a class to manage the several static maps we have that go from an id to
+ * a country code
+ */
+class WPSC_Id_To_Value_Map {
+
+	private $_map_name = null;
+	private $_map_data = null;
+	private $_dirty    = false;
+
+	public function __construct( $map_name ) {
+		$this->_map_name = $map_name;
+		add_action( 'shutdown', array( &$this, '_save_map' ) );
+	}
+
+	public function clear() {
+		if ( ! empty( $this->_map_name ) ) {
+			delete_transient( $this->_map_name );
+			$this_map_data = null;
+		}
+	}
+
+	private function confirm_data_ready() {
+		if ( ! is_array( $this->_map_data ) ) {
+			$this->_map_data = get_transient( $this->_map_name );
+			if ( ! is_array( $this->_map_data ) ) {
+				$this->_map_data = array();
+				$this->_dirty = true;
+			}
+		}
+
+		return (  is_array( $this->_map_data ) );
 
 	}
 
-	add_action( 'wpsc_setup_customer', 'testit' );
-}
+	public function id( $key ) {
+		if ( $this->confirm_data_ready() ) {
+			if ( isset( $this->_map_data[$key] ) ) {
+				return intval( $this->_map_data[$key] );
+			}
+		}
 
+		return false;
+	}
+
+	public function map( $key, $value ) {
+		if ( $this->confirm_data_ready() ) {
+			if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
+				$this->_map_data[$key] = $value;
+				$this->_dirty = true;
+			}
+		}
+
+		return false;
+	}
+
+	public function _save_map() {
+		if ( $this->_dirty ) {
+			ksort( $this->_map_data );
+			set_transient( $this->_map_name, $this->_map_data, WEEK_IN_SECONDS );
+			$this->_dirty = false;
+		}
+
+	}
+
+}

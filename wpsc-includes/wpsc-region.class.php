@@ -127,17 +127,17 @@ class WPSC_Region {
 	}
 
 	/**
-	 * private region class properties
+	 * private region class properties - note that they are marked as public so this object can be serialized
 	 *
 	 * @access private
 	 *
 	 * @since 3.8.14
 	 *
 	 */
-	private $_id 			= null;
-	private $_country_id 	= null;
-	private $_name 			= null;
-	private $_code 			= null;
-	private $_tax 			= 0;
+	public $_id 			= false;
+	public $_country_id 	= '';
+	public $_name 			= '';
+	public $_code 			= '';
+	public $_tax 			= 0;
 }
 

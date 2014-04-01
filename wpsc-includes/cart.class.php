@@ -670,7 +670,7 @@ class wpsc_cart {
 	 * @access public
 	 */
 	function get_tax_rate() {
-		$country = new WPSC_Nation( get_option( 'base_country' ) );
+		$country = new WPSC_Country( get_option( 'base_country' ) );
 
 		$country_data = WPSC_Countries::country( get_option( 'base_country' ), true );
 		$add_tax = false;
