@@ -679,9 +679,9 @@ class WPSC_Countries {
 	 */
 	public function __construct() {
 
-		self::$iso_map = new WPSC_Id_To_Value_Map( 'iso' );
-		self::$code_map = new WPSC_Id_To_Value_Map( 'code' );
-		self::$region_map = new WPSC_Id_To_Value_Map( 'region' );
+		self::$iso_map = new WPSC_Data_Map( 'iso' );
+		self::$code_map = new WPSC_Data_Map( 'code' );
+		self::$region_map = new WPSC_Data_Map( 'region' );
 
 		if ( self::$countries == null ) {
 			self::restore_myself();
