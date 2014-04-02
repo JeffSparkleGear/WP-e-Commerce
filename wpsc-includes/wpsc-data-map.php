@@ -56,20 +56,31 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return string  a map name to uniquely identify this map so it can be saved and restored
+	 * @param string|int  $key 			for which the value will be retrieved
+	 * @param any (including callable)  $default 	what to return if the key is not found
+	 *
+	 * @return string  the value from the data map if it is there, otherwise the value of the default parameter, or null
 	 */
-	public function value( $key ) {
+	public function value( $key, $default = null ) {
 		if ( $this->confirm_data_ready() ) {
 			if ( isset( $this->_map_data[$key] ) ) {
-				return $this->_map_data[$key];
+				$value = $this->_map_data[$key];
+			} else {
+				if ( $default === null ) {
+					$value = null;
+				} elseif ( is_callable( $default ) ) {
+					$value = call_user_func( $default );
+				} else {
+					$value = $default;
+				}
 			}
 		}
 
-		return null;
+		return $value;
 	}
 
 	/**
-	 * Get the value associated wit ha key from the map, or null on failure
+	 * Get the value associated with a key from the map, or null on failure
 	 *
 	 * @access public
 	 *
@@ -120,7 +131,11 @@ class WPSC_Data_Map {
 			$this->_map_data = get_transient( $this->_map_name );
 			if ( ! is_array( $this->_map_data ) ) {
 				$this->_map_data = array();
-				$this->_dirty = true;
+				call_user_func( $this->_map_callback , $this );
+				if ( ! is_array( $this->_map_data ) ) {
+					$this->_map_data = array();
+					$this->_dirty = true;
+				}
 			}
 		}
 

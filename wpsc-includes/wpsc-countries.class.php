@@ -93,9 +93,7 @@ class WPSC_Countries {
 			if ( is_numeric( $country_id_or_isocode ) ) {
 				$country_id = intval( $country_id_or_isocode );
 			} elseif ( is_string( $country_id_or_isocode ) ) {
-				if ( isset( self::$country_iso_code_map[$country_id_or_isocode] ) ) {
-					$country_id = self::$country_iso_code_map[$country_id_or_isocode];
-				}
+				$country_id = self::$country_iso_code_map->value( $country_id_or_isocode );
 			} else {
 				_wpsc_doing_it_wrong( 'WPSC_Countries::country_id', __( 'Function "country_id" requires an integer country code or a string ISO code ', 'wpsc' ), '3.8.14' );
 			}
@@ -558,9 +556,8 @@ class WPSC_Countries {
 			return 0;
 		}
 
-		if ( isset( self::$region_id_to_country_id_map[$region_id] ) ) {
-			return self::$region_id_to_country_id_map[$region_id];
-		}
+		return self::$region_id_to_country_id_map->value( $region_id );
+
 	}
 
 	/**
@@ -640,7 +637,7 @@ class WPSC_Countries {
 	 *
 	 * @var array
 	 */
-	private static $country_iso_code_map = array();
+	private static $country_iso_code_map = null;
 
 	/**
 	 * An array that maps from country code to country id
@@ -651,7 +648,7 @@ class WPSC_Countries {
 	 *
 	 * @var array
 	*/
-	private static $country_code_map = array();
+	private static $country_code_map = null;
 
 	/**
 	 * map of unique region id to WPSC_Region objects held within WPSC_Country objects
@@ -662,12 +659,19 @@ class WPSC_Countries {
 	 *
 	 * @var array
 	 */
-	private static $region_id_to_country_id_map = array();
+	private static $region_id_to_country_id_map = null;
+	private static $region_id_to_region_code_map = null;
 
-	private static $iso_map = null;
-	private static $code_map = null;
-	private static $region_map = null;
-
+	/**
+	 * Have we initialized this global class?
+	 *
+	 * @access private
+	 * @static
+	 * @since 3.8.14
+	 *
+	 * @var array
+	 */
+	private static $_initialized = false;
 
 	/**
 	 * Constructor of an WPSC_countries instance. Cannot be called publicly
@@ -679,15 +683,20 @@ class WPSC_Countries {
 	 */
 	public function __construct() {
 
-		self::$iso_map = new WPSC_Data_Map( 'iso' );
-		self::$code_map = new WPSC_Data_Map( 'code' );
-		self::$region_map = new WPSC_Data_Map( 'region' );
+		//self::$iso_map = new WPSC_Data_Map( 'iso' );
+		//self::$code_map = new WPSC_Data_Map( 'code' );
 
 		if ( self::$countries == null ) {
 			self::restore_myself();
+			self::$region_id_to_region_code_map = new WPSC_Data_Map( 'region_id_to_region_code' );
+			self::$country_iso_code_map         = new WPSC_Data_Map( 'country_iso_code_map' );
+			self::$country_names                = new WPSC_Data_Map( 'country_names' );
+			self::$country_code_map             = new WPSC_Data_Map( '$country_code_map' );
+			self::$region_id_to_country_id_map  = new WPSC_Data_Map( 'region-to-country-id', array( __CLASS__, 'create_region_id_region_object_map' ) );
 		}
 
 		if ( self::$countries == null ) {
+
 			global $wpdb;
 
 			// now countries is a list with the key being the integer country id, the value is the country data
@@ -714,9 +723,9 @@ class WPSC_Countries {
 			self::$currencies = $wpdb->get_results( $sql, OBJECT_K );
 
 			self::save_myself();
-
-			self::create_region_id_region_object_map();
 		}
+
+		self::$_initialized = true;
 	}
 
 	private static function _convert_country_arrays_to_objects( $countries_array ) {
@@ -735,9 +744,9 @@ class WPSC_Countries {
 				$country->tax = floatval( self::$countries[$country_id]->tax );
 			}
 
-			self::$country_iso_code_map[$country->isocode] = intval( $country->id );
-			self::$country_names[$country->country] = intval( $country->id );
-			self::$country_code_map[$country->code] = intval( $country->id );
+			self::$country_iso_code_map->map( $country->isocode, $country->id );
+			self::$country_names->map( $country->country, $country->id );
+			self::$country_code_map->map( $country->code, $country->id );
 
 			if ( $country->has_regions ) {
 				$sql = 'SELECT code, country_id, name, tax, id FROM `' . WPSC_TABLE_REGION_TAX . '` '
@@ -811,6 +820,9 @@ class WPSC_Countries {
 		self::$country_names        = array();
 		self::$currencies           = array();
 
+		self::$_initialized 		= false;
+
+
 	}
 
 	/**
@@ -818,13 +830,13 @@ class WPSC_Countries {
 	 *
 	 * @access private
 	 *
-	 * @since 3.8.10
+	 * @since 3.8.14
 	 *
 	 * @return none
 	 */
 	private function save_myself() {
-
 		$mydata = array();
+
 		$mydata['country_iso_code_map']     = self::$country_iso_code_map;
 		$mydata['country_code_map']         = self::$country_code_map;
 		$mydata['country_names']            = self::$country_names;
@@ -865,7 +877,6 @@ class WPSC_Countries {
 					self::$invisible_countries  = $mydata['invisible_countries'];
 					self::$country_names        = $mydata['country_names'];
 					self::$currencies           = $mydata['currencies'];
-
 					$have_data = true;
 			}
 		}
@@ -874,7 +885,7 @@ class WPSC_Countries {
 			self::clear_cache();
 		}
 
-		self::create_region_id_region_object_map();
+		//self::create_region_id_region_object_map();
 
 		return $this;
 	}
@@ -895,30 +906,26 @@ class WPSC_Countries {
 	/**
 	 * Create a master map of region ids to region objects
 	 *
-	 * @access public static
+	 * @access private static
 	 *
 	 * @since 3.8.10
 	 *
 	 * @return none
 	 */
-	private static function create_region_id_region_object_map() {
-		self::$region_id_to_country_id_map = array();
-
-
+	public static function create_region_id_region_object_map( $data_map = null ) {
 		foreach ( self::$countries as $country_id => $country ) {
 			foreach ( $country->regions() as $region_id => $region_code ) {
-				self::$region_id_to_country_id_map[$region_id] = $country_id;
-				self::$region_map->map( $region_id, $country_id );
+				//self::$region_id_to_country_id_map[$region_id] = $country_id;
+				$data_map->map( $region_id, $country_id );
 			}
 		}
 
 		foreach ( self::$invisible_countries as $country_id => $country ) {
 			foreach ( $country->regions() as $region_id => $region_code ) {
-				self::$region_id_to_country_id_map[$region_id] = $country_id;
-				self::$region_map->map( $region_id, $country_id );
+				//self::$region_id_to_country_id_map[$region_id] = $country_id;
+				$data_map->map( $region_id, $country_id );
 			}
 		}
-
 	}
 
 	/**
@@ -931,17 +938,52 @@ class WPSC_Countries {
 	 * @return none
 	 */
 	private static function confirmed_initialization() {
-		if ( self::$countries == null ) {
+		if ( ! self::$_initialized ) {
 			$an_instance = new WPSC_Countries();
 		}
 
-		return (self::$countries != null);
+		return self::$_initialized;
 	}
 }
 
 
+// a little tiny test stub
+if ( true ) {
+	function testit() {
 
-/*
- * WPSC_Country_Id_Map a class to manage the several static maps we have that go from an id to
- * a country code
- */
+		WPSC_Countries:: clear_cache();
+
+
+		$id = WPSC_Countries::country_id_from_region_id( 'MA' );
+
+		$x = WPSC_Countries:: region_count( 'US' );
+		//error_log( 'US static has ' . $x );
+
+		$x = WPSC_Countries:: region_count( '136' );
+		//error_log( '136 static has ' . $x );
+
+		$us = new WPSC_Country( 'US' );
+
+		$ma = new WPSC_Region( 'US' , 'MA' );
+
+		$country = new WPSC_Country(
+				array(
+						'country'   => 'Grand Fenwick',
+						'isocode'   => 'FG',
+						'currency'  => 'Grand Fenwick Dubloon',
+						'code'      => 'GFD',
+						'continent' => 'europe',
+						'visible'   => 1,
+				)
+		);
+		// deprecated function test
+		//$country_list = $country->get_data();
+
+		// should return an array of data
+		//WPSC_Country::get_cache( 136 , 'id' );
+		//error_log( 'testit done' );
+
+	}
+
+	add_action( 'wpsc_setup_customer', 'testit' );
+}
