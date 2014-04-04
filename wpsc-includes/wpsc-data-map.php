@@ -1,18 +1,18 @@
 <?php
 
-
 /**
  * A class that will maintain a map of keys to values, and persist it across page sessions.
  * Users of this class should treat it like a transient, it can vaporize and not be
- * available until reconstructed
+ * available until reconstructed.  The contents of the map can be manually cleared using the
+ * clear method.
+ *
+ * This class has these advantages over using an array in the implementation of business logic:
+ *  - caching is completely transparent you don't need to
  *
  * @access public
  *
  * @since 3.8.14
  *
- * @param a map name to uniquely identify this map so it can be saved and restored
- *
- * @return object WPSC_Country
  */
 class WPSC_Data_Map {
 
@@ -62,7 +62,7 @@ class WPSC_Data_Map {
 	 * @return string  the value from the data map if it is there, otherwise the value of the default parameter, or null
 	 */
 	public function value( $key, $default = null ) {
-		if ( $this->confirm_data_ready() ) {
+		if ( $this->_confirm_data_ready() ) {
 			if ( isset( $this->_map_data[$key] ) ) {
 				$value = $this->_map_data[$key];
 			} else {
@@ -86,10 +86,12 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return string  a map name to uniquely identify this map so it can be saved and restored
+	 * @param string  	$key	the key value for the map
+	 * @param varied	$value 	to store in the map
+	 *
 	 */
 	public function map( $key, $value ) {
-		if ( $this->confirm_data_ready() ) {
+		if ( $this->_confirm_data_ready() ) {
 			if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
 				$this->_map_data[$key] = $value;
 				$this->_dirty = true;
@@ -126,7 +128,7 @@ class WPSC_Data_Map {
 	 *
 	 * @return string  a map name to uniquely identify this map so it can be saved and restored
 	 */
-	private function confirm_data_ready() {
+	private function _confirm_data_ready() {
 		if ( ! is_array( $this->_map_data ) ) {
 			$this->_map_data = get_transient( $this->_map_name );
 			if ( ! is_array( $this->_map_data ) ) {
@@ -145,16 +147,17 @@ class WPSC_Data_Map {
 
 
 	/**
-	 * Private properties for this class
+	 * Private properties for this class, they are declared as public so that objects of this class
+	 * can be serialized, not to provide access to the outside world.
 	 *
 	 * @access private
 	 *
 	 * @since 3.8.14
 	 *
 	 */
-	private $_map_name 		= null;
-	private $_map_callback 	= null;
-	private $_map_data 		= null;
+	public $_map_name 		= null;
+	public $_map_callback 	= null;
+	public $_map_data 		= null;
 	private $_dirty    		= false;
 
 
