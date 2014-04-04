@@ -124,6 +124,7 @@ class WPSC_Region {
 		$this->_name 		= $region->name;
 		$this->_code 		= $region->code;
 		$this->_id 			= $region->id;
+		$this->_tax			= $region->tax;
 	}
 
 	/**
