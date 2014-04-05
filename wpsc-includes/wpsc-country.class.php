@@ -2,7 +2,7 @@
 
 
 /**
- * a geographic nation
+ * a country
  *
  * @access public
  *
@@ -64,9 +64,13 @@ class WPSC_Country {
 			}
 		}
 
-		// if the regions map has not been initialized we should create an empty map now
+		// if the regions maps has not been initialized we should create an empty map now
 		if ( empty( $this->_regions ) ) {
 			$this->_regions = new WPSC_Data_Map();
+		}
+
+		if ( empty( $this->_region_id_from_region_code ) ){
+			$this->_region_id_from_region_code = new WPSC_Data_Map();
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -363,8 +367,7 @@ class WPSC_Country {
 		$region_id = false;
 
 		if ( $region_code ) {
-			$wpsc_region = $this->_regions->value( $region_code );
-			$region_id = $wpsc_region->id();
+			$region_id = $this->_region_id_from_region_code->value( $region_code );
 		}
 
 		return $region_id;
@@ -436,10 +439,8 @@ class WPSC_Country {
 		return $result;
 	}
 
-
-
 	/**
-	 * saves country data to the databse
+	 * saves country data to the database
 	 *
 	 * @access public
 	 *
