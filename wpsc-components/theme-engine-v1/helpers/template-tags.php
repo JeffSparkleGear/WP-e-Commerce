@@ -527,12 +527,14 @@ function wpsc_show_stock_availability(){
  * @return string - the product image URL, or the URL of the resized version
  */
 function wpsc_product_image( $attachment_id = 0, $width = null, $height = null ) {
+
 	// Do some dancing around the image size
-	if ( ( ( $width >= 10 ) && ( $height >= 10 ) ) && ( ( $width <= 1024 ) && ( $height <= 1024 ) ) )
+	if ( ( ( $width >= 10 ) && ( $height >= 10 ) ) && ( ( $width <= 1024 ) && ( $height <= 1024 ) ) ) {
 		$intermediate_size = "wpsc-{$width}x{$height}";
+	}
 
 	// Get image url if we have enough info
-	if ( ( $attachment_id > 0 ) && ( !empty( $intermediate_size ) ) ) {
+	if ( $attachment_id > 0 && ! empty( $intermediate_size ) ) {
 
 		// Get all the required information about the attachment
 		$uploads    = wp_upload_dir();
@@ -540,49 +542,58 @@ function wpsc_product_image( $attachment_id = 0, $width = null, $height = null )
 		$file_path  = get_attached_file( $attachment_id );
 
 		// Clean up the meta array
-		foreach ( $image_meta as $meta_name => $meta_value )
-			$image_meta[$meta_name] = maybe_unserialize( array_pop( $meta_value ) );
+		foreach ( $image_meta as $meta_name => $meta_value ) {
+			$image_meta[ $meta_name ] = maybe_unserialize( array_pop( $meta_value ) );
+		}
 
-
-		$attachment_metadata = $image_meta['_wp_attachment_metadata'];
+		$attachment_metadata = isset( $image_meta['_wp_attachment_metadata'] ) ? $image_meta['_wp_attachment_metadata'] : null;
+		
 		// Determine if we already have an image of this size
-		if ( isset( $attachment_metadata['sizes'] ) && (count( $attachment_metadata['sizes'] ) > 0) && ( isset( $attachment_metadata['sizes'][$intermediate_size] ) ) ) {
+		if ( isset( $attachment_metadata['sizes'] ) && count( $attachment_metadata['sizes'] ) && ( isset( $attachment_metadata['sizes'][ $intermediate_size ] ) ) ) {
 			$intermediate_image_data = image_get_intermediate_size( $attachment_id, $intermediate_size );
-			$image_url = $intermediate_image_data['url'];
+			$image_url               = $intermediate_image_data['url'];
 		} else {
 			$image_url = home_url( "index.php?wpsc_action=scale_image&attachment_id={$attachment_id}&width=$width&height=$height" );
 		}
 	// Not enough info so attempt to fallback
 	} else {
 
-		if ( !empty( $attachment_id ) ) {
+		if ( ! empty( $attachment_id ) ) {
 			$image_url = home_url( "index.php?wpsc_action=scale_image&attachment_id={$attachment_id}&width=$width&height=$height" );
 		} else {
 			$image_url = false;
 		}
 
 	}
-	if(empty($image_url) && !empty($file_path)){
+
+	if ( empty( $image_url ) && ! empty( $file_path ) ) {
+
 		$image_meta = get_post_meta( $attachment_id, '_wp_attached_file' );
-		if ( ! empty( $image_meta ) )
-			$image_url = $uploads['baseurl'].'/'.$image_meta[0];
+
+		if ( ! empty( $image_meta ) ) {
+			$image_url = $uploads['baseurl'] . '/' . $image_meta[0];
+		}
 	}
 
-	if ( $image_url ) {
-		$image_url = set_url_scheme( $image_url );
-	}
-
-	return apply_filters( 'wpsc_product_image', $image_url );
+	/**
+	 * The filter here and in wpsc_the_product_image() were unfortunately named, as were the functions.
+	 * They do very different things but are named as if they do not.  The onus will be on the
+	 * plugin developer to check if the second parameter is an attachment ID or a product ID.
+	 * 
+	 * @since 3.8
+	 */
+	return apply_filters( 'wpsc_product_image', set_url_scheme( $image_url ), $attachment_id );
 }
 
 function wpsc_product_no_image_fallback( $image_url = '' ) {
-	if ( !empty( $image_url ) )
+	if ( ! empty( $image_url ) ) {
 		return $image_url;
-	else
+	} else {
 		return apply_filters( 'wpsc_product_noimage', WPSC_CORE_THEME_URL . 'wpsc-images/noimage.png' );
+	}
 }
-add_filter( 'wpsc_product_image', 'wpsc_product_no_image_fallback' );
 
+add_filter( 'wpsc_product_image', 'wpsc_product_no_image_fallback' );
 
 /**
  * wpsc show pnp function
