@@ -39,15 +39,16 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param string  		$saved_map_unique_name 		a map name to uniquely identify this map so it can be saved and restored
+	 * @param string|null  $saved_map_unique_name		an optional map name to uniquely identify this map so it can be saved and restored
 	 * 													if empty the map will not be save
-	 * @param string|array  a callback function to re-generate the map if it can't be reloaded when it is needed
+	 *
+	 * @param string|null  $create_map_callback        	a optional callback function to re-generate the map if it can't be reloaded
 	 *
 	 */
 	public function __construct( $saved_map_unique_name = '', $create_map_callback = null ) {
 
 		$this->_map_name 		= $saved_map_unique_name;
-		$this->_map_callback 	= $map_callback;
+		$this->_map_callback 	= $create_map_callback;
 
 		// if our map is names it means we want to save the map for use some time in the future
 		if ( ! empty( $this->_map_name ) ) {
