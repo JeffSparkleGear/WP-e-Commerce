@@ -38,6 +38,44 @@ class WPSC_Data_Map {
 		}
 	}
 
+
+
+	/**
+	 * Count of items in the map
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return int
+	 */
+	public function data() {
+		if ( is_array( $this->_map_data ) ) {
+			return array_values( $this->_map_data );
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Count of items in the map
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return int
+	 */
+	public function count() {
+		$count = 0;
+
+		if ( is_array( $this->_map_data ) ) {
+			$count = count( $this->_map_data );
+		}
+
+		return $count;
+	}
+
 	/**
 	 * Clear the cached map
 	 *
@@ -52,8 +90,7 @@ class WPSC_Data_Map {
 			delete_transient( $this->_map_name );
 		}
 
-		$this_map_data = null;
-
+		$this->_map_data = null;
 	}
 
 	/**
@@ -178,6 +215,10 @@ class WPSC_Data_Map {
 
 		return (  is_array( $this->_map_data ) );
 
+	}
+
+	public function dirty() {
+		return $this->_dirty;
 	}
 
 

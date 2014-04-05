@@ -366,6 +366,37 @@ class WPSC_Country {
 	}
 
 	/**
+	 * return country as an array
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return array
+	 */
+	public function as_array() {
+
+		$result = array(
+			'id' 				   => $this->_id,
+			'country' 			   => $this->_name,
+			'name' 				   => $this->_name, 			// backwards compatibility pre 3.8.14
+			'isocode' 			   => $this->_isocode,
+			'currency_name' 	   => $this->_currency_name,
+			'currency_symbol' 	   => $this->_currency_symbol,
+			'currency_symbol_html' => $this->_currency_symbol_html,
+			'currency_code' 	   => $this->_currency_code,
+			'has_regions' 		   => $this->_has_regions,
+			'tax' 				   => $this->_tax,
+			'continent'            => $this->_continent,
+			'visible'              => $this->_visible,
+			);
+
+		return $result;
+	}
+
+
+
+	/**
 	 * saves country data to the databse
 	 *
 	 * @access public
