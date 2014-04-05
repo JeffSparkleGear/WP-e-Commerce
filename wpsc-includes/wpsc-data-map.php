@@ -38,6 +38,44 @@ class WPSC_Data_Map {
 		}
 	}
 
+
+
+	/**
+	 * Count of items in the map
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return int
+	 */
+	public function data() {
+		if ( is_array( $this->_map_data ) ) {
+			return array_values( $this->_map_data );
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Count of items in the map
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return int
+	 */
+	public function count() {
+		$count = 0;
+
+		if ( is_array( $this->_map_data ) ) {
+			$count = count( $this->_map_data );
+		}
+
+		return $count;
+	}
+
 	/**
 	 * Clear the cached map
 	 *
@@ -52,8 +90,7 @@ class WPSC_Data_Map {
 			delete_transient( $this->_map_name );
 		}
 
-		$this_map_data = null;
-
+		$this->_map_data = null;
 	}
 
 	/**
@@ -96,17 +133,29 @@ class WPSC_Data_Map {
 	 * @param string  	$key	the key value for the map
 	 * @param varied	$value 	to store in the map
 	 *
+	 * @return boolean true if the map data has been modified byt this or previous operations, false otherwise
 	 */
-	public function map( $key, $value ) {
+	public function map( $key_or_array_of_key_values, $value = null ) {
+
 		if ( $this->_confirm_data_ready() ) {
-			if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
-				$this->_map_data[$key] = $value;
-				$this->_dirty = true;
+			// if we got a single value add it to the map
+			if ( ! is_array( $key_or_array_of_key_values ) ) {
+				$key = $key_or_array_of_key_values;
+				if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
+					$this->_map_data[$key] = $value;
+					$this->_dirty = true;
+				}
+			} else {
+				// add map entry for each element
+				foreach ( $key_or_array_of_key_values as $key => $value ) {
+					$this->map( $key, $value );
+				}
 			}
 		}
 
-		return false;
+		return $this->_dirty;
 	}
+
 
 	/**
 	 * Save the map- if this map has been given a name it means we will save it as a transient when
@@ -178,6 +227,10 @@ class WPSC_Data_Map {
 
 		return (  is_array( $this->_map_data ) );
 
+	}
+
+	public function dirty() {
+		return $this->_dirty;
 	}
 
 

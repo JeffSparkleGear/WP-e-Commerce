@@ -15,6 +15,20 @@
 class WPSC_Country {
 
 	/**
+	 * A country's public properties
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 */
+
+	/*****
+	 * No public properties, so you can stop looking for them now :)
+	 * Access information about the country through the methods provided.
+	 *****/
+
+	/**
 	 * a geographic nation constructor
 	 *
 	 * @access public
@@ -48,6 +62,11 @@ class WPSC_Country {
 					$this->$property = $value;
 				}
 			}
+		}
+
+		// if the regions map has not been initialized we should create an empty map now
+		if ( empty( $this->_regions ) ) {
+			$this->_regions = new WPSC_Data_Map();
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +196,23 @@ class WPSC_Country {
 	}
 
 	/**
+	 * does the nation use a region list
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @param
+	 *
+	 * @return boolean	true if we have a region lsit for the nation, false otherwise
+	 */
+	public function has_region( $region_id_or_code ) {
+		$region = $this->region( $region_id_or_code );
+		return $region != false;
+	}
+
+
+	/**
 	 *  get nation's (country's) tax rate
 	 *
 	 * @access public
@@ -232,9 +268,11 @@ class WPSC_Country {
 
 		$region = false;
 
-		if ( $this->_id ) {
-			if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
-				$region = new WPSC_Region( $this->_id, $region_id_or_code );
+		if ( $region_id_or_code ) {
+			if ( $this->_id ) {
+				if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
+					$region = $this->_regions->value( $region_id );
+				}
 			}
 		}
 
@@ -268,7 +306,7 @@ class WPSC_Country {
 	 * @return array of WPSC_Region
 	 */
 	public function regions() {
-		return $this->_regions;
+		return $this->_regions->data();
 	}
 
 	/**
@@ -324,17 +362,19 @@ class WPSC_Country {
 	public function region_id_from_region_code( $region_code ) {
 		$region_id = false;
 
-		if ( isset( $this->_regions[$region_code] ) ) {
-			$region_id = $this->_regions[$region_code]->id();
+		if ( $region_code ) {
+			$wpsc_region = $this->_regions->value( $region_code );
+			$region_id = $wpsc_region->id();
 		}
 
 		return $region_id;
 	}
 
 	/**
-	 * description
+	 * Copy the country properties from a stdClass object to this class object.  Needed when retrieving
+	 * objects from the database, but could be useful elsewhere in WPeC?
 	 *
-	 * @access public
+	 * @access static but private to WPeC
 	 *
 	 * @since 3.8.14
 	 *
@@ -348,13 +388,15 @@ class WPSC_Country {
 		$this->_name 							= $country->country;
 		$this->_isocode 						= $country->isocode;
 		$this->_currency_name					= $country->currency;
-		$this->_currency_symbol 				= $country->symbol;
-		$this->_currency_symbol_html			= $country->symbol_html;
-		$this->_currency_code					= $country->code;
 		$this->_has_regions 					= $country->has_regions;
 		$this->_tax 							= $country->tax;
 		$this->_continent 						= $country->continent;
 		$this->_visible 						= $country->visible;
+
+		// TODO: perhaps the currency information embedded in a country should reference a WPSC_Currency object by code?
+		$this->_currency_symbol 				= $country->symbol;
+		$this->_currency_symbol_html			= $country->symbol_html;
+		$this->_currency_code					= $country->code;
 
 		if ( property_exists( $country, 'region_id_to_region_code_map' ) ) {
 			$this->_region_id_to_region_code_map 	= $country->region_id_to_region_code_map;
@@ -364,6 +406,37 @@ class WPSC_Country {
 			$this->_regions 						= $country->regions;
 		}
 	}
+
+	/**
+	 * return country as an array
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return array
+	 */
+	public function as_array() {
+
+		$result = array(
+			'id' 				   => $this->_id,
+			'country' 			   => $this->_name,
+			'name' 				   => $this->_name, 			// backwards compatibility pre 3.8.14
+			'isocode' 			   => $this->_isocode,
+			'currency_name' 	   => $this->_currency_name,
+			'currency_symbol' 	   => $this->_currency_symbol,
+			'currency_symbol_html' => $this->_currency_symbol_html,
+			'currency_code' 	   => $this->_currency_code,
+			'has_regions' 		   => $this->_has_regions,
+			'tax' 				   => $this->_tax,
+			'continent'            => $this->_continent,
+			'visible'              => $this->_visible,
+			);
+
+		return $result;
+	}
+
+
 
 	/**
 	 * saves country data to the databse
@@ -428,7 +501,7 @@ class WPSC_Country {
 	}
 
 	/**
-	 * A country's properties, these are private to this class (notice the prefix '_'!).  They are marked as public so that
+	 * A country's private properties, these are private to this class (notice the prefix '_'!).  They are marked as public so that
 	 * object serialization will work properly
 	 *
 	 * @access public
@@ -450,8 +523,8 @@ class WPSC_Country {
 	public $_tax 							= '';
 	public $_continent 					= '';
 	public $_visible 						= true;
-	public $_regions 						= array();
-	public $_region_id_to_region_code_map 	= array();
+	public $_region_id_from_region_code 	= null;
+	public $_regions 	                    = null;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// As a result of merging the legacy WPSC_Country class we no longer need several of the public class
