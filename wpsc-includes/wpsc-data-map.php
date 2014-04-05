@@ -133,17 +133,29 @@ class WPSC_Data_Map {
 	 * @param string  	$key	the key value for the map
 	 * @param varied	$value 	to store in the map
 	 *
+	 * @return boolean true if the map data has been modified byt this or previous operations, false otherwise
 	 */
-	public function map( $key, $value ) {
+	public function map( $key_or_array_of_key_values, $value = null ) {
+
 		if ( $this->_confirm_data_ready() ) {
-			if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
-				$this->_map_data[$key] = $value;
-				$this->_dirty = true;
+			// if we got a single value add it to the map
+			if ( ! is_array( $key_or_array_of_key_values ) ) {
+				$key = $key_or_array_of_key_values;
+				if ( ! (isset( $this->_map_data[$key] )  && ( $this->_map_data[$key] == $value ) ) ) {
+					$this->_map_data[$key] = $value;
+					$this->_dirty = true;
+				}
+			} else {
+				// add map entry for each element
+				foreach ( $key_or_array_of_key_values as $key => $value ) {
+					$this->map( $key, $value );
+				}
 			}
 		}
 
-		return false;
+		return $this->_dirty;
 	}
+
 
 	/**
 	 * Save the map- if this map has been given a name it means we will save it as a transient when
