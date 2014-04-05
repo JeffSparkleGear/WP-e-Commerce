@@ -1,7 +1,6 @@
 <?php
 
 /**
- * WPSC_Data_Map
  * A class that will maintain a map of keys to values, and persist it across page sessions.
  * Users of this class should treat it like a transient, it can vaporize and not be
  * available until reconstructed.  The contents of the map can be manually cleared using the
@@ -10,26 +9,11 @@
  * This class has these advantages over using an array in the implementation of business logic:
  *  - caching is completely transparent you don't need to
  *
- *  - can return a value from a list of values based on a unique identifier
- *
- *  - will retain its list of values throughout a transactions execution without having
- *    to go back to a database
- *
- *  - is smart enough restore its list of values from a cached copy of itself only if it
- *    is necessary, and without a client needing to initiate the save
- *
- *  - can automatically save itself when appropriate, and without a client object needing
- *    to initiate the save operation
- *
- *  - will automatically recreate itself should it be the case that  the cached copy its
- *    data was no longer available
- *
  * @access public
  *
  * @since 3.8.14
  *
  */
-
 class WPSC_Data_Map {
 
 	/**
@@ -39,16 +23,14 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param string|null  $saved_map_unique_name		an optional map name to uniquely identify this map so it can be saved and restored
-	 * 													if empty the map will not be save
-	 *
-	 * @param string|null  $create_map_callback        	a optional callback function to re-generate the map if it can't be reloaded
+	 * @param string  		a map name to uniquely identify this map so it can be saved and restored
+	 * @param string|array  a callback function to re-generate the map if it can't be reloaded when it is neaded
 	 *
 	 */
-	public function __construct( $saved_map_unique_name = '', $create_map_callback = null ) {
+	public function __construct( $map_name = '', $map_callback = null ) {
 
-		$this->_map_name 		= $saved_map_unique_name;
-		$this->_map_callback 	= $create_map_callback;
+		$this->_map_name 		= $map_name;
+		$this->_map_callback 	= $map_callback;
 
 		// if our map is names it means we want to save the map for use some time in the future
 		if ( ! empty( $this->_map_name ) ) {
@@ -56,35 +38,20 @@ class WPSC_Data_Map {
 		}
 	}
 
+
+
 	/**
-	 * get an array filled with all of the items in the map
+	 * Count of items in the map
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return array
+	 * @return int
 	 */
 	public function data() {
 		if ( is_array( $this->_map_data ) ) {
 			return array_values( $this->_map_data );
-		} else {
-			return array();
-		}
-	}
-
-	/**
-	 * get an array filled with all of the keys in the map
-	 *
-	 * @access public
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return array
-	 */
-	public function keys() {
-		if ( is_array( $this->_map_data ) ) {
-			return array_keys( $this->_map_data );
 		} else {
 			return array();
 		}
@@ -116,7 +83,7 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return self reference to support method chaining
+	 * @return string  a map name to uniquely identify this map so it can be saved and restored
 	 */
 	public function clear() {
 		if ( ! empty( $this->_map_name ) ) {
@@ -124,8 +91,6 @@ class WPSC_Data_Map {
 		}
 
 		$this->_map_data = null;
-
-		return $this;
 	}
 
 	/**
@@ -165,10 +130,10 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param string  	$key_or_array_of_key_values		the key value for the map, or an array of key value pairs
-	 * @param varied	$value 							to store in the map, ignored if first parameter is an array
+	 * @param string  	$key	the key value for the map
+	 * @param varied	$value 	to store in the map
 	 *
-	 * @return self reference to support method chaining
+	 * @return boolean true if the map data has been modified byt this or previous operations, false otherwise
 	 */
 	public function map( $key_or_array_of_key_values, $value = null ) {
 
@@ -188,7 +153,7 @@ class WPSC_Data_Map {
 			}
 		}
 
-		return $this;
+		return $this->_dirty;
 	}
 
 
@@ -200,7 +165,7 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return self reference to support method chaining
+	 * @return string  a map name to uniquely identify this map so it can be saved and restored
 	 */
 	public function _save_map() {
 		if ( $this->_dirty ) {
@@ -221,7 +186,6 @@ class WPSC_Data_Map {
 			$this->_dirty = false;
 		}
 
-		return $this;
 	}
 
 	/**
@@ -231,7 +195,7 @@ class WPSC_Data_Map {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @return boolean   true if the map is ready and has leaded any saved data from the transient store
+	 * @return string  a map name to uniquely identify this map so it can be saved and restored
 	 */
 	private function _confirm_data_ready() {
 		if ( ! is_array( $this->_map_data ) ) {
@@ -265,23 +229,14 @@ class WPSC_Data_Map {
 
 	}
 
-	/**
-	 * is the data in the map dirty and in need of saving?
-	 *
-	 * @access private
-	 *
-	 * @since 3.8.14
-	 *
-	 * @return boolean  true if dirty, false if no modifications have been made
-	 *
-	 */
 	public function dirty() {
 		return $this->_dirty;
 	}
 
+
 	/**
-	 * Private properties for this class, some are declared as public so that objects of this class
-	 * can be easily serialized, not to provide access to the outside world.
+	 * Private properties for this class, they are declared as public so that objects of this class
+	 * can be serialized, not to provide access to the outside world.
 	 *
 	 * @access private
 	 *
