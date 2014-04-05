@@ -27,10 +27,15 @@ class WPSC_Data_Map {
 	 * @param string|array  a callback function to re-generate the map if it can't be reloaded when it is neaded
 	 *
 	 */
-	public function __construct( $map_name, $map_callback = null ) {
+	public function __construct( $map_name = '', $map_callback = null ) {
+
 		$this->_map_name 		= $map_name;
 		$this->_map_callback 	= $map_callback;
-		add_action( 'shutdown', array( &$this, '_save_map' ) );
+
+		// if our map is names it means we want to save the map for use some time in the future
+		if ( ! empty( $this->_map_name ) ) {
+			add_action( 'shutdown', array( &$this, '_save_map' ) );
+		}
 	}
 
 	/**
@@ -45,8 +50,10 @@ class WPSC_Data_Map {
 	public function clear() {
 		if ( ! empty( $this->_map_name ) ) {
 			delete_transient( $this->_map_name );
-			$this_map_data = null;
 		}
+
+		$this_map_data = null;
+
 	}
 
 	/**
@@ -102,7 +109,8 @@ class WPSC_Data_Map {
 	}
 
 	/**
-	 * Save the map
+	 * Save the map- if this map has been given a name it means we will save it as a transient when
+	 *               requested or when we shutdown
 	 *
 	 * @access private
 	 *
@@ -112,8 +120,20 @@ class WPSC_Data_Map {
 	 */
 	public function _save_map() {
 		if ( $this->_dirty ) {
+
+			// we sort the data before storing it, just to be neat
 			ksort( $this->_map_data );
-			set_transient( $this->_map_name, $this->_map_data, WEEK_IN_SECONDS );
+
+			// if the map is named we will save it for next time, unless it is empty, we give an
+			// expiration so that transient storage mechanisms can destroy the map if space is needed
+			if ( ! empty ( $this->_map_name ) ) {
+				if ( ! empty( $this->_map_data ) ) {
+					set_transient( $this->_map_name, $this->_map_data, 13 * WEEK_IN_SECONDS );
+				} else {
+					delete_transient( $this->_map_name );
+				}
+			}
+
 			$this->_dirty = false;
 		}
 
@@ -130,8 +150,15 @@ class WPSC_Data_Map {
 	 */
 	private function _confirm_data_ready() {
 		if ( ! is_array( $this->_map_data ) ) {
-			$this->_map_data = get_transient( $this->_map_name );
-			if ( ! is_array( $this->_map_data ) ) {
+
+			// if this is a named map we can try to restore it from the transient store
+			if ( ! empty ( $this->_map_name ) ) {
+				$this->_map_data = get_transient( $this->_map_name );
+			}
+
+			// if we still don't have a valid map and there is a constructor callback use it
+			if ( ! is_array( $this->_map_data ) && ! empty( $this->_map_callback ) && is_callable( $this->_map_callback ) ) {
+
 				$this->_map_data = array();
 				call_user_func( $this->_map_callback , $this );
 				if ( ! is_array( $this->_map_data ) ) {
@@ -139,6 +166,14 @@ class WPSC_Data_Map {
 					$this->_dirty = true;
 				}
 			}
+
+			// if we still don't have valid map data create an empty array
+			if ( ! is_array( $this->_map_data ) ) {
+				$this->_map_data = array();
+			}
+
+			// we have not soiled our data, note that
+			$this->_dirty = false;
 		}
 
 		return (  is_array( $this->_map_data ) );
@@ -159,6 +194,4 @@ class WPSC_Data_Map {
 	public $_map_callback 	= null;
 	public $_map_data 		= null;
 	private $_dirty    		= false;
-
-
 }
