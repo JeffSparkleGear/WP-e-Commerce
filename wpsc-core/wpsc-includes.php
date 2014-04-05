@@ -5,6 +5,7 @@ if ( defined( 'WPEC_LOAD_DEPRECATED' ) )
 
 // Start including the rest of the plugin here
 require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-meta-util.php'                  );
+require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-deprecated-meta.php'            );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/customer.php'                        );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-meta-customer.php'              );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-meta-visitor.php'               );
@@ -16,6 +17,7 @@ require_once( WPSC_FILE_PATH . '/wpsc-includes/ajax.functions.php'              
 require_once( WPSC_FILE_PATH . '/wpsc-includes/misc.functions.php'                  );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/mimetype.php'                        );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/claimed-stock.class.php'             );
+require_once( WPSC_FILE_PATH . '/wpsc-includes/cart-template-api.php'               );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/cart.class.php'                      );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/cart-item.class.php'                 );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/checkout.class.php'                  );
