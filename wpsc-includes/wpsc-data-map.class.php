@@ -229,10 +229,31 @@ class WPSC_Data_Map {
 
 	}
 
+	/**
+	 * is the data map dirty
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return boolean 	true if the data in the map has been modified, false otherwise
+	 */
 	public function dirty() {
 		return $this->_dirty;
 	}
 
+	/**
+	 * clear the dirty flag
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return boolean 	true if the data in the map has been modified, false otherwise
+	 */
+	public function clear_dirty() {
+		return $this->_dirty = false;
+	}
 
 	/**
 	 * Private properties for this class, they are declared as public so that objects of this class

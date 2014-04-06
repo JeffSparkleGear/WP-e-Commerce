@@ -46,7 +46,7 @@ class WPSC_Country {
 				// if we get an array as an argument we are making a new country
 				$country_id_or_isocode = $this->_save_country_data( $country_id_or_isocode_or_new_country_data );
 			}  else {
-				// we are constructing a country using a numeric id or iso code
+				// we are constructing a country using a numeric id or ISO code
 				$country_id_or_isocode = $country_id_or_isocode_or_new_country_data;
 			}
 
