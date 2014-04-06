@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * a country
  *
@@ -8,9 +6,6 @@
  *
  * @since 3.8.14
  *
- * @param int|string 	required	the nation (country) identifier, can be the string iso code, or the numeric wpec country id
- *
- * @return object WPSC_Country
  */
 class WPSC_Country {
 
@@ -26,17 +21,19 @@ class WPSC_Country {
 	/*****
 	 * No public properties, so you can stop looking for them now :)
 	 * Access information about the country through the methods provided.
+	 *
+	 * If your code desires to use the individual properties get all of the properties using the as_array()
+	 * method, maybe even 'explode' it to get individual variables each with the property value
 	 *****/
 
 	/**
-	 * a geographic nation constructor
+	 * a country's constructor
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param int|string|array 	required 	the country identifier, can be the string iso code,
-	 * 										or the numeric wpec country id,
+	 * @param int|string|array 	required 	the country identifier, can be the string ISO code or the integer country id,
 	 * 										or an array of data used to create a new country
 	 *
 	 * @return object WPSC_Country
@@ -141,7 +138,7 @@ class WPSC_Country {
 	 *
 	 * @return WPSC_Currency 		country's currency
 	 */
-	public function currency_name() {
+	public function currency() {
 		return new WPSC_Currency( $this->_currency_name );
 	}
 
@@ -228,7 +225,6 @@ class WPSC_Country {
 		return $region != false;
 	}
 
-
 	/**
 	 *  get nation's (country's) tax rate
 	 *
@@ -271,15 +267,15 @@ class WPSC_Country {
 	}
 
 	/**
-	 * get a region that is in a country
+	 * get a region that is in this country
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
+	 * @param int|string			required	the region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return WPSC_Region|boolean The region, or false if the region code is not valid for the counry
+	 * @return WPSC_Region|false 				The region, or false if the region code is not valid for the country
 	 */
 	public function region( $region_id_or_code ) {
 
@@ -339,7 +335,7 @@ class WPSC_Country {
 	 */
 	public function regions_array() {
 
-		$regions = $this-> regions();
+		$regions = $this->regions();
 		$json  = json_encode( $regions );
 		$regions = json_decode( $json, true );
 
@@ -437,7 +433,7 @@ class WPSC_Country {
 		$result = array(
 			'id' 				   => $this->_id,
 			'country' 			   => $this->_name,
-			'name' 				   => $this->_name, 			// backwards compatibility pre 3.8.14
+			'name' 				   => $this->_name, 			// backwards compatibility to before 3.8.14
 			'isocode' 			   => $this->_isocode,
 			'currency_name' 	   => $this->_currency_name,
 			'currency_symbol' 	   => $this->_currency_symbol,
@@ -484,6 +480,7 @@ class WPSC_Country {
 			return false;
 		}
 
+		// check the database to find the country id
 		$sql = $wpdb->prepare(
 				'SELECT id FROM ' . WPSC_TABLE_CURRENCY_LIST . ' WHERE (`id` = %d ) OR ( `code` = %s ) OR ( `isocode` = %s ) ',
 				$country_id,
@@ -493,6 +490,16 @@ class WPSC_Country {
 
 		$country_id_from_db = $wpdb->get_var( $sql );
 
+		// do a little data clean up prior to inserting into the database
+		if ( isset( $country_data['has_regions'] ) ) {
+			$country_data['has_regions'] = $country_data['has_regions'] ? 1:0;
+		}
+
+		if ( isset( $country_data['visible'] ) ) {
+			$country_data['visible'] = $country_data['visible'] ? 1:0;
+		}
+
+		// insrt or update the information
 		if ( empty( $country_id_from_db ) ) {
 			// we are doing an insert of a new country
 			$result = $wpdb->insert( WPSC_TABLE_CURRENCY_LIST, $country_data );
