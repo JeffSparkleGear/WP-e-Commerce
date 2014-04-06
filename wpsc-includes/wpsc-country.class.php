@@ -275,12 +275,12 @@ class WPSC_Country {
 		if ( $region_id_or_code ) {
 			if ( $this->_id ) {
 				if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
-					$region = $this->_regions->value( $region_id );
+					$wpsc_region = $this->_regions->value( $region_id );
 				}
 			}
 		}
 
-		return $region;
+		return $wpsc_region;
 	}
 
 	/**
@@ -295,7 +295,7 @@ class WPSC_Country {
 	 * @return WPSC_Region
 	 */
 	public function region_count() {
-		return count( $this->_regions );
+		return $this->_regions->count();
 	}
 
 	/**

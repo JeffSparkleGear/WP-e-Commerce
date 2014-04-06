@@ -1,11 +1,27 @@
 <?php
-
 /*
- * This WPeC geography module provides
+ * WPSC_Countries
  *
- * The WPSC_Countries is a WPeC class used to provide easy access to country, region
+ * Before your read to much farther , if you want to do things with countries, regions or currencies
+ * you want to take a look at these classes:
+ *
+ *     WPSC_Countires  - found in file wpsc-countries.class.php
+ *     WPSC_Regions - found in file wpsc-regions.class.php
+ *     WPSC_Currency - found in file wpsc-currency.class.php
+ *
+ *
+ * About WPSC_Countries:
+ * WPSC_Countries is a WPeC class used to provide easy access to country, region
  * and currency information for all of WPeC an any extensions. Because this data is
  * accessed a lot throughout WPeC it is designed to be quick and avoid accessing the database.
+ *
+ * This class is largely procedural, and has many static methods that let the caller get access
+ * to country/region/currency data
+ *
+ * HOWEVER, the primary purpose of the is class is to centralize the access to country/region/currency data,
+ * act as a service provider for access of the data, act as a central place to keep the data set to avoid
+ * replicating it many times during execution of the code, and in the end make it very fast and efficient to
+ * work with country/region/currency data.
  *
  * How does it work?
  *  This class uses the static currency and region information distributed with WPeC to create an
@@ -22,12 +38,9 @@
  *  You access geography data through the static methods available in WPSC_Countries, or by instantiating
  *  objects of type WPSC_Country and WPSC_Region.
  *
- * Why is there a WPSC_Country class not WPSC_Country?
- *  At the time this module was created there was already a WPSC_Country class.  WPSC_Country was only used in a
- *  couple of places, and the module is on the fast track to being deprecated.
- *
  * What about the database?
- *  Can you identify the film this quote comes from? ... Forget about Dave. For our immediate purposes, there is no Dave. Dave does not exist.
+ *  Can you identify the film this quote comes from? ... Forget about Dave. For our immediate purposes,
+ *  there is no Dave. Dave does not exist.
  *
  * Why is that important?
  *  Forget about database. For our immediate purposes, there is no database. database does not exist.
@@ -159,12 +172,18 @@ class WPSC_Countries {
 
 
 	/**
-	 * How many regions does the country have
+	 * Return a WPSC_Region to the caller
 	 *
 	 * @access public
 	 * @since 3.8.14
 	 *
-	 * @param int | string country being check, if non-numeric country is treated as an isocode, number is the country id
+	 * @param int|string|null 	optional	if non-numeric country is treated as an ISO code, number is the country id
+	 *
+	 * @param int|string 	 	required 	if non-numeric country is treated as an region code, number is the region id,
+	 * 										if the region id is passed then country_id is ignored
+	 *
+	 * @return WPSC_Region|boolean          WPSC_Region object or false on failure
+	 *
 	 */
 	public static function region( $country_id_or_isocode, $region_id_or_code ) {
 
@@ -172,21 +191,24 @@ class WPSC_Countries {
 			return null;
 		}
 
-		$region = null;
-
-		$country_id = self::country_id( $country_id_or_isocode );
-		$region_id = self::region_id( $country_id_or_isocode, $region_id_or_code );
-
-		if ( $country_id && $region_id ) {
-			$wpsc_country = self::$all_wpsc_country_from_country_id->get( $country_id );
-			if ( $wpsc_country->has_regions() ) {
-				$wpsc_country = self::$all_wpsc_country_from_country_id->region( $region_id_or_code );
-			}
+		// we want to get to the unique region id to retrieve the region object, it might have been passed, or we
+		// will have to figure it out from the country and the region
+		if ( is_int( $region_id_or_code ) ) {
+			$region_id = $region_id_or_code;
+			$country_id = self::$country_id_from_region_id->value( $region_id );
 		} else {
-			$region = null;
+			$country_id = self::country_id( $country_id_or_isocode );
+			$region_id = self::region_id( $country_id, $region_id_or_code );
 		}
 
-		return $region;
+		if ( $country_id && $region_id ) {
+			$wpsc_country = self::$all_wpsc_country_from_country_id->value( $country_id );
+			$wpsc_region = &$wpsc_country->region( $region_id );
+		} else {
+			$wpsc_region = false;
+		}
+
+		return $wpsc_region;
 	}
 
 	/**
@@ -580,16 +602,31 @@ class WPSC_Countries {
 	/**
 	 * get the country id from a region id,
 	 *
-	 * @access private
+	 * @access public
+	 *
 	 * @static
+	 *
 	 * @since 3.8.14
 	 *
-	 * @return array   country list with index as country, value as name, sorted by country name
+	 * @param int 	$region_id		unqiue region idnetifier
+	 *
+	 * @return int					unqiue country identifier
 	 */
 	public static function country_id_from_region_id( $region_id ) {
 
 		if ( ! self::confirmed_initialization() ) {
-			return 0;
+			return false;
+		}
+
+		if ( is_numeric( $region_id ) ) {
+			$region_id = intval( $region_id );
+		} else {
+			$region_id = 0;
+		}
+
+		if ( ! $region_id ) {
+			_wpsc_doing_it_wrong( 'WPSC_Countries::country_id_from_region_id', __( 'Function "country_id_from_region_id" requires an integer $region_id', 'wpsc' ), '3.8.14' );
+			return false;
 		}
 
 		return self::$country_id_from_region_id->value( $region_id );
@@ -938,19 +975,17 @@ class WPSC_Countries {
 			$wpsc_country->_copy_properties_from_stdclass( $country );
 
 			if ( $country->has_regions ) {
-				$sql = 'SELECT code, country_id, name, tax, id FROM `' . WPSC_TABLE_REGION_TAX . '` '
+				$sql = 'SELECT id, code, country_id, name, tax FROM `' . WPSC_TABLE_REGION_TAX . '` '
 						. ' WHERE `country_id` = %d '
 								. ' ORDER BY code ASC ';
 
 				// put the regions list into our country object
 				$regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ) , OBJECT_K );
 
-				$country->region_id_to_region_code_map = array();
-
 				// any properties that came in as text that should be numbers or boolean get adjusted here, we also build
 				// an array to map from region code to region id
-				foreach ( $regions as $region_code => $region ) {
-					$region->id         = intval( $region->id );
+				foreach ( $regions as $region_id => $region ) {
+					$region->id         = intval( $region_id );
 					$region->country_id = intval( $region->country_id );
 					$region->tax        = floatval( $region->tax );
 
@@ -960,7 +995,7 @@ class WPSC_Countries {
 					$wpsc_country->_regions->map( $region->id, $wpsc_region );
 					$wpsc_country->_region_id_from_region_code->map( $region->code, $region->id  );
 
-					self::$all_wpsc_region_from_region_id->map( $region->id, $wpsc_region );
+					self::$country_id_from_region_id->map( $region->id, $region->country_id );
 				}
 			}
 
@@ -1111,14 +1146,16 @@ class WPSC_Countries {
 
 		$have_data = false;
 
-		foreach ( $mydata as $variable => $value ) {
-			if ( property_exists( $this, $variable ) ) {
-				self::$$variable = $value;
-				$have_data = true;
-			} else {
-				// something went wrong with save / restore
-				$have_data = false;
-				break;
+		if ( is_array( $mydata ) ) {
+			foreach ( $mydata as $variable => $value ) {
+				if ( property_exists( $this, $variable ) ) {
+					self::$$variable = $value;
+					$have_data = true;
+				} else {
+					// something went wrong with save / restore
+					$have_data = false;
+					break;
+				}
 			}
 		}
 

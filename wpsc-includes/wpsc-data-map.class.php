@@ -108,7 +108,7 @@ class WPSC_Data_Map {
 	public function value( $key, $default = null ) {
 		if ( $this->_confirm_data_ready() ) {
 			if ( isset( $this->_map_data[$key] ) ) {
-				$value = $this->_map_data[$key];
+				$value = &$this->_map_data[$key];
 			} else {
 				if ( $default === null ) {
 					$value = null;
