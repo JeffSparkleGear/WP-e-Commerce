@@ -860,15 +860,15 @@ class ash_ups {
 		if ( $quotes != false ) {
 			$rate_table = apply_filters( 'wpsc_rates_table', $this->_formatTable( $quotes, $args['currency'] ), $args, $this->shipment );
 		} else {
-			if ( isset( $wpsc_ups_settings['upsenvironment'] ) && current_user_can( 'manage_options' ) && ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+			if ( isset( $wpsc_ups_settings['upsenvironment'] ) ) {
 				echo "<strong>:: GetQuote ::DEBUG OUTPUT::</strong><br />";
 				echo "Arguments sent to UPS";
 				print_r( $args );
 				echo "<hr />";
-				print esc_html( $request );
+				print $request;
 				echo "<hr />";
 				echo "Response from UPS";
-				echo esc_html( $raw_quote );
+				echo $raw_quote;
 				echo "</strong>:: GetQuote ::End DEBUG OUTPUT::";
 			}
 		}
