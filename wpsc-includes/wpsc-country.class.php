@@ -133,7 +133,20 @@ class WPSC_Country {
 	}
 
 	/**
-	 * get nation's (country's) currency name
+	 * get this country's currency
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return WPSC_Currency 		country's currency
+	 */
+	public function currency_name() {
+		return new WPSC_Currency( $this->_currency_name );
+	}
+
+	/**
+	 * get this country's  currency name
 	 *
 	 * @access public
 	 *
@@ -146,7 +159,7 @@ class WPSC_Country {
 	}
 
 	/**
-	 * get nation's (country's) currency symbol
+	 * get this country's  currency symbol
 	 *
 	 * @access public
 	 *
@@ -159,7 +172,7 @@ class WPSC_Country {
 	}
 
 	/**
-	 * get nation's (country's) currency symbol HTML
+	 * get this country's  currency symbol HTML
 	 *
 	 * @access public
 	 *
@@ -172,7 +185,7 @@ class WPSC_Country {
 	}
 
 	/**
-	 * get nation's (country's) currency code
+	 * get this country's currency code
 	 *
 	 * @access public
 	 *
