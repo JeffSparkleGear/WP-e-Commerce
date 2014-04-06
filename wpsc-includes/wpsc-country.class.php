@@ -279,7 +279,7 @@ class WPSC_Country {
 	 */
 	public function region( $region_id_or_code ) {
 
-		$region = false;
+		$wpsc_region = false;
 
 		if ( $region_id_or_code ) {
 			if ( $this->_id ) {

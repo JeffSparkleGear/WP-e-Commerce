@@ -1114,6 +1114,7 @@ class WPSC_Countries {
 		// which maps to we want to have available as soon as this class is initialized?  Serialize those
 		// maps into the saved verison of this object.
 		$mydata['currencies']              = self::$currencies;
+		$mydata['all_wpsc_region_from_region_id']      = self::$all_wpsc_region_from_region_id;
 
 		$mydata['region_code_from_region_id'] 	 = self::$region_code_from_region_id;
 		$mydata['country_iso_code_map']         = self::$country_iso_code_map;
@@ -1123,7 +1124,6 @@ class WPSC_Countries {
 
 		$mydata['active_wpsc_country_from_country_id'] = self::$active_wpsc_country_from_country_id;
 		$mydata['all_wpsc_country_from_country_id']    = self::$all_wpsc_country_from_country_id;
-		$mydata['all_wpsc_region_from_region_id']      = self::$all_wpsc_region_from_region_id;
 
 		set_transient( self::transient_name(), $mydata, WEEK_IN_SECONDS * 13 );
 
