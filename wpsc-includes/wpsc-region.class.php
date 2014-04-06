@@ -11,7 +11,9 @@
  * @since 3.8.14
  *
  * @param int|string 	required	the country identifier, can be the string ISO code, or the numeric WPeC country id
- * @param int|string	required	the region identifier, can be the text region code, or the numeric region id
+ *
+ * @param int|string|null|array	required 	the region identifier, can be the text region code, or the numeric region id,
+ * 											if an array is passed a new region will be created and saved in the permanent data store
  *
  * @return object WPSC_Region
  */
