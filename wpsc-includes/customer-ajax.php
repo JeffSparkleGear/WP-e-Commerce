@@ -166,7 +166,7 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		// Get the checkout information and if something has changed send it to the client
 		$new_checkout_info = _wpsc_wpsc_remove_unchanged_checkout_info( $old_checkout_info, _wpsc_get_checkout_info() );
 		if ( ! empty( $new_checkout_info ) ) {
-			$response['checkout_info'] = _wpsc_get_checkout_info();
+			$response['checkout_info'] = $new_checkout_info;
 		}
 
 		wp_send_json_success( $response );
@@ -235,8 +235,6 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 
 		return $response;
 	}
-
-
 
 	if ( _wpsc_doing_customer_meta_ajax() ) {
 		add_action( 'wp_ajax_wpsc_validate_customer'       		, 'wpsc_validate_customer_ajax' );
