@@ -307,15 +307,15 @@ class WPSC_Country {
 	 *
 	 * @return self, to support method chaining
 	 */
-	public function set( $key_or_array_of_key_values, $value = '' ) {
+	public function set( $property, $value = '' ) {
 
-		if ( is_array( $key_or_array_of_key_values ) ) {
-			foreach ( $key_or_array_of_key_values as $key => $value ) {
+		if ( is_array( $property ) ) {
+			foreach ( $property as $key => $value ) {
 				$this->set( $key, $value );
 			}
 		} else {
 
-			$key = $key_or_array_of_key_values;
+			$key = $property;
 
 			$property_name = '_' . $key;
 
@@ -347,29 +347,24 @@ class WPSC_Country {
 	 *
 	 * @param int|string	required	$region_identifier 	The region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return WPSC_Region|false 							The region, or false if the region code is not valid for the country
+	 * @return WPSC_Region|false The region, or false if the region code is not valid for the country
 	 */
-	public function region( $region_identifier ) {
+	public function region( $region ) {
 
 		$wpsc_region = false;
 
-		if ( $region_identifier ) {
-			if ( $this->_id ) {
-				if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_identifier ) ) {
-
-					if ( ctype_digit( $region_identifier ) ) {
-						$region_id = intval( $region_id_or_region_code_or_region_name );
-						$wpsc_region = $this->_regions->value( $region_id );
-					} else {
-						// check to see if it is a valid region code
-						if ( $region_id = $this->_region_id_from_region_code->value( $region_identifier ) ) {
-							$wpsc_region = $this->_regions->value( $region_id );
-						} else {
-							// check to see if we have a valid region name
-							if ( $region_id = $this->_region_id_from_region_name->value( strtolower( $region_identifier ) ) ) {
-								$wpsc_region = $this->_regions->value( $region_id );
-							}
-						}
+		if ( $region ) {
+			if ( is_numeric( $region ) ) {
+				$region_id = intval( $region );
+				$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
+			} else {
+				// check to see if it is a valid region code
+				if ( $region_id = $this->_region_id_from_region_code->value( $region ) ) {
+					$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
+				} else {
+					// check to see if we have a valid region name
+					if ( $region_id = $this->_region_id_from_region_name->value( strtolower( $region ) ) ) {
+						$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
 					}
 				}
 			}
@@ -402,7 +397,7 @@ class WPSC_Country {
 	 *
 	 * @param boolean return the result as an array, default is to return the result as an object
 	 *
-	 * @return array of WPSC_Region
+	 * @return array of WPSC_Region objects, indexed by region id
 	 */
 	public function regions() {
 		return $this->_regions->data();
@@ -463,7 +458,7 @@ class WPSC_Country {
 		$region_id = false;
 
 		if ( $region_code ) {
-			$region_id = $this->_region_id_from_region_code->value( $region_code );
+			$region_id = $this->_region_id_from_region_code->value( $region_code, $region_id );
 		}
 
 		return $region_id;
@@ -494,7 +489,7 @@ class WPSC_Country {
 	 * Copy the country properties from a stdClass object to this class object.  Needed when retrieving
 	 * objects from the database, but could be useful elsewhere in WPeC?
 	 *
-	 * @access static but private to WPeC
+	 * @access private
 	 *
 	 * @since 3.8.14
 	 *
