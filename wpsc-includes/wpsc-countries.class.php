@@ -839,7 +839,6 @@ class WPSC_Countries {
 	 * @access private
 	 * @since 3.8.14
 	 *
-	 * @param string $id Optional. Defaults to 0.
 	 */
 	public function __construct() {
 		if ( self::$active_wpsc_country_from_country_id == null ) {
