@@ -607,17 +607,14 @@ function _wpsc_visitor_location_is_changing( $meta_value, $meta_key, $visitor_id
 	$location_change_updated = false;
 
 	$what_about_the_visitor_location_changed = wpsc_get_visitor_meta( $visitor_id, 'location_attributes_changed', true );
-	if ( ! is_array( $what_about_the_visitor_location_changed ) ) {
+	if ( ! $what_about_the_visitor_location_changed ) {
 		$what_about_the_visitor_location_changed = array();
 	}
 
 	if ( ! in_array( $meta_key, $what_about_the_visitor_location_changed ) ) {
-
-		$location_change_updated = wpsc_update_visitor_meta( $visitor_id, $meta_key, $meta_value );
-		if ( $location_change_updated ) {
-			$what_about_the_visitor_location_changed[] = $meta_key;
-			wpsc_update_visitor_meta( $visitor_id, 'location_attributes_changed', $what_about_the_visitor_location_changed );
-		}
+		$what_about_the_visitor_location_changed[] = $meta_key;
+		wpsc_update_visitor_meta( $visitor_id, 'location_attributes_changed', $what_about_the_visitor_location_changed );
+		$location_change_updated = true;
 	}
 
 	return $location_change_updated;

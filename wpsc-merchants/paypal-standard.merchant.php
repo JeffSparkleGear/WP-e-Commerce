@@ -323,7 +323,8 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 					$paypal_vars['handling_'.$i] = 0;
 				}
 
-				$paypal_vars['tax_cart'] = $this->convert( $tax_total );
+				$paypal_vars['tax_cart'] = $aggregate ? 0 : $this->convert( $tax_total );
+
 			} else {
 				$cart_row = $this->cart_items[0];
 				$item_number = get_post_meta( $cart_row['product_id'], '_wpsc_sku', true );
@@ -731,7 +732,7 @@ function form_paypal_multiple() {
 		</td>
 	</tr>\n";
 
-	$store_currency_data = WPSC_Countries::currency_data( get_option( 'currency_type' ) );
+	$store_currency_data = WPSC_Countries::currency_data( get_option( 'currency_type' ), true );
 	$current_currency = get_option('paypal_curcode');
 	if ( ( $current_currency == '' ) && in_array( $store_currency_data['code'], $wpsc_gateways['wpsc_merchant_paypal_standard']['supported_currencies']['currency_list'] ) ) {
 		update_option( 'paypal_curcode', $store_currency_data['code'] );

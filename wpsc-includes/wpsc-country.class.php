@@ -33,28 +33,29 @@ class WPSC_Country {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param int|string|array 	required 	the country identifier, can be the string ISO code or the integer country id,
-	 * 										or an array of data used to create a new country
+	 * @param int|string|array 	required 	$country_identifier 	the country identifier, can be the string ISO code,
+	 * 																or the integer country id, or an array of data used
+	 * 																to create a new country
 	 *
 	 * @return object WPSC_Country
 	 */
-	public function __construct( $country_id_or_isocode_or_new_country_data, $deprecated_paramater_col = null ) {
+	public function __construct( $country, $deprecated_paramater_col = null ) {
 
-		if ( $country_id_or_isocode_or_new_country_data ) {
+		if ( $country ) {
 
-			if ( is_array( $country_id_or_isocode_or_new_country_data ) ) {
+			if ( is_array( $country ) ) {
 				// if we get an array as an argument we are making a new country
-				$country_id_or_isocode = $this->_save_country_data( $country_id_or_isocode_or_new_country_data );
+				$country_id_or_isocode = $this->_save_country_data( $country );
 			}  else {
 				// we are constructing a country using a numeric id or ISO code
-				$country_id_or_isocode = $country_id_or_isocode_or_new_country_data;
+				$country_id_or_isocode = $country;
 			}
 
 			// make sure we have a valid country id
 			$country_id = WPSC_Countries::country_id( $country_id_or_isocode );
 			if ( $country_id ) {
-				$country = WPSC_Countries::country( $country_id );
-				foreach ( $country as $property => $value ) {
+				$wpsc_country = WPSC_Countries::country( $country_id );
+				foreach ( $wpsc_country as $property => $value ) {
 					// copy the properties in this copy of the country
 					$this->$property = $value;
 				}
@@ -70,6 +71,11 @@ class WPSC_Country {
 			$this->_region_id_from_region_code = new WPSC_Data_Map();
 		}
 
+		if ( empty( $this->_region_id_from_region_name ) ){
+			$this->_region_id_from_region_name = new WPSC_Data_Map();
+		}
+
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// As a result of merging the legacy WPSC_Country class we no longer need the "col" constructor parameter
 		// that was in the prior version of this class.
@@ -84,8 +90,6 @@ class WPSC_Country {
 		if ( ! empty ( $deprecated_paramater_col) ) {
 			if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
 				_wpsc_deprecated_argument( __FUNCTION__, '3.8.14',$this->_parameter_no_longer_used_message( 'col', __FUNCTION__ ) );
-			} else {
-				wp_die(  $this->_parameter_no_longer_used_message( 'col', __FUNCTION__ ) );
 			}
 		}
 	}
@@ -210,18 +214,18 @@ class WPSC_Country {
 	}
 
 	/**
-	 * does the nation use a region list
+	 * Is the region valid for this country
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param
+	 * @param int|string 		$region 		region id, or string region name.  If string is used comparison is case insensitive
 	 *
-	 * @return boolean	true if we have a region lsit for the nation, false otherwise
+	 * @return boolean	true if the region is valid for the country, false otherwise
 	 */
-	public function has_region( $region_id_or_code ) {
-		$region = $this->region( $region_id_or_code );
+	public function has_region( $region ) {
+		$region = $this->region( $region );
 		return $region != false;
 	}
 
@@ -267,28 +271,104 @@ class WPSC_Country {
 	}
 
 	/**
+	 * returns a country's property matching the key, either a well know property or a property defined elsewhere
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return varies 	value of the property
+	 */
+	public function get( $key ) {
+
+		$function = __CLASS__ . '::' . __FUNCTION__ . '( "' . $key . '" )';
+		$replacement = __CLASS__ . '::' . $key . '()';
+
+		$property_name = '_' . $key;
+
+		if ( property_exists( $this, $property_name ) ) {
+			$value = $this->$property_name;
+		} else {
+			$value = wpsc_get_meta( $this->_id, $key, __CLASS__ );
+		}
+
+		return apply_filters( 'wpsc_country_get_property', $this->$property_name, $key, $this );
+	}
+
+
+	/**
+	 * sets a property for a country, well know properties are not allowed to be set using this function,
+	 * but arbitrary properties can be set (and accessed later with get)
+	 *
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return self, to support method chaining
+	 */
+	public function set( $key_or_array_of_key_values, $value = '' ) {
+
+		if ( is_array( $key_or_array_of_key_values ) ) {
+			foreach ( $key_or_array_of_key_values as $key => $value ) {
+				$this->set( $key, $value );
+			}
+		} else {
+
+			$key = $key_or_array_of_key_values;
+
+			$property_name = '_' . $key;
+
+			if ( property_exists( $this, $property_name ) ) {
+				$value = $this->$property_name;
+				_wpsc_doing_it_wrong( __FUNCTION__, __( 'Using set to change a well-known WPSC_Country property is deprecated as of version 3.8.14.  Use the class constructor and specify all properties together to perform and insert or an update.', 'wpsc' ), '3.8.14' );
+				if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
+					$country_array = $this->as_array();
+					$country_array[$key] = $value;
+					$this->_save_country_data( $country_array );
+				}
+			} else {
+				wpsc_update_meta( $this->_id, $key, $value, __CLASS__  );
+			}
+
+			$this->data[$key] = $value;
+		}
+
+		return $this;
+	}
+
+
+	/**
 	 * get a region that is in this country
 	 *
 	 * @access public
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param int|string			required	the region identifier, can be the text region code, or the numeric region id
+	 * @param int|string	required	$region_identifier 	The region identifier, can be the text region code, or the numeric region id
 	 *
-	 * @return WPSC_Region|false 				The region, or false if the region code is not valid for the country
+	 * @return WPSC_Region|false The region, or false if the region code is not valid for the country
 	 */
-	public function region( $region_id_or_code ) {
+	public function region( $region ) {
 
 		$wpsc_region = false;
 
-		if ( $region_id_or_code ) {
-			if ( $this->_id ) {
-				if ( $region_id = WPSC_Countries::region_id( $this->_id, $region_id_or_code ) ) {
+		if ( $region && $this->_id && ( $region_id = WPSC_Countries::region_id( $this->_id, $region ) ) ) {
+			if ( is_numeric( $region ) ) {
+				$wpsc_region = $this->_regions->value( intval( $region_id ) );
+			} else {
+				// check to see if it is a valid region code
+				if ( $region_id = $this->_region_id_from_region_code->value( $region ) ) {
 					$wpsc_region = $this->_regions->value( $region_id );
+				} else {
+					// check to see if we have a valid region name
+					if ( $region_id = $this->_region_id_from_region_name->value( strtolower( $region ) ) ) {
+						$wpsc_region = $this->_regions->value( $region_id );
+					}
 				}
 			}
 		}
-
+		
 		return $wpsc_region;
 	}
 
@@ -369,6 +449,7 @@ class WPSC_Country {
 	 *
 	 * @since 3.8.14
 	 *
+	 * @param string 	$region_name	the name of the region for which we are looking for an id, case insensitive!
 	 *
 	 * @return int region id
 	 */
@@ -383,10 +464,31 @@ class WPSC_Country {
 	}
 
 	/**
+	 * get a region code from a region name
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @param string 	$region_name	the name of the region for which we are looking for an id, case insensitive!
+	 *
+	 * @return int region id
+	 */
+	public function region_id_from_region_name( $region_name ) {
+		$region_id = false;
+
+		if ( $region_name ) {
+			$region_id = $this->_region_id_from_region_name->value( strtolower( $region_name ) );
+		}
+
+		return $region_id;
+	}
+
+	/**
 	 * Copy the country properties from a stdClass object to this class object.  Needed when retrieving
 	 * objects from the database, but could be useful elsewhere in WPeC?
 	 *
-	 * @access static but private to WPeC
+	 * @access private
 	 *
 	 * @since 3.8.14
 	 *
@@ -545,6 +647,7 @@ class WPSC_Country {
 	public $_continent 					= '';
 	public $_visible 						= true;
 	public $_region_id_from_region_code 	= null;
+	public $_region_id_from_region_name		= null;
 	public $_regions 	                    = null;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -581,15 +684,12 @@ class WPSC_Country {
 
 		$function = __CLASS__ . '::' . __FUNCTION__ . '()';
 		$replacement = 'WPSC_Countries::country()';
+		_wpsc_deprecated_function( $function, '3.8.14', $replacement );
 
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( $function, '3.8.14', $replacement );
-		} else {
-			wp_die( self::_function_not_available_message( $function , $replacement ) );
+			$list = WPSC_Countries::countries_array( WPSC_Countries::INCLUDE_INVISIBLE );
+			return apply_filters( 'wpsc_country_get_all_countries', $list );
 		}
-
-		$list = WPSC_Countries::countries_array( WPSC_Countries::INCLUDE_INVISIBLE );
-		return apply_filters( 'wpsc_country_get_all_countries', $list );
 	}
 
 	/*
@@ -599,34 +699,27 @@ class WPSC_Country {
 
 		$function = __CLASS__ . '::' . __FUNCTION__ . '()';
 		$replacement = 'WPSC_Countries::country()';
+		_wpsc_deprecated_function( $function, '3.8.14', $replacement );
 
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( $function, '3.8.14', $replacement );
-		} else {
-			wp_die( self::_function_not_available_message( $function , $replacement ) );
+			if ( is_null( $value ) && $col == 'id' )
+				$value = get_option( 'currency_type' );
+
+			// note that we can't store cache by currency code, the code is used by various countries
+			// TODO: remove duplicate entry for Germany (Deutschland)
+			if ( ! in_array( $col, array( 'id', 'isocode' ) ) ) {
+				return false;
+			}
+
+			return WPSC_Countries::country( $value, WPSC_Countries::RETURN_AN_ARRAY );
 		}
-
-		if ( is_null( $value ) && $col == 'id' )
-			$value = get_option( 'currency_type' );
-
-		// note that we can't store cache by currency code, the code is used by various countries
-		// TODO: remove duplicate entry for Germany (Deutschland)
-		if ( ! in_array( $col, array( 'id', 'isocode' ) ) ) {
-			return false;
-		}
-
-		return WPSC_Countries::country( $value, WPSC_Countries::RETURN_AN_ARRAY );
 	}
 
 	/*
 	 * deprected since 3.8.14
 	*/
 	public static function update_cache( $data ) {
-		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( __FUNCTION__, '3.8.14', self::_function_not_available_message( __FUNCTION__ ) );
-		} else {
-			wp_die( self::_function_not_available_message( __FUNCTION__ ) );
-		}
+		_wpsc_deprecated_function( __FUNCTION__, '3.8.14', self::_function_not_available_message( __FUNCTION__ ) );
 	}
 
 	/*
@@ -635,33 +728,9 @@ class WPSC_Country {
 	public static function delete_cache( $value = null, $col = 'id' ) {
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
 			_wpsc_deprecated_function( __FUNCTION__, '3.8.14', self::_function_not_available_message( __FUNCTION__ ) );
-		} else {
-			wp_die( self::_function_not_available_message( __FUNCTION__ ) );
 		}
 	}
 
-	/*
-	 * deprected since 3.8.14
-	 */
-	public function get( $key ) {
-
-		$function = __CLASS__ . '::' . __FUNCTION__ . '( "' . $key . '" )';
-		$replacement = __CLASS__ . '::' . $key . '()';
-
-		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( $function, '3.8.14', $replacement );
-		} else {
-			wp_die( self::_function_not_available_message( $function , $replacement ) );
-		}
-
-		$property_name = '_' . $key;
-
-		if ( property_exists( $this, $property_name ) ) {
-			return apply_filters( 'wpsc_country_get_property', $this->$property_name, $key, $this );
-		}
-
-		return null;
-	}
 
 	/**
 	 * Returns the whole database row in the form of an associative array
@@ -676,45 +745,17 @@ class WPSC_Country {
 	public function get_data() {
 
 		$function = __CLASS__ . '::' . __FUNCTION__ . '()';
-		$replacement = 'WPSC_Countries::countries_array()';
+		$replacement = 'WPSC_Country::as_array()';
 
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
 			_wpsc_deprecated_function( $function, '3.8.14', $replacement );
-		} else {
-			wp_die( self::_function_not_available_message( $function , $replacement ) );
 		}
 
-		$data = WPSC_Countries::countries_array();
+		$data = $this->as_array();
 
 		return apply_filters( 'wpsc_country_get_data', $data, $this );
 	}
 
-	/*
-	 * @deprecated since 3.8.14
-	*
-	*/
-	public function set( $key, $value = '' ) {
-		$function = __CLASS__ . '::' . __FUNCTION__ . '()';
-		$replacement = 'WPSC_Countries::__construct()';
-
-		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( $function, '3.8.14', $replacement );
-		} else {
-			wp_die( self::_function_not_available_message( $function , $replacement ) );
-		}
-
-		if ( ! empty( $this->_id ) ){
-			if ( ! is_array( $key ) ) {
-				$country_data = array( $key => $value );
-			}
-
-			$this->_save_country_data( $country_data );
-		}
-
-		$data = WPSC_Countries::countries_array();
-
-		return apply_filters( 'wpsc_country_get_data', $data, $this );
-	}
 
 	/*
 	 * @deprecated since 3.8.14
@@ -722,9 +763,7 @@ class WPSC_Country {
 	*/
 	public function save() {
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
-			_wpsc_deprecated_function( __FUNCTION__, '3.8.14', self::_function_not_available_message( __FUNCTION__ ) );
-		} else {
-			wp_die( self::_function_not_available_message( __FUNCTION__ ) );
+			_wpsc_doing_it_wrong( __FUNCTION__, __( 'As of version 3.8.14 calling WPSC_Country class method "save" is not required. Changes to WPSC_Country properties are saved automatically.', 'wpsc' ), '3.8.14'  );
 		}
 	}
 
@@ -736,10 +775,7 @@ class WPSC_Country {
 
 		if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
 			_wpsc_deprecated_argument( __FUNCTION__, '3.8.14', self::_function_not_available_message( __FUNCTION__ ) );
-		} else {
-			wp_die( self::_function_not_available_message( __FUNCTION__ ) );
 		}
-
 
 		return true;
 	}
@@ -748,8 +784,8 @@ class WPSC_Country {
 		$message = sprintf(
 							__( 'As of version 3.8.14 the function "%s" is no longer available in class %s. Use %s instead', 'wpsc' ),
 							$function,
-							$replacement,
-							__CLASS__
+							__CLASS__,
+							$replacement
 						);
 
 		return $message;

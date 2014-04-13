@@ -140,8 +140,8 @@ function wpsc_price_control_forms() {
 	$currency_type = get_option( 'currency_type' );
 	$country = new WPSC_Country( $currency_type );
 
-	$ct_code = $country->get( 'code' );		// Country name
-	$ct_symb = $country->get( 'symbol' );	// Country symbol
+	$ct_code = $country->currency_code();		// Country name
+	$ct_symb = $country->currency_symbol();	// Country symbol
 
 	$price 		= $product_data['meta']['_wpsc_price'];
 	$sale_price = $product_data['meta']['_wpsc_special_price'];
@@ -162,7 +162,7 @@ function wpsc_price_control_forms() {
     	<?php /* Check product if a product has variations */ ?>
     	<?php if ( wpsc_product_has_children( $post->ID ) ) : ?>
     		<?php $price = wpsc_product_variation_price_from( $post->ID ); ?>
-			<p style="margin-top: 6px;"><?php echo sprintf( __( 'This product has variations. To edit the price please use the <a href="%s">Variation Controls</a>.' , 'wpsc'  ), '#wpsc_product_variation_forms' ); ?></p>
+			<p style="margin-top: 6px;"><?php echo sprintf( __( 'This product has variations. To edit the price, please use the <a href="%s">Variation Controls</a>.' , 'wpsc'  ), '#wpsc_product_variation_forms' ); ?></p>
 			<p><?php printf( __( 'Price: %s and above.' , 'wpsc' ) , $price ); ?></p>
 		<?php else: ?>
 
@@ -348,7 +348,7 @@ function wpsc_stock_control_forms() {
 		} ?>
 					<?php if ( wpsc_product_has_children( $post->ID ) ) : ?>
 			    		<?php $stock = wpsc_variations_stock_remaining( $post->ID ); ?>
-						<p><?php echo sprintf( __( 'This product has variations. To edit the quantity please use the <a href="%s">Variation Controls</a> below.' , 'wpsc' ), '#wpsc_product_variation_forms' ); ?></p>
+						<p><?php echo sprintf( __( 'This product has variations. To edit the quantity, please use the <a href="%s">Variation Controls</a> below.' , 'wpsc' ), '#wpsc_product_variation_forms' ); ?></p>
 						<p><?php printf( _n( "%s variant item in stock.", "%s variant items in stock.", $stock, 'wpsc' ), $stock ); ?></p>
 					<?php else: ?>
 						<div style="margin-bottom:20px;">
@@ -694,7 +694,7 @@ function wpsc_product_shipping_forms( $product = false, $field_name_prefix = 'me
 			$currency_type = get_option( 'currency_type' );
 			$country = new WPSC_Country( $currency_type );
 
-			$ct_symb = $country->get( 'symbol' );
+			$ct_symb = $country->currency_symbol_html();
 		?>
 
 		<div class="wpsc-product-shipping-section wpsc-product-shipping-flat-rate">
@@ -950,6 +950,9 @@ function wpsc_product_personalization_forms(){
 }
 
 function wpsc_product_delivery_forms(){
+	$has_variations    = wpsc_product_has_variations( get_post()->ID );
+
+	$show_if_variation = $has_variations ? 'display: block;' : 'display:none;';
 ?>
 	<em id="wpsc_product_delivery_metabox_live_title" class="wpsc_metabox_live_title">
 		<p></p>
@@ -962,11 +965,17 @@ function wpsc_product_delivery_forms(){
 			<li><a href="#wpsc_product_delivery-external_link">External Link</a></li>
 		</ul>
 
-		<div id="wpsc_product_delivery-shipping" class="tabs-panel" style="display: block;">
-			<?php wpsc_product_shipping_forms(); ?>
+		<div id="wpsc_product_delivery-shipping" class="tabs-panel" style="display:block;">
+			<?php 
+				if ( ! $has_variations ) {
+					wpsc_product_shipping_forms(); 
+				} else {
+ 					echo '<p>' . sprintf( __( 'This product has variations. To edit the shipping, please use the <a href="%s">Variation Controls</a>.' , 'wpsc'  ), '#wpsc_product_variation_forms' ) . '</p>';
+ 				}
+			?>
 		</div>
 
-		<div id="wpsc_product_delivery-download" class="tabs-panel" style="display: none;">
+		<div id="wpsc_product_delivery-download" class="tabs-panel" style="display:none;">
 			<?php wpsc_product_download_forms(); ?>
 		</div>
 
