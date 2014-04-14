@@ -873,20 +873,20 @@ class WPSC_Countries {
 	 */
 	public static function _wpsc_countries_localizations( $localizations_array ) {
 
-		$localizations_array['no_country_selected'] = __( 'Please select a country', 'wpsc' );
+		$localizations_array['no_country_selected']       = __( 'Please select a country', 'wpsc' );
+		$localizations_array['no_region_selected_format'] = __( 'Please select a %s', 'wpsc' );
 
-		$checkout_form = new WPSC_Checkout_Form();
+		$checkout_form    = new WPSC_Checkout_Form();
 		$billing_state_id = $checkout_form->get_field_id_by_unique_name( 'billingstate' );
-		$fields = $checkout_form->get_fields();
+		$fields           = $checkout_form->get_fields();
 
 		$in_this_country_a_region_is_called_a = $checkout_form->get( $billing_state_id );
-		$namevalue = ' name="collected_data[' . $region_form_id . ']" ';
 
 		$country_list = array();
 
 		foreach ( self::countries() as $country_id => $wpsc_country ) {
 			if ( $wpsc_country->visible() ) {
-				$country_list[$country_id] = $wpsc_country->name();
+				$country_list[$wpsc_country->isocode()] = $wpsc_country->name();
 
 				if ( $wpsc_country->has_regions() ) {
 					$regions = $wpsc_country->regions();
@@ -896,18 +896,22 @@ class WPSC_Countries {
 					}
 
 					if ( ! empty ( $region_list ) ) {
-						$localizations_array['wpsc_country_'.$country_id.'_regions'] = $region_list;
+						$localizations_array[ 'wpsc_country_'.$wpsc_country->isocode() . '_regions' ] = $region_list;
 					}
 				}
 
 				$in_this_country_a_region_is_called_a = $wpsc_country->get( 'region_is_called' );
 				if ( ! empty( $in_this_country_a_region_is_called_a ) ) {
-					$localizations_array['wpsc_country_'.$country_id.'_region_is_called'] = $in_this_country_a_region_is_called_a;
+					$localizations_array['wpsc_country_' . $wpsc_country->isocode() . '_region_is_called' ] = $in_this_country_a_region_is_called_a;
 				}
 			}
 		}
 
-		$localizations_array['wpsc_countrries'] = $country_list;
+		if ( ! empty( $country_list ) ) {
+			$localizations_array['wpsc_countrries'] = $country_list;
+		}
+
+		return $localizations_array;
 	}
 
 	/**
