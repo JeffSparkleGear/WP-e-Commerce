@@ -184,8 +184,8 @@ function wpsc_update_customer_meta( response ) {
 					} else {
 						var current_value = jQuery( this ).val();
 						var new_value = meta_value;
-						if ( jQuery( this ).val() != meta_value ) {
-							jQuery( this ).val( meta_value );
+						if ( current_value != new_value ) {
+							jQuery( this ).val( new_value );
 						}
 					}
 				}
