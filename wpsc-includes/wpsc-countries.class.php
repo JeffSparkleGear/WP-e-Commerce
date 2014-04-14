@@ -446,7 +446,7 @@ class WPSC_Countries {
 			$wpsc_country = self::$all_wpsc_country_from_country_id->value( $country_id );
 
 			if ( $wpsc_country->has_regions() ) {
-				$regions = $wpsc_country->regions();
+				$regions = $wpsc_country->regions( $as_array );
 			}
 		}
 
@@ -464,11 +464,12 @@ class WPSC_Countries {
 	 * @access public
 	 * @since 3.8.14
 	 *
-	 * @param boolean return countries that are set to invisible
+	 * @param boolean 	$include_invisible	return countries that are set to invisible
+	 * @param boolean 	$sortbyname			return countries ordered by name
 	 *
-	 * @return array of region objects index by region id
+	 * @return array of region objects index by region idm sorted by country name
 	 */
-	public static function countries( $include_invisible = false ) {
+	public static function countries( $include_invisible = false, $sortbyname = true ) {
 		if ( ! self::confirmed_initialization() ) {
 			return array();
 		}
@@ -477,6 +478,13 @@ class WPSC_Countries {
 			$countries = self::$all_wpsc_country_from_country_id->data();
 		} else {
 			$countries = self::$active_wpsc_country_from_country_id->data();
+		}
+
+		if ( $sortbyname && ! empty( $countries ) ) {
+			usort( $countries, array( __CLASS__, '_compare_countries_by_name' ) );
+		} else {
+			// countries should be sorted internally by id, but hust in case data was changed since the last data load
+			usort( $countries, array( __CLASS__, '_compare_countries_by_id' ) );
 		}
 
 		return $countries;
@@ -1260,6 +1268,36 @@ class WPSC_Countries {
 
 		return $dirty;
 	}
+
+	/**
+	 * Comapre countries using country's name
+	 *
+	 * @param unknown $a instance of WPSC_Country class
+	 * @param unknown $b instance of WPSC_Country class
+	 *
+	 * @return 0 if country names are the same, -1 if country name of a comes before country b, 1 otherwise
+	 */
+	private static function _compare_countries_by_name( $a, $b ) {
+		return strcmp( $a->name(), $b->name() );
+	}
+
+
+	/**
+	 * Comapre countries using country's id
+	 *
+	 * @param unknown $a instance of WPSC_Country class
+	 * @param unknown $b instance of WPSC_Country class
+	 *
+	 * @return 0 if country id's are the same, -1 if country id of a comes before country b, 1 otherwise
+	 */
+	private static function _compare_countries_by_id( $a, $b ) {
+		if ( $a->id() == $b->id() ) {
+			return 0;
+		}
+
+		return ($a->id() < $b->id() ) ? -1 : 1;
+	}
+
 
 	/**
 	 * the identifier for the tranient used to cache country data
