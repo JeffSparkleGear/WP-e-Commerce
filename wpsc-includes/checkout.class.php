@@ -61,38 +61,6 @@ function wpsc_get_buyers_email($purchase_id){
 
 	return $email;
 }
-
-/**
- * wpsc google checkout submit used for google checkout (unsure whether necessary in 3.8)
- * @access public
- *
- * @since 3.7
- */
-function wpsc_google_checkout_submit() {
-	global $wpdb, $wpsc_cart, $current_user;
-	$wpsc_checkout = new wpsc_checkout();
-	$purchase_log_id = $wpdb->get_var( "SELECT `id` FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `sessionid` IN(%s) LIMIT 1", wpsc_get_customer_meta( 'checkout_session_id' ) );
-	get_currentuserinfo();
-	if ( $current_user->display_name != '' ) {
-		foreach ( $wpsc_checkout->checkout_items as $checkoutfield ) {
-			if ( $checkoutfield->unique_name == 'billingfirstname' ) {
-				$checkoutfield->value = $current_user->display_name;
-			}
-		}
-	}
-	if ( $current_user->user_email != '' ) {
-		foreach ( $wpsc_checkout->checkout_items as $checkoutfield ) {
-			if ( $checkoutfield->unique_name == 'billingemail' ) {
-				$checkoutfield->value = $current_user->user_email;
-			}
-		}
-	}
-
-	$wpsc_checkout->save_forms_to_db( $purchase_log_id );
-	$wpsc_cart->save_to_db( $purchase_log_id );
-	$wpsc_cart->submit_stock_claims( $purchase_log_id );
-}
-
 /**
  * returns the tax label
  * @access public
@@ -141,7 +109,7 @@ function wpsc_get_acceptable_countries() {
 		$target_market_ids = $target_market_ids[0];
 	}
 
-	$country_data = WPSC_Countries::countries_array();
+	$country_data = WPSC_Countries::get_countries_array();
 
 	$have_target_market = $have_target_market && count( $country_data ) != count( $target_market_ids );
 	$GLOBALS['wpsc_country_data'] = $country_data; // TODO Is this ever used?
@@ -334,12 +302,12 @@ class wpsc_checkout {
 				break;
 
 			case "country":
-				$output = WPSC_Countries_list( $this->checkout_item->id, false, $billing_country, $billing_region, $this->form_element_id() );
+				$output = wpsc_country_region_list( $this->checkout_item->id, false, $billing_country, $billing_region, $this->form_element_id() );
 				break;
 
 			case "delivery_country":
 				$checkoutfields = true;
-				$output = WPSC_Countries_list( $this->checkout_item->id, false, $delivery_country, $delivery_region, $this->form_element_id(), $checkoutfields );
+				$output = wpsc_country_region_list( $this->checkout_item->id, false, $delivery_country, $delivery_region, $this->form_element_id(), $checkoutfields );
 				break;
 
 			case "select":
@@ -566,15 +534,13 @@ class wpsc_checkout {
 	 */
 	function save_forms_to_db( $purchase_id ) {
 
-		global $wpdb;
-
 		foreach ( $this->checkout_items as $form_data ) {
 
 			if ( $form_data->type == 'heading' ) {
 				continue;
 			}
 
-			$customer_meta_key = $form_data->unique_name;
+			$customer_meta_key    = $form_data->unique_name;
 			$checkout_item_values = wpsc_get_customer_meta( $customer_meta_key );
 
 			if ( ! is_array( $checkout_item_values ) ) {
@@ -606,7 +572,7 @@ class wpsc_checkout {
 	 */
 	function get_count_checkout_fields() {
 		$checkout = new WPSC_Checkout_Form();
-		$count = $checkout->get_field_count();
+		$count    = $checkout->get_field_count();
 		return $count;
 	}
 

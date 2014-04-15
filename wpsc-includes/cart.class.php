@@ -286,20 +286,22 @@ class wpsc_cart {
 			$custom_shipping = (array) $custom_shipping;
 		}
 
-		$this->shipping_methods = get_option( 'custom_shipping_options' );
+		$this->shipping_methods      = get_option( 'custom_shipping_options' );
 		$this->shipping_method_count = count( $this->shipping_methods );
 
-		do_action( 'wpsc_before_get_shipping_method' , $this );
+		do_action( 'wpsc_before_get_shipping_method', $this );
 
-		if ( ( get_option( 'do_not_use_shipping' ) != 1 ) && ( count( $this->shipping_methods ) > 0)  &&  apply_filters( 'wpsc_ready_to_calculate_shipping', true, $this ) ) {
+		if ( ( get_option( 'do_not_use_shipping' ) != 1 ) && ( $this->shipping_method_count > 0 ) && apply_filters( 'wpsc_ready_to_calculate_shipping', true, $this ) ) {
 
 			$shipping_quotes = null;
+
 			if ( $this->selected_shipping_method != null ) {
 
 				// use the selected shipping module
-				if ( is_callable( array( & $wpsc_shipping_modules[$this->selected_shipping_method], 'getQuote'  ) ) ) {
-					$this->shipping_quotes = $wpsc_shipping_modules[$this->selected_shipping_method]->getQuote();
+				if ( is_callable( array( &$wpsc_shipping_modules[ $this->selected_shipping_method ], 'getQuote'  ) ) ) {
+					$this->shipping_quotes = $wpsc_shipping_modules[ $this->selected_shipping_method ]->getQuote();
 				}
+
 			} else {
 
 				// select the shipping quote with lowest value
@@ -357,7 +359,11 @@ class wpsc_cart {
 		}
 
 		if ( ( $this->shipping_quotes != null ) && ( array_search( $this->selected_shipping_option, array_keys( $this->shipping_quotes ) ) === false ) ) {
-			$this->selected_shipping_option = apply_filters( 'wpsc_default_shipping_quote', array_pop( array_keys( array_slice( $this->shipping_quotes, 0, 1 ) ) ), $this->shipping_quotes );
+			
+			$slice    = array_keys( array_slice( $this->shipping_quotes, 0, 1 ) );
+			$selected = array_pop( $slice );
+			
+			$this->selected_shipping_option = apply_filters( 'wpsc_default_shipping_quote', $selected, $this->shipping_quotes );
 		}
 	}
 
@@ -399,7 +405,7 @@ class wpsc_cart {
 	function get_tax_rate() {
 		$country = new WPSC_Country( get_option( 'base_country' ) );
 
-		$country_data = WPSC_Countries::country( get_option( 'base_country' ), true );
+		$country_data = WPSC_Countries::get_country( get_option( 'base_country' ), true );
 		$add_tax = false;
 
 		if ( $this->selected_country == get_option( 'base_country' ) ) {
@@ -443,10 +449,10 @@ class wpsc_cart {
 
 		if ( $add_tax == true ) {
 			if ( $country->has_regions() ) {
-				$region = $country->region( $tax_region );
-				$tax_percentage = $region->tax();
+				$region = $country->get_region( $tax_region );
+				$tax_percentage = $region->get_tax();
 			} else {
-				$tax_percentage = $country->tax();
+				$tax_percentage = $country->get_tax();
 			}
 		} else {
 			// no tax charged = tax equal to 0%
