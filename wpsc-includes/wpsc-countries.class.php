@@ -885,31 +885,31 @@ class WPSC_Countries {
 
 		$country_list = array();
 
-		foreach ( self::countries() as $country_id => $wpsc_country ) {
-			if ( $wpsc_country->visible() ) {
-				$country_list[$wpsc_country->isocode()] = $wpsc_country->name();
+		foreach ( self::get_countries() as $country_id => $wpsc_country ) {
+			if ( $wpsc_country->is_visible() ) {
+				$country_list[$wpsc_country->get_isocode()] = $wpsc_country->get_name();
 
 				if ( $wpsc_country->has_regions() ) {
-					$regions = $wpsc_country->regions();
+					$regions = $wpsc_country->get_regions();
 					$region_list = array();
 					foreach ( $regions as $region_id => $wpsc_region ) {
-						$region_list[$region_id] = $wpsc_region->name();
+						$region_list[$region_id] = $wpsc_region->get_name();
 					}
 
 					if ( ! empty ( $region_list ) ) {
-						$localizations_array[ 'wpsc_country_'.$wpsc_country->isocode() . '_regions' ] = $region_list;
+						$localizations_array[ 'wpsc_country_'.$wpsc_country->get_isocode() . '_regions' ] = $region_list;
 					}
 				}
 
-				$in_this_country_a_region_is_called_a = $wpsc_country->get( 'region_is_called' );
+				$in_this_country_a_region_is_called_a = $wpsc_country->get( '_region_label' );
 				if ( ! empty( $in_this_country_a_region_is_called_a ) ) {
-					$localizations_array['wpsc_country_' . $wpsc_country->isocode() . '_region_is_called' ] = $in_this_country_a_region_is_called_a;
+					$localizations_array['wpsc_country_' . $wpsc_country->get_isocode() . '_region_label' ] = $in_this_country_a_region_is_called_a;
 				}
 			}
 		}
 
 		if ( ! empty( $country_list ) ) {
-			$localizations_array['wpsc_countrries'] = $country_list;
+			$localizations_array['wpsc_countries'] = $country_list;
 		}
 
 		return $localizations_array;
