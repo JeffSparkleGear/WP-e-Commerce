@@ -145,8 +145,9 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		foreach ( $response['customer_meta'] as $current_meta_key => $current_meta_value ) {
 
 			// if the meta key and value are the same as what was sent in the request we don't need to
-			// send them back because the client already knows about this.  But we have to check in case
-			// a data rule or a plugin that used our hooks made some adjustments
+			// send them back because the client already knows about this.
+			//
+			// But we have to check just in case a data rule or a plugin that used our hooks made some adjustments
 			if ( isset( $response['old_customer_meta'][$current_meta_key] ) && ( $response['old_customer_meta'][$current_meta_key] == $current_meta_value ) ) {
 				// new value s the same as the old value, why send it?
 				unset( $response['customer_meta'][$current_meta_key] );
@@ -167,7 +168,19 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		$new_checkout_info = _wpsc_wpsc_remove_unchanged_checkout_info( $old_checkout_info, _wpsc_get_checkout_info() );
 		if ( ! empty( $new_checkout_info ) ) {
 			$response['checkout_info'] = $new_checkout_info;
+		} else {
+			if ( isset( $response['checkout_info'] ) ) {
+				unset( $response['checkout_info'] );
+			}
 		}
+
+		// We don't need to send the old customer meta values to the client, so we will remove them
+		if ( isset( $response['old_customer_meta'] ) ) {
+			unset( $response['old_customer_meta'] );
+		}
+
+		// debug
+		error_log( var_export( $response, true ) );
 
 		wp_send_json_success( $response );
 		die();
