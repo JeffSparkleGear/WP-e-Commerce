@@ -609,7 +609,8 @@ function wpsc_submit_checkout( $collected_data = true ) {
 	$selected_gateways = get_option( 'custom_gateway_options' );
 	$submitted_gateway = isset( $_POST['custom_gateway'] ) ? $_POST['custom_gateway'] : '';
 	$options = get_option( 'custom_shipping_options' );
-	if ( $collected_data ) {
+
+	//if ( $collected_data ) {
 		$form_validity = $wpsc_checkout->validate_forms();
 		extract( $form_validity ); // extracts $is_valid and $error_messages
 
@@ -617,10 +618,10 @@ function wpsc_submit_checkout( $collected_data = true ) {
 			$error_messages[] = __( 'Please agree to the terms and conditions, otherwise we cannot process your order.', 'wpsc' );
 			$is_valid = false;
 		}
-	} else {
+	//} else {
 		$is_valid = true;
 		$error_messages = array();
-	}
+	//}
 
 	$wpsc_country = new WPSC_Country( wpsc_get_customer_meta( 'shippingcountry' ) );
 	$country_id   = $wpsc_country->get_id();
@@ -705,7 +706,7 @@ function wpsc_submit_checkout( $collected_data = true ) {
 			$tax_percentage = 0.00;
 		}
 		$total = $wpsc_cart->calculate_total_price();
-		
+
 		$args = array(
 			'totalprice'       => $total,
 			'statusno'         => '0',
