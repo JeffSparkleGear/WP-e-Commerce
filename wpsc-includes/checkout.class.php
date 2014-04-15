@@ -61,8 +61,6 @@ function wpsc_get_buyers_email($purchase_id){
 
 	return $email;
 }
-
-
 /**
  * returns the tax label
  * @access public

@@ -1871,13 +1871,17 @@ function _wpsc_deprecated_javascript_localization_vars( $localizations = array()
 }
 
 
+
 /**
  * wpsc google checkout submit used for google checkout (unsure whether necessary in 3.8)
  * @access public
  *
- * @deprecated since 3.7
+ * @deprecated since 3.8.14
  */
 function wpsc_google_checkout_submit() {
+
+	_wpsc_deprecated_function( __FUNCTION__, '3.8.14' );
+
 	global $wpdb, $wpsc_cart, $current_user;
 	$wpsc_checkout = new wpsc_checkout();
 	$purchase_log_id = $wpdb->get_var( "SELECT `id` FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `sessionid` IN(%s) LIMIT 1", wpsc_get_customer_meta( 'checkout_session_id' ) );
@@ -1901,3 +1905,4 @@ function wpsc_google_checkout_submit() {
 	$wpsc_cart->save_to_db( $purchase_log_id );
 	$wpsc_cart->submit_stock_claims( $purchase_log_id );
 }
+
