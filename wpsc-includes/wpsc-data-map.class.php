@@ -95,6 +95,7 @@ class WPSC_Data_Map {
 		}
 
 		$this->_map_data = null;
+		$this->_dirty = false;
 	}
 
 	/**
