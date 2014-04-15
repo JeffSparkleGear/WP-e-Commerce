@@ -606,6 +606,14 @@ function wpsc_add_currency_list() {
 			$wpdb->query( $currency_row );
 		}
 	}
+
+	// add the region name meta now that the currency ( country _ data is setup
+	$wpsc_country = new WPSC_Country( 'US' );
+	$wpsc_country->set( 'region_is_called', __( 'state', 'wpsc' ) );
+
+	$wpsc_country = new WPSC_Country( 'CA' );
+	$wpsc_country->set( 'region_is_called', __( 'province', 'wpsc' ) );
+
 }
 
 /**

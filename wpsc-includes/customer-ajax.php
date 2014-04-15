@@ -102,6 +102,9 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			$customer_meta = array();
 		}
 
+		// We will want to know which, if any, checkout data changed, so grab the current checkout data so we can compare later
+		$old_checkout_info = _wpsc_get_checkout_info();
+
 		// We will also want to keep track of the values that are being set
 		$response['changed_customer_meta'] = $customer_meta;
 
@@ -152,12 +155,18 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			}
 
 			// if the meta value we are considering sending back is one of the values the client gave, we don't send it
-			// becuase the client already knows the meta value and it is probably already visible in the user interface
+			// because the client already knows the meta value and it is probably already visible in the user interface
 			if ( isset( $customer_meta[$current_meta_key] ) && ( $customer_meta[$current_meta_key] == $current_meta_value ) ) {
 				// new value s the same as the old value, why send it?
 				unset( $response['customer_meta'][$current_meta_key] );
 				continue;
 			}
+		}
+
+		// Get the checkout information and if something has changed send it to the client
+		$new_checkout_info = _wpsc_wpsc_remove_unchanged_checkout_info( $old_checkout_info, _wpsc_get_checkout_info() );
+		if ( ! empty( $new_checkout_info ) ) {
+			$response['checkout_info'] = $new_checkout_info;
 		}
 
 		wp_send_json_success( $response );
@@ -227,8 +236,6 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		return $response;
 	}
 
-
-
 	if ( _wpsc_doing_customer_meta_ajax() ) {
 		add_action( 'wp_ajax_wpsc_validate_customer'       		, 'wpsc_validate_customer_ajax' );
 		add_action( 'wp_ajax_nopriv_wpsc_validate_customer'		, 'wpsc_validate_customer_ajax' );
@@ -242,7 +249,6 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 		add_action( 'wp_ajax_wpsc_update_customer_meta'       	, 'wpsc_update_customer_meta_ajax' );
 		add_action( 'wp_ajax_nopriv_wpsc_update_customer_meta'	, 'wpsc_update_customer_meta_ajax' );
 	}
-
 } // end if doing customer meta ajax
 
 /*************************************************************************************************
@@ -689,4 +695,29 @@ function _wpsc_get_checkout_info() {
 
 	return $checkout_info;
 }
+
+
+/**
+ * remove checkout info that has not changed
+ *
+ * @since 3.8.14
+ * @access private
+ * @return array  checkout information
+ */
+function _wpsc_wpsc_remove_unchanged_checkout_info( $old_checkout_info, $new_checkout_info ) {
+
+	foreach ( $new_checkout_info as $new_checkout_info_key => $new_checkout_info_value ) {
+		if ( isset( $old_checkout_info[$new_checkout_info_key] ) ) {
+			$old_checkout_info_crc = crc32( json_encode( $old_checkout_info[$new_checkout_info_key] ) );
+			$new_checkout_info_crc = crc32( json_encode( $new_checkout_info_value ) );
+
+			if ( $old_checkout_info_crc == $new_checkout_info_crc ) {
+				unset( $new_checkout_info[$new_checkout_info_key] );
+			}
+		}
+	}
+
+	return $new_checkout_info;
+}
+
 
