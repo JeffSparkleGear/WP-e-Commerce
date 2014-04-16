@@ -477,9 +477,43 @@ function wpsc_change_regions_when_country_changes() {
 	wpsc_update_location_labels();
 	wpsc_update_state_edit_text_visibility();
 	
+	wpsc_copy_meta_value_to_similiar( country_select );
+	
 	return true;
 }
 
+function wpsc_copy_meta_value_to_similiar( element ) {
+
+
+	var element_meta_key = wpsc_get_element_meta_key( element );
+	var value_to_set = element.val();
+		
+	// if there are other fields on the current page that are used to change the same meta value then 
+	// they need to be updated
+	var selector = '[data-wpsc-meta-key="' + meta_key + '"]';
+	
+	jQuery( selector ).each( function( index, value ) {
+		
+		if ( this == element) {
+			continue;
+		}
+		
+			if ( jQuery(this).is(':checkbox') ) {
+				var boolean_meta_value = meta_value == "1"; 
+				if ( boolean_meta_value ) {
+					jQuery( this ).attr( 'checked', 'checked' );
+				} else {
+					jQuery( this ).removeAttr( 'checked' );
+				}
+			} else {
+				var current_value = jQuery( this ).val();
+				if ( current_value != meta_value ) {
+					jQuery( this ).val( meta_value );
+				}
+			}
+		}
+	});
+}
 
 function wpsc_update_state_edit_text_visibility() {
 
