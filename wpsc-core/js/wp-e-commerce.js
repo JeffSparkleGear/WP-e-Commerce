@@ -417,6 +417,27 @@ function wpsc_adjust_checkout_form_element_visibility() {
  * 
  */
 function wpsc_update_location_labels() {
+	
+	//var label = wpsc_country_region_label( country_code );
+
+	var billing_state_element = wpsc_get_wpsc_meta_element( 'billingstate' ) ;
+	
+	if ( billing_state_element ) {
+	
+		var billing_state_label = wpsc_get_label_element( billing_state_element );
+	}	
+
+	var shipping_state_element = wpsc_get_wpsc_meta_element( 'shippingstate' );
+
+	if ( shipping_state_element ) {
+
+		var shipping_state_label = wpsc_get_label_element( shipping_state_element );
+		
+	}
+
+	return true;
+
+	
 }
 
 
@@ -451,6 +472,7 @@ function wpsc_change_regions_when_country_changes() {
 		region_select.hide();
 	}
 	
+	wpsc_update_location_labels();
 	wpsc_update_state_edit_text_visibility();
 	
 	return true;
@@ -526,7 +548,23 @@ function wpsc_no_region_selected_message( country_code ) {
 	return message;	
 }
 
-
+function wpsc_get_label_element( input ) {
+	
+	if ( input instanceof jQuery ) {
+		input_element = input;
+	} else if ( typeof input == "string" ) {
+		input_element = wpsc_get_wpsc_meta_element( input );
+	} else if ( typeof input == "object" ){
+		input_element = jQuery( input );
+	} else {
+		return null;
+	}
+	
+	var input_id = input_element.attr('id');
+	
+	var label_element = jQuery( "label[for='" + input_id + "']" );
+	return label_element;
+}
 
 
 /*
