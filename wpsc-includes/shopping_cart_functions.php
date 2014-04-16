@@ -113,11 +113,16 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$id = 'billingcountry';
 	}
 
+	if ( empty( $supplied_form_id ) ) {
+		$supplied_form_id = $id;
+	}
+
+
 	$additional_attributes = 'data-wpsc-meta-key="' . $title . '" title="' . $title . '" ' . $js;
 	$output .= "<div id='$html_form_id'>\n\r";
 	$output .= wpsc_get_country_dropdown(
 		array(
-				'id'                    => $id,
+				'id'                    => $supplied_form_id,
 				'name'                  => "collected_data[{$form_id}][0]",
 				'class'                 => 'current_country wpsc-visitor-meta',
 				'selected'              => $selected_country->get_isocode(),
@@ -143,9 +148,11 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 		$id = 'billingregion';
 	}
 
+	$region_form_id = $supplied_form_id . '_region';
+
 	$output .= "<div id='region_select_$form_id'>";
 	if ( $region_list != null ) {
-		$output .= '<select id="' . $id . '" class="current_region wpsc-visitor-meta" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
+		$output .= '<select id="' . $region_form_id . '" class="current_region wpsc-visitor-meta wpsc-region-dropdown" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
 		foreach ( $region_list as $region ) {
 			if ( $selected_region && $selected_region->get_id() == $region->get_id() ) {
 				$selected = "selected='selected'";

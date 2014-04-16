@@ -71,19 +71,19 @@ function _wpsc_country_dropdown_options( $args = '' ) {
 
 function wpsc_get_country_dropdown( $args = '' ) {
 	static $count = 0;
-	$count ++;
+	$count++;
 
 	$defaults = array(
 			'name'                  => 'wpsc_countries',
 			'id'                    => "wpsc-country-dropdown-{$count}",
-			'class'                 => 'wpsc_country_dropdown',
+			'class'                 => '',
 			'additional_attributes' => '',
 	);
 
 	$args = wp_parse_args( $args, $defaults );
 
 	$output = sprintf(
-			'<select name="%1$s" id="%2$s" class="%3$s" %4$s>',
+			'<select name="%1$s" id="%2$s" class="%3$s wpsc-country-dropdown" %4$s>',
 			/* %1$s */ esc_attr( $args['name'] ),
 			/* %2$s */ esc_attr( $args['id'] ),
 			/* %3$s */ esc_attr( $args['class'] ),

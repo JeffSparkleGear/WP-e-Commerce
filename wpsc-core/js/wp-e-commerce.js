@@ -1,20 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// This logic is used to create the globals that were originally defined in the 
+// This logic is used to create the global that were originally defined in the 
 // dynamic-js file pre 3.8.14.  Note that variables also also exist in the "wpsc_ajax" structure.
 
-// iterate over the object and explicitly make each property a new global variable.  Because
-// we are doing the operation in the global context the 'this' is the same as 'window' and 
+// From our localization object and explicitly make the legacy wpsc_ajax property a new global variable.  
+// Because we are doing the operation in the global context the 'this' is the same as 'window' and 
 // is the same functionally as do a 'var objectname' statement. Creating 'global variables' 
 // in this manner the new "variable" is enumerable and can be deleted.  
 // 
 // To add a new global property that can be referenced in the script see the hook 
 // wpsc_javascript_localizations in wpsc-core/wpsc-functions.php
 //
-for ( var a_name in wpsc_vars ) {
-  if ( wpsc_vars.hasOwnProperty( a_name ) ) {
-	  a_value = wpsc_vars[a_name];
-	  this[a_name] = a_value;
-  }
+if ( wpsc_vars.hasOwnProperty( "wpsc_ajax" ) ) {
+  this["wpsc_ajax"] = wpsc_vars["wpsc_ajax"];
 }
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +168,7 @@ function wpsc_update_customer_meta( response ) {
 			var selector = '[data-wpsc-meta-key="' + meta_key + '"]';
 			
 			jQuery( selector ).each( function( index, value ) {		
-				var element_meta_key = get_element_meta_key( this );
+				var element_meta_key = wpsc_get_element_meta_key( this );
 				
 				if ( element_meta_key != element_that_caused_change_event ) {
 					if ( jQuery(this).is(':checkbox') ) {
@@ -306,7 +303,7 @@ function wpsc_meta_item_change_response( response ) {
  * @param element  the lement to extract the meta key from
  * @returns string meta_key
  */
-function get_element_meta_key ( element ) {
+function wpsc_get_element_meta_key ( element ) {
 	
 	var meta_key = jQuery( element ).attr( "data-wpsc-meta-key" );
 	
@@ -327,21 +324,8 @@ function get_element_meta_key ( element ) {
  */
 function wpsc_meta_item_change() {
 
-	var meta_value;
-	
-	if ( jQuery(this).is(':checkbox') ) {
-		if ( jQuery( this ).is(':checked') ) {
-			meta_value = 1;
-		} else { 
-			meta_value = 0;
-		}
-	} else if ( jQuery(this).is('select') ) {
-		meta_value = jQuery( this ).find( 'option:selected' ).val();		
-	} else 	{
-		meta_value = jQuery( this ).val();	
-	}
-	
-	var meta_key = get_element_meta_key( this );
+	var meta_value = wpsc_get_value_from_wpsc_meta_element( this );	
+	var meta_key   = wpsc_get_element_meta_key( this );
 	
 	// if there are other fields on the current page that are used to change the same meta value then 
 	// they need to be updated
@@ -382,10 +366,11 @@ function wpsc_adjust_checkout_form_element_visibility() {
 		jQuery( shipping_row ).siblings().show();
 		jQuery( "#shippingsameasbillingmessage" ).hide();		
 	} 
-	
+
 	// set the visibility of the shipping state input fields
-	var shipping_country = jQuery( "#shippingcountry" ).val();
-	var shipping_state_element = jQuery( "input[data-wpsc-meta-key='shippingstate']" ) ;
+	var shipping_country = wpsc_get_value_from_wpsc_meta_element( 'shippingcountry' );
+	var shipping_state_element = wpsc_get_wpsc_meta_element( 'shippingstate' ) ;
+	
 	
 	if ( jQuery("#shippingSameBilling").is(":checked") || ('US' === shipping_country) || ('CA' === shipping_country) ) {
 		shipping_state_element.closest( "tr" ).hide();
@@ -396,10 +381,11 @@ function wpsc_adjust_checkout_form_element_visibility() {
 	}
 	
 	// set the visibility of the shipping state input fields
-	var billing_country = jQuery( "#billingcountry" ).val();
-	var billing_state_element = jQuery( "input[data-wpsc-meta-key='billingstate']" ) ;
+	var billing_country = wpsc_get_value_from_wpsc_meta_element( 'billingcountry' );
+	var billing_state_element = wpsc_get_wpsc_meta_element( 'billingstate' ) ;
 	
-	if ( 'US' === billing_country || 'CA' === billing_country ) {
+	// are there any regions for the currently selected billing country
+	if ( wpsc_country_has_regions( billing_country ) ) {
 		billing_state_element.closest( "tr" ).hide();
 		billing_state_element.val( '' ).attr( 'disabled', 'disabled' );
 	} else {			
@@ -410,6 +396,78 @@ function wpsc_adjust_checkout_form_element_visibility() {
 	// make sure any item that changes checkout data is bound to the proper event handler
 	jQuery( ".wpsc-visitor-meta" ).on( "change", wpsc_meta_item_change );
 }
+
+
+function wpsc_get_wpsc_meta_element( meta_key ) {
+	var selector = '[data-wpsc-meta-key="' + meta_key + '"]';
+	var element = jQuery( selector ).first();
+	return element;
+}
+
+
+function wpsc_get_value_from_wpsc_meta_element( meta ) {
+	var element;
+	
+	if ( typeof meta == string ) {
+		element = wpsc_get_wpsc_meta_element( meta_key );
+	} else {
+		element = meta;
+	}
+	
+	var meta_value = false;
+	
+	if ( element.is(':checkbox') ) {
+		if ( element.is(':checked') ) {
+			meta_value = 1;
+		} else { 
+			meta_value = 0;
+		}
+	} else if ( element.is('select') ) {
+		meta_value = element.find( 'option:selected' ).val();		
+	} else 	{
+		meta_value = element.val();	
+	}
+
+	return meta_value;
+}
+
+function wpsc_country_has_regions( country_code ) {
+	var regions_object_name = "wpsc_country_" + country_code + "_regions";
+	return wpsc_isset( regions_object_name );	
+}
+
+/*
+ * check if a variable is set, kind of like the php isset function, but only 
+ * for our localizaed data
+ * 
+ * @since 3.8.14
+ * 
+ * @return true if set, false otherwise
+ */
+function wpsc_isset( name ) {
+	var exists = wpsc_vars.hasOwnProperty ( name );
+	return exists;
+}
+
+/*
+ * get a variable is set, kind of like the php get method, but only 
+ * for our localizaed data
+ *
+ * @since 3.8.14
+ * 
+ * @return variable if set, null otherwise
+ * 
+ */
+function wpsc_get_var( name ) {
+	var value = null;
+	
+	if ( wpsc_is_var_set( name ) ) {
+		value = wpsc_vars.name;
+	}
+	
+	return value;
+}
+
 
 /*
  * Change the labels assicated with country and region fields to match the 
@@ -432,7 +490,7 @@ function wpsc_update_location_labels() {
  * since 3.8.14
  * 
  */
-function wpsc_update_region_dropdowns() {
+function wpsc_change_regions_when_country_changes() {
 
 }
 
@@ -446,13 +504,17 @@ function wpsc_update_region_dropdowns() {
  */
 jQuery(document).ready(function ($) {
 
+	if ( jQuery( ".wpsc-country-dropdown" ).length ) {
+		jQuery( ".wpsc-country-dropdown"   ).on( 'change', wpsc_change_regions_when_country_changes() );
+	}
+
+	
 	if ( jQuery( "#shippingSameBilling" ).length ) {
 		// make sure visibility of form elements is what it should be
 		wpsc_adjust_checkout_form_element_visibility();
 		jQuery( "#shippingSameBilling"  ).on( 'change', wpsc_adjust_checkout_form_element_visibility() );
 	}
-	
-	
+		
 	if(jQuery('#checkout_page_container .wpsc_email_address input').val())
 		jQuery('#wpsc_checkout_gravatar').attr('src', 'https://secure.gravatar.com/avatar/'+MD5(jQuery('#checkout_page_container .wpsc_email_address input').val().split(' ').join(''))+'?s=60&d=mm');
 	jQuery('#checkout_page_container .wpsc_email_address input').keyup(function(){
