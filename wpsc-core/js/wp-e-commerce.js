@@ -411,6 +411,34 @@ function wpsc_adjust_checkout_form_element_visibility() {
 	jQuery( ".wpsc-visitor-meta" ).on( "change", wpsc_meta_item_change );
 }
 
+/*
+ * Change the labels assicated with country and region fields to match the 
+ * terminology for the selected location.  For example, regions in the USA are
+ * called states, regions in Canada are called provinces
+ * 
+ * since 3.8.14
+ * 
+ */
+function wpsc_update_location_labels() {
+	
+	
+
+}
+
+
+/*
+ * Load the region dropdowns based on changes to the country dropdowns
+ * 
+ * since 3.8.14
+ * 
+ */
+function wpsc_update_region_dropdowns() {
+
+}
+
+
+
+
 /**
  * ready to setup the events for user actions that casuse meta item changes 
  * 
