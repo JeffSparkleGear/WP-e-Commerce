@@ -130,7 +130,6 @@ endif;
    <?php do_action('wpsc_before_shipping_of_shopping_cart'); ?>
 
    <div id="wpsc_shopping_cart_container">
-    <?php   if ( true ) { ?>
 
    <?php if(wpsc_uses_shipping()) : ?>
       <h2><?php _e('Calculate Shipping Price', 'wpsc'); ?></h2>
@@ -202,7 +201,6 @@ endif;
          <?php endif; ?>
       </table>
    <?php endif;  ?>
-   <?php } ?>
 
    <?php
       $wpec_taxes_controller = new wpec_taxes_controller();

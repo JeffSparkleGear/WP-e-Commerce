@@ -179,9 +179,6 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 			unset( $response['old_customer_meta'] );
 		}
 
-		// debug
-		error_log( var_export( $response, true ) );
-
 		wp_send_json_success( $response );
 		die();
 	}
