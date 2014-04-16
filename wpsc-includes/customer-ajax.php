@@ -311,7 +311,7 @@ function _wpsc_shipping_same_as_billing_ajax_response( $response, $meta_key, $me
 	return $response;
 }
 
-add_filter( 'wpsc_customer_meta_response_shippingSameBilling', '_wpsc_shipping_same_as_billing_ajax_response', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_filter( 'wpsc_customer_meta_response_shippingSameBilling', '_wpsc_shipping_same_as_billing_ajax_response', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 
 /**
@@ -365,7 +365,7 @@ function _wpsc_update_customer_billingregion( $response, $meta_key, $meta_value 
 	return $response;
 }
 
-add_action( 'wpsc_customer_meta_response_billingregion', '_wpsc_update_customer_billingregion', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_action( 'wpsc_customer_meta_response_billingregion', '_wpsc_update_customer_billingregion', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 /**
  * Update the shipping same as billing meta value, return updated content to the user
@@ -398,7 +398,7 @@ function _wpsc_update_customer_billingcountry( $response, $meta_key, $meta_value
 	return $response;
 }
 
-add_action( 'wpsc_customer_meta_response_billingcountry', '_wpsc_update_customer_billingcountry', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_action( 'wpsc_customer_meta_response_billingcountry', '_wpsc_update_customer_billingcountry', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 
 /**
@@ -432,7 +432,7 @@ function _wpsc_update_customer_shippingregion( $response, $meta_key, $meta_value
 	return $response;
 }
 
-add_action( 'wpsc_customer_meta_response_shippingregion', '_wpsc_update_customer_shippingregion', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_action( 'wpsc_customer_meta_response_shippingregion', '_wpsc_update_customer_shippingregion', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 
 /**
@@ -463,7 +463,7 @@ function _wpsc_update_customer_shippingcountry( $response, $meta_key, $meta_valu
 	return $response;
 }
 
-add_action( 'wpsc_customer_meta_response_shippingcountry', '_wpsc_update_customer_shippingcountry', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_action( 'wpsc_customer_meta_response_shippingcountry', '_wpsc_update_customer_shippingcountry', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 
 
@@ -498,7 +498,7 @@ function _wpsc_customer_meta_response_shippingSameBilling( $response, $meta_key,
 }
 
 
-add_filter( 'wpsc_customer_meta_response_shippingSameBilling', '_wpsc_customer_meta_response_shippingSameBilling', _WPSC_USER_META_HOOK_PRIORITY, 3 );
+//add_filter( 'wpsc_customer_meta_response_shippingSameBilling', '_wpsc_customer_meta_response_shippingSameBilling', _WPSC_USER_META_HOOK_PRIORITY, 3 );
 
 
 function _wpsc_customer_shipping_quotes_need_recalc( $meta_value, $meta_key, $customer_id ) {

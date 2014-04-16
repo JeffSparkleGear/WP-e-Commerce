@@ -876,6 +876,7 @@ class WPSC_Countries {
 
 		$localizations_array['no_country_selected']       = __( 'Please select a country', 'wpsc' );
 		$localizations_array['no_region_selected_format'] = __( 'Please select a %s', 'wpsc' );
+		$localizations_array['no_region_label']           = __( 'state/province', 'wpsc' );
 
 		$checkout_form    = new WPSC_Checkout_Form();
 		$billing_state_id = $checkout_form->get_field_id_by_unique_name( 'billingstate' );
@@ -901,9 +902,9 @@ class WPSC_Countries {
 					}
 				}
 
-				$in_this_country_a_region_is_called_a = $wpsc_country->get( '_region_label' );
-				if ( ! empty( $in_this_country_a_region_is_called_a ) ) {
-					$localizations_array['wpsc_country_' . $wpsc_country->get_isocode() . '_region_label' ] = $in_this_country_a_region_is_called_a;
+				$region_label = $wpsc_country->get( 'region_label' );
+				if ( ! empty( $region_label ) ) {
+					$localizations_array['wpsc_country_' . $wpsc_country->get_isocode() . '_region_label' ] = $region_label;
 				}
 			}
 		}

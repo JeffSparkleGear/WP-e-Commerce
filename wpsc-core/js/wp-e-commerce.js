@@ -13,6 +13,16 @@
 if ( wpsc_vars.hasOwnProperty( "wpsc_ajax" ) ) {
   this["wpsc_ajax"] = wpsc_vars["wpsc_ajax"];
 }
+
+
+if ( 'object' === typeof wpsc_vars.wpsc_ajax ) {
+	for ( var key in wpsc_vars.wpsc_ajax ) {
+	  if ( wpsc_vars.wpsc_ajax.hasOwnProperty( key ) ) {
+		  value = wpsc_vars[ key ];
+		  this[ key ] = value;
+	  }
+	}
+}
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +98,7 @@ if ( ! ( document.cookie.indexOf("wpsc_customer_cookie") >= 0 ) ) {
  */
 // a convenient function that will return the url to which ajax requests are sent
 function wpsc_ajax_url() {
-	return _wpsc_admin_ajax_url;
+	return wpsc_var_get( '_wpsc_admin_ajax_url' );
 }
 
 var ajax_via_jquery_post = false;
@@ -181,7 +191,7 @@ function wpsc_update_customer_meta( response ) {
 					} else {
 						var current_value = jQuery( this ).val();
 						if ( current_value != meta_value ) {
-							jQuery( this ).val( new_value );
+							jQuery( this ).val( meta_value );
 						}
 					}
 				}
@@ -325,7 +335,7 @@ function wpsc_get_element_meta_key ( element ) {
 function wpsc_meta_item_change() {
 
 	var meta_value = wpsc_get_value_from_wpsc_meta_element( this );	
-	var meta_key   = wpsc_get_element_meta_key( this );
+	var meta_key   = wpsc_get_element_meta_key( jQuery( this ) );
 	
 	// if there are other fields on the current page that are used to change the same meta value then 
 	// they need to be updated
@@ -398,6 +408,177 @@ function wpsc_adjust_checkout_form_element_visibility() {
 }
 
 
+/*
+ * Change the labels assicated with country and region fields to match the 
+ * terminology for the selected location.  For example, regions in the USA are
+ * called states, regions in Canada are called provinces
+ * 
+ * since 3.8.14
+ * 
+ */
+function wpsc_update_location_labels() {
+}
+
+
+/*
+ * Load the region dropdowns based on changes to the country dropdowns
+ * 
+ * since 3.8.14
+ * 
+ */
+function wpsc_change_regions_when_country_changes() {
+	
+	var country_select = jQuery( this );
+	
+	region_select = wpsc_country_region_element( country_select );
+	
+	region_select.empty();
+	
+	var country_code = wpsc_get_value_from_wpsc_meta_element( country_select );
+	
+	if ( wpsc_country_has_regions( country_code ) ) {
+		region_select.show();
+		var select_a_region_message = wpsc_no_region_selected_message( country_code );		
+		region_select.append( new Option( select_a_region_message, '' ) );
+		var regions = wpsc_country_regions( country_code ) 
+		for ( var region_code in regions ) {
+		  if ( regions.hasOwnProperty( region_code ) ) {
+			  var region_name = regions[region_code];
+			  region_select.append( new Option( region_name, region_code ) );
+		  }
+		}				
+	} else {
+		region_select.hide();
+	}
+	
+	wpsc_update_state_edit_text_visibility();
+	
+	return true;
+}
+
+
+function wpsc_update_state_edit_text_visibility() {
+
+	var billing_state_element = wpsc_get_wpsc_meta_element( 'billingstate' ) ;
+	
+	if ( billing_state_element ) {
+	
+		// set the visibility of the shipping state input fields
+		var billing_country_code = wpsc_get_value_from_wpsc_meta_element( 'billingcountry' );
+		
+		// are there any regions for the currently selected billing country
+		if ( wpsc_country_has_regions( billing_country_code ) ) {
+			billing_state_element.closest( "tr" ).hide();
+			billing_state_element.val( '' ).attr( 'disabled', 'disabled' );
+		} else {			
+			billing_state_element.closest( "tr" ).show();
+			billing_state_element.val( '' ).removeAttr( 'disabled' );
+		}
+	}	
+
+	var shipping_country_element = wpsc_get_wpsc_meta_element( 'shippingcountry' );
+
+	if ( shipping_country_element.is(":visible") ) {
+
+		var shipping_state_element = wpsc_get_wpsc_meta_element( 'shippingstate' );
+
+		if ( shipping_state_element ) {
+			// set the visibility of the shipping state input fields
+			var shipping_country_code = wpsc_get_value_from_wpsc_meta_element( 'shippingcountry' );
+				
+			if ( wpsc_country_has_regions( shipping_country_code ) ) {
+				shipping_state_element.closest( "tr" ).hide();
+				shipping_state_element.val( '' ).attr( 'disabled', 'disabled' );
+			} else {			
+				shipping_state_element.closest( "tr" ).show();
+				shipping_state_element.val( '' ).removeAttr( 'disabled' );
+			}
+		}
+	}
+
+	return true;
+}
+
+function wpsc_country_has_regions( country_code ) {
+	var regions_object_name = "wpsc_country_" + country_code + "_regions";
+	return wpsc_var_isset( regions_object_name );	
+}
+
+function wpsc_country_regions( country_code ) {
+	var regions_object_name = "wpsc_country_" + country_code + "_regions";
+	return wpsc_var_get( regions_object_name );	
+}
+
+function wpsc_country_region_label( country_code ) {
+	var regions_label_name = "wpsc_country_" + country_code + "_region_label";
+	var label = wpsc_var_get( regions_label_name );
+	if ( ! label ) {
+		label = wpsc_var_get( 'no_region_label' );
+	}
+	
+	return label;
+}
+
+function wpsc_no_region_selected_message( country_code ) {
+	var label = wpsc_country_region_label( country_code )	
+	var format = wpsc_var_get( 'no_region_selected_format' );	
+	var message = format.replace("%s",label);	
+	return message;	
+}
+
+
+
+
+/*
+ * check if a variable is set, kind of like the php isset function, but only 
+ * for our localizaed data
+ * 
+ * @since 3.8.14
+ * 
+ * @return true if set, false otherwise
+ */
+function wpsc_var_isset( name ) {
+	var exists = wpsc_vars.hasOwnProperty ( name );
+	return exists;
+}
+
+/*
+ * get a wpsc ajax variable, kind of like the php get method, but only 
+ * for our localizaed data
+ *
+ * @since 3.8.14
+ * 
+ * @return variable if set, null otherwise
+ * 
+ */
+function wpsc_var_get( name ) {
+	var value = null;
+	
+	if ( wpsc_var_isset( name ) ) {
+		value = wpsc_vars[name];
+	}
+	
+	return value;
+}
+
+/*
+ * get a wpsc ajax variable, kind of like the php get method, but only 
+ * for our localizaed data
+ *
+ * @since 3.8.14
+ * 
+ * @return variable if set, null otherwise
+ * 
+ */
+function wpsc_var_set( name, value ) {
+	if ( wpsc_is_var_set( name ) ) {
+		wpsc_vars.name = value;
+	}
+	
+	return value;
+}
+
+
 function wpsc_get_wpsc_meta_element( meta_key ) {
 	var selector = '[data-wpsc-meta-key="' + meta_key + '"]';
 	var element = jQuery( selector ).first();
@@ -408,10 +589,14 @@ function wpsc_get_wpsc_meta_element( meta_key ) {
 function wpsc_get_value_from_wpsc_meta_element( meta ) {
 	var element;
 	
-	if ( typeof meta == string ) {
-		element = wpsc_get_wpsc_meta_element( meta_key );
-	} else {
+	if ( meta instanceof jQuery ) {
 		element = meta;
+	} else if ( typeof meta == "string" ) {
+		element = wpsc_get_wpsc_meta_element( meta );
+	} else if ( typeof meta == "object" ){
+		element = jQuery( meta );
+	} else {
+		return null;
 	}
 	
 	var meta_value = false;
@@ -431,69 +616,27 @@ function wpsc_get_value_from_wpsc_meta_element( meta ) {
 	return meta_value;
 }
 
-function wpsc_country_has_regions( country_code ) {
-	var regions_object_name = "wpsc_country_" + country_code + "_regions";
-	return wpsc_isset( regions_object_name );	
-}
-
 /*
- * check if a variable is set, kind of like the php isset function, but only 
- * for our localizaed data
+ * find the region dropdown that goes with the country dropdown
  * 
- * @since 3.8.14
- * 
- * @return true if set, false otherwise
- */
-function wpsc_isset( name ) {
-	var exists = wpsc_vars.hasOwnProperty ( name );
-	return exists;
-}
-
-/*
- * get a variable is set, kind of like the php get method, but only 
- * for our localizaed data
- *
- * @since 3.8.14
- * 
- * @return variable if set, null otherwise
+ * since 3.8.14
  * 
  */
-function wpsc_get_var( name ) {
-	var value = null;
+function wpsc_country_region_element( country ) {	
 	
-	if ( wpsc_is_var_set( name ) ) {
-		value = wpsc_vars.name;
+	// if the meta key was was given as the arument we can find the element easy enough
+	if ( typeof country == "string" ) {
+		country = wpsc_get_wpsc_meta_element( country );
 	}
 	
-	return value;
-}
-
-
-/*
- * Change the labels assicated with country and region fields to match the 
- * terminology for the selected location.  For example, regions in the USA are
- * called states, regions in Canada are called provinces
- * 
- * since 3.8.14
- * 
- */
-function wpsc_update_location_labels() {
+	var country_id = country.attr('id')	
+	var region_id = country_id + "_region";
 	
+	var region_select = jQuery( "#" + region_id );
 	
-
+	return region_select;
+	
 }
-
-
-/*
- * Load the region dropdowns based on changes to the country dropdowns
- * 
- * since 3.8.14
- * 
- */
-function wpsc_change_regions_when_country_changes() {
-
-}
-
 
 
 
@@ -505,14 +648,17 @@ function wpsc_change_regions_when_country_changes() {
 jQuery(document).ready(function ($) {
 
 	if ( jQuery( ".wpsc-country-dropdown" ).length ) {
-		jQuery( ".wpsc-country-dropdown"   ).on( 'change', wpsc_change_regions_when_country_changes() );
+		jQuery( ".wpsc-country-dropdown"   ).on( 'change', wpsc_change_regions_when_country_changes );
 	}
 
+	if ( jQuery( ".wpsc-country-dropdown" ).length ) {
+		jQuery( ".wpsc-visitor-meta").on( "change", wpsc_meta_item_change );
+	}
 	
 	if ( jQuery( "#shippingSameBilling" ).length ) {
 		// make sure visibility of form elements is what it should be
 		wpsc_adjust_checkout_form_element_visibility();
-		jQuery( "#shippingSameBilling"  ).on( 'change', wpsc_adjust_checkout_form_element_visibility() );
+		jQuery( "#shippingSameBilling"  ).on( 'change', wpsc_adjust_checkout_form_element_visibility );
 	}
 		
 	if(jQuery('#checkout_page_container .wpsc_email_address input').val())
