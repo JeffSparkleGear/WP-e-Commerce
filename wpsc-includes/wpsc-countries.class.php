@@ -864,6 +864,7 @@ class WPSC_Countries {
 		self::$_initialized = true;
 	}
 
+
 	/**
 	 * add countries data to the wpec javascript localizations
 	 *
