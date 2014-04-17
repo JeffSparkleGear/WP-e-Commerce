@@ -705,7 +705,7 @@ function wpsc_submit_checkout( $collected_data = true ) {
 			$tax_percentage = 0.00;
 		}
 		$total = $wpsc_cart->calculate_total_price();
-		
+
 		$args = array(
 			'totalprice'       => $total,
 			'statusno'         => '0',
@@ -832,11 +832,6 @@ function wpsc_change_tax() {
 		$wpsc_checkout = new WPSC_Checkout();
 	}
 
-	$replacements = array();
-
-	$replacements = _wpsc_get_country_and_region_replacements( $replacements, true, true );
-
-	$json_response['replacements']     = $replacements;
 	$json_response['delivery_country'] = esc_js( $delivery_country );
 	$json_response['billing_country']  = esc_js( $wpsc_selected_country );
 	$json_response['widget_output']    = $output;
@@ -847,7 +842,6 @@ function wpsc_change_tax() {
 	$json_response['display_tax']      = wpsc_cart_tax();
 	$json_response['total']            = $total;
 	$json_response['total_input']      = $total_input;
-
 
 	$json_response['lock_tax']     = get_option( 'lock_tax' );
 	$json_response['country_name'] = wpsc_get_country( $delivery_country );
