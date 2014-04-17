@@ -10,8 +10,21 @@
 // To add a new global property that can be referenced in the script see the hook 
 // wpsc_javascript_localizations in wpsc-core/wpsc-functions.php
 //
-if ( wpsc_vars.hasOwnProperty( "wpsc_ajax" ) ) {
-  this["wpsc_ajax"] = wpsc_vars["wpsc_ajax"];
+
+// If the deprecated property is present in the structure that we localized into this script
+// we will make sure all of the variables that used to be here previously are explicitly declared
+// here for scripts to notice and access.
+// 
+// If a value for an deprecated variable is found in the deprecated properties it will be set. Otherwise
+// the deprecated variable will have the value of uninitialized.
+//
+// It is important to note that the variable declaration for some of these deprecated items may have 
+// been in HTML page head for regular pages, or in previously existing dynamically generated javascript. 
+if ( wpsc_vars.hasOwnProperty( "wpsc_deprecated" ) ) {
+	var wpsc_ajax = null;
+	
+	
+	this["wpsc_ajax"] = wpsc_vars["wpsc_ajax"];
 }
 
 
@@ -90,24 +103,26 @@ if ( ! ( document.cookie.indexOf("wpsc_customer_cookie") >= 0 ) ) {
 }
 // end of setting up the WPEC customer identifier
 ///////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Get the URL that should be used when this script initiates AJAX requests to the server
+ * 
+ * @since 3.8.14
+ * @access global
+ * @param url to receive AJAX requests
+ */
+// a convenient function that will return the url to which ajax requests are sent
+function wpsc_ajax_url() {
+	return _wpsc_admin_ajax_url;
+}
 
-	return wpsc_var_get( '_wpsc_admin_ajax_url' );
-	return wpsc_var_get( '_wpsc_admin_ajax_url' );
-var ajax_via_jquery_post = false;
-
-function wpsc_do_ajax_request( ajax_url, data, success_callback ) {
-	
-	if ( ajax_via_jquery_post ) {
-		jQuery.post( wpsc_ajax.ajaxurl, form_values, success, 'json' );
-	} else {
-		jQuery.ajax({
-			type      : "post",
-			dataType  : "json",
-			url       : ajax_url,
-			data      : data,
-			success   : success_callback,
-		});   					
-	}
+function wpsc_do_ajax_request( ajax_url, data, success_callback ) {	
+	jQuery.ajax({
+		type      : "post",
+		dataType  : "json",
+		url       : ajax_url,
+		data      : data,
+		success   : success_callback,
+	});   					
 }
 
 /**

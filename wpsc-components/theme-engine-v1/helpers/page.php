@@ -239,7 +239,7 @@ function wpsc_database_update_notice() { ?>
 
 
 function wpsc_theme_admin_notices() {
-	
+
 	// Check to see if WP eCommerce is installed before showing upgrade notices.
 	if ( false !== get_option( 'wpsc_version' ) ) {
 
@@ -357,7 +357,7 @@ function wpsc_enqueue_user_script_and_css() {
 		}
 
 		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $version_identifier );
-		wp_localize_script( 'wp-e-commerce', 'wpsc_ajax', _wpsc_javascript_localizations() );
+		wp_localize_script( 'wp-e-commerce', 'wpsc_vars', _wpsc_javascript_localizations() );
 
 		wp_enqueue_script( 'livequery',                   WPSC_URL 			. '/wpsc-admin/js/jquery.livequery.js',   array( 'jquery' ), '1.0.3' );
 		if ( get_option( 'product_ratings' ) == 1 )
@@ -1076,7 +1076,7 @@ function wpsc_transaction_results( $content = '' ) {
 		if ( ! defined( 'DONOTCACHEPAGE' ) || ( defined( 'DONOTCACHEPAGE' ) && ! DONOTCACHEPAGE ) ) {
 			define( 'DONOTCACHEPAGE', true );
 		}
-		
+
 		ob_start();
 		include( wpsc_get_template_file_path( 'wpsc-transaction_results.php' ) );
 		$output = ob_get_contents();

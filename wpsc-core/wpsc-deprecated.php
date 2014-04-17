@@ -1837,12 +1837,18 @@ function _wpsc_deprecated_javascript_localization_vars( $localizations = array()
 
 	/**
 	 * @deprecated since 3.8.14
-	 * 
+	 *
 	 * wpsc_deprecated_vars as an object with the properties below has been replaced and each of the properties
-	 * is available as it's own variable, that means devs isntead of referencing "wpsc_ajax.base_url" do
+	 * is available as it's own variable, that means devs instead of referencing "wpsc_ajax.base_url" do
 	 * "base_url"
 	 */
+
+	$wpsc_deprecated_vars = array();
+
 	$wpsc_ajax = array(
+		/* ajax handler */
+		'ajaxurl'              => admin_url( 'admin-ajax.php', 'relative' ),
+
 		/* base url */
 		'base_url'             => site_url(), //admin-legacy.js
 		'WPSC_URL'             => WPSC_URL,
@@ -1858,7 +1864,9 @@ function _wpsc_deprecated_javascript_localization_vars( $localizations = array()
 		'borderSize'               => 10, //if you adjust the padding in the CSS, you will need to update this variable
 	);
 
-	$localizations['wpsc_deprecated_vars'] = $wpsc_ajax;
+	$wpsc_deprecated_vars['wpsc_ajax'] = $wpsc_ajax;
+
+	$localizations['wpsc_deprecated_vars'] = $wpsc_deprecated_vars;
 
 	return $localizations;
 
