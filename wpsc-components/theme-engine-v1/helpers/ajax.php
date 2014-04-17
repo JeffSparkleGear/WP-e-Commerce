@@ -829,7 +829,7 @@ function wpsc_change_tax() {
 
 	global $wpsc_checkout;
 	if ( empty( $wpsc_checkout ) ) {
-		$wpsc_checkout = new WPSC_Checkout();
+		$wpsc_checkout = new wpsc_checkout();
 	}
 
 	$json_response['delivery_country'] = esc_js( $delivery_country );
