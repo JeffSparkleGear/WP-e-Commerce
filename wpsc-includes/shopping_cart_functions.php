@@ -151,8 +151,10 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 	$region_form_id = $supplied_form_id . '_region';
 
 	$output .= "<div id='region_select_$form_id'>";
+
+	$output .= '<select id="' . $region_form_id . '" class="current_region wpsc-visitor-meta wpsc-region-dropdown" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . ">\n\r";
+
 	if ( $region_list != null ) {
-		$output .= '<select id="' . $region_form_id . '" class="current_region wpsc-visitor-meta wpsc-region-dropdown" data-wpsc-meta-key="' . $title . '"  title="' . $title . '" ' . $namevalue . '" ' . $js . ">\n\r";
 		foreach ( $region_list as $region ) {
 			if ( $selected_region && $selected_region->get_id() == $region->get_id() ) {
 				$selected = "selected='selected'";
@@ -161,8 +163,9 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
 			}
 			$output .= "<option value='" . $region->get_id() . "' $selected>" . esc_html( $region->get_name() ) . "</option>\n\r";
 		}
-		$output .= "</select>\n\r";
 	}
+
+	$output .= "</select>\n\r";
 
 	$output .= '</div>';
 	$output .= "</div>\n\r";

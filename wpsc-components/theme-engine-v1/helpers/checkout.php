@@ -292,8 +292,9 @@ function wpsc_shipping_region_list( $selected_country, $selected_region, $shippi
 	$country = new WPSC_Country( $selected_country );
 	$regions = $country->get_regions();
 
+	$output .= "<select class=\"wpsc-visitor-meta\" data-wpsc-meta-key=\"shippingregion\" name=\"region\"  id=\"region\" >\n\r";
+
 	if ( count( $regions ) > 0 ) {
-		$output .= "<select class=\"wpsc-visitor-meta\" data-wpsc-meta-key=\"shippingregion\" name=\"region\"  id=\"region\" >\n\r";
 		foreach ( $regions as $region_id => $region ) {
 			$selected = '';
 			if ( $selected_region == $region_id ) {
@@ -303,10 +304,10 @@ function wpsc_shipping_region_list( $selected_country, $selected_region, $shippi
 		}
 		$output .= '';
 
-		$output .= '</select>';
-	} else {
-		$output .= ' ';
 	}
+
+	$output .= '</select>';
+
 	return $output;
 }
 
