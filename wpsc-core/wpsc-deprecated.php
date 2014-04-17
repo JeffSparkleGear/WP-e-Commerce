@@ -1939,3 +1939,13 @@ function wpsc_admin_dynamic_css() {
 	}
 	exit();
 }
+
+/**
+ * everywhere else in the code we use "wpsc_ajax_action", not the plural, deprecate this version
+ * @deprecated 3.8.14
+ *
+ */
+if ( isset( $_REQUEST['wpsc_ajax_actions'] ) && 'update_location' == $_REQUEST['wpsc_ajax_actions'] ) {
+	_wpsc_deprecated_function( 'wpsc_ajax_actions', '3.8.14', 'wpsc_ajax_action' );
+	add_action( 'init', 'wpsc_update_location' );
+}
