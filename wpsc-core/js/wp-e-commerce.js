@@ -21,8 +21,28 @@
 // It is important to note that the variable declaration for some of these deprecated items may have 
 // been in HTML page head for regular pages, or in previously existing dynamically generated javascript. 
 if ( wpsc_vars.hasOwnProperty( "wpsc_deprecated" ) ) {
-	var wpsc_ajax = null;
 	
+	var WPSC_URL 					= wpsc_deprecated_js_vars['WPSC_URL'];
+	var WPSC_IMAGE_URL				= wpsc_deprecated_js_vars['WPSC_IMAGE_URL'];
+	var WPSC_CORE_IMAGES_URL		= wpsc_deprecated_js_vars['WPSC_CORE_IMAGES_URL'];
+	var fileThickboxLoadingImage	= wpsc_deprecated_js_vars['fileThickboxLoadingImage'];
+
+	
+	var wpsc_ajax;
+    var base_url;
+    var WPSC_URL;
+    var WPSC_IMAGE_URL;
+    var WPSC_DIR_NAME;
+    var WPSC_CORE_IMAGES_URL;
+
+    /* LightBox Configuration start*/
+    var fileLoadingImage;
+    var fileBottomNavCloseImage;
+    var fileThickboxLoadingImage;
+    var resizeSpeed;
+    var borderSize;
+
+
 	
 	this["wpsc_ajax"] = wpsc_vars["wpsc_ajax"];
 }
