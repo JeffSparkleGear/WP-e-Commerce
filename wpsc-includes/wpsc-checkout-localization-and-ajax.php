@@ -479,18 +479,10 @@ function wpsc_customer_updated_data_ajax() {
 	wp_send_json_success( $response );
 }
 
-
-
 add_action( 'wp_ajax_wpsc_customer_updated_data'       , 'wpsc_customer_updated_data_ajax' );
 add_action( 'wp_ajax_nopriv_wpsc_customer_updated_data', 'wpsc_customer_updated_data_ajax' );
 
 
-
-
-/***************************************************************************************************************************************
- * Customer meta is built on a lower level API, Visitor meta.  Some visitor meta values are dependant on each other and need to
-* be changed when other visitor meta values change.  For example, shipping same as billing.  Below is the built in functionality
-* that enforces those changes.  Developers are free to add additional relationships as needed in plugins
-***************************************************************************************************************************************/
+add_action( 'wpsc_before_shopping_cart_page', '_wpsc_checkout_current_location_fields' );'
 
 
