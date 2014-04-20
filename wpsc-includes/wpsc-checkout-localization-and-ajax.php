@@ -59,7 +59,7 @@ function _wpsc_countries_localizations( $localizations_array ) {
  *
  * @param array 	localizations  other localizations that can be added to
  *
- * @return array	localizations array with cehckout information added
+ * @return array	localizations array with checkout information added
  */
 function _wpsc_localize_checkout_item_name_to_from_id( $localizations ) {
 	$localizations['wpsc_checkout_unique_name_to_form_id_map'] = _wpsc_create_checkout_unique_name_to_form_id_map();
@@ -350,7 +350,7 @@ function _wpsc_get_checkout_meta( $meta_keys = null ) {
 
 
 /**
- * Update customer information using infromation supplied by shopper on WPeC pages
+ * Update customer information using information supplied by shopper on WPeC pages
  *
  * @since 3.8.14
  *
@@ -482,7 +482,4 @@ function wpsc_customer_updated_data_ajax() {
 add_action( 'wp_ajax_wpsc_customer_updated_data'       , 'wpsc_customer_updated_data_ajax' );
 add_action( 'wp_ajax_nopriv_wpsc_customer_updated_data', 'wpsc_customer_updated_data_ajax' );
 
-
 add_action( 'wpsc_before_shopping_cart_page', '_wpsc_checkout_current_location_fields' );'
-
-
