@@ -1101,15 +1101,6 @@ class WPSC_Countries {
 		// delete anthing that is stored in the transient cache
 		delete_transient( self::transient_name() );
 
-		// Clear any data maps that restore on thier own
-		if ( is_a( self::$country_id_by_country_name, 'WPSC_Data_Map' ) ) {
-			self::$country_id_by_country_name->clear();
-		}
-
-		if ( is_a( self::$all_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
-			self::$all_wpsc_country_by_country_id->clear();
-		}
-
 		// when we clear the cached copy of the sdata, we also clear the resident copy of the data
 		// so it is rebuilt and stays in sync
 		self::_clean_data_maps();
