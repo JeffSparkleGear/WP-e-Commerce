@@ -833,13 +833,10 @@ class WPSC_Countries {
 			self::restore();
 		}
 
-// 		if ( ! self::$active_wpsc_country_by_country_id->initialized() ) {
-// 			self::_create_country_maps();
-// 		}
-
-		add_action( 'shutdown'                      , array( __CLASS__, 'save' ) );
+		add_action( 'shutdown', array( __CLASS__, 'save' ) );
 		self::$_initialized = true;
 	}
+
 
 	/**
 	 * creates the data maps used internally by this class to service requests
@@ -849,7 +846,8 @@ class WPSC_Countries {
 	 *
 	 * @param string $id Optional. Defaults to 0.
 	 */
-	public static function _create_country_maps() {
+	public static function _create_country_maps( $data_map ) {
+		self::clear_cache();
 
 		global $wpdb;
 
@@ -882,64 +880,6 @@ class WPSC_Countries {
 		}
 	}
 
-	private static function _add_country_arrays_to_wpsc_country_map( $countries_array, $data_map ) {
-		global $wpdb;
-
-		// build an array to map from iso code to country, while we do this get any region data for the country
-		foreach ( $countries_array as $country_id => $country ) {
-
-			// take this opportunity to clean up any types that have been turned into text by the query
-			$country->id = intval( $countries_array[$country_id]->id );
-			$country->has_regions = $countries_array[$country_id]->has_regions == '1';
-			$country->visible = $countries_array[$country_id]->visible == '1';
-
-			if ( ! empty( $country->tax ) && ( is_int( $country->tax ) ) || is_float( $country->tax ) ) {
-				$wpsc_country = self::$all_wpsc_country_by_country_id->value( $country_id, false );
-				$country->tax = floatval( $wpsc_country->tax );
-			}
-
-			self::$country_code_by_iso_code->map( $country->isocode, $country->id );
-			self::$country_id_by_country_name->map( $country->country, $country->id );
-			self::$country_code_by_country_id->map( $country->code, $country->id );
-
-			// create a new empty country object, add the properties we know about, then we add our region info
-			$wpsc_country = new WPSC_Country( null );
-			$wpsc_country->_copy_properties_from_stdclass( $country );
-
-			if ( $country->has_regions ) {
-				$sql = 'SELECT id, code, country_id, name, tax FROM `' . WPSC_TABLE_REGION_TAX . '` ' . ' WHERE `country_id` = %d ' . ' ORDER BY code ASC ';
-
-				// put the regions list into our country object
-				$regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ), OBJECT_K );
-
-				// any properties that came in as text that should be numbers or boolean get adjusted here, we also
-				// build
-				// an array to map from region code to region id
-				foreach ( $regions as $region_id => $region ) {
-					$region->id = intval( $region_id );
-					$region->country_id = intval( $region->country_id );
-					$region->tax = floatval( $region->tax );
-
-					// create a new empty region object, then copy our region data into it.
-					$wpsc_region = new WPSC_Region( null, null );
-					$wpsc_region->_copy_properties_from_stdclass( $region );
-					$wpsc_country->_regions->map( $region->id, $wpsc_region );
-					$wpsc_country->_region_id_by_region_code->map( $region->code, $region->id );
-					$wpsc_country->_region_id_by_region_name->map( strtolower( $region->name ), $region->id );
-
-					self::$country_id_by_region_id->map( $region->id, $region->country_id );
-					self::$region_by_region_id->map( $region->id, $wpsc_region );
-					self::$region_code_by_region_id->map( $region->id, $region->code );
-				}
-			}
-
-			$data_map->map( $country_id, $wpsc_country );
-		}
-
-		self::$_dirty = true;
-
-		return $countries_array;
-	}
 
 	/**
 	 * Returns a count of how many fields are in the checkout form
@@ -959,21 +899,21 @@ class WPSC_Countries {
 	 * Create the empty maps used by this class to do it's work.
 	 *
 	 * This functions contributes greatly to the performance of the class. Data maps that are named
-	 * can store and retrieve themselves at the time of the first request. That means they don'tneed to
+	 * can store and retrieve themselves at the time of the first request. That means they don't need to
 	 * be rebuilt every time, nor does all of the data have to be loaded and waiting for a request that
 	 * may never come.
 	 *
-	 * What this means is that we use unnamed maps for data that is small, or has a very very high
-	 * probability of being requested. The unnamed maps get serialized with this main class.
+	 * Because the geographic data managed by this class can be accessed hundreds or even
+	 * thousands of times when creating WPeC pages, moderate gains here can translate into
+	 * substantial gains in end user perfroamnce. For this reason this class will try to keep
+	 * the smaller frequently references data sets (data maps) intact and always available.
+	 * Potentially large data sets, such as the global list of all countires with all regions,
+	 * are only loaded when they are accessed. The WPSC_Data_Map provides the transpernet
+	 * loading and creating functions for these data sets.
 	 *
-	 * We use named maps for large data sets that might not be accessed.
-	 *
-	 * As an example the list of all countries known to WPeC might never be accessed becuase WPeC
-	 * mostly looks at only the active countries. Not retriving the big list at startup
-	 * improves performance, especcially for smaller sites not using caching, becuase the dataset isn't
-	 * requested in the intial database transaction.
 	 *
 	 * @access private
+	 *
 	 * @static
 	 *
 	 * @since 3.8.14
@@ -982,21 +922,73 @@ class WPSC_Countries {
 	private static function _clean_data_maps() {
 
 		/*
-		 * maps without names will be loaded with the core class
-		*/
+		 * maps without names will be loaded with the core class, we maintain
+		 * a list as they are created
+		 */
 		self::$_maps_to_save_with_core_class = array();
 
+		// at 3.8.14 checked and this is about 1 KB of data
+		if ( is_a( self::$region_by_region_id, 'WPSC_Data_Map' ) ) {
+			self::$region_by_region_id->clear();
+		} else {
+			self::$region_by_region_id = new WPSC_Data_Map( null, array( __CLASS__, '_create_region_by_region_id_map' )  );
+		}
+		self::$_maps_to_save_with_core_class['region_by_region_id'] = true;
 
-		// our current implementation is to rebuild all of the maps if any one of them disappears
-		// if the country database grows beyond several hundreds of rows it would be beneficial
-		// to hafve more targetted rebuild functions. But since rebuild of alomst all of the lists
-		// requires touching the bulk of the country data we might as well do everything at the same
-		// time
-		$default_rebuild_callback = array( __CLASS__, '_create_country_maps' );
+		// at 3.14 checked and this is about 1 KB of data
+		if ( is_a( self::$region_code_by_region_id, 'WPSC_Data_Map' ) ) {
+			self::$region_code_by_region_id->clear();
+		} else {
+			self::$region_code_by_region_id = new WPSC_Data_Map( null, array( __CLASS__, '_create_region_code_by_region_id_map' ) );
+		}
+		self::$_maps_to_save_with_core_class['region_code_by_region_id'] = true;
+
+		// at 3.8.14 checked and this is about 1 KB of data
+		if ( is_a( self::$country_id_by_region_id, 'WPSC_Data_Map' ) ) {
+			self::$country_id_by_region_id->clear();
+		} else {
+			self::$country_id_by_region_id = new WPSC_Data_Map( null, array( __CLASS__, '_create_country_id_by_region_id_map' ) );
+		}
+		self::$_maps_to_save_with_core_class['country_id_by_region_id'] = true;
+
+		// at 3.8.14 checked and this is about 1 KB of data
+		if ( is_a( self::$country_code_by_iso_code, 'WPSC_Data_Map' ) ) {
+			self::$country_code_by_iso_code->clear();
+		} else {
+			self::$country_code_by_iso_code = new WPSC_Data_Map( null, array( __CLASS__, '_create_country_code_by_iso_code_map' ) );
+		}
+		self::$_maps_to_save_with_core_class['country_code_by_iso_code'] = true;
+
+		// at 3.8.14 checked and this is about 1 KB of data
+		if ( is_a( self::$country_code_by_country_id, 'WPSC_Data_Map' ) ) {
+			self::$country_code_by_country_id->clear();
+		} else {
+			self::$country_code_by_country_id = new WPSC_Data_Map( null, array( __CLASS__, '_create_country_code_by_country_id' ) );
+		}
+		self::$_maps_to_save_with_core_class['country_code_by_country_id'] = true;
+
+		// at 3.8.14 checked and this is about 2KB of data with 7 countries active, including US and CA
+		if ( is_a( self::$active_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
+			self::$active_wpsc_country_by_country_id->clear();
+		} else {
+			self::$active_wpsc_country_by_country_id = new WPSC_Data_Map( null, array( __CLASS__, '_create_active_countries_map' ) );
+		}
+		self::$_maps_to_save_with_core_class['active_wpsc_country_by_country_id'] = true;
+
+		// at 3.8.14 checked and this is about 1 KB of data
+		if ( is_a( self::$currencies, 'WPSC_Data_Map' ) ) {
+			self::$currencies->clear();
+		} else {
+			self::$currencies = new WPSC_Data_Map( null, array( __CLASS__, '_create_currency_by_currency_code_map' ) );
+		}
+		self::$_maps_to_save_with_core_class['currencies'] = true;
+
 
 		/*
-		 * maps with names can optionally reload thier data themselves when the first request is processed, this class
-		 * does not need to load them. Keeps size of transient down and intitialization fast
+		 * maps with names can optionally reload thier data themselves when the first request
+		 * is processed, this class does not need to load/ re-load them because the WPSC_Data_Map
+		 * class takes care of that transparently. This goes a long way towards keeping the size of
+		 * of the transient used to cache this classes data small, making WPeC intitialization faster.
 		 */
 
 		// at 3.14 checked and this is about 3KB of data, this map isn't as frequently used so we will load it if it
@@ -1004,7 +996,7 @@ class WPSC_Countries {
 		if ( is_a( self::$country_id_by_country_name, 'WPSC_Data_Map' ) ) {
 			self::$country_id_by_country_name->clear();
 		} else {
-			self::$country_id_by_country_name = new WPSC_Data_Map( '$country_id_by_country_name', $default_rebuild_callback );
+			self::$country_id_by_country_name = new WPSC_Data_Map( '$country_id_by_country_name', array( __CLASS__, '_create_country_id_by_country_name_map' ) );
 		}
 		self::$_maps_to_save_with_core_class['country_id_by_country_name'] = false;
 
@@ -1013,75 +1005,9 @@ class WPSC_Countries {
 		if ( is_a( self::$all_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
 			self::$all_wpsc_country_by_country_id->clear();
 		} else {
-			self::$all_wpsc_country_by_country_id = new WPSC_Data_Map( '$all_wpsc_country_by_country_id', $default_rebuild_callback );
+			self::$all_wpsc_country_by_country_id = new WPSC_Data_Map( '$all_wpsc_country_by_country_id', array( __CLASS__, '_create_all_countries_map' ) );
 		}
 		self::$_maps_to_save_with_core_class['all_wpsc_country_by_country_id'] = false;
-
-
-		/*
-		 * The remainder of the maps are saved with the core countires class becuase they are small,  they
-		 * don't have their own callback cretion routine becuase they are created when the main country maps
-		 * are created
-		 */
-		$default_rebuild_callback = null;
-
-		// at 3.8.14 checked and this is about 1 KB of data
-		if ( is_a( self::$region_by_region_id, 'WPSC_Data_Map' ) ) {
-			self::$region_by_region_id->clear();
-		} else {
-			self::$region_by_region_id = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['region_by_region_id'] = true;
-
-		// at 3.14 checked and this is about 1 KB of data
-		if ( is_a( self::$region_code_by_region_id, 'WPSC_Data_Map' ) ) {
-			self::$region_code_by_region_id->clear();
-		} else {
-			self::$region_code_by_region_id = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['region_code_by_region_id'] = true;
-
-		// at 3.8.14 checked and this is about 1 KB of data
-		if ( is_a( self::$country_id_by_region_id, 'WPSC_Data_Map' ) ) {
-			self::$country_id_by_region_id->clear();
-		} else {
-			self::$country_id_by_region_id = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['country_id_by_region_id'] = true;
-
-		// at 3.8.14 checked and this is about 1 KB of data
-		if ( is_a( self::$country_code_by_iso_code, 'WPSC_Data_Map' ) ) {
-			self::$country_code_by_iso_code->clear();
-		} else {
-			self::$country_code_by_iso_code = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['country_code_by_iso_code'] = true;
-
-		// at 3.8.14 checked and this is about 1 KB of data
-		if ( is_a( self::$country_code_by_country_id, 'WPSC_Data_Map' ) ) {
-			self::$country_code_by_country_id->clear();
-		} else {
-			self::$country_code_by_country_id = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['country_code_by_country_id'] = true;
-
-		// at 3.8.14 checked and this is about 2KB of data with 7 countries active, including US and CA
-		if ( is_a( self::$active_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
-			self::$active_wpsc_country_by_country_id->clear();
-		} else {
-			self::$active_wpsc_country_by_country_id = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['active_wpsc_country_by_country_id'] = true;
-
-		// at 3.8.14 checked and this is about 1 KB of data
-		if ( is_a( self::$currencies, 'WPSC_Data_Map' ) ) {
-			self::$currencies->clear();
-		} else {
-			self::$currencies = new WPSC_Data_Map( null, $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['currencies'] = true;
-
-
 	}
 
 	/**
@@ -1280,6 +1206,290 @@ class WPSC_Countries {
 
 		return self::$_initialized;
 	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// class internal functions used to create the data maps used to provide fast access to
+	// global country / region / currency data.
+	//
+	////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * create a map that lets us find the country iso code using a numeric country id
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_country_code_by_country_id_map( $data_map ) {
+		$all_countries_data = self::$all_wpsc_country_by_country_id->data();
+
+		foreach ( $all_countries_data as $country_id => $wpsc_country ) {
+			$data_map->map( $wpsc_country->isocode, $country_id );
+		}
+	}
+
+	/**
+	 * create a map that lets us find the numeric country code using a country's iso code
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_country_code_by_iso_code_map( $data_map ) {
+		$all_countries_data = self::$all_wpsc_country_by_country_id->data();
+
+		foreach ( $all_countries_data as $country_id => $wpsc_country ) {
+			$data_map->map( $wpsc_country->isocode, $country_id );
+		}
+	}
+
+
+	/**
+	 * create a map that lets us find the numeric country code using a country's name
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_country_id_by_country_name_map( $data_map ) {
+		$all_countries_data = self::$all_wpsc_country_by_country_id->data();
+
+		foreach ( $all_countries_data as $country_id => $wpsc_country ) {
+			$data_map->map( $wpsc_country->country, $country_id );
+		}
+	}
+
+	/**
+	 * create a map that lets us find the numeric country id using a numeric region id
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_country_id_by_region_id_map( $data_map ) {
+		$all_regions_data = self::$region_by_region_id;
+
+		foreach ( $all_regions_data as $region_id => $wpsc_region ) {
+			$data_map->map( $region_id, $wpsc_region->get_country_id() );
+		}
+	}
+
+	/**
+	 * create a map that lets us find the WPSC_Region using a numeric region id
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_region_by_region_id_map( $data_map ) {
+		$all_countries_data = self::$all_wpsc_country_by_country_id->data();
+
+		foreach ( $all_countries_data as $country_id => $wpsc_country ) {
+
+			if ( $wpsc_country->has_regions() ) {
+				$regions = $wpsc_country->get_regions();
+				foreach ( $regions as $region_id => $wpsc_country ) {
+					$data_map->map( $wpsc_country->isocode, $country_id );
+				}
+			}
+		}
+	}
+
+	/**
+	 * create a map that lets us find the region code using a numeric region id
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_region_code_by_region_id_map( $data_map ) {
+		$all_regions_data = self::$region_by_region_id;
+
+		foreach ( $all_regions_data as $region_id => $wpsc_region ) {
+			$data_map->map( $region_id, $wpsc_region->get_code() );
+		}
+	}
+
+	/**
+	 * create a map that lets us find the country iso code using a numeric country id
+	 *
+	 * This function should be rarely called as the results are cached with the class
+	 * data.  But because caches can be cleared at any time and for multitudes of reasons
+	 * we provide this callback to recreate the data. We use the data in other data maps
+	 * so that we don't have to query the database for this maps data.
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 *
+	 */
+	private static function _create_currency_by_currency_code_map( $data_map ) {
+		global $wpdb;
+
+		// build a global active currency list
+		$sql = 'SELECT DISTINCT code, symbol, symbol_html, currency FROM `' . WPSC_TABLE_CURRENCY_LIST . '` ORDER BY code ASC';
+		$currencies = $wpdb->get_results( $sql, OBJECT_K );
+
+		foreach ( $currencies as $currency_code => $currency ) {
+			$wpsc_currency = new WPSC_Currency( $currency->code, $currency->symbol, $currency->symbol_html, $currency->currency );
+			$data_map->map( $currency_code, $wpsc_currency );
+		}
+
+	}
+
+	/**
+	 * callback that creates / re-creates the data map mapping all known country ids to all know countries
+	 *
+	 * @access private
+	 * @since 3.8.14
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 */
+	public static function _create_all_countries_map( $data_map ) {
+
+		global $wpdb;
+
+		// there are also invisible countries
+		$sql = 'SELECT '
+				. ' id, country, isocode, currency, symbol, symbol_html, code, has_regions, tax, continent, visible '
+					. ' FROM `' . WPSC_TABLE_CURRENCY_LIST
+						. '` ORDER BY id ASC';
+
+		$countries_array = $wpdb->get_results( $sql, OBJECT_K );
+
+		// build an array to map from iso code to country, while we do this get any region data for the country
+		foreach ( $countries_array as $country_id => $country ) {
+
+			// create a new empty country object, add the properties we know about, then we add our region info
+			$wpsc_country = new WPSC_Country( null );
+			$wpsc_country->_copy_properties_from_stdclass( $country );
+
+			if ( $country->has_regions ) {
+				$sql = 'SELECT id, code, country_id, name, tax '
+						. ' FROM `' . WPSC_TABLE_REGION_TAX . '` '
+							. ' WHERE `country_id` = %d '
+								. ' ORDER BY code ASC ';
+
+				// put the regions list into our country object
+				$regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ), OBJECT_K );
+
+				// any properties that came in as text that should be numbers or boolean get adjusted here, we also
+				// build
+				// an array to map from region code to region id
+				foreach ( $regions as $region_id => $region ) {
+					$region->id = intval( $region_id );
+					$region->country_id = intval( $region->country_id );
+					$region->tax = floatval( $region->tax );
+
+					// create a new empty region object, then copy our region data into it.
+					$wpsc_region = new WPSC_Region( null, null );
+					$wpsc_region->_copy_properties_from_stdclass( $region );
+					$wpsc_country->_regions->map( $region->id, $wpsc_region );
+					$wpsc_country->_region_id_by_region_code->map( $region->code, $region->id );
+					$wpsc_country->_region_id_by_region_name->map( strtolower( $region->name ), $region->id );
+
+					self::$country_id_by_region_id->map( $region->id, $region->country_id );
+					self::$region_by_region_id->map( $region->id, $wpsc_region );
+					self::$region_code_by_region_id->map( $region->id, $region->code );
+				}
+			}
+
+			$data_map->map( $country_id, $wpsc_country );
+		}
+
+		self::$_dirty = true;
+	}
+
+	/**
+	 * callback that creates / re-creates the data map mapping all active country ids to all active countries
+	 *
+	 * @access private
+	 * @since 3.8.14
+	 *
+	 * @param WPSC_Data_Map    $data_map     Data map object being intitilized
+	 */
+	public static function _create_active_countries_map( $data_map ) {
+
+		global $wpdb;
+
+		// there are also invisible countries
+		$sql = 'SELECT '
+				. ' id, country, isocode, currency, symbol, symbol_html, code, has_regions, tax, continent, visible '
+					. ' FROM `' . WPSC_TABLE_CURRENCY_LIST
+						. '` WHERE `visible`= "1" '
+							. ' ORDER BY id ASC';
+
+
+		$countries_array = $wpdb->get_results( $sql, OBJECT_K );
+
+		// build an array to map from iso code to country, while we do this get any region data for the country
+		foreach ( $countries_array as $country_id => $country ) {
+
+			// create a new empty country object, add the properties we know about, then we add our region info
+			$wpsc_country = new WPSC_Country( null );
+			$wpsc_country->_copy_properties_from_stdclass( $country );
+
+			if ( $country->has_regions ) {
+				$sql = 'SELECT id, code, country_id, name, tax '
+						. ' FROM `' . WPSC_TABLE_REGION_TAX . '` '
+							. ' WHERE `country_id` = %d '
+								. ' ORDER BY code ASC ';
+
+				// put the regions list into our country object
+				$regions = $wpdb->get_results( $wpdb->prepare( $sql, $country_id ), OBJECT_K );
+
+				/*
+				 * any properties that came in as text that should be numbers or boolean
+				 * get adjusted here, we also build an array to map from region code to region id
+				 */
+				foreach ( $regions as $region_id => $region ) {
+					$region->id = intval( $region_id );
+					$region->country_id = intval( $region->country_id );
+					$region->tax = floatval( $region->tax );
+
+					// create a new empty region object, then copy our region data into it.
+					$wpsc_region = new WPSC_Region( null, null );
+					$wpsc_region->_copy_properties_from_stdclass( $region );
+					$wpsc_country->_regions->map( $region->id, $wpsc_region );
+					$wpsc_country->_region_id_by_region_code->map( $region->code, $region->id );
+					$wpsc_country->_region_id_by_region_name->map( strtolower( $region->name ), $region->id );
+
+					self::$country_id_by_region_id->map( $region->id, $region->country_id );
+					self::$region_by_region_id->map( $region->id, $wpsc_region );
+					self::$region_code_by_region_id->map( $region->id, $region->code );
+				}
+			}
+
+			$data_map->map( $country_id, $wpsc_country );
+		}
+
+		self::$_dirty = true;
+	}
+
 }
 
 
