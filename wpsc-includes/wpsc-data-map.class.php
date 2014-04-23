@@ -40,8 +40,6 @@ final class WPSC_Data_Map {
 		}
 	}
 
-
-
 	/**
 	 * Count of items in the map
 	 *
@@ -216,6 +214,8 @@ final class WPSC_Data_Map {
 			if ( ! is_array( $this->_map_data ) && ! empty( $this->_map_callback ) && is_callable( $this->_map_callback ) ) {
 				static $already_invoking_callback = false;
 
+				if ( ! $already_invoking_callback ) {
+					$already_invoking_callback = true;
 
 				if ( ! $already_invoking_callback ) {
 					$already_invoking_callback = true;
