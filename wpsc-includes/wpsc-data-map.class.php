@@ -216,9 +216,9 @@ final class WPSC_Data_Map {
 			if ( ! is_array( $this->_map_data ) && ! empty( $this->_map_callback ) && is_callable( $this->_map_callback ) ) {
 				static $already_invoking_callback = false;
 
-				$already_invoking_callback = true;
 
 				if ( ! $already_invoking_callback ) {
+					$already_invoking_callback = true;
 					$this->_map_data = array();
 
 					call_user_func( $this->_map_callback );

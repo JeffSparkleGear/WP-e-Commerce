@@ -833,7 +833,7 @@ class WPSC_Countries {
 			self::restore();
 		}
 
-		if ( ! self::$active_wpsc_country_by_country_id->count() ) {
+		if ( ! self::$active_wpsc_country_by_country_id->initialized() ) {
 			self::_create_country_maps();
 		}
 
@@ -989,6 +989,12 @@ class WPSC_Countries {
 	 */
 	private static function _clean_data_maps() {
 
+		/*
+		 * maps without names will be loaded with the core class
+		*/
+		self::$_maps_to_save_with_core_class = array();
+
+
 		// our current implementation is to rebuild all of the maps if any one of them disappears
 		// if the country database grows beyond several hundreds of rows it would be beneficial
 		// to hafve more targetted rebuild functions. But since rebuild of alomst all of the lists
@@ -997,9 +1003,35 @@ class WPSC_Countries {
 		$default_rebuild_callback = array( __CLASS__, '_create_country_maps' );
 
 		/*
-		 * maps without names will be loaded with the core class
+		 * maps with names can optionally reload thier data themselves when the first request is processed, this class
+		 * does not need to load them. Keeps size of transient down and intitialization fast
 		 */
-		self::$_maps_to_save_with_core_class = array();
+
+		// at 3.14 checked and this is about 3KB of data, this map isn't as frequently used so we will load it if it
+		// needed
+		if ( is_a( self::$country_id_by_country_name, 'WPSC_Data_Map' ) ) {
+			self::$country_id_by_country_name->clear();
+		} else {
+			self::$country_id_by_country_name = new WPSC_Data_Map( '$country_id_by_country_name', $default_rebuild_callback );
+		}
+		self::$_maps_to_save_with_core_class['country_id_by_country_name'] = false;
+
+		// at 3.14 checked and this is about 23KB of data, not a big hit if there is a memory based object cache
+		// but impacts perfomance on lower end (default) configurations that use the database to store transients
+		if ( is_a( self::$all_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
+			self::$all_wpsc_country_by_country_id->clear();
+		} else {
+			self::$all_wpsc_country_by_country_id = new WPSC_Data_Map( '$all_wpsc_country_by_country_id', $default_rebuild_callback );
+		}
+		self::$_maps_to_save_with_core_class['all_wpsc_country_by_country_id'] = false;
+
+
+		/*
+		 * The remainder of the maps are saved with the core countires class becuase they are small,  they
+		 * don't have their own callback cretion routine becuase they are created when the main country maps
+		 * are created
+		 */
+		$default_rebuild_callback = null;
 
 		// at 3.8.14 checked and this is about 1 KB of data
 		if ( is_a( self::$region_by_region_id, 'WPSC_Data_Map' ) ) {
@@ -1058,28 +1090,6 @@ class WPSC_Countries {
 		self::$_maps_to_save_with_core_class['currencies'] = true;
 
 
-		/*
-		 * maps with names can optionally reload thier data themselves when the first request is processed, this class
-		 * does not need to load them. Keeps size of transient down and intitialization fast
-		 */
-
-		// at 3.14 checked and this is about 3KB of data, this map isn't as frequently used so we will load it if it
-		// needed
-		if ( is_a( self::$country_id_by_country_name, 'WPSC_Data_Map' ) ) {
-			self::$country_id_by_country_name->clear();
-		} else {
-			self::$country_id_by_country_name = new WPSC_Data_Map( '$country_id_by_country_name', $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['country_id_by_country_name'] = false;
-
-		// at 3.14 checked and this is about 23KB of data, not a big hit if there is a memory based object cache
-		// but impacts perfomance on lower end (default) configurations that use the database to store transients
-		if ( is_a( self::$all_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
-			self::$all_wpsc_country_by_country_id->clear();
-		} else {
-			self::$all_wpsc_country_by_country_id = new WPSC_Data_Map( '$all_wpsc_country_by_country_id', $default_rebuild_callback );
-		}
-		self::$_maps_to_save_with_core_class['all_wpsc_country_by_country_id'] = false;
 	}
 
 	/**
