@@ -429,11 +429,6 @@ class WPSC_Countries {
 			}
 		}
 
-		if ( $as_array ) {
-			$json = json_encode( $regions );
-			$regions = json_decode( $json, true );
-		}
-
 		return $regions;
 	}
 
