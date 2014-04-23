@@ -833,20 +833,13 @@ class WPSC_Countries {
 			self::restore();
 		}
 
-		if ( ! self::$active_wpsc_country_by_country_id->initialized() ) {
-			self::_create_country_maps();
-		}
+// 		if ( ! self::$active_wpsc_country_by_country_id->initialized() ) {
+// 			self::_create_country_maps();
+// 		}
 
 		add_action( 'shutdown'                      , array( __CLASS__, 'save' ) );
 		self::$_initialized = true;
 	}
-
-
-
-
-
-
-
 
 	/**
 	 * creates the data maps used internally by this class to service requests
@@ -857,7 +850,6 @@ class WPSC_Countries {
 	 * @param string $id Optional. Defaults to 0.
 	 */
 	public static function _create_country_maps() {
-		self::clear_cache();
 
 		global $wpdb;
 
