@@ -516,3 +516,16 @@ function wpsc_checkout_shipping_state_and_region( $wpsc_checkout = null ) {
 function wpsc_get_base_country() {
 	return get_option( 'base_country' );
 }
+
+
+function wpsc_shipping_add_error_message( $message ) {
+	$shipping_error_messages = wpsc_get_customer_meta( 'shipping_error_messages' );
+	if ( empty ( $shipping_error_messages ) && ! is_array( $shipping_error_messages ) ) {
+		$shipping_error_messages = array();
+	}
+
+	$id = md5( $message );
+	$shipping_error_messages[$id] = $message;
+
+	wpsc_get_customer_meta( 'shipping_error_messages', $shipping_error_messages );
+}

@@ -184,7 +184,6 @@ class ASHTools {
      * @return string|int will be int if wordpress database & wpec are not available
      */
     function get_state( $state_code ){
-        $state_code = isset( $_POST['region'] ) ? $_POST['region'] : $state_code;
         return wpsc_get_region( $state_code );
     }
 

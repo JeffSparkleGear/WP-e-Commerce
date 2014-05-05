@@ -915,6 +915,7 @@ function wpsc_update_shipping_quotes_on_shipping_same_as_billing() {
                </tr>
             <?php endif; ?>
          <?php endif; ?>
+
          <tr class='wpsc_change_country'>
             <td colspan='5'>
                <form name='change_country' id='change_country' action='' method='post'>
