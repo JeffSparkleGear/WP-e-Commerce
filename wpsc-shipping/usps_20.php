@@ -621,8 +621,10 @@ class ash_usps {
 
 		$packages = $wpec_ash_xml->get( "Package", $response );
 		if ( ! is_array( $packages ) || stripos( $packages[0], '<ERROR>') === 0 ) {
+			// TODO: this is a temporary fix to capture the error message from USPS,
+			// more robust handling is certainly required
 			$message = $wpec_ash_xml->get( "Description",  $packages[0] );
-				wpsc_shipping_add_error_message( $message[0] );
+			_wpsc_shipping_add_error_message( $message[0] );
 			return array();
 		}
 
@@ -1039,7 +1041,7 @@ class ash_usps {
 		// We do not want to spam USPS (and slow down our process) if we already
 		// have a shipping quote!
 		if ( count($cache["rate_table"] ) >= 1 ) { //$cache['rate_table'] could be array(0).
-			//return $cache["rate_table"];
+			return $cache["rate_table"];
 		}
 		//*** WPEC Configuration values ***\\
 		$this->use_test_env   = ( ! isset( $settings["test_server"] ) ) ? false : ( bool ) $settings['test_server'];
