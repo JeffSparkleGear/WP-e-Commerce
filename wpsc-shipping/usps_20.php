@@ -621,8 +621,10 @@ class ash_usps {
 
 		$packages = $wpec_ash_xml->get( "Package", $response );
 		if ( ! is_array( $packages ) || stripos( $packages[0], '<ERROR>') === 0 ) {
+			// TODO: this is a temporary fix to capture the error message from USPS,
+			// more robust handling is certainly required
 			$message = $wpec_ash_xml->get( "Description",  $packages[0] );
-				wpsc_shipping_add_error_message( $message[0] );
+			_wpsc_shipping_add_error_message( $message[0] );
 			return array();
 		}
 
