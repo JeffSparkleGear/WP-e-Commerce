@@ -541,16 +541,15 @@ function _wpsc_shipping_add_error_message( $message ) {
 
 
 /**
- * Record an error message related to shipping
+ * clear shipping error messages
  *
  * @since 3.8.14
  *
  * @access private
  *
- * @param string $message
  */
 function _wpsc_clear_shipping_error_messages() {
-	$shipping_error_messages = wpsc_delete_customer_meta( 'shipping_error_messages' );
+	wpsc_delete_customer_meta( 'shipping_error_messages' );
 }
 
 // clear shipping messages before shipping quotes are recalculated
@@ -558,15 +557,14 @@ add_action(  'wpsc_before_get_shipping_method', '_wpsc_clear_shipping_error_mess
 
 
 /**
- * Record an error message related to shipping
+ * output shipping error messages
  *
  * @since 3.8.14
  *
  * @access private
  *
- * @param string $message
  */
-function _wpsc_echo_shipping_error_messages() {
+function _wpsc_shipping_error_messages() {
 	$shipping_error_messages = wpsc_get_customer_meta( 'shipping_error_messages' );
 	?>
 	<div class="wpsc-shipping-error_messages">
@@ -588,7 +586,7 @@ function _wpsc_echo_shipping_error_messages() {
 }
 
 // echo shipping error messages on checkout form
-add_action(  'wpsc_before_shipping_of_shopping_cart', '_wpsc_echo_shipping_error_messages' );
+add_action(  'wpsc_before_shipping_of_shopping_cart', '_wpsc_shipping_error_messages' );
 
 
 
