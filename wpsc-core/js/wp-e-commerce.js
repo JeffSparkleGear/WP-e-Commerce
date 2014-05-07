@@ -577,6 +577,8 @@ function wpsc_update_location_labels( country_select ) {
 	return true;
 }
 
+
+
 /**
  * Fill the associated regions drop down based on the value in the country drop down
  *
@@ -654,8 +656,9 @@ function wpsc_copy_meta_value_to_similiar( element ) {
 				}
 			} if ( jQuery(this).is('select') ) {
 				current_value = jQuery( this ).val();
-				jQuery( this ).html( element_html );
-				jQuery( this ).val( meta_value );
+				if ( current_value != meta_value ) {
+					jQuery( this ).val( meta_value );
+				}
 			} else {
 				current_value = jQuery( this ).val();
 				if ( current_value != meta_value ) {
@@ -1009,6 +1012,7 @@ jQuery(document).ready(function ($) {
 	}
 
 	// setup checkout form and make sure visibility of form elements is what it should be
+	wpsc_setup_region_dropdowns();
 	wpsc_adjust_checkout_form_element_visibility();
 	wpsc_update_location_elements_visibility();
 	wpsc_countries_lists_handle_restrictions();
