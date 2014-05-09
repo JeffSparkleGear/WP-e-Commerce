@@ -241,7 +241,7 @@ function wpsc_update_customer_meta( response ) {
 
 				if ( element_meta_key != element_that_caused_change_event ) {
 					if ( jQuery(this).is(':checkbox') ) {
-						var boolean_meta_value = meta_value == "1";
+						var boolean_meta_value = wpsc_string_to_boolean( meta_value );
 						if ( boolean_meta_value ) {
 							jQuery( this ).attr( 'checked', 'checked' );
 						} else {
@@ -313,7 +313,8 @@ function wpsc_check_for_shipping_recalc_needed( response ) {
 
 			if ( ! jQuery( '#shipping_quotes_need_recalc').length ) {
 
-				form.before( '<div id="shipping_quotes_need_recalc">' + msg + '</div>' );
+				form.before( '<div id="shipping_quotes_need_recalc" style="display:none">' + msg + '</div>' );
+				jQuery( '#shipping_quotes_need_recalc' ).show( 375 );
 
 				if ( wpsc_ajax.hasOwnProperty( 'slide_to_shipping_error' ) && wpsc_ajax.slide_to_shipping_error && ! wpsc_element_is_visible( jQuery( '#shipping_quotes_need_recalc' ) ) ) {
 					jQuery( 'html, body' ).animate({
@@ -324,10 +325,10 @@ function wpsc_check_for_shipping_recalc_needed( response ) {
 			}
 
 			jQuery( 'input:radio[name=shipping_method]' ).prop('checked', false).attr('disabled',true);
-			jQuery( 'input:radio[name=shipping_method]' ).closest( 'tr' ).hide();
-			jQuery( 'tr.wpsc_shipping_header' ).hide();
-			jQuery( '.wpsc_checkout_table_totals' ).hide();
-			jQuery( '.total_tax' ).closest( 'table' ).hide();
+			jQuery( 'input:radio[name=shipping_method]' ).closest( 'tr' ).hide( 275 );
+			jQuery( 'tr.wpsc_shipping_header' ).hide( 275 );
+			jQuery( '.wpsc_checkout_table_totals' ).hide( 275 );
+			jQuery( '.total_tax' ).closest( 'table' ).hide( 275 );
 		}
 	}
 
@@ -485,7 +486,7 @@ function wpsc_meta_item_change() {
 	jQuery( selector ).each( function( index, value ) {
 		if ( element_that_changed_meta_value != this ) {
 			if ( jQuery(this).is(':checkbox') ) {
-				var boolean_meta_value = meta_value == "1";
+				var boolean_meta_value =  wpsc_string_to_boolean( meta_value );
 				if ( boolean_meta_value ) {
 					jQuery( this ).attr( 'checked', 'checked' );
 				} else {
@@ -664,7 +665,7 @@ function wpsc_update_regions_list_to_match_country( country_select ) {
 		if ( region ) {
 			all_region_selects.val( region );
 		}
-		
+
 		region_select.show();
 	} else {
 		region_select.hide();
@@ -674,6 +675,10 @@ function wpsc_update_regions_list_to_match_country( country_select ) {
 	wpsc_update_location_labels( country_select );
 	wpsc_update_location_elements_visibility();
 	wpsc_copy_meta_value_to_similiar( country_select );
+}
+
+function wpsc_string_to_boolean( string ) {
+	return a.trim( string ) !== '';
 }
 
 /*
@@ -702,7 +707,7 @@ function wpsc_copy_meta_value_to_similiar( element ) {
 		if ( this != element) {
 
 			if ( jQuery(this).is(':checkbox') ) {
-				var boolean_meta_value = meta_value == "1";
+				var boolean_meta_value =  wpsc_string_to_boolean( meta_value );
 				if ( boolean_meta_value ) {
 					jQuery( this ).attr( 'checked', 'checked' );
 				} else {
@@ -909,9 +914,9 @@ function wpsc_get_value_from_wpsc_meta_element( meta ) {
 
 	if ( element.is(':checkbox') ) {
 		if ( element.is(':checked') ) {
-			meta_value = 1;
+			meta_value = element.val();
 		} else {
-			meta_value = 0;
+			meta_value = '';
 		}
 	} else if ( element.is('select') ) {
 		meta_value = element.find( 'option:selected' ).val();
