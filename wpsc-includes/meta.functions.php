@@ -211,10 +211,10 @@ function update_product_meta($product_id, $key, $value, $prev_value = '') {
 
 class wpsc_custom_meta {
 	// Custom meta values
-	var $custom_meta;
-	var $custom_meta_count = 0;
-	var $current_custom_meta = -1;
-	var $custom_meta_values;
+	public $custom_meta;
+	public $custom_meta_count   = 0;
+	public $current_custom_meta = -1;
+	public $custom_meta_values;
 
 	function wpsc_custom_meta($postid) {
 		global $wpdb;
@@ -247,7 +247,6 @@ class wpsc_custom_meta {
 		return $this->custom_meta_values;
 	}
 
-
 	function the_custom_meta() {
 		$this->custom_meta_values = $this->next_custom_meta();
 		return $this->custom_meta_values;
@@ -257,5 +256,13 @@ class wpsc_custom_meta {
 		if ($this->custom_meta_count > 0) {
 			$this->custom_meta_values = $this->custom_meta[0];
 		}
+	}
+
+	function key() {
+		return $this->custom_meta_values['meta_key'];
+	}
+
+	function value() {
+		return $this->custom_meta_values['meta_value'];
 	}
 }
