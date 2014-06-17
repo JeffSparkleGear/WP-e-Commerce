@@ -603,6 +603,8 @@ function wpsc_get_visitor_cart( $visitor_id ) {
 
 	$wpsc_cart = apply_filters( 'wpsc_get_visitor_cart', $wpsc_cart, $visitor_id );
 
+	// loaded the cart, update it's signature
+	$wpsc_cart->_signature = _wpsc_calculate_cart_signature( $wpsc_cart );
 	return $wpsc_cart;
 }
 
@@ -612,13 +614,18 @@ function wpsc_get_visitor_cart( $visitor_id ) {
  * @access public
  * @since 3.8.9
  * @param  mixed $id visitor ID. Default to the current user ID.
- * @return WP_Error|array Return an array of metadata if no error occurs, WP_Error
- *                        if otherwise.
+ * @return WP_Error|wpsc_cart
  */
 function wpsc_update_visitor_cart( $visitor_id, $wpsc_cart ) {
 
 	if ( ! _wpsc_visitor_database_ready() ) {
 		return $wpsc_cart;
+	}
+
+	if ( property_exists( $wpsc_cart, '_signature' ) ) {
+		if ( _wpsc_calculate_cart_signature( $wpsc_cart ) == $wpsc_cart->_signature ) {
+			return $wpsc_cart;
+		}
 	}
 
 	foreach ( $wpsc_cart as $key => $value ) {
@@ -627,6 +634,9 @@ function wpsc_update_visitor_cart( $visitor_id, $wpsc_cart ) {
 		// we don't store empty cart properties, this keeps meta table and caches neater
 		if ( ! empty( $value ) ) {
 			switch ( $key ) {
+				case '_signature':
+					continue; // don't save the signature
+
 				case 'shipping_methods':
 				case 'shipping_quotes':
 				case 'cart_items':
@@ -645,9 +655,32 @@ function wpsc_update_visitor_cart( $visitor_id, $wpsc_cart ) {
 		}
 	}
 
+	// saved the cart, update it's signature
+	$wpsc_cart->_signature = _wpsc_calculate_cart_signature( $wpsc_cart );
+
 	return $wpsc_cart;
 }
 
+/**
+ * Calculate a cart signature
+ *
+ * @access private
+ * @since 3.8.14.2
+ * @param  object wpsc_cart shopping cart
+ * @return signature string for the cart
+ */
+function _wpsc_calculate_cart_signature( $wpsc_cart ) {
+	$cart_array = (array) $wpsc_cart;
+
+	if ( isset( $cart_array['_signature'] ) ) {
+		unset( $cart_array['_signature'] );
+	}
+
+	$raw_data = serialize( $cart_array );
+	$signature = md5( $raw_data );
+
+	return $signature;
+}
 
 /**
  *  If a value is an object or an array encode it so it can be stored as WordPress meta
@@ -1147,7 +1180,7 @@ add_action( 'wpsc_updated_visitor_meta_shippingregion', '_wpsc_updated_visitor_m
  */
 function _wpsc_updated_visitor_meta_shippingcountry( $meta_value, $meta_key, $visitor_id ) {
 
-	$old_shipping_state  = wpsc_get_visitor_meta( $visitor_id, 'shippingstate' , true );
+	$old_shipping_state = wpsc_get_visitor_meta( $visitor_id, 'shippingstate' , true );
 	$old_shipping_region = wpsc_get_visitor_meta( $visitor_id, 'shippingregion' , true );
 
 	if ( ! empty( $meta_value ) ) {
@@ -1155,11 +1188,11 @@ function _wpsc_updated_visitor_meta_shippingcountry( $meta_value, $meta_key, $vi
 		// check the current state and region values, if either isn't valid for the new country delete them
 		$wpsc_country = new WPSC_Country( $meta_value );
 
-		if ( ! empty ( $old_shipping_state ) &&  $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_shipping_state ) ) {
+		if ( ! empty ( $old_shipping_state ) && ! $wpsc_country->has_region( $old_shipping_state ) ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'shippingstate' );
 		}
 
-		if ( ! empty ( $old_shipping_region ) &&  $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_shipping_region ) ) {
+		if ( ! empty ( $old_shipping_region ) && ! $wpsc_country->has_region( $old_shipping_region ) ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'shippingregion' );
 		}
 	} else {
@@ -1207,7 +1240,7 @@ add_action( 'wpsc_updated_visitor_meta_billingregion', '_wpsc_updated_visitor_me
 */
 function _wpsc_updated_visitor_meta_billingcountry( $meta_value, $meta_key, $visitor_id ) {
 
-	$old_billing_state  = wpsc_get_visitor_meta( $visitor_id, 'billingstate' , true );
+	$old_billing_state = wpsc_get_visitor_meta( $visitor_id, 'billingstate' , true );
 	$old_billing_region = wpsc_get_visitor_meta( $visitor_id, 'billingregion' , true );
 
 	if ( ! empty( $meta_value ) ) {
@@ -1215,11 +1248,11 @@ function _wpsc_updated_visitor_meta_billingcountry( $meta_value, $meta_key, $vis
 		// check the current state and region values, if either isn't valid for the new country delete them
 		$wpsc_country = new WPSC_Country( $meta_value );
 
-		if ( ! empty ( $old_billing_state ) &&  $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_billing_state ) ) {
+		if ( ! empty ( $old_billing_state ) && ! $wpsc_country->has_region( $old_billing_state ) ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'billingstate' );
 		}
 
-		if ( ! empty ( $old_billing_region ) && $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_billing_region ) ) {
+		if ( ! empty ( $old_billing_region ) && ! $wpsc_country->has_region( $old_billing_region ) ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'billingregion' );
 		}
 	} else {
