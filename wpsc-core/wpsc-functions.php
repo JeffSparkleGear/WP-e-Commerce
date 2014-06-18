@@ -492,13 +492,28 @@ function wpsc_register_post_types() {
 	);
 	$args = apply_filters( 'wpsc_register_taxonomies_product_variation_args', $args );
 	// Product Variations, is internally heirarchical, externally, two separate types of items, one containing the other
-	register_taxonomy( 'wpsc-variation', 'wpsc-product', $args );
+
+	if ( true || is_admin() ) {
+		// always register variations for admins
+		register_taxonomy( 'wpsc-variation', 'wpsc-product', $args );
+	} else {
+		if ( ! get_option( 'wpsc_variations_disabled', false ) ) {
+			register_taxonomy( 'wpsc-variation', 'wpsc-product', $args );
+		}
+	}
 
 	do_action( 'wpsc_register_post_types_after' );
 	do_action( 'wpsc_register_taxonomies_after' );
 }
 
 add_action( 'init', 'wpsc_register_post_types', 8 );
+
+function wpsc_check_if_variations_exist() {
+	$disable_variations = wp_count_terms( 'wpsc-variation' ) == 0;
+	update_option( 'wpsc_variations_disabled' , $disable_variations );
+}
+
+add_action( 'shutdown', 'wpsc_check_if_variations_exist' );
 
 /**
  * Post Updated Messages

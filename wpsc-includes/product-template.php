@@ -116,6 +116,10 @@ function wpsc_product_normal_price() {
 function wpsc_calculate_price( $product_id, $variations = false, $special = true ) {
 	global $wpdb;
 
+	if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+		$variations = false;
+	}
+
 	$p_id = $product_id;
 	if ( ! empty( $variations ) )
 		$product_id = wpsc_get_child_object_in_terms( $product_id, $variations, 'wpsc-variation' );
@@ -226,6 +230,10 @@ function wpsc_get_downloadable_file( $file_id ) {
 * @return boolean true if product does have variations, false otherwise
 */
 function wpsc_product_has_children( $id, $exclude_unpublished = true ){
+	if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+		return false;
+	}
+
 	return wpsc_product_has_variations( $id );
 }
 
@@ -239,6 +247,10 @@ function wpsc_product_has_children( $id, $exclude_unpublished = true ){
  */
 function wpsc_product_has_variations( $id = 0 ) {
 	static $has_variations = array();
+
+	if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+		return false;
+	}
 
 	if ( ! $id )
 		$id = get_the_ID();

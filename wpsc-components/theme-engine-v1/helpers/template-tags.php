@@ -696,6 +696,11 @@ function wpsc_product_creation_time( $format = null ) {
  */
 function wpsc_check_variation_stock_availability( $product_id, $variations ) {
 	global $wpdb;
+
+	if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+		return 0;
+	}
+
 	$selected_post = get_posts( array(
 				'post_parent'      => $product_id,
 				'post_type'        => "wpsc-product",

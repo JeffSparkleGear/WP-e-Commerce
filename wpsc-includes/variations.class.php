@@ -30,6 +30,10 @@ class wpsc_variations {
 		$this->first_variations = array();
 		$this->all_associated_variations = array();
 
+		if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+			return;
+		}
+
 		$product_terms = wpsc_get_product_terms( $product_id, 'wpsc-variation' );
 		$product_terms = wpsc_get_terms_variation_sort_filter( $product_terms );
 

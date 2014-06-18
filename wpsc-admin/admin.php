@@ -1165,7 +1165,12 @@ function wpsc_ajax_ie_save() {
 	$id = absint( $_POST['id'] );
 	$post = get_post( $_POST['id'] );
 	$parent = get_post( $post->post_parent );
-	$terms = wpsc_get_product_terms( $id, 'wpsc-variation', 'name' );
+
+	if ( ! taxonomy_exists( 'wpsc-variation' ) ) {
+		$terms = array();
+	} else {
+		$terms = wpsc_get_product_terms( $id, 'wpsc-variation', 'name' );
+	}
 
 	$product = array(
 		'ID' => $_POST['id'],
