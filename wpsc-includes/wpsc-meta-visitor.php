@@ -561,6 +561,12 @@ function wpsc_get_visitor_cart( $visitor_id ) {
 			if ( ! empty( $meta_value ) ) {
 
 				switch ( $key ) {
+					case '_signature': // don't load the signature
+					case 'current_cart_item': // don't load array cursor
+					case 'current_shipping_method': // don't load array cursor
+					case 'current_shipping_quote': // don't load array cursor
+						continue;
+
 					case 'shipping_methods':
 					case 'shipping_quotes':
 					case 'cart_items':
@@ -695,6 +701,11 @@ function _wpsc_calculate_cart_signature( $wpsc_cart ) {
 	unset( $cart_array['current_cart_item'] );
 	unset( $cart_array['current_shipping_method'] );
 	unset( $cart_array['current_shipping_quote'] );
+	unset( $cart_array['cart_item'] );
+
+//	foreach ( $cart_array['cart_items'] as $index => $cart_item ) {
+//		$cart_array['cart_items'][$index]->cart = null;
+//	}
 
 	$raw_data = serialize( $cart_array );
 	$signature = md5( $raw_data );
