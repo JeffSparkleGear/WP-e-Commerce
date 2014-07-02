@@ -450,19 +450,19 @@ function wpsc_update_product_price() {
  */
 function wpsc_update_location() {
 	global $wpsc_cart;
-
+	
 	/*
-	 * Checkout page shipping calculator MAY provide a zip code using the identifier from prior
-	 * releases.  Let's check for that.
+	 * WPeC's totally awesome checkout page shipping calculator has a submit button that will send
+	 * some of the shipping data to us in an AJAX request.  The format of the data as of version
+	 * 3.8.14.1 uses the 'collected_data' array format just like in checkout. We should process
+	 * this array in case it has some updates to the user meta (checkout information) that haven't been
+	 * recorded at the time the calculate button was clicked.
 	 */
-	if ( isset( $_POST['zipcode'] ) ) {
-		wpsc_update_customer_meta( 'shippingpostcode', $_POST['zipcode'] );
+	if ( isset( $_POST['collected_data'] ) && is_array( $_POST['collected_data'] ) ) {
+		_wpsc_checkout_customer_meta_update( $_POST['collected_data'] );
 	}
 
-	/*
-	 * Checkout page shipping calculator MAY provide a country code using the identifier from prior
-	 * releases.  Let's check for that.
-	 */
+
 	if ( isset( $_POST['country'] ) ) {
 		$wpsc_country = new WPSC_Country( $_POST['country'] );
 		wpsc_update_customer_meta( 'shippingcountry', $wpsc_country->get_isocode() );
