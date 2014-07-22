@@ -601,6 +601,11 @@ function wpsc_get_visitor_cart( $visitor_id ) {
 		}
 	}
 
+	foreach ( $wpsc_cart->cart_items as $index => $cart_item ) {
+		unset( $wpsc_cart->cart_items[$index]->cart );
+		$wpsc_cart->cart_items[$index]->cart = &$wpsc_cart;
+	}
+
 	$wpsc_cart = apply_filters( 'wpsc_get_visitor_cart', $wpsc_cart, $visitor_id );
 
 	return $wpsc_cart;
