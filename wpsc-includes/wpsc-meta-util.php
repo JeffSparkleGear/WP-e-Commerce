@@ -419,7 +419,7 @@ function _wpsc_replace_visitor_meta_keys( $replacements ) {
 	}
 
 	if ( $total_count_updated > 0 ) {
-		wp_cache_flush();
+		wpsc_core_flush_temporary_data();
 	}
 
 	return $total_count_updated;
@@ -523,7 +523,7 @@ function _wpsc_meta_migrate_anonymous_user_cron() {
 		$response = wp_remote_post( admin_url( 'admin-ajax.php' ) . '?action=wpsc_migrate_anonymous_user' , array(  'blocking' => true, ) );
 		wp_schedule_single_event( time() + 30 , 'wpsc_migrate_anonymous_user_cron' );
 	} else {
-		wp_cache_flush();
+		wpsc_core_flush_temporary_data();
 	}
 }
 
@@ -722,9 +722,11 @@ function _wpsc_has_visitor_location_changed( $visitor_id = false ) {
 }
 
 /**
- * Tries to turn an arbitrary value into a avalid bool looking at the contents, including for strings like false and no, ...
+ * Tries to turn an arbitrary value into a valid bool looking at the contents, including for strings like false and no, ...
+ *
  * @param varies $value      value to boolify
- * @return Ambigous <boolean, string>
+ *
+ * @return boolean true or false
  */
 function _wpsc_make_value_into_bool( $value ) {
 	if ( ! is_bool( $value ) ) {
