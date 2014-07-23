@@ -698,11 +698,7 @@ function _wpsc_calculate_cart_signature( $wpsc_cart ) {
 	unset( $cart_array['current_shipping_quote'] );
 	unset( $cart_array['cart_item'] );
 
-//	foreach ( $cart_array['cart_items'] as $index => $cart_item ) {
-//		$cart_array['cart_items'][$index]->cart = null;
-//	}
-
-	$raw_data = serialize( $cart_array );
+	$raw_data = json_encode( $cart_array );
 	$signature = md5( $raw_data );
 
 	return $signature;
