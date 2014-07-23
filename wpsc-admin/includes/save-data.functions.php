@@ -108,6 +108,7 @@ function wpsc_custom_category_column_data( $string, $column_name, $term_id ) {
  */
 function wpsc_admin_get_category_array( $parent_id = null ){
 	global $wpdb;
+	error_log( __FUNCTION__ );
 
 	$orderedList = array();
 
