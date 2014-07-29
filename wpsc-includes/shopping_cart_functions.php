@@ -1,6 +1,7 @@
 <?php
 
 function wpsc_shopping_cart( $input = null, $override_state = null ) {
+	global $wpdb, $wpsc_cart;
 
 	$customer_id = wpsc_get_current_customer_id();
 
@@ -43,6 +44,7 @@ function wpsc_shopping_cart( $input = null, $override_state = null ) {
 			echo wpsc_shopping_basket_internals(false, false, true );
 			echo "  </div>";
 			echo "</div>";
+			$dont_add_input = true;
 		} else {
 			echo "<div id='sideshoppingcart'>";
 			echo "<h3>" . __( 'Shopping Cart', 'wpsc' ) . "$fancy_collapser</h3>";
@@ -65,6 +67,7 @@ function wpsc_shopping_cart( $input = null, $override_state = null ) {
 }
 
 function wpsc_shopping_basket_internals( $deprecated = false, $quantity_limit = false, $no_title=false ) {
+	global $wpdb;
 
 	$display_state = '';
 
