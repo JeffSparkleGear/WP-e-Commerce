@@ -1,7 +1,6 @@
 <?php
 
 function wpsc_shopping_cart( $input = null, $override_state = null ) {
-	global $wpdb, $wpsc_cart;
 
 	$customer_id = wpsc_get_current_customer_id();
 
