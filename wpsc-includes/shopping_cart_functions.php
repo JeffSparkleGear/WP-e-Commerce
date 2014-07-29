@@ -66,8 +66,6 @@ function wpsc_shopping_cart( $input = null, $override_state = null ) {
 }
 
 function wpsc_shopping_basket_internals( $deprecated = false, $quantity_limit = false, $no_title=false ) {
-	global $wpdb;
-
 	$display_state = '';
 
 	if ( ( ( ( isset( $_SESSION['slider_state'] ) && $_SESSION['slider_state'] == 0) ) || ( wpsc_cart_item_count() < 1 ) ) && ( get_option( 'show_sliding_cart' ) == 1 ) )

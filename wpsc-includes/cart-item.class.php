@@ -456,8 +456,6 @@ class wpsc_cart_item {
 	 * no parameters, nothing returned
 	 */
 	function update_claimed_stock() {
-		global $wpdb;
-
 		if($this->has_limited_stock == true) {
 			$claimed_query = new WPSC_Claimed_Stock( array(
 				'product_id' => $this->product_id,

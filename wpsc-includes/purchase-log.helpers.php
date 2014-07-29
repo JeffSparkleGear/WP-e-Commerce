@@ -47,7 +47,6 @@ function wpsc_get_plaintext_table( $headings, $rows ) {
 }
 
 function wpsc_update_purchase_log_status( $unique_id, $new_status, $by = 'id' ) {
-	global $wpdb;
 
 	$purchase_log = new WPSC_Purchase_Log( $unique_id, $by );
 
@@ -57,8 +56,6 @@ function wpsc_update_purchase_log_status( $unique_id, $new_status, $by = 'id' ) 
 }
 
 function wpsc_update_purchase_log_details( $unique_id, $details, $by = 'id' ) {
-	global $wpdb;
-
 	$purchase_log = new WPSC_Purchase_Log( $unique_id, $by );
 	$purchase_log->set( $details );
 	return $purchase_log->save();
