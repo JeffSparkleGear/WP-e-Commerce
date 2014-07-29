@@ -142,7 +142,7 @@ function _wpsc_admin_download_file() {
 	$file_id = $_REQUEST['wpsc_download_id'];
 	check_admin_referer( 'wpsc-admin-download-file-' . $file_id );
 
-	$file_data = get_post( $file_id );
+	get_post( $file_id );
 	_wpsc_force_download_file( $file_id );
 }
 
@@ -150,7 +150,6 @@ if ( ! empty( $_REQUEST['wpsc_download_id'] ) )
 	add_action( 'admin_init', '_wpsc_admin_download_file' );
 
 function wpsc_select_variation_file( $file_id, $variation_ids, $variation_combination_id = null ) {
-	global $wpdb;
 	$file_list = wpsc_uploaded_files();
 	$unique_id_component = ((int)$variation_combination_id) . "_" . str_replace( ",", "_", $variation_ids );
 
@@ -179,7 +178,6 @@ function wpsc_select_variation_file( $file_id, $variation_ids, $variation_combin
 }
 
 function wpsc_list_product_themes( $theme_name = null ) {
-	global $wpdb;
 
 	if ( !$selected_theme = get_option( 'wpsc_selected_theme' ) )
 		$selected_theme = 'default';

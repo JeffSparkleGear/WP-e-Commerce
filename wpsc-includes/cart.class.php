@@ -90,7 +90,6 @@ class wpsc_cart {
 
 
     function wpsc_cart() {
-		$coupon = 'percentage';
 		$this->update_location();
 		$this->wpsc_refresh_cart_items();
 		$this->unique_id = sha1( uniqid( rand(), true ) );

@@ -79,7 +79,6 @@ class wpsc_variations {
 	 * ( Variation Group and Variation ) Loop Code Starts here
 	*/
 	function get_variation_groups() {
-		global $wpdb;
 		$this->variation_group_count = count( $this->variation_groups );
 		$this->get_first_variations();
 	}
@@ -114,13 +113,11 @@ class wpsc_variations {
 	}
 
 	function get_first_variations() {
-		global $wpdb;
 		return null;
 	}
 
 
 	function get_variations() {
-		global $wpdb;
 		$this->variations = $this->all_associated_variations[$this->variation_group->term_id];
 		$this->variation_count = count( $this->variations );
 	}
@@ -216,7 +213,6 @@ function wpsc_get_child_object_in_terms( $parent_id, $terms, $taxonomies = 'wpsc
 	$args['tax_query'] = $tax_query;
 
 	$children = get_posts( $args );
-	$child_id = ! empty( $children ) ? $children[0]->ID : false;
 
 	// return false if product not found, a single product id if one id found, or an array of ids if many found
 	if ( empty( $children ) ) {
@@ -289,6 +285,7 @@ function wpsc_get_child_object_in_terms_var( $parent_id, $terms, $taxonomies, $a
 		AND tt.term_id IN ( {$terms} )
 		AND tt.parent > 0
 	GROUP BY tr.object_id";
+
 	$object_ids = $wpdb->get_results( $object_sql, ARRAY_A );
 	if ( count( $object_ids ) > 0 ) {
 		return $object_ids;

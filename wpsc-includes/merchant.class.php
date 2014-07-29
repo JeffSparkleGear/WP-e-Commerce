@@ -85,7 +85,6 @@ class wpsc_merchant {
 	);
 
 	function __construct( $purchase_id = null, $is_receiving = false ) {
-		global $wpdb;
 
 		if ( ($purchase_id == null) && ($is_receiving == true) ) {
 			$this->is_receiving = true;

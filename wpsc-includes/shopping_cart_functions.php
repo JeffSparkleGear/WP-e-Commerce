@@ -82,7 +82,6 @@ function wpsc_shopping_basket_internals( $deprecated = false, $quantity_limit = 
 }
 
 function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_country = null, $selected_region = null, $supplied_form_id = null, $shippingfields = false ) {
-	global $wpdb;
 
 	$output = '';
 
@@ -179,8 +178,6 @@ function wpsc_country_region_list( $form_id = null, $ajax = false, $selected_cou
  * @return string
  */
 function wpsc_country_list( $form_id = null, $ajax = null, $selected_country = null, $selected_region = null, $supplied_form_id = null, $shippingfields = false ) {
-	global $wpdb;
-
 	$output = '';
 
 	if ( $form_id != null ) {

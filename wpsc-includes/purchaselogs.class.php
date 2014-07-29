@@ -338,7 +338,7 @@ function wpsc_purchaselog_details_shipping() {
 }
 
 function wpsc_purchaselog_details_tax() {
-   global $purchlogitem, $wpsc_cart;
+   global $purchlogitem;
 
    return (float) $purchlogitem->purchitem->tax_charged;
 }

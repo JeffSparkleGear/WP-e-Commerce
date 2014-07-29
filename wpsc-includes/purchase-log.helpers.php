@@ -95,7 +95,6 @@ function _wpsc_get_cart_item_downloadable_links( $item, $purchase_log ) {
 	$links = array();
 
 	foreach ( $results as $single_download ) {
-		$file_data = get_post( $single_download->product_id );
 		$args = array(
 			'post_type'   => 'wpsc-product-file',
 			'post_parent' => $single_download->product_id,
