@@ -493,7 +493,7 @@ function wpsc_register_post_types() {
 	$args = apply_filters( 'wpsc_register_taxonomies_product_variation_args', $args );
 	// Product Variations, is internally heirarchical, externally, two separate types of items, one containing the other
 
-	if ( true || is_admin() ) {
+	if (  is_admin() ) {
 		// always register variations for admins
 		register_taxonomy( 'wpsc-variation', 'wpsc-product', $args );
 	} else {
@@ -509,11 +509,15 @@ function wpsc_register_post_types() {
 add_action( 'init', 'wpsc_register_post_types', 8 );
 
 function wpsc_check_if_variations_exist() {
-	$disable_variations = wp_count_terms( 'wpsc-variation' ) == 0;
-	update_option( 'wpsc_variations_disabled' , $disable_variations );
+	if ( taxonomy_exists( 'wpsc-variation' ) ) {
+		$disable_variations = wp_count_terms( 'wpsc-variation' ) == 0;
+		update_option( 'wpsc_variations_disabled', $disable_variations );
+	}
 }
 
-add_action( 'shutdown', 'wpsc_check_if_variations_exist' );
+if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+	add_action( 'shutdown', 'wpsc_check_if_variations_exist' );
+}
 
 /**
  * Post Updated Messages
@@ -679,13 +683,20 @@ function wpsc_update_permalink_slugs() {
  * @return stdObject[]
  */
 function wpsc_get_product_terms( $product_id, $tax, $field = '' ) {
-	$terms = get_the_terms( $product_id, $tax );
 
-	if ( ! $terms )
+	if ( taxonomy_exists( $tax ) ) {
+		$terms = get_the_terms( $product_id, $tax );
+	} else {
 		$terms = array();
+	}
 
-	if ( $field )
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		$terms = array();
+	}
+
+	if ( ! empty( $terms ) && $field ) {
 		$terms = wp_list_pluck( $terms, $field );
+	}
 
 	// remove the redundant array keys, could cause issues in loops with iterator
 	$terms = array_values( $terms );

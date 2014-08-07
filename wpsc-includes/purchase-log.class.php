@@ -157,7 +157,7 @@ class WPSC_Purchase_Log {
 		if ( ! $has_date_restriction ) {
 			foreach ( $products as $product ) {
 				// store the ID if this product doesn't have a stats cache yet
-				if ( $product->post->_wpsc_stats === '' ) {
+				if ( ! property_exists( $product->post, '_wpsc_stats' ) ||  '' === $product->post->_wpsc_stats ) {
 					$needs_fetching[] = $product->post->ID;
 				} else {
 					// tally up the sales and earnings if this one has cache already
