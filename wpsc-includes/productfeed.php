@@ -192,7 +192,8 @@ function wpsc_generate_product_feed() {
 
 				if ( ! $done_weight ) {
 					$wpsc_product_meta = get_product_meta( $post->ID, 'product_metadata',true );
-					$weight = apply_filters ( 'wpsc_google_shipping_weight', $wpsc_product_meta['weight'], $post->ID );
+					$weight = isset( $wpsc_product_meta['weight'] ) ? $wpsc_product_meta['weight'] : 0;
+					$weight = apply_filters ( 'wpsc_google_shipping_weight', $weight, $post->ID );
 					if ( $weight && is_numeric ( $weight ) && $weight > 0 ) {
 						echo "<g:shipping_weight>$weight pounds</g:shipping_weight>";
 					}
