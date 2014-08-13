@@ -35,7 +35,10 @@ if ( _wpsc_doing_customer_meta_ajax() ) {
 	 */
 	function wpsc_validate_customer_ajax() {
 		// most of the validation should be done by the WPEC initialization, just return the current customer values
-		$response = array( 'valid' => (_wpsc_validate_customer_cookie() !== false), 'id' => wpsc_get_current_customer_id() );
+		$customer_id = wpsc_get_current_customer_id();
+		$valid = false !== _wpsc_validate_customer_cookie() ;
+
+		$response = array( 'valid' => ( $valid !== false ), 'id' => $customer_id );
 		$response = apply_filters( '_wpsc_validate_customer_ajax', $response );
 		wp_send_json_success( $response );
 	}

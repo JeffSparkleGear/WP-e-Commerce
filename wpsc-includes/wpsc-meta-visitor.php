@@ -75,8 +75,6 @@ function wpsc_create_visitor( $args = null ) {
 		return false;
 	}
 
-	$new_visitor_id = false;
-
 	// set user id
 	if ( ! is_array( $args ) || empty( $args ) ) {
 		$args = array( 'user_id' => null );
