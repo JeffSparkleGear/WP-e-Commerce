@@ -453,7 +453,7 @@ function _wpsc_is_bot_user() {
 		}
 
 		// check for non WPEC ajax request, no reason to create a visitor profile if this is the case
-		if ( ! $is_bot && ! _wpsc_doing_wpsc_ajax_request() ) {
+		if ( ! $is_bot && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) && ! _wpsc_doing_wpsc_ajax_request() ) {
 			$is_bot = true;
 		}
 

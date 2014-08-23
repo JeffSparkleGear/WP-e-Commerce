@@ -345,8 +345,8 @@ function wpsc_column_sql_orderby( $vars ) {
 	if ( ! isset( $vars['post_type'] ) || 'wpsc-product' != $vars['post_type'] || ! isset( $vars['orderby'] ) )
 		return $vars;
 
-			switch ( $vars['orderby'] ) :
-				case 'stock' :
+	switch ( $vars['orderby'] ) :
+		case 'stock' :
 			$vars = array_merge(
 				$vars,
 				array(
