@@ -30,7 +30,7 @@ function wpsc_generate_product_feed() {
 	// Don't build up a huge posts cache for the whole store - http://code.google.com/p/wp-e-commerce/issues/detail?id=885
 	wp_suspend_cache_addition(true);
 
-    $chunk_size = apply_filters ( 'wpsc_productfeed_chunk_size', 50 );
+    $chunk_size = apply_filters ( 'wpsc_productfeed_chunk_size', 10 );
 
     // Don't cache feed under WP Super-Cache
     define( 'DONOTCACHEPAGE', true );
@@ -93,7 +93,13 @@ function wpsc_generate_product_feed() {
 			echo "      <title><![CDATA[".get_the_title()."]]></title>\n\r";
 			echo "      <link>$purchase_link</link>\n\r";
 			echo "      <description><![CDATA[". wpsc_the_product_description() ."]]></description>\n\r";
-			echo "      <guid>$purchase_link</guid>\n\r";
+
+			$google_product_id = wpsc_product_sku();
+			if ( empty( $google_product_id ) ) {
+				$google_product_id = get_the_ID();
+			}
+
+			echo "      <g:id>$google_product_id</g:id>\n\r";
 
 			$image_link = wpsc_the_product_thumbnail() ;
 
@@ -104,7 +110,6 @@ function wpsc_generate_product_feed() {
 				} else {
 					echo "      <enclosure url='" . esc_url( $image_link ) . "' />\n\r";
 				}
-
 			}
 
 			$price = wpsc_calculate_price($post->ID);
@@ -133,7 +138,10 @@ function wpsc_generate_product_feed() {
 
 				echo "      <g:price>".$price."</g:price>\n\r";
 
-				$google_elements = array();
+				$google_elements = array(
+					'g:mpn'   => array( $google_product_id ),
+					'g:brand' => array( get_bloginfo( 'name' ) ),
+				);
 
 				$product_meta = get_post_custom ( $post->ID );
 
@@ -158,7 +166,7 @@ function wpsc_generate_product_feed() {
 						foreach ( $element_values as $element_value ) {
 
 							echo "      <".$element_name.">";
-							echo "<![CDATA[".$element_value."]]>";
+							echo $element_value;
 							echo "</".$element_name.">\n\r";
 
 						}
