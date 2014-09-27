@@ -171,18 +171,26 @@ function wpsc_start_the_query() {
 	global $wpsc_page_titles, $wp_query, $wpsc_query, $wpsc_query_vars;
 
 	$is_404 = $wp_query->is_404;
-	if ( null == $wpsc_query ) {
-		if( ( $wp_query->is_404 && !empty($wp_query->query_vars['paged']) ) || (isset( $wp_query->query['pagename']) && strpos( $wp_query->query['pagename'] , $wpsc_page_titles['products'] ) !== false ) && !isset($wp_query->post)){
+	if (  ! $is_404 && empty( $wpsc_query )  ) {
+		if( ( $is_404 && !empty($wp_query->query_vars['paged']) ) || (isset( $wp_query->query['pagename']) && strpos( $wp_query->query['pagename'] , $wpsc_page_titles['products'] ) !== false ) && !isset($wp_query->post)){
 			global $post;
-			$is_404 = true;
-			if( !isset( $wp_query->query_vars['wpsc_product_category'] ) && ! isset( $wp_query->query_vars['product_tag'] ) )
-				$wp_query = new WP_Query('post_type=wpsc-product&name='.$wp_query->query_vars['name']);
 
-			if(  isset( $wp_query->post ) && is_object( $wp_query->post ) && isset($wp_query->post->ID))
+			/*
+			 * If we think we might have a 404, and we don't already have a product category,
+			 * let's check to see if the page name exists, optherwise we will use the page name as
+			 * a WPeC product category
+			 */
+			if( ! isset( $wp_query->query_vars['wpsc_product_category'] ) && ! isset( $wp_query->query_vars['product_tag'] ) ) {
+				$wp_query = new WP_Query( 'post_type=wpsc-product&name=' . $wp_query->query_vars['name'] );
+			}
+
+			if(  isset( $wp_query->post ) && is_object( $wp_query->post ) && isset( $wp_query->post->ID ) ) {
 				$post = $wp_query->post;
-			else
-				$wpsc_query_vars['wpsc_product_category'] = $wp_query->query_vars['name'];
+			} else {
+				$wp_query->query_vars['wpsc_product_category'] = $wp_query->query_vars['name'];
+			}
 		}
+
 		if ( count( $wpsc_query_vars ) <= 1 ) {
 			$wpsc_query_vars = array(
 				'post_status' => apply_filters( 'wpsc_product_display_status', array( 'publish' ) ),
@@ -190,6 +198,7 @@ function wpsc_start_the_query() {
 				'order'       => apply_filters( 'wpsc_product_order', get_option( 'wpsc_product_order', 'ASC' ) ),
 				'post_type'   => apply_filters( 'wpsc_product_post_type', array( 'wpsc-product' ) ),
 			);
+
 			if($wp_query->query_vars['preview'])
 				$wpsc_query_vars['post_status'] = 'any';
 
@@ -200,14 +209,14 @@ function wpsc_start_the_query() {
 				$wpsc_query_vars['product_tag'] = $wp_query->query_vars['product_tag'];
 				$wpsc_query_vars['taxonomy'] = get_query_var( 'taxonomy' );
 				$wpsc_query_vars['term'] = get_query_var( 'term' );
-			}elseif( isset($wp_query->query_vars['wpsc_product_category']) ){
+			} elseif( isset($wp_query->query_vars['wpsc_product_category']) ){
 				$wpsc_query_vars['wpsc_product_category'] = $wp_query->query_vars['wpsc_product_category'];
 				$wpsc_query_vars['taxonomy'] = get_query_var( 'taxonomy' );
 				$wpsc_query_vars['term'] = get_query_var( 'term' );
-			}else{
-				$wpsc_query_vars['post_type'] = 'wpsc-product';
+			} else {
 				$wpsc_query_vars['pagename']  = wpsc_get_page_slug( '[productspage]' );
 			}
+
 			if(1 == get_option('use_pagination')){
 				$wpsc_query_vars['nopaging'] = false;
 
@@ -218,7 +227,6 @@ function wpsc_start_the_query() {
 					$wpsc_query_vars['paged'] = get_query_var('page');
 
 				}
-
 			}
 
 			$orderby = ( isset( $_GET['product_order'] ) ) ? 'title' : null;
@@ -244,20 +252,21 @@ function wpsc_start_the_query() {
 		}
 	}
 
-	if(  $is_404 || ( ( isset($wpsc_query->post_count) && $wpsc_query->post_count == 0 ) && isset($wpsc_query_vars['wpsc_product_category'] )  )){
+	// If we have products in our $wpsc_query results we need to show the products page.
+	if(  ! $is_404 ||  ! empty( $wpsc_query->post_count ) ){
 
-		$args = array_merge($wp_query->query, array('posts_per_page' => get_option('wpsc_products_per_page')));
-		$wp_query = new WP_Query($args);
-
+	 // Make sure that we have a products page ready to go in the WordPress $wp_query global
 		if( empty( $wp_query->posts ) ){
 			$product_page_id = wpsc_get_the_post_id_by_shortcode('[productspage]');
 			$wp_query = new WP_Query( 'page_id='.$product_page_id);
 		}
 	}
-	if ( isset( $wp_query->post ) && is_object( $wp_query->post ) && isset( $wp_query->post->ID ) )
+
+	if ( isset( $wp_query->post ) && is_object( $wp_query->post ) && isset( $wp_query->post->ID ) ) {
 		$post_id = $wp_query->post->ID;
-	else
+	} else {
 		$post_id = 0;
+	}
 
 	if ( get_permalink( $post_id ) == get_option( 'shopping_cart_url' ) )
 		$_SESSION['wpsc_has_been_to_checkout'] = true;
