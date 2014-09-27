@@ -450,7 +450,7 @@ function wpsc_update_product_price() {
  */
 function wpsc_update_location() {
 	global $wpsc_cart;
-	
+
 	/*
 	 * WPeC's totally awesome checkout page shipping calculator has a submit button that will send
 	 * some of the shipping data to us in an AJAX request.  The format of the data as of version
