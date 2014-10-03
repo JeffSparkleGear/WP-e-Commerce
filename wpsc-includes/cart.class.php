@@ -413,6 +413,7 @@ class wpsc_cart {
 			}
 		}
 
+		// Quotes may have changed, rewind the quote loop to the start
 		$this->rewind_shipping_methods();
 
 	}
@@ -449,6 +450,7 @@ class wpsc_cart {
 			$this->selected_shipping_option = apply_filters( 'wpsc_default_shipping_quote', $this->selected_shipping_option, $this->shipping_quotes, $this );
 		}
 
+		// Quotes may have changed, rewind the quote loop to the start
 		$this->rewind_shipping_methods();
 	}
 
@@ -1209,6 +1211,7 @@ class wpsc_cart {
 
 		$this->shipping_quote_count = count( $this->shipping_quotes );
 
+		// Quotes may have changed, rewind the quote loop to the start
 		$this->rewind_shipping_methods();
 	}
 
@@ -1295,6 +1298,9 @@ class wpsc_cart {
 	}
 }
 
+/**
+ * Recalculate shipping quotes just prior to the quote information being displayed on the product page
+ */
 function wpsc_calculate_shipping_quotes_before_product_page() {
 	global $wpsc_cart;
 	$wpsc_cart->get_shipping_method();
