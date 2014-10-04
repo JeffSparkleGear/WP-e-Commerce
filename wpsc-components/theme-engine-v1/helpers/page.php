@@ -984,11 +984,12 @@ function wpsc_thesis_compat( $loop ) {
 // Template tags
 function wpsc_all_products_on_page(){
 	global $wp_query,$wpsc_query;
+	$obj = $wp_query->get_queried_object();
+	wpsc_update_permalink_slugs();
 	do_action('wpsc_swap_the_template');
 	$products_page_id = wpsc_get_the_post_id_by_shortcode('[productspage]');
 	$term = get_query_var( 'wpsc_product_category' );
 	$tax_term = get_query_var ('product_tag' );
-	$obj = $wp_query->get_queried_object();
 
 	$id = isset( $obj->ID ) ? $obj->ID : null;
 
@@ -1249,7 +1250,7 @@ function wpsc_display_featured_products_page() {
 	ob_start();
 		include_once($featured_product_theme_path);
 		$is_single = false;
-		$output .= ob_get_contents();
+		$output = ob_get_contents();
 		ob_end_clean();
 
 			//Begin outputting featured product.  We can worry about templating later, or folks can just CSS it up.
