@@ -262,13 +262,16 @@ function wpsc_start_the_query() {
 			$wp_query = new WP_Query( 'page_id='.$product_page_id);
 		}
 	}
-	if ( isset( $wp_query->post->ID ) )
+	if ( ! empty( $wp_query->post ) &&  isset( $wp_query->post->ID ) ) {
 		$post_id = $wp_query->post->ID;
-	else
-		$post_id = 0;
 
-	if ( get_permalink( $post_id ) == get_option( 'shopping_cart_url' ) )
-		$_SESSION['wpsc_has_been_to_checkout'] = true;
+		if ( get_permalink( $post_id ) == get_option( 'shopping_cart_url' ) )
+			$_SESSION['wpsc_has_been_to_checkout'] = true;
+
+	} else {
+		$post_id = 0;
+	}
+
 }
 
 /**
