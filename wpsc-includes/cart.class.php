@@ -412,6 +412,9 @@ class wpsc_cart {
 				do_action( 'wpsc_after_get_shipping_method', $this );
 			}
 		}
+
+		$this->rewind_shipping_methods();
+
 	}
 
 	/**
@@ -445,6 +448,8 @@ class wpsc_cart {
 		if (  empty( $this->selected_shipping_option ) && is_array( $this->shipping_quotes ) && ! empty( $this->shipping_quotes ) ) {
 			$this->selected_shipping_option = apply_filters( 'wpsc_default_shipping_quote', $this->selected_shipping_option, $this->shipping_quotes, $this );
 		}
+
+		$this->rewind_shipping_methods();
 	}
 
 	/**
@@ -1203,6 +1208,8 @@ class wpsc_cart {
 		}
 
 		$this->shipping_quote_count = count( $this->shipping_quotes );
+
+		$this->rewind_shipping_methods();
 	}
 
 	function google_shipping_quotes() {
@@ -1286,5 +1293,14 @@ class wpsc_cart {
 			$this->calculate_total_price();
 		}
 	}
-
 }
+
+function wpsc_calculate_shipping_quotes_before_product_page() {
+	global $wpsc_cart;
+	$wpsc_cart->get_shipping_method();
+	$wpsc_cart->rewind_shipping_methods();
+}
+
+add_action( 'wpsc_before_shipping_of_shopping_cart' , 'wpsc_calculate_shipping_quotes_before_product_page' , 1 );
+
+
