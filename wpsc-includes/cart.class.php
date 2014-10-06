@@ -1208,8 +1208,6 @@ class wpsc_cart {
 		}
 
 		$this->shipping_quote_count = count( $this->shipping_quotes );
-
-		$this->rewind_shipping_methods();
 	}
 
 	function google_shipping_quotes() {
