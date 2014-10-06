@@ -1210,9 +1210,12 @@ class wpsc_cart {
 		}
 
 		$this->shipping_quote_count = count( $this->shipping_quotes );
+<<<<<<< HEAD
 
 		// Quotes may have changed, rewind the quote loop to the start
 		$this->rewind_shipping_methods();
+=======
+>>>>>>> 1b559a0... remove reset of quote loop on quotes calculate
 	}
 
 	function google_shipping_quotes() {
