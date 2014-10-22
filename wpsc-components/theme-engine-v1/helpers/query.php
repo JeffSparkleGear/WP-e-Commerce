@@ -170,6 +170,11 @@ function _wpsc_pre_get_posts_reset_taxonomy_globals( $query ) {
  * wpsc_start_the_query
  */
 function wpsc_start_the_query() {
+
+	if ( is_404() ) {
+		return;
+	}
+
 	global $wpsc_page_titles, $wp_query, $wpsc_query, $wpsc_query_vars;
 
 	$is_404 = $wp_query->is_404;
