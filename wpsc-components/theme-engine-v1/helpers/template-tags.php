@@ -1034,14 +1034,22 @@ function wpsc_the_product_thumbnail( $width = null, $height = null, $product_id 
 
 			if ( ! $custom_thumbnail ) {
 				$custom_thumbnail = 'medium-single-product';
+			}
+
+			$src = wp_get_attachment_image_src( $thumbnail_id, $custom_thumbnail );
+
+			if ( ! $src ) {
+				$custom_thumbnail = 'medium-single-product';
 				$current_size = image_get_intermediate_size( $thumbnail_id, $custom_thumbnail );
 				$settings_width  = get_option( 'single_view_image_width' );
 				$settings_height = get_option( 'single_view_image_height' );
 
-				if ( ! $current_size || ( $current_size['width'] != $settings_width && $current_size['height'] != $settings_height ) )
+				if ( ! $current_size || ( $current_size['width'] != $settings_width && $current_size['height'] != $settings_height ) ) {
 					_wpsc_regenerate_thumbnail_size( $thumbnail_id, $custom_thumbnail );
+				}
+
+				$src = wp_get_attachment_image_src( $thumbnail_id, $custom_thumbnail );
 			}
-			$src = wp_get_attachment_image_src( $thumbnail_id, $custom_thumbnail );
 
 			if ( ! empty( $src ) && is_string( $src[0] ) )
 				$thumbnail = $src[0];
