@@ -57,7 +57,7 @@ function wpsc_core_constants() {
 	}
 
 	if ( ! defined( 'WPSC_MINOR_VERSION' ) ) {
-		define( 'WPSC_MINOR_VERSION'      , '86c1a52' );
+		define( 'WPSC_MINOR_VERSION'      , '86c1a52.3' );
 	}
 
 	if ( ! defined( 'WPSC_PRESENTABLE_VERSION' ) ) {
