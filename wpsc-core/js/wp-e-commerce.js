@@ -179,6 +179,13 @@ function checkVisitorId() {
             wpsc_http.open("POST", wpsc_ajax.ajaxurl + "?action=wpsc_validate_customer", false);
             wpsc_http.setRequestHeader("Content-type", "application/json; charset=utf-8");
 
+            // a timeout for this check request can be set, but should not be necessary as the AJAX
+            // transaction to validate the WPeC visitor id is light weight.  If the request is taking
+            // an extended period of time the web server should be looked at carefullt becuase there may
+            // be a more general performance problem.  The timout value below can be uncommented as an
+            //  alternative to allow processing to continue without a valid customer id.
+            // wpsc_http.timeout = 4000;  // timeout value in milliseconds
+
             // Note that we cannot set a timeout on synchronous requests due to XMLHttpRequest limitations, we also collect
             // how long the request takes to aid in identifying issues related to slow servers and timeouts
 
@@ -203,19 +210,22 @@ function checkVisitorId() {
                     wpsc_visitor_id = result.data.id;
                     console.log( "The new WPeC visitor id is " + wpsc_visitor_id );
                 }
+            } else {
+                console.log( "The HTTP request to validate the WPeC validate visitor id  was not successful, HTTP error " + wpsc_http.status );
             }
         }
     } else {
         wpsc_visitor_id = get_customer_id_from_cookie( );
         console.log( "The existing WPeC visitor id is " + wpsc_visitor_id );
     }
-    // end of setting up the WPEC customer identifier
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 if ( ! wpsc_visitor_id ) {
     setTimeout( checkVisitorId, 25 );
 }
+
+// end of setting up the WPEC customer identifier
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 function wpsc_do_ajax_request( data, success_callback ) {
 	jQuery.ajax({
@@ -1009,6 +1019,10 @@ function wpsc_region_change() {
 function wpsc_checkout_item_active( $checkout_item ) {
 	var active_items = wpsc_var_get( "wpsc_checkout_item_active" );
 
+	if ( 'undefined' === typeof active_items ) {
+		return false;
+	}
+
 	var is_active = active_items.hasOwnProperty( $checkout_item ) && active_items[$checkout_item];
 
 	return is_active;
@@ -1244,6 +1258,7 @@ jQuery(document).ready(function ($) {
 			}
 
 			stock_display.html(response.variation_msg);
+
 			if ( response.price !== undefined ) {
 				if (price_field.length && price_field.attr('type') == 'text') {
 					price_field.val(response.numeric_price);
@@ -1261,10 +1276,18 @@ jQuery(document).ready(function ($) {
 						save.parent().hide();
 					}
 				}
+
 				donation_price.val(response.numeric_price);
 
+				//Set quantity field based on response for wpsc_check_variation_stock_availability
+				if ( response.stock_available === true ) {
+					buynow.find( 'input.wpsc-buy-now-quantity' ).val( '1' );
+					buynow.find( 'input.wpsc-buy-now-button' ).prop( 'disabled', false );
+				} else {
+					buynow.find( 'input.wpsc-buy-now-button' ).prop( 'disabled', true );
+				}
+
 				buynow.find('input[name="'+jQuery(self).prop('name')+'"]').val(jQuery(self).val());
-				buynow.find('input.wpsc-buy-now-button').prop('disabled', false);
 			}
 		}, 'json' );
 	});
