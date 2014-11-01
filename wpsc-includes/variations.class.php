@@ -34,7 +34,6 @@ class wpsc_variations {
 			$variations_are_being_used = intval( get_option( self::VARIATIONS_BEING_USED_OPTION_NAME, 1 ) );
 		}
 
-		error_log( __CLASS__ . '::' . __FUNCTION__ . ' ' . ( $variations_are_being_used ? 'true' : 'false' ) );
 		return (bool) $variations_are_being_used;
 	}
 
@@ -117,7 +116,7 @@ class wpsc_variations {
 
 		return $this->variation_group;
 	}
-	
+
 	function the_variation_group() {
 		$this->variation_group = $this->next_variation_group();
 		$this->get_variations();
@@ -365,7 +364,6 @@ if ( is_admin() ) {
 		if ( $old_variations_being_used != $new_variations_are_being_used ) {
 			delete_option( wpsc_variations::VARIATIONS_BEING_USED_OPTION_NAME );
 			add_option( wpsc_variations::VARIATIONS_BEING_USED_OPTION_NAME, $new_variations_are_being_used, null, true );
-			error_log(  __FUNCTION__ . ' updating variations being used option ' . ( $new_variations_are_being_used ? 'true' : 'false' ) );
 		}
 	}
 
