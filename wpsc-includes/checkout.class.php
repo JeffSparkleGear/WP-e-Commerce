@@ -172,8 +172,9 @@ class wpsc_checkout {
 		$GLOBALS['wpsc_customer_checkout_details'  ] = apply_filters( 'wpsc_get_customer_checkout_details', wpsc_get_customer_meta( 'checkout_details' ) );
 
 		// legacy filter
-		if ( is_user_logged_in() )
+		if ( is_user_logged_in() ) {
 			$GLOBALS['wpsc_customer_checkout_details'] = apply_filters( 'wpsc_checkout_user_profile_get', $GLOBALS['wpsc_customer_checkout_details'], get_current_user_id() );
+		}
 
 		if ( ! is_array( $GLOBALS['wpsc_customer_checkout_details'] ) )
 			$GLOBALS['wpsc_customer_checkout_details'] = array();

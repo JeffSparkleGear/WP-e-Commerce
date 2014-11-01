@@ -216,18 +216,27 @@ class wpsc_custom_meta {
 	var $current_custom_meta = -1;
 	var $custom_meta_values;
 
-	function wpsc_custom_meta($postid) {
-		global $wpdb;
+	function __construct( $post_id ) {
 
-		$this->custom_meta = $wpdb->get_results( $wpdb->prepare("SELECT meta_key, meta_value, meta_id, post_id
-			FROM $wpdb->postmeta
-			WHERE post_id = %d
-			AND `meta_key` NOT REGEXP '^_'
-			ORDER BY meta_key,meta_id", $postid), ARRAY_A );
+		$cleaned_metas = array();
 
-		$this->custom_meta_count = count($this->custom_meta);
+		if ( ! empty( $post_id ) ) {
+			$meta_values = get_post_meta( $post_id );
+
+			foreach ( $meta_values as $key => $values ) {
+				if ( '_' !== $key[0] ) {
+					if ( is_array( $values ) ) {
+						foreach ( $values as $value ) {
+							$cleaned_metas[] = array( 'meta_key' => $key, 'meta_value' => $value );
+						}
+					}
+				}
+			}
+		}
+
+		$this->custom_meta = $cleaned_metas;
+		$this->custom_meta_count = count( $this->custom_meta );
 	}
-
 
 	function have_custom_meta() {
 		if (($this->current_custom_meta + 1) < $this->custom_meta_count) {
