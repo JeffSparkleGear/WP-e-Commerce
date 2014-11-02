@@ -244,6 +244,10 @@ function wpsc_product_has_variations( $id = 0 ) {
 		return false;
 	}
 
+	if ( ! wpsc_variations::variations_are_being_used() ) {
+		return false;
+	}
+
 	if ( ! $id )
 		$id = get_the_ID();
 
