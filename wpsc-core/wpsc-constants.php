@@ -53,15 +53,15 @@ function wpsc_core_constants() {
 
 	// Define Plugin version
 	if ( ! defined( 'WPSC_VERSION' ) ) {
-		define( 'WPSC_VERSION'            , '3.9-dev' );
+		define( 'WPSC_VERSION'            , '3.9' );
 	}
 
 	if ( ! defined( 'WPSC_MINOR_VERSION' ) ) {
-		define( 'WPSC_MINOR_VERSION'      , '6720b163bc' );
+		define( 'WPSC_MINOR_VERSION'      , '7b172ca71a' );
 	}
 
 	if ( ! defined( 'WPSC_PRESENTABLE_VERSION' ) ) {
-		define( 'WPSC_PRESENTABLE_VERSION', '3.9-dev' );
+		define( 'WPSC_PRESENTABLE_VERSION', '3.9' );
 	}
 
 	// Define a salt to use when we hash, WPSC_SALT may be defined for us in our config file, so check first
@@ -74,7 +74,7 @@ function wpsc_core_constants() {
 	}
 
 	// Define the current database version
-	define( 'WPSC_DB_VERSION', 13 );
+	define( 'WPSC_DB_VERSION', 14 );
 
 	// Define Debug Variables for developers, if they haven't already been defined
 	if ( ! defined( 'WPSC_DEBUG' ) ) {

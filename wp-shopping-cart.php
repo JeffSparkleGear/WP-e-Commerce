@@ -1,11 +1,11 @@
 <?php
 /**
   * Plugin Name: WP eCommerce
-  * Plugin URI: http://getshopped.org/
-  * Description: A plugin that provides a WordPress Shopping Cart. See also: <a href="http://getshopped.org" target="_blank">GetShopped.org</a> | <a href="https://wordpress.org/support/plugin/wp-e-commerce/" target="_blank">Support Forum</a> | <a href="http://docs.getshopped.org/" target="_blank">Documentation</a>
-  * Version: 3.9-dev
-  * Author: Instinct Entertainment
-  * Author URI: http://getshopped.org/
+  * Plugin URI: http://wpecommerce.org/
+  * Description: A plugin that provides a WordPress Shopping Cart. See also: <a href="http://wpecommerce.org" target="_blank">WPeCommerce.org</a> | <a href="https://wordpress.org/support/plugin/wp-e-commerce/" target="_blank">Support Forum</a> | <a href="http://docs.wpecommerce.org/" target="_blank">Documentation</a>
+  * Version: 3.9
+  * Author: WP eCommerce
+  * Author URI: http://wpecommerce.org/
   **/
 
 /**
@@ -91,7 +91,7 @@ class WP_eCommerce {
 	}
 
 	/**
-	 * Initialize the basic WPEC constants
+	 * Initialize the basic WP eCommerce constants
 	 *
 	 * @uses plugins_url()              Retrieves url to plugins directory
 	 * @uses load_plugin_textdomain()   Loads plugin transations strings
@@ -104,14 +104,16 @@ class WP_eCommerce {
 
 		// Define the path to the plugin folder
 		define( 'WPSC_DIR_NAME',  basename( WPSC_FILE_PATH ) );
+		define( 'WPSC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 		// Define the URL to the plugin folder
-		define( 'WPSC_FOLDER',    dirname( plugin_basename( __FILE__ ) ) );
+		define( 'WPSC_FOLDER',    dirname( WPSC_PLUGIN_BASENAME ) );
 		define( 'WPSC_URL',       plugins_url( '', __FILE__ ) );
 
 		//load text domain
-		if ( ! load_plugin_textdomain( 'wpsc', false, '../languages/' ) )
-			load_plugin_textdomain( 'wpsc', false, dirname( plugin_basename( __FILE__ ) ) . '/wpsc-languages/' );
+		if ( ! load_plugin_textdomain( 'wpsc', false, '../languages/' ) ) {
+			load_plugin_textdomain( 'wpsc', false, dirname( WPSC_PLUGIN_BASENAME ) . '/wpsc-languages/' );
+		}
 
 		// Finished starting
 		do_action( 'wpsc_started' );

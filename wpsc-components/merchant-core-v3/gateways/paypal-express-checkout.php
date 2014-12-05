@@ -39,35 +39,38 @@ class WPSC_Payment_Gateway_Paypal_Express_Checkout extends WPSC_Payment_Gateway 
         add_filter( 'wpsc_purchase_log_gateway_data', array( $this, 'filter_purchase_log_gateway_data' ), 10, 2 );
         add_filter(
             'wpsc_payment_method_form_fields',
-            array( $this, 'filter_unselect_default' ), 100 , 1 
+            array( $this, 'filter_unselect_default' ), 100 , 1
         );
     }
 
     /**
      * Returns the HTML of the logo of the payment gateway.
      *
-     * @access public 
+     * @access public
      * @return string
      *
      * @since 3.9
      */
     public function get_mark_html() {
-        $html = '<a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="' . esc_attr__( 'How PayPal Works' ) . '" onclick="javascript:window.open(\'https://www.paypal.com/webapps/mpp/paypal-popup\',\'WIPaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" border="0" alt="PayPal Logo"></a>'; 
+        $html = '<a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="' . esc_attr__( 'How PayPal Works' ) . '" onclick="javascript:window.open(\'https://www.paypal.com/webapps/mpp/paypal-popup\',\'WIPaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" border="0" alt="PayPal Logo"></a>';
 
-        return $html;
+        return apply_filters( 'wpsc_paypal-ec_mark_html', $html );
     }
 
     /**
      * No payment gateway is selected by default
      *
-     * @access public 
+     * @access public
      * @param array $fields
      * @return array
      *
      * @since 3.9
      */
     public function filter_unselect_default( $fields ) {
-        $fields[0]['checked'] = false;
+        foreach ( $fields as $i=>$field ) {
+            $fields[ $i ][ 'checked' ] = false;
+		}
+
         return $fields;
     }
 
@@ -160,7 +163,7 @@ class WPSC_Payment_Gateway_Paypal_Express_Checkout extends WPSC_Payment_Gateway 
         ),
         get_option( 'transact_url' )
     );
-        return apply_filters( 'wpsc_paypal_express_checkout_return_url', $location );
+        return apply_filters( 'wpsc_paypal_express_checkout_return_url', $location, $this );
     }
 
     /**
@@ -289,12 +292,16 @@ class WPSC_Payment_Gateway_Paypal_Express_Checkout extends WPSC_Payment_Gateway 
         $location = remove_query_arg( 'payment_gateway_callback' );
 
         if ( $response->has_errors() ) {
-            if ( $response->get_params()['L_ERRORCODE0'] == '10486' ) {
+            $errors = $response->get_params();
+
+            if ( isset( $errors['L_ERRORCODE0'] ) && '10486' == $errors['L_ERRORCODE0'] ) {
                 wp_redirect( $this->get_redirect_url( array( 'token' => $token ) ) );
                 exit;
             }
+
             wpsc_update_customer_meta( 'paypal_express_checkout_errors', $response->get_errors() );
             $location = add_query_arg( array( 'payment_gateway_callback' => 'display_paypal_error' ) );
+
         } elseif ( $response->is_payment_completed() || $response->is_payment_pending() ) {
             $location = remove_query_arg( 'payment_gateway' );
 

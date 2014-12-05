@@ -5,7 +5,6 @@
  * This is the class for WP eCommerce Cart Items,
  * The Cart Items class handles the same, but for cart items themselves.
  *
- *
  * @package wp-e-commerce
  * @since 3.8
  * @subpackage wpsc-cart-classes
@@ -30,7 +29,6 @@ class wpsc_cart_item {
 	public $quantity = 1;
 	public $provided_price;
 
-
 	//values from the database
 	public $product_name;
 	public $category_list = array();
@@ -47,6 +45,12 @@ class wpsc_cart_item {
 	public $thumbnail_image;
 	public $custom_tax_rate = null;
 	public $meta = array();
+	public $stock = 1;
+	public $tax_rate = 0.00;
+	public $has_limited_stock = false;
+	public $uses_shipping = 1;
+	public $file_id = null;
+	public $is_downloadable = false;
 
 	private $item_meta = array();
 
@@ -91,7 +95,8 @@ class wpsc_cart_item {
 	}
 
 	/**
-	 * update or add cart item meta value
+	 * Update or add cart item meta value
+	 * 
 	 * @access public
 	 * @param meta key name
 	 * @param meta key value
@@ -158,7 +163,7 @@ class wpsc_cart_item {
 	 *
 	 * @param integer the product ID
 	 * @param array parameters
-	 * @param objcet  the cart object
+	 * @param object  the cart object
 	 * @return boolean true on sucess, false on failure
 	 */
 	function __construct( $product_id, $parameters, $cart ) {
@@ -183,7 +188,7 @@ class wpsc_cart_item {
 		$this->product_variations =& $this->variation_values;
 
 		if ( $parameters['is_customisable'] == true && $parameters['file_data'] != null ) {
-			$this->save_provided_file( $this->file_data );
+			$this->save_provided_file( $parameters['file_data'] );
 		}
 
 		$this->refresh_item();
@@ -322,10 +327,8 @@ class wpsc_cart_item {
 		) );
 
 		if(count($product_files) > 0) {
-			$this->file_id = null;
 			$this->is_downloadable = true;
 		} else {
-			$this->file_id = null;
 			$this->is_downloadable = false;
 		}
 

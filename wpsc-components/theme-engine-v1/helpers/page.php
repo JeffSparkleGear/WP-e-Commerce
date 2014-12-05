@@ -5,16 +5,16 @@ add_action( 'init', 'wpsc_register_core_theme_files' );
 add_action( 'wpsc_move_theme', 'wpsc_flush_theme_transients', 10, true );
 add_action( 'wpsc_switch_theme', 'wpsc_flush_theme_transients', 10, true );
 add_action( 'switch_theme', 'wpsc_flush_theme_transients', 10, true );
-add_action('admin_init','wpsc_theme_admin_notices');
+add_action( 'admin_init','wpsc_theme_admin_notices');
 add_action( 'update_option_product_image_width'     , 'wpsc_cache_to_upload' );
 add_action( 'update_option_product_image_height'    , 'wpsc_cache_to_upload' );
 add_action( 'update_option_single_view_image_width' , 'wpsc_cache_to_upload' );
 add_action( 'update_option_single_view_image_height', 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_width'    , 'wpsc_cache_to_upload' );
 add_action( 'update_option_category_image_height'   , 'wpsc_cache_to_upload' );
-add_action('template_redirect', 'wpsc_all_products_on_page');
+add_action( 'template_redirect', 'wpsc_all_products_on_page');
 add_filter( 'aioseop_description', 'wpsc_set_aioseop_description' );
-add_filter('request', 'wpsc_remove_page_from_query_string');
+add_filter( 'request', 'wpsc_remove_page_from_query_string');
 
 //Potentially unnecessary, as I believe this option is deprecated
 add_action( 'update_option_show_categorybrands'     , 'wpsc_cache_to_upload' );
@@ -125,6 +125,11 @@ function wpsc_flush_theme_transients( $force = false ) {
 }
 
 function wpsc_force_flush_theme_transients() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	// Flush transients
 	wpsc_flush_theme_transients( true );
 
@@ -511,8 +516,8 @@ function wpsc_display_products_page( $query ) {
 
 	// Pretty sure this single_product code is legacy...but fixing it up just in case.
 	// get the display type for the selected category
-	if(!empty($temp_wpsc_query->query_vars['term']))
-		$display_type = wpsc_get_the_category_display($temp_wpsc_query->query_vars['term']);
+	if(!empty($wpsc_query->query_vars['term']))
+		$display_type = wpsc_get_the_category_display($wpsc_query->query_vars['term']);
 	elseif( !empty( $args['wpsc_product_category'] ) )
 		$display_type = wpsc_get_the_category_display($args['wpsc_product_category']);
 	else
@@ -563,11 +568,10 @@ function wpsc_single_template( $content ) {
 	if ( !is_archive() && $wp_query->post_count > 0 && 'wpsc-product' == $wp_query->post->post_type && $wp_query->post_count <= 1 ) {
 		remove_filter( "the_content", "wpsc_single_template", 12 );
 		$single_theme_path = wpsc_get_template_file_path( 'wpsc-single_product.php' );
-		if( isset( $wp_query->query_vars['preview'] ) && $wp_query->query_vars['preview'])
-			$is_preview = 'true';
-		else
-			$is_preview = 'false';
-		$wpsc_temp_query = new WP_Query( array( 'p' => $wp_query->post->ID , 'post_type' => 'wpsc-product','posts_per_page'=>1, 'preview' => $is_preview ) );
+
+		$is_preview = isset( $wp_query->query_vars['preview'] ) && $wp_query->query_vars['preview'];
+
+		$wpsc_temp_query = new WP_Query( array( 'p' => $wp_query->post->ID , 'post_type' => 'wpsc-product','posts_per_page' => 1, 'preview' => $is_preview ) );
 
 		list( $wp_query, $wpsc_temp_query ) = array( $wpsc_temp_query, $wp_query ); // swap the wpsc_query object
 		$_wpsc_is_in_custom_loop = true;
@@ -983,6 +987,11 @@ function wpsc_thesis_compat( $loop ) {
 
 // Template tags
 function wpsc_all_products_on_page(){
+
+	if ( is_404() ) {
+		return;
+	}
+
 	global $wp_query,$wpsc_query;
 	$obj = $wp_query->get_queried_object();
 	wpsc_update_permalink_slugs();
@@ -1109,7 +1118,10 @@ function wpsc_user_log( $content = '' ) {
 	if ( ! in_the_loop() )
 		return $content;
 	if ( preg_match( "/\[userlog\]/", $content ) ) {
-		define( 'DONOTCACHEPAGE', true );
+
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
 
 		ob_start();
 
@@ -1156,7 +1168,7 @@ function wpec_remap_shop_subpages( $vars ) {
 		return $vars;
 	$reserved_names = array('[shoppingcart]','[userlog]','[transactionresults]');
 	foreach($reserved_names as $reserved_name){
-		if ( isset( $vars['taxonomy'] ) && $vars['taxonomy'] == 'wpsc_product_category' && $isset( $vars['term'] ) && $vars['term'] == $page->post_name ) {
+		if ( isset( $vars['taxonomy'] ) && $vars['taxonomy'] == 'wpsc_product_category' && isset( $vars['term'] ) && $vars['term'] == $page->post_name ) {
 			$page_id = wpsc_get_the_post_id_by_shortcode( $reserved_name );
 			$page = get_post( $page_id );
 			return array( 'page_id' => $page->ID );
@@ -1231,6 +1243,7 @@ function is_products_page(){
  */
 function wpsc_display_featured_products_page() {
 	global $wp_query;
+	$output = '';
 	$sticky_array = get_option( 'sticky_products' );
 	if ( (is_front_page() || is_home() || is_products_page() ) && !empty( $sticky_array ) && $wp_query->post_count > 1) {
 		$query = get_posts( array(
@@ -1407,3 +1420,40 @@ function wpsc_this_page_url() {
 	return $output;
 }
 
+/**
+ * Strips shortcode placeholders from excerpts returned in search results (and excerpts returned anywhere).
+ *
+ * @param  string $text Trimmed excerpt
+ * @return string $text Trimmed excerpt, sans placeholders
+ *
+ * @since  3.9.0
+ */
+function wpsc_strip_shortcode_placeholders( $text ) {
+
+    $is_wpsc_placeholder = false;
+
+    $wpsc_shortcodes = array(
+        '[productspage]'      ,
+        '[shoppingcart]'      ,
+        '[checkout]'          ,
+        '[transactionresults]',
+        '[userlog]'           ,
+    );
+
+    foreach ( $wpsc_shortcodes as $shortcode ) {
+
+        if ( false !== strpos( $text, $shortcode ) ) {
+            $is_wpsc_placeholder = $shortcode;
+            break;
+        }
+    }
+
+    if ( $is_wpsc_placeholder ) {
+        $text = str_replace( $is_wpsc_placeholder, '', $text );
+    }
+
+    return $text;
+
+}
+
+add_filter( 'wp_trim_excerpt', 'wpsc_strip_shortcode_placeholders' );

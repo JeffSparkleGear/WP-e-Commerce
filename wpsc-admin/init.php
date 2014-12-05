@@ -1,6 +1,10 @@
 <?php
-
 function wpsc_ajax_sales_quarterly() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	$lastdate = sanitize_text_field( $_POST['add_start'] );
 	$date = preg_split( '/-/', $lastdate );
 	if ( !isset( $date[0] ) )
@@ -66,6 +70,10 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && ($_REQUEST['wpsc_admin_action'] 
  */
 function wpsc_duplicate_product() {
 
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	// Get the original post
 	$id = absint( $_GET['product'] );
 	$post = get_post( $id );
@@ -76,7 +84,7 @@ function wpsc_duplicate_product() {
 
 		$duplicated = true;
 		$sendback = wp_get_referer();
-		$sendback = add_query_arg( 'duplicated', (int)$duplicated, $sendback );
+		$sendback = add_query_arg( 'duplicated', (int) $duplicated, $sendback );
 
 		wp_redirect( $sendback );
 		exit();
@@ -89,10 +97,16 @@ if ( isset( $_GET['wpsc_admin_action'] ) && ( $_GET['wpsc_admin_action'] == 'dup
     add_action( 'admin_init', 'wpsc_duplicate_product' );
 
 function wpsc_purchase_log_csv() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	global $wpdb, $wpsc_gateways;
 	get_currentuserinfo();
 	$count = 0;
-	if ( 'key' == $_REQUEST['rss_key'] && current_user_can( 'manage_options' ) ) {
+
+	if ( 'key' == $_REQUEST['rss_key'] ) {
 		if ( isset( $_REQUEST['start_timestamp'] ) && isset( $_REQUEST['end_timestamp'] ) ) {
 			$start_timestamp = $_REQUEST['start_timestamp'];
 			$end_timestamp   = $_REQUEST['end_timestamp'];
@@ -235,6 +249,11 @@ if ( isset( $_GET['purchase_log_csv'] ) && ( 'true' == $_GET['purchase_log_csv']
 	add_action( 'admin_init', 'wpsc_purchase_log_csv' );
 
 function wpsc_admin_sale_rss() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	global $wpdb;
 	if ( ($_GET['rss'] == "true") && ($_GET['rss_key'] == 'key') && ($_GET['action'] == "purchase_log") ) {
 		$sql = "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `date`!='' ORDER BY `date` DESC";
@@ -269,74 +288,212 @@ function wpsc_admin_sale_rss() {
 	}
 }
 
-if ( isset( $_GET['action'] ) && ( 'purchase_log' == $_GET['action'] ) )
+if ( isset( $_GET['action'] ) && ( 'purchase_log' == $_GET['action'] ) ) {
 	add_action( 'admin_init', 'wpsc_admin_sale_rss' );
+}
 
 /**
- * Purchase log ajax code starts here
+ * Do Purchase Log Actions
+ *
+ * All purchase log actions are capability and nonce checked before calling
+ * the relevent 'wpsc_purchase_log_action-{wpsc_purchase_log_action}' hook.
+ *
+ * @since  3.9.0
  */
-function wpsc_purchlog_resend_email() {
-	global $wpdb;
-	$log_id = $_REQUEST['email_buyer_id'];
-	$wpec_taxes_controller = new wpec_taxes_controller();
-	if ( is_numeric( $log_id ) ) {
-		$purchase_log = new WPSC_Purchase_Log( $log_id );
-		$sent = wpsc_send_customer_email( $purchase_log );
+function wpsc_do_purchase_log_actions() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
 	}
 
+	if ( isset( $_GET['wpsc_purchase_log_action'] ) && isset( $_GET['id'] ) && isset( $_GET['_wpnonce'] ) ) {
+		$wpsc_purchase_log_action = sanitize_key( $_GET['wpsc_purchase_log_action'] );
+
+		if ( wp_verify_nonce( $_GET['_wpnonce'], 'wpsc_purchase_log_action_' . $wpsc_purchase_log_action ) ) {
+
+			do_action( 'wpsc_purchase_log_action-' . $wpsc_purchase_log_action, absint( $_GET['id'] ) );
+
+		}
+	}
+
+}
+add_action( 'admin_init', 'wpsc_do_purchase_log_actions' );
+
+/**
+ * Handle clear downloads lock purchase log action
+ *
+ * The 'wpsc_purchase_log_action-downloads_lock' action hook which calls this function is nonce and capability checked
+ * in wpsc_do_purchase_log_actions() before triggering do_action( 'wpsc_purchase_log_action-downloads_lock' ).
+ *
+ * @since  3.9.0
+ *
+ * @param  int  $log_id  Purchase log ID.
+ */
+function wpsc_purchase_log_action_downloads_lock( $log_id ) {
+
+	wpsc_purchlog_clear_download_items( $log_id );
+
+	// Redirect back to purchase logs list
 	$sendback = wp_get_referer();
-
-	if ( isset( $sent ) )
-	    $sendback = add_query_arg( 'sent', $sent, $sendback );
-
+	$sendback = add_query_arg( 'cleared', 1, $sendback );
 	wp_redirect( $sendback );
 	exit();
-}
 
-if ( isset( $_REQUEST['email_buyer_id'] ) && is_numeric( $_REQUEST['email_buyer_id'] ) ) {
-	add_action( 'admin_init', 'wpsc_purchlog_resend_email' );
 }
+add_action( 'wpsc_purchase_log_action-downloads_lock', 'wpsc_purchase_log_action_downloads_lock' );
 
-function wpsc_purchlog_clear_download_items() {
+/**
+ * Handle delete purchase log action
+ *
+ * The 'wpsc_purchase_log_action-delete' action hook which calls this function is nonce and capability checked
+ * in wpsc_do_purchase_log_actions() before triggering do_action( 'wpsc_purchase_log_action-delete' ).
+ *
+ * @since  3.9.0
+ *
+ * @param  int  $log_id  Purchase log ID.
+ */
+function wpsc_purchase_log_action_delete( $log_id ) {
+
+	$log = new WPSC_Purchase_Log( $log_id );
+	$deleted = $log->delete();
+
+	// Redirect back to purchase logs list
+	$sendback = wp_get_referer();
+	$sendback = remove_query_arg( array( 'c', 'id' ), $sendback );
+	$sendback = add_query_arg( 'deleted', absint( $deleted ), $sendback );
+	wp_redirect( $sendback );
+	exit();
+
+}
+add_action( 'wpsc_purchase_log_action-delete', 'wpsc_purchase_log_action_delete' );
+
+/**
+ * Handle email receipt purchase log action
+ *
+ * The 'wpsc_purchase_log_action-email_receipt' action hook which calls this function is nonce and capability checked
+ * in wpsc_do_purchase_log_actions() before triggering do_action( 'wpsc_purchase_log_action-email_receipt' ).
+ *
+ * @since  3.9.0
+ *
+ * @param  int  $log_id  Purchase log ID.
+ */
+function wpsc_purchase_log_action_email_receipt( $log_id ) {
+
+	$sent = wpsc_purchlog_resend_email( $log_id );
+
+	// Redirect back to purchase logs list
+	$sendback = wp_get_referer();
+	$sendback = add_query_arg( 'sent', absint( $sent ), $sendback );
+	wp_redirect( $sendback );
+	exit();
+
+}
+add_action( 'wpsc_purchase_log_action-email_receipt', 'wpsc_purchase_log_action_email_receipt' );
+
+/**
+ * Resend Purchase Log Email
+ *
+ * @param   int|string  $log_id  Required. Purchase log ID (empty string is deprecated).
+ * @return  boolean              Sent successfully.
+ */
+function wpsc_purchlog_resend_email( $log_id = '' ) {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	global $wpdb;
-	if ( is_numeric( $_GET['purchaselog_id'] ) ) {
-		$purchase_id = (int)$_GET['purchaselog_id'];
-		$downloadable_items = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_DOWNLOAD_STATUS . "` WHERE `purchid` = %d", $purchase_id ), ARRAY_A );
 
-		$wpdb->update( WPSC_TABLE_DOWNLOAD_STATUS, array( 'ip_number' => '' ), array( 'purchid' => $purchase_id ), '%s', '%d' );
-		$cleared = true;
+	// Deprecate empty purchase log ID parameter.
+	if ( $log_id == '' ) {
+		_wpsc_doing_it_wrong( 'wpsc_purchlog_resend_email', __( '$log_id parameter requires a numeric purchase log ID.', 'wpsc' ), '3.9.0' );
 
-		$email_form_field = $wpdb->get_var( "SELECT `id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `type` IN ('email') AND `active` = '1' ORDER BY `checkout_order` ASC LIMIT 1" );
-		$email_address = $wpdb->get_var( $wpdb->prepare( "SELECT `value` FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` WHERE `log_id` = %d AND `form_id` = '{$email_form_field}' LIMIT 1", $purchase_id ) );
+		// Support redirect for legacy purposes for the moment
+		$sendback = add_query_arg( 'sent', 0, wp_get_referer() );
+		wp_redirect( $sendback );
+		exit();
 
-		foreach ( (array) $downloadable_items as $downloadable_item ) {
-			$download_links .= add_query_arg(
-				'downloadid',
-				$downloadable_item['uniqueid'],
-				home_url()
-			)  . "\n";
+	}
+
+	$log_id = absint( $log_id );
+
+	if ( $log_id > 0 ) {
+
+		$wpec_taxes_controller = new wpec_taxes_controller();
+
+		if ( is_numeric( $log_id ) ) {
+			$purchase_log = new WPSC_Purchase_Log( $log_id );
+			return wpsc_send_customer_email( $purchase_log );
 		}
 
+	}
+
+	return false;
+
+}
+
+// Deprecate resending purchase log email receipt via URL query
+if ( isset( $_REQUEST['email_buyer_id'] ) && is_numeric( $_REQUEST['email_buyer_id'] ) ) {
+	_wpsc_doing_it_wrong( 'wpsc_purchlog_resend_email', __( 'Do not trigger resend purchase log email action via email_buyer_id URL query. Instead use the Purchase Log Action Links API.', 'wpsc' ), '3.9.0' );
+}
+
+/**
+ * Clear Purchase Log Download Locks
+ *
+ * @param   string   $log_id  Required. Purchase log ID (empty string is deprecated).
+ * @return  boolean
+ */
+function wpsc_purchlog_clear_download_items( $log_id = '' ) {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
+	global $wpdb;
+
+	// Deprecate empty purchase log ID parameter.
+	if ( $log_id == '' ) {
+		_wpsc_doing_it_wrong( 'wpsc_purchlog_clear_download_items', __( '$log_id parameter requires a numeric purchase log ID.', 'wpsc' ), '3.9.0' );
+		return false;
+	}
+
+	$log_id = absint( $log_id );
+
+	if ( $log_id > 0 ) {
+
+		$downloadable_items = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_DOWNLOAD_STATUS . "` WHERE `purchid` = %d", $log_id ), ARRAY_A );
+
+		$wpdb->update( WPSC_TABLE_DOWNLOAD_STATUS, array( 'ip_number' => '' ), array( 'purchid' => $log_id ), '%s', '%d' );
+
+		$email_form_field = $wpdb->get_var( "SELECT `id` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `type` IN ('email') AND `active` = '1' ORDER BY `checkout_order` ASC LIMIT 1" );
+		$email_address = $wpdb->get_var( $wpdb->prepare( "SELECT `value` FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` WHERE `log_id` = %d AND `form_id` = '{$email_form_field}' LIMIT 1", $log_id ) );
+
+		foreach ( $downloadable_items as $downloadable_item ) {
+			$download_links .= add_query_arg( 'downloadid', $downloadable_item['uniqueid'], home_url() )  . "\n";
+		}
 
 		wp_mail( $email_address, __( 'The administrator has unlocked your file', 'wpsc' ), str_replace( "[download_links]", $download_links, __( 'Dear CustomerWe are pleased to advise you that your order has been updated and your downloads are now active.Please download your purchase using the links provided below.[download_links]Thank you for your custom.', 'wpsc' ) ), "From: " . get_option( 'return_email' )  );
 
-		$sendback = wp_get_referer();
+		return true;
 
-		if ( isset( $cleared ) ) {
-			$sendback = add_query_arg( 'cleared', $cleared, $sendback );
-		}
-
-		wp_redirect( $sendback );
-		exit();
 	}
+
+	return false;
+
 }
 
+// Deprecate clearing purchase log download locks via URL query
 if ( isset( $_REQUEST['wpsc_admin_action'] ) && ($_REQUEST['wpsc_admin_action'] == 'clear_locks') ) {
-	add_action( 'admin_init', 'wpsc_purchlog_clear_download_items' );
+	_wpsc_doing_it_wrong( 'wpsc_purchlog_clear_download_items', __( 'Do not trigger clear purchase log download locks action via wpsc_admin_action = clear_locks URL query. Instead use the Purchase Log Action Links API.', 'wpsc' ), '3.9.0' );
 }
 
 //bulk actions for purchase log
 function wpsc_purchlog_bulk_modify() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	if ( $_POST['purchlog_multiple_status_change'] != -1 ) {
 		if ( is_numeric( $_POST['purchlog_multiple_status_change'] ) && $_POST['purchlog_multiple_status_change'] != 'delete' ) {
 			foreach ( (array)$_POST['purchlogids'] as $purchlogid ) {
@@ -346,8 +503,12 @@ function wpsc_purchlog_bulk_modify() {
 		} elseif ( $_POST['purchlog_multiple_status_change'] == 'delete' ) {
 			foreach ( (array)$_POST['purchlogids'] as $purchlogid ) {
 
-				wpsc_delete_purchlog( $purchlogid );
-				$deleted++;
+				$log = new WPSC_Purchase_Log( $purchlogid );
+				$deleted_log = $log->delete();
+				if ( $deleted_log ) {
+					$deleted++;
+				}
+
 			}
 		}
 	}
@@ -396,44 +557,33 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && $_REQUEST['wpsc_admin_action'] =
 	add_action( 'admin_init', 'wpsc_purchlogs_update_notes' );
 }
 
-//delete a purchase log
-function wpsc_delete_purchlog( $purchlog_id='' ) {
+/**
+ * Delete a purchase log
+ *
+ * @deprecated  Use WPSC_Purchase_Log->delete() instead.
+ *
+ * @param   int|string  $purchlog_id  Required. Purchase log ID (empty string is deprecated).
+ * @return  boolean                   Deleted successfully.
+ */
+function wpsc_delete_purchlog( $purchlog_id = '' ) {
+
 	global $wpdb;
-	$deleted = 0;
 
+	// Deprecate empty purchase log ID parameter.
 	if ( $purchlog_id == '' ) {
-		$purchlog_id = absint( $_GET['purchlog_id'] );
-		check_admin_referer( 'delete_purchlog_' . $purchlog_id );
+		_wpsc_doing_it_wrong( 'wpsc_delete_purchlog', __( '$purchlog_id parameter requires a numeric purchase log ID.', 'wpsc' ), '3.9.0' );
+		return false;
 	}
 
-	$purchlog_status = $wpdb->get_var( $wpdb->prepare( "SELECT `processed` FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id`= %d", $purchlog_id ) );
-	if ( $purchlog_status == 5 || $purchlog_status == 1 ) {
-		$claimed_query = new WPSC_Claimed_Stock( array(
-			'cart_id'        => $purchlog_id,
-			'cart_submitted' => 1
-		) );
-		$claimed_query->clear_claimed_stock( 0 );
-	}
+	$log = new WPSC_Purchase_Log( $purchlog_id );
 
-	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid` = %d", $purchlog_id ) );
-	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` WHERE `log_id` IN (%d)", $purchlog_id ) );
-	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id` = %d LIMIT 1", $purchlog_id ) );
+	return $log->delete();
 
-	$deleted = 1;
-
-	if ( is_numeric( $_GET['purchlog_id'] ) ) {
-		$sendback = wp_get_referer();
-		$sendback = remove_query_arg( array( 'c', 'id' ), $sendback );
-		if ( isset( $deleted ) ) {
-			$sendback = add_query_arg( 'deleted', $deleted, $sendback );
-		}
-		wp_redirect( $sendback );
-		exit();
-	}
 }
 
-if ( isset( $_REQUEST['wpsc_admin_action'] ) && ($_REQUEST['wpsc_admin_action'] == 'delete_purchlog') ) {
-	add_action( 'admin_init', 'wpsc_delete_purchlog' );
+// Deprecate deleting purchase log via URL query
+if ( isset( $_REQUEST['wpsc_admin_action'] ) && ( $_REQUEST['wpsc_admin_action'] == 'delete_purchlog' ) ) {
+	_wpsc_doing_it_wrong( 'wpsc_delete_purchlog', __( 'Do not trigger delete purchase log action via wpsc_admin_action = delete_purchlog URL query. Instead use the Purchase Log Action Links API.', 'wpsc' ), '3.9.0' );
 }
 
 function wpsc_update_option_product_category_hierarchical_url() {
@@ -497,7 +647,10 @@ add_action( 'update_option_users_can_register', '_wpsc_action_update_option_user
  * @return nothing
  */
 function wpsc_update_page_urls( $auto = false ) {
-	global $wpdb;
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
 
 	wpsc_update_permalink_slugs();
 	wpsc_core_load_page_titles();
@@ -520,6 +673,11 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && ($_REQUEST['wpsc_admin_action'] 
 
 //change the regions tax settings
 function wpsc_change_region_tax() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	global $wpdb;
 	if ( is_array( $_POST['region_tax'] ) ) {
 		foreach ( $_POST['region_tax'] as $region_id => $tax ) {
@@ -550,6 +708,10 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && ($_REQUEST['wpsc_admin_action'] 
 
 function wpsc_product_files_existing() {
 	//List all product_files, with checkboxes
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
 
 	$product_id = absint( $_GET["product_id"] );
 	$file_list = wpsc_uploaded_files();
@@ -657,6 +819,11 @@ if ( isset( $_REQUEST['wpsc_admin_action'] ) && ( 'wpsc-delete-variation-set' ==
 	add_action( 'admin_init', 'wpsc_delete_variation_set' );
 
 function wpsc_backup_theme() {
+
+	if ( ! wpsc_is_store_admin() ) {
+		return;
+	}
+
 	$wp_theme_path = get_stylesheet_directory();
 	wpsc_recursive_copy( $wp_theme_path, WPSC_THEME_BACKUP_DIR );
 	$_SESSION['wpsc_themes_backup'] = true;

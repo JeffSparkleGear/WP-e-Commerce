@@ -284,7 +284,7 @@ final class WPSC_Payment_Gateways {
 			self::$active_gateways = array_intersect( $selected_gateways, $registered_gateways );
 		}
 
-		return array_values( self::$active_gateways );
+		return apply_filters( 'wpsc_get_active_gateways', array_values( self::$active_gateways ) );
 	}
 
 	/**
@@ -313,6 +313,8 @@ abstract class WPSC_Payment_Gateway {
 	public $checkout_data;
 
 	public $currency_code;
+
+	public $title;
 
 	/**
 	 * Return the title of the payment gateway. For this to work, $this->title must
@@ -415,6 +417,7 @@ abstract class WPSC_Payment_Gateway {
 	public function get_mark_html() {
 		return false;
 	}
+
 	public function set_purchase_log( &$purchase_log ) {
 		$this->purchase_log = &$purchase_log;
 		$this->checkout_data = new WPSC_Checkout_Form_Data( $purchase_log->get( 'id' ) );
@@ -424,6 +427,8 @@ abstract class WPSC_Payment_Gateway {
 		if ( ! $this->currency_code ) {
 			$country = new WPSC_Country( get_option( 'currency_type' ) );
 			$currency = $country->get( 'currency_code' );
+		} else {
+			$currency = $this->currency_code;
 		}
 
 		return $currency;
@@ -483,8 +488,7 @@ abstract class WPSC_Payment_Gateway {
 	}
 }
 
-class WPSC_Payment_Gateway_Setting
-{
+class WPSC_Payment_Gateway_Setting {
 	/**
 	 * Contain settings of the payment gateway
 	 *

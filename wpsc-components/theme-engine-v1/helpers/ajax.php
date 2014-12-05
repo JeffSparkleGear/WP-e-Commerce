@@ -341,7 +341,7 @@ function wpsc_update_product_rating() {
 		) );
 		$data = $wpdb->get_results( "SELECT `id`,`rated` FROM `" . WPSC_TABLE_PRODUCT_RATING . "` WHERE `ipnum`='" . $ip_number . "' AND `productid` = '" . $product_id . "'  AND `rated` = '" . $rating . "' AND `time` = '" . $nowtime . "' ORDER BY `id` DESC LIMIT 1", ARRAY_A );
 		$vote_id = $data[0]['id'];
-		setcookie( "voting_cookie[$prodid]", ($vote_id . "," . $rating ), time() + (60 * 60 * 24 * 360) );
+		setcookie( "voting_cookie[$product_id]", ($vote_id . "," . $rating ), time() + (60 * 60 * 24 * 360) );
 	}
 	if ( $_POST['ajax'] == 'true' ) {
 
@@ -571,7 +571,7 @@ function wpsc_submit_checkout( $collected_data = true ) {
 	$use_shipping       = 0;
 	$disregard_shipping = 0;
 
-	do_action( 'wpsc_before_submit_checkout' );
+	do_action( 'wpsc_before_submit_checkout', $collected_data );
 
 	$error_messages = wpsc_get_customer_meta( 'checkout_misc_error_messages' );
 
@@ -639,10 +639,19 @@ function wpsc_submit_checkout( $collected_data = true ) {
 
 		// Test for required shipping information
 		if ( wpsc_core_shipping_enabled() && ( $num_items != $disregard_shipping ) ) {
-			// for shipping to work we need a method, option and a quote
-			if ( ! $wpsc_cart->shipping_method_selected() || ! $wpsc_cart->shipping_quote_selected() ) {
-				$error_messages[] = __( 'Please select one of the available shipping options, then we can process your order.', 'wpsc' );
-				$is_valid = false;
+			// for shipping to work we need a method, option and a quote, unless we have free shipping.
+
+			$shipping_discount_value  = get_option( 'shipping_discount_value' );
+			$is_free_shipping_enabled = get_option( 'shipping_discount' );
+			$subtotal                 = $wpsc_cart->calculate_subtotal();
+
+			$has_free_shipping = $is_free_shipping_enabled && $shipping_discount_value > 0 && $shipping_discount_value <= $subtotal;
+
+			if ( ! $has_free_shipping ) {
+				if ( ! $wpsc_cart->shipping_method_selected() || ! $wpsc_cart->shipping_quote_selected() ) {
+					$error_messages[] = __( 'Please select one of the available shipping options, then we can process your order.', 'wpsc' );
+					$is_valid = false;
+				}
 			}
 
 			// if we don't have a valid zip code ( the function also checks if we need it ) we have an error
@@ -766,7 +775,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'billingregion', $wpsc_selected_region );
 	}
 
-	$check_country_code = WPSC_Countries::country_id( wpsc_get_customer_meta( 'billing_region' ) );
+	$check_country_code = WPSC_Countries::get_country_id_by_region_id( wpsc_get_customer_meta( 'billing_region' ) );
 
 	if ( wpsc_get_customer_meta( 'billingcountry' ) != $check_country_code ) {
 		$wpsc_selected_region = null;
@@ -781,7 +790,7 @@ function wpsc_change_tax() {
 		wpsc_update_customer_meta( 'shippingregion', $wpsc_delivery_region );
 	}
 
-	$check_country_code = WPSC_Countries::country_id( $wpsc_delivery_region );
+	$check_country_code = WPSC_Countries::get_country_id_by_region_id( $wpsc_delivery_region );
 	if ( $wpsc_delivery_country != $check_country_code ) {
 		$wpsc_delivery_region = null;
 	}

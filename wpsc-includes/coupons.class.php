@@ -1,4 +1,11 @@
 <?php
+/** 
+ * The Coupons Class
+ * 
+ * Holds the main coupon class amd other important coupon functions 
+ * 
+ * @package wp-e-commerce
+ */ 
 
 /**
 * uses coupons function, no parameters
@@ -7,20 +14,23 @@
 function wpsc_uses_coupons() {
 	global $wpsc_coupons;
 
-	if( empty( $wpsc_coupons ) )
+	if ( empty( $wpsc_coupons ) ) {
 		$wpsc_coupons = new wpsc_coupons();
+	}
 
-	if( is_object( $wpsc_coupons ) )
+	if ( is_object( $wpsc_coupons ) ) {
 		return $wpsc_coupons->uses_coupons();
+	}
 
 	return false;
 }
+
 function wpsc_coupons_error(){
 	global $wpsc_coupons;
 
-	if(isset($wpsc_coupons->errormsg) && $wpsc_coupons->errormsg == true){
+	if ( isset( $wpsc_coupons->errormsg ) && $wpsc_coupons->errormsg == true ) {
 		return true;
-	}else{
+	} else {
 		return false;
 	}
 }
@@ -52,14 +62,14 @@ class wpsc_coupons {
 	public $errormsg;
 
 	/**
-	 * Coupons constractor
+	 * Coupons constructor
 	 *
 	 * Instantiate a coupons object with optional variable $code;
 	 *
 	 * @param string code (optional) the coupon code you would like to use.
 	 * @return bool True if coupon code exists, False otherwise.
 	 */
-	function wpsc_coupons( $code = '' ){
+	function wpsc_coupons( $code = '' ) {
 	    global $wpdb;
 
 		if ( empty( $code ) ) {
@@ -89,7 +99,7 @@ class wpsc_coupons {
 
 			$this->value         = (float) $coupon_data['value'];
 			$this->is_percentage = $coupon_data['is-percentage'];
-			$this->conditions    = unserialize($coupon_data['condition']);
+			$this->conditions    = unserialize( $coupon_data['condition'] );
 			$this->is_used       = $coupon_data['is-used'];
 			$this->active        = $coupon_data['active'];
 			$this->use_once      = $coupon_data['use-once'];
@@ -115,8 +125,10 @@ class wpsc_coupons {
 		$now = current_time( 'timestamp', true );
 
 		$valid      = true;
-		$start_date = strtotime( $this->start_date );
-		$end_date   = strtotime( $this->end_date );
+
+		// If date fields are left empty, they don't return false, rather, default to 0000-00-00 00:00:00
+		$start_date = '0000-00-00 00:00:00' === $this->start_date ? false : strtotime( $this->start_date );
+		$end_date   = '0000-00-00 00:00:00' === $this->end_date   ? false : strtotime( $this->end_date );
 
 		if ( '1' != $this->active ) {
 			$valid = false;
@@ -770,7 +782,9 @@ class wpsc_coupons {
 	*/
 	function uses_coupons() {
 		global $wpdb;
+
 		$num_active_coupons = $wpdb->get_var("SELECT COUNT(id) as c FROM `".WPSC_TABLE_COUPON_CODES."` WHERE active='1'");
+
 		return ( $num_active_coupons > 0 );
 	}
 
