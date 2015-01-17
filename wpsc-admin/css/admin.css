@@ -2470,3 +2470,17 @@ a.wpsc_remove_meta {
 .branch-3-6 .wpsc-quantity-discounts td.remove a:hover {
 	background-position: -10px 0;
 }
+
+
+
+.manage-column.column-customer {
+	white-space: nowrap;
+	min-width: 100px;
+	width: 180px;
+}
+
+.manage-column.column-shipping-method {
+	white-space: nowrap;
+	min-width: 100px;
+	width: 180px;
+}

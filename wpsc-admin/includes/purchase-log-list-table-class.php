@@ -206,6 +206,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 	 * @return array[string]string List of column headings
 	 */
 	public function get_columns() {
+
 		return array(
 			'cb'       => '<input type="checkbox" />',
 			'id'       => __( 'Order ID', 'wpsc' ),
