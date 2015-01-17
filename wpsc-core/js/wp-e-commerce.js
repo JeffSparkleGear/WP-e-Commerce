@@ -139,29 +139,30 @@ if ( ! window.console ) console = { log: function(){} };
 var wpsc_visitor_id = false;
 var wpsc_ajax_request_time = 0;
 
-function checkVisitorId() {
 
 
-    function get_customer_id_from_cookie() {
-        var i, cookieName, cookieValue, docCcookies = document.cookie.split( ";" );
-        var customerId = false;
+function get_customer_id_from_cookie() {
+    var i, cookieName, cookieValue, docCcookies = document.cookie.split( ";" );
+    var customerId = false;
 
-        for ( i = 0; i < docCcookies.length; i++ ) {
-            cookieName = docCcookies[i].substr( 0, docCcookies[i].indexOf( "=" ) );
-            cookieName = cookieName.replace( /^\s+|\s+$/g,"" );
-            cookieValue = docCcookies[i].substr( docCcookies[i].indexOf("=") + 1) ;
+    for ( i = 0; i < docCcookies.length; i++ ) {
+        cookieName = docCcookies[i].substr( 0, docCcookies[i].indexOf( "=" ) );
+        cookieName = cookieName.replace( /^\s+|\s+$/g,"" );
+        cookieValue = docCcookies[i].substr( docCcookies[i].indexOf("=") + 1) ;
 
-            // does the cookie start with the WPeC prefix
-            if ( 0 == cookieName.indexOf( "wpsc_customer_cookie" ) ) {
-                var idAsText = cookieValue.substr(0,cookieValue.indexOf( "%" ) );
-                customerId = parseInt( idAsText );
-                break;
-            }
+        // does the cookie start with the WPeC prefix
+        if ( 0 == cookieName.indexOf( "wpsc_customer_cookie" ) ) {
+            var idAsText = cookieValue.substr(0,cookieValue.indexOf( "%" ) );
+            customerId = parseInt( idAsText );
+            break;
         }
-
-        return customerId;
     }
 
+    return customerId;
+}
+
+
+function checkVisitorId() {
     if (!( document.cookie.indexOf("wpsc_customer_cookie") >= 0 )) {
         if (!( document.cookie.indexOf("wpsc_attempted_validate") >= 0 )) {
             // create a cookie to signal that we have attempted validation.  If we find the cookie is set
@@ -221,6 +222,11 @@ function checkVisitorId() {
     }
 }
 
+// get the current customer id from an existing cookie
+wpsc_visitor_id = get_customer_id_from_cookie();
+
+// if we couldn't get the customer id we will reach out over http to get the cookie, but don't
+// do it immediatly.  this gives the browser a chances to load the remaining page elements.
 if ( ! wpsc_visitor_id ) {
     setTimeout( checkVisitorId, 25 );
 }
