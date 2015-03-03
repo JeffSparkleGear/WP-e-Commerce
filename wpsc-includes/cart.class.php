@@ -1192,6 +1192,9 @@ class wpsc_cart {
 
 	function rewind_shipping_methods() {
 		$this->current_shipping_method = - 1;
+
+		$this->shipping_method_count = count( $this->shipping_methods );
+
 		if ( $this->shipping_method_count > 0 ) {
 			$this->shipping_method = $this->shipping_methods[0];
 		}
