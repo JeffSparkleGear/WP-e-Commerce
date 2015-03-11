@@ -175,10 +175,6 @@ function _wpsc_create_customer_id_cookie( $id, $fake_it = false ) {
 
 	$cookie = $id . '|' . $expire . '|' . $visitor_hash;
 
-	if ( headers_sent() ) {
-		error_log( 'WPeC Customer Cookie for shopper id ' . $id . '  can not be set because headers have already been sent?' );
-	}
-
 	// store ID, expire and hash to validate later
 	if ( headers_sent() || $fake_it ) {
 		$_COOKIE[ WPSC_CUSTOMER_COOKIE ] = $cookie;
