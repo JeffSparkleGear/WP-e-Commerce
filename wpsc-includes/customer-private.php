@@ -175,6 +175,10 @@ function _wpsc_create_customer_id_cookie( $id, $fake_it = false ) {
 
 	$cookie = $id . '|' . $expire . '|' . $visitor_hash;
 
+	if ( headers_sent() ) {
+		error_log( 'WPeC Customer Cookie for shopper id ' . $id . '  can not be set because headers have already been sent?' );
+	}
+
 	// store ID, expire and hash to validate later
 	if ( headers_sent() || $fake_it ) {
 		$_COOKIE[ WPSC_CUSTOMER_COOKIE ] = $cookie;
@@ -218,7 +222,7 @@ function _wpsc_validate_customer_cookie() {
 		return false;
 	}
 
-	$cookie = $_COOKIE[ WPSC_CUSTOMER_COOKIE ];
+	$cookie = urldecode( $_COOKIE[ WPSC_CUSTOMER_COOKIE ] );
 
 	list( $id, $expire, $visitor_hash_from_cookie ) = $x = explode( '|', $cookie );
 
@@ -330,7 +334,6 @@ function _wpsc_merge_cart() {
 
 	$id_from_customer_meta = wpsc_get_customer_meta( 'merge_cart_vistor_id' );
 	wpsc_delete_customer_meta( 'merge_cart_vistor_id' );
-
 
 	$old_cart = wpsc_get_customer_cart( $id_from_customer_meta );
 	$items    = $old_cart->get_items();
