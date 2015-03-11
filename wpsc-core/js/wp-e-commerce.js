@@ -31,6 +31,7 @@ if ( typeof wpsc_vars !== 'undefined' ) {
 	var WPSC_IMAGE_URL           = wpsc_vars.WPSC_IMAGE_URL;
 	var WPSC_CORE_IMAGES_URL     = wpsc_vars.WPSC_CORE_IMAGES_URL;
 	var fileThickboxLoadingImage = wpsc_vars.fileThickboxLoadingImage;
+    var wpsc_debug               = wpsc_vars.hasOwnProperty( 'debug' );
 }
 // end of variable definitions
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,11 +80,19 @@ function wpsc_var_get( name ) {
  * @return boolean          Whether or not element is visible.
  */
 function wpsc_element_is_visible( el ) {
-	var top   = jQuery( window ).scrollTop(),
-	bottom    = top + jQuery( window ).height(),
-	elTop     = el.offset().top;
 
-	return ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is( ':visible' );
+    // check to be sure the form element exists, it may have been passed to us unveriified in a callback
+    if ( typeof el !== 'undefined' && el.length ) {
+        var top = jQuery(window).scrollTop(),
+            bottom = top + jQuery(window).height(),
+            elTop = el.offset().top;
+
+        $visible = ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is(':visible');
+    } else {
+        visible = false;
+    }
+
+    return visible;
 }
 
 /**
@@ -139,20 +148,19 @@ if ( ! window.console ) console = { log: function(){} };
 var wpsc_visitor_id = false;
 var wpsc_ajax_request_time = 0;
 
-
-
 function get_customer_id_from_cookie() {
-    var i, cookieName, cookieValue, docCcookies = document.cookie.split( ";" );
+    var i, cookieName, cookieValue, docCookies = document.cookie.split( ";" );
     var customerId = false;
 
-    for ( i = 0; i < docCcookies.length; i++ ) {
-        cookieName = docCcookies[i].substr( 0, docCcookies[i].indexOf( "=" ) );
-        cookieName = cookieName.replace( /^\s+|\s+$/g,"" );
-        cookieValue = docCcookies[i].substr( docCcookies[i].indexOf("=") + 1) ;
+    for ( i = 0; i < docCookies.length; i++ ) {
+        cookieName  = docCookies[i].substr( 0, docCookies[i].indexOf( "=" ) );
+        cookieName  = cookieName.replace( /^\s+|\s+$/g,"" );
+        cookieValue = docCookies[i].substr( docCookies[i].indexOf("=") + 1) ;
 
         // does the cookie start with the WPeC prefix
         if ( 0 == cookieName.indexOf( "wpsc_customer_cookie" ) ) {
-            var idAsText = cookieValue.substr(0,cookieValue.indexOf( "%" ) );
+            var cookieValueClean = decodeURI(cookieValue);
+            var idAsText = cookieValueClean.substr(0,cookieValueClean.indexOf( "|" ) );
             customerId = parseInt( idAsText );
             break;
         }
@@ -201,7 +209,7 @@ function checkVisitorId() {
             d = new Date();
             var end = d.getTime();
             wpsc_ajax_request_time = end - start;
-            if ( window.console ) {
+            if ( wpsc_debug && window.console ) {
                 console.log('wpsc_validate_customer request time was ' + wpsc_ajax_request_time + ' ms'  );
             }
 
@@ -210,15 +218,21 @@ function checkVisitorId() {
                 var result = JSON.parse(wpsc_http.responseText);
                 if (result.data.valid && result.data.id) {
                     wpsc_visitor_id = result.data.id;
-                    console.log( "The new WPeC visitor id is " + wpsc_visitor_id );
+                    if ( wpsc_debug ) {
+                        console.log("The new WPeC visitor id is " + wpsc_visitor_id);
+                    }
                 }
             } else {
-                console.log( "The HTTP request to validate the WPeC validate visitor id  was not successful, HTTP error " + wpsc_http.status );
+                if ( wpsc_debug ) {
+                    console.log("The HTTP request to validate the WPeC validate visitor id  was not successful, HTTP error " + wpsc_http.status);
+                }
             }
         }
     } else {
         wpsc_visitor_id = get_customer_id_from_cookie( );
-        console.log( "The existing WPeC visitor id is " + wpsc_visitor_id );
+        if ( wpsc_debug ) {
+            console.log("The existing WPeC visitor id is " + wpsc_visitor_id);
+        }
     }
 }
 
@@ -259,9 +273,11 @@ function wpsc_update_customer_data( meta_key, meta_value, response_callback ) {
 		var ajax_data = {action: 'wpsc_customer_updated_data', meta_key : meta_key, meta_value : meta_value };
 		wpsc_do_ajax_request( ajax_data, response_callback );
 	} catch ( err ) {
-		if ( window.console && window.console.log ) {
-			console.log( err );
-		}
+        if ( wpsc_debug ) {
+            if (window.console && window.console.log) {
+                console.log(err);
+            }
+        }
 	}
 
 }
@@ -280,9 +296,11 @@ function wpsc_get_customer_data( response_callback ) {
 		var ajax_data = {action: 'wpsc_get_customer_meta' };
 		wpsc_do_ajax_request( ajax_data, response_callback );
 	} catch ( err ) {
-		if ( window.console && window.console.log ) {
-			console.log( err );
-		}
+        if ( wpsc_debug ) {
+            if (window.console && window.console.log) {
+                console.log(err);
+            }
+        }
 	}
 }
 
