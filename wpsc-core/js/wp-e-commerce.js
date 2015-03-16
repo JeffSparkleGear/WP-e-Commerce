@@ -153,6 +153,8 @@ var wpsc_visitor_id = false;
 
 if ( document.cookie.indexOf("wpsc_customer_cookie") < 0 ) {
 	if ( document.cookie.indexOf("wpsc_attempted_validate") < 0 ) {
+    if ( !( document.cookie.indexOf("wpsc_customer_cookie") >= 0 )) {
+        if ( !( document.cookie.indexOf("wpsc_attempted_validate") >= 0 )) {
 		// create a cookie to signal that we have attempted validation.  If we find the cookie is set
 		// we don't re-attempt validation.  This means will only try to validate once and not slow down
 		// subsequent page views.
@@ -163,23 +165,100 @@ if ( document.cookie.indexOf("wpsc_customer_cookie") < 0 ) {
 		var now = new Date();
 		document.cookie = "wpsc_attempted_validate="+now;
 
-		var wpsc_http = new XMLHttpRequest();
+            // note the starting time
+            var d = new Date();
+            var start = d.getTime();
 
-		// open setup and send the request in synchronous mode
-		wpsc_http.open( "POST", wpsc_ajax.ajaxurl + "?action=wpsc_validate_customer", false );
-		wpsc_http.setRequestHeader( "Content-type", "application/json; charset=utf-8" );
+            jQuery.ajax({
+                type: "post",
+                dataType: "json",
+                url: wpsc_ajax.ajaxurl,
+                data: {action: "wpsc_validate_customer"},
+                success: function (response) {
+                    if (response.hasOwnProperty('data')) {
 
-		// Note that we cannot set a timeout on synchronous requests due to XMLHttpRequest limitations
-		wpsc_http.send();
+                        var data = response.data;
+                        var missing_cookie_data = false;
+                        if (data.hasOwnProperty('valid')) {
+                            var cookie_value = data.valid;
+                        } else {
+                            missing_cookie_data = true;
+                        }
+                        if (data.hasOwnProperty('id')) {
+                            wpsc_visitor_id = data.id;
+                        } else {
+                            missing_cookie_data = true;
+                        }
+                        if (data.hasOwnProperty('cookie_name')) {
+                            var cookie_name = data.cookie_name;
+                        } else {
+                            missing_cookie_data = true;
+                        }
 
-		// we did the request in synchronous mode so we don't need the on load or ready state change events	to check the result
-		if (wpsc_http.status == 200) {
-			 var result = JSON.parse( wpsc_http.responseText );
-			 if ( result.valid && result.id ) {
-				 wpsc_visitor_id = result.id;
+                        if (data.hasOwnProperty('cookie_value')) {
+                            var cookie_value = data.cookie_value;
+                        } else {
+                            missing_cookie_data = true;
+                        }
+
+                        if (data.hasOwnProperty('cookie_expire')) {
+                            var cookie_expire = data.cookie_expire;
+                        } else {
+                            missing_cookie_data = true;
+                        }
+
+
+                        if ( ! missing_cookie_data ) {
+                            if ( wpsc_debug && window.console ) {
+                                d = new Date();
+                                var end = d.getTime();
+
+                                wpsc_ajax_request_time = end - start;
+
+                                console.log('wpsc_validate_customer request time was ' + wpsc_ajax_request_time + ' ms'  );
+                                console.log("The new WPeC visitor id is " + wpsc_visitor_id);
+                             }
+                            // if there wasn't a customer cookie this AJAX request should have set it.  BUT under some circumstances
+                            // the cookie might not get set.  We can check for that and if the cookie did not get set we can
+                            // set it ourselves using the information from the AJAX JSON response.
+                            var customer_id_from_cookie = get_customer_id_from_cookie();
+
+                            if ( customer_id_from_cookie != wpsc_visitor_id ) {
+                                if (wpsc_debug && window.console) {
+                                    console.log('WPeC validate customer AJAX request came back with a customer id that is different than the customer id in the cookie, this is not correct.');
+                                }
+                            }
+
+                            if ( ! customer_id_from_cookie ) {
+                                if (wpsc_debug && window.console) {
+                                    console.log('WPeC validate customer AJAX request did not set the customer cookie');
+                                }
+
+                                var expire_time = new Date( cookie_expire );
+                                var expire_time_string = expire_time.toGMTString();
+
+                                document.cookie = cookie_name + "=" + cookie_value + "; expires=" + expire_time_string + ";  path=/";
+                                if (wpsc_debug && window.console) {
+                                    console.log('Set cookie and updated global for customer WPeC customer id ' + wpsc_visitor_id);
+                                }
+                            }
+                        }
+                    }
+
+                },
+                error: function (request, status, error) {
+                    if ( wpsc_debug && window.console ) {
+                        console.log( "The AJAX request to validate the WPeC validate visitor id  was not successful, error: " + request.responseText );
+                    }
+                }
+            });
+        }
 			 }
 		}
 	}
+// if we couldn't get the customer id we will reach out over http to get the cookie, the request
+// is an asynchronous AJAX request, so it shouldn't interrupt page layout
+    setTimeout( checkVisitorId(), 25 );
 }
 // end of setting up the WPEC customer identifier
 ///////////////////////////////////////////////////////////////////////////////////////////////
