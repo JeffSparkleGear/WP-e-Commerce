@@ -20,5 +20,7 @@
 		"Backbone": false,
 		"jQuery": false,
 		"wp": false
-	}
+	},
+
+    "predef": [ "wpsc_vars" ]
 }
