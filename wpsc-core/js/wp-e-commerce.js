@@ -87,7 +87,7 @@ function wpsc_element_is_visible( el ) {
             bottom = top + jQuery(window).height(),
             elTop = el.offset().top;
 
-        $visible = ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is(':visible');
+        visible = ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is(':visible');
     } else {
         visible = false;
     }
@@ -115,8 +115,11 @@ function wpsc_var_set( name, value ) {
 	return undefined;
 }
 
+
 // Avoid `console` errors in browsers that lack a console.
-if ( ! window.console ) console = { log: function(){} };
+if ( ! window.console ) {
+    console = { log: function(){} };
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Setting up the WPEC customer identifier
@@ -149,19 +152,19 @@ var wpsc_visitor_id = false;
 var wpsc_ajax_request_time = 0;
 
 function get_customer_id_from_cookie() {
-    var i, cookieName, cookieValue, docCookies = document.cookie.split( ";" );
+    var i, cookieName, cookieValue, docCookies = document.cookie.split( ';' );
     var customerId = false;
 
     for ( i = 0; i < docCookies.length; i++ ) {
-        cookieName  = docCookies[i].substr( 0, docCookies[i].indexOf( "=" ) );
-        cookieName  = cookieName.replace( /^\s+|\s+$/g,"" );
-        cookieValue = docCookies[i].substr( docCookies[i].indexOf("=") + 1) ;
+        cookieName  = docCookies[i].substr( 0, docCookies[i].indexOf( '=' ) );
+        cookieName  = cookieName.replace( /^\s+|\s+$/g, '' );
+        cookieValue = docCookies[i].substr( docCookies[i].indexOf( '=' ) + 1) ;
 
         // does the cookie start with the WPeC prefix
-        if ( 0 == cookieName.indexOf( "wpsc_customer_cookie" ) ) {
+        if ( 0 === cookieName.indexOf( 'wpsc_customer_cookie' ) ) {
             var cookieValueClean = decodeURI(cookieValue);
-            var idAsText = cookieValueClean.substr(0,cookieValueClean.indexOf( "|" ) );
-            customerId = parseInt( idAsText );
+            var idAsText = cookieValueClean.substr(0,cookieValueClean.indexOf( '|' ) );
+            customerId = parseInt( idAsText, 10 );
             break;
         }
     }
@@ -171,8 +174,8 @@ function get_customer_id_from_cookie() {
 
 
 function checkVisitorId() {
-    if ( !( document.cookie.indexOf("wpsc_customer_cookie") >= 0 )) {
-        if ( !( document.cookie.indexOf("wpsc_attempted_validate") >= 0 )) {
+    if ( -1 === document.cookie.indexOf('wpsc_customer_cookie') ) {
+        if ( -1 === document.cookie.indexOf( 'wpsc_attempted_validate' ) ) {
             // create a cookie to signal that we have attempted validation.  If we find the cookie is set
             // we don't re-attempt validation.  This means will only try to validate once and not slow down
             // subsequent page views.
@@ -181,25 +184,32 @@ function checkVisitorId() {
             // is closed, so the next time the visitor attempts to access the site after closing the browser
             // they will revalidate.
             var now = new Date();
-            document.cookie = "wpsc_attempted_validate=" + now;
 
-            // note the starting time
+            // note the starting time so we can track the elapsed transaction time
             var d = new Date();
             var start = d.getTime();
 
+            // set the attempted validate cookie so if things go awry we don't
+            // repeat the operation for the remainder of the session
+            document.cookie = 'wpsc_attempted_validate=' + now;
+
             jQuery.ajax({
-                type: "post",
-                dataType: "json",
+                type: 'post',
+                dataType: 'json',
                 url: wpsc_ajax.ajaxurl,
-                data: {action: "wpsc_validate_customer"},
+                data: {action: 'wpsc_validate_customer'},
                 success: function (response) {
                     if (response.hasOwnProperty('data')) {
 
                         var data = response.data;
                         var missing_cookie_data = false;
+                        var cookie_valid;
+                        var cookie_name;
+                        var cookie_expire;
+                        var cookie_value;
 
                         if (data.hasOwnProperty('valid')) {
-                            var cookie_value = data.valid;
+                            cookie_valid = data.valid;
                         } else {
                             missing_cookie_data = true;
                         }
@@ -211,23 +221,22 @@ function checkVisitorId() {
                         }
 
                         if (data.hasOwnProperty('cookie_name')) {
-                            var cookie_name = data.cookie_name;
+                            cookie_name = data.cookie_name;
                         } else {
                             missing_cookie_data = true;
                         }
 
                         if (data.hasOwnProperty('cookie_value')) {
-                            var cookie_value = data.cookie_value;
+                            cookie_value = data.cookie_value;
                         } else {
                             missing_cookie_data = true;
                         }
 
                         if (data.hasOwnProperty('cookie_expire')) {
-                            var cookie_expire = data.cookie_expire;
+                            cookie_expire = data.cookie_expire;
                         } else {
                             missing_cookie_data = true;
                         }
-
 
                         if ( ! missing_cookie_data ) {
                             if ( wpsc_debug && window.console ) {
@@ -236,16 +245,16 @@ function checkVisitorId() {
 
                                 wpsc_ajax_request_time = end - start;
 
-                                console.log('wpsc_validate_customer request time was ' + wpsc_ajax_request_time + ' ms'  );
-                                console.log("The new WPeC visitor id is " + wpsc_visitor_id);
-                             }
+                                console.log( 'wpsc_validate_customer request time was ' + wpsc_ajax_request_time + ' ms'  );
+                                console.log( 'The new WPeC visitor id is ' + wpsc_visitor_id);
+                            }
 
                             // if there wasn't a customer cookie this AJAX request should have set it.  BUT under some circumstances
                             // the cookie might not get set.  We can check for that and if the cookie did not get set we can
                             // set it ourselves using the information from the AJAX JSON response.
                             var customer_id_from_cookie = get_customer_id_from_cookie();
 
-                            if ( customer_id_from_cookie != wpsc_visitor_id ) {
+                            if ( customer_id_from_cookie !== wpsc_visitor_id ) {
                                 if (wpsc_debug && window.console) {
                                     console.log('WPeC validate customer AJAX request came back with a customer id that is different than the customer id in the cookie, this is not correct.');
                                 }
@@ -259,9 +268,9 @@ function checkVisitorId() {
                                 var expire_time = new Date( cookie_expire );
                                 var expire_time_string = expire_time.toGMTString();
 
-                                document.cookie = cookie_name + "=" + cookie_value + "; expires=" + expire_time_string + ";  path=/";
+                                document.cookie = cookie_name + '=' + cookie_value + '; expires=' + expire_time_string + ';  path=/';
                                 if (wpsc_debug && window.console) {
-                                    console.log('Set cookie and updated global for customer WPeC customer id ' + wpsc_visitor_id);
+                                    console.log( 'Set cookie and updated global for customer WPeC customer id ' + wpsc_visitor_id);
                                 }
                             }
                         }
@@ -270,7 +279,7 @@ function checkVisitorId() {
                 },
                 error: function (request, status, error) {
                     if ( wpsc_debug && window.console ) {
-                        console.log( "The AJAX request to validate the WPeC validate visitor id  was not successful, error: " + request.responseText );
+                        console.log( 'The AJAX request to validate the WPeC validate visitor id  was not successful, error: ' + request.responseText );
                     }
                 }
             });
@@ -278,7 +287,7 @@ function checkVisitorId() {
     } else {
         wpsc_visitor_id = get_customer_id_from_cookie( );
         if ( wpsc_debug ) {
-            console.log("The existing WPeC visitor id is " + wpsc_visitor_id);
+            console.log( 'The existing WPeC visitor id is ' + wpsc_visitor_id );
         }
     }
 }
@@ -296,13 +305,13 @@ if ( ! wpsc_visitor_id ) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 function wpsc_do_ajax_request( data, success_callback ) {
-	jQuery.ajax({
-		type      : "post",
-		dataType  : "json",
-		url       : wpsc_ajax.ajaxurl,
-		data      : data,
-		success   : success_callback,
-	});
+    jQuery.ajax({
+        type      : 'post',
+        dataType  : 'json',
+        url       : wpsc_ajax.ajaxurl,
+        data      : data,
+        success   : success_callback
+    });
 }
 
 /**
