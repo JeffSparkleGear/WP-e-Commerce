@@ -24,13 +24,13 @@
  *
  */
 if ( typeof wpsc_vars !== 'undefined' ) {
-	var wpsc_ajax                = wpsc_vars.wpsc_ajax;
-	var base_url                 = wpsc_vars.base_url;
-	var WPSC_URL                 = wpsc_vars.WPSC_URL;
-	var WPSC_IMAGE_URL           = wpsc_vars.WPSC_IMAGE_URL;
-	var WPSC_IMAGE_URL           = wpsc_vars.WPSC_IMAGE_URL;
-	var WPSC_CORE_IMAGES_URL     = wpsc_vars.WPSC_CORE_IMAGES_URL;
-	var fileThickboxLoadingImage = wpsc_vars.fileThickboxLoadingImage;
+    var wpsc_ajax                = wpsc_vars.wpsc_ajax;               // jshint ignore:line
+    var base_url                 = wpsc_vars.base_url;                // jshint ignore:line
+    var WPSC_URL                 = wpsc_vars.WPSC_URL;                // jshint ignore:line
+    var WPSC_IMAGE_URL           = wpsc_vars.WPSC_IMAGE_URL;          // jshint ignore:line
+    var WPSC_IMAGE_URL           = wpsc_vars.WPSC_IMAGE_URL;          // jshint ignore:line
+    var WPSC_CORE_IMAGES_URL     = wpsc_vars.WPSC_CORE_IMAGES_URL;    // jshint ignore:line
+    var fileThickboxLoadingImage = wpsc_vars.fileThickboxLoadingImage;// jshint ignore:line
     var wpsc_debug               = wpsc_vars.hasOwnProperty( 'debug' );
 }
 // end of variable definitions
