@@ -87,7 +87,7 @@ function wpsc_element_is_visible( el ) {
             bottom = top + jQuery(window).height(),
             elTop = el.offset().top;
 
-        $visible = ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is(':visible');
+        visible = ( (elTop >= top ) && ( elTop <= bottom ) && ( elTop <= bottom ) && ( elTop >= top ) ) && el.is(':visible');
     } else {
         visible = false;
     }
@@ -143,13 +143,13 @@ function wpsc_var_set( name, value ) {
 // a global variable used to hold the current users visitor id,
 // if you are going to user it always check to be sure it is not false
 var wpsc_visitor_id = false;
-    var i, cookieName, cookieValue, docCookies = document.cookie.split( ";" );
+    var i, cookieName, cookieValue, docCookies = document.cookie.split( ';' );
     for ( i = 0; i < docCookies.length; i++ ) {
-        cookieName  = docCookies[i].substr( 0, docCookies[i].indexOf( "=" ) );
-        cookieName  = cookieName.replace( /^\s+|\s+$/g,"" );
-        cookieValue = docCookies[i].substr( docCookies[i].indexOf("=") + 1) ;
+        cookieName  = docCookies[i].substr( 0, docCookies[i].indexOf( '=' ) );
+        cookieName  = cookieName.replace( /^\s+|\s+$/g, '' );
+        cookieValue = docCookies[i].substr( docCookies[i].indexOf('=') + 1);
             var cookieValueClean = decodeURI(cookieValue);
-            var idAsText = cookieValueClean.substr(0,cookieValueClean.indexOf( "|" ) );
+            var idAsText = cookieValueClean.substr(0,cookieValueClean.indexOf( '|' ) );
 
 if ( document.cookie.indexOf("wpsc_customer_cookie") < 0 ) {
 	if ( document.cookie.indexOf("wpsc_attempted_validate") < 0 ) {
