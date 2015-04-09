@@ -41,11 +41,21 @@ function wpsc_transaction_theme() {
 	$errorcode = '';
 	$transactid = '';
 	$dont_show_transaction_results = false;
+
 	if ( isset( $_GET['sessionid'] ) )
 		$sessionid = $_GET['sessionid'];
 
 	if ( !isset( $_GET['sessionid'] ) && isset( $_GET['ms'] ) )
 		$sessionid = $_GET['ms'];
+
+
+	if ( current_user_can('administrator') ) {
+		if ( isset( $_REQUEST['purchaseid'] ) ) {
+			$purchase_id = $_REQUEST['purchaseid'];
+			$purchase_log = new WPSC_Purchase_Log( $purchase_id );
+			$sessionid = $purchase_log->get( 'sessionid' ) ;
+		}
+	}
 
 	$selected_gateway = wpsc_get_customer_meta( 'selected_gateway' );
 	if ( $selected_gateway && in_array( $selected_gateway, array( 'paypal_certified', 'wpsc_merchant_paypal_express' ) ) )

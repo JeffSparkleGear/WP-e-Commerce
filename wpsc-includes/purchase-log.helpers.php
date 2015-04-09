@@ -239,9 +239,9 @@ function wpsc_send_admin_email( $purchase_log, $force = false ) {
 }
 
 function wpsc_get_transaction_html_output( $purchase_log ) {
-	if ( ! is_object( $purchase_log ) )
+	if ( ! is_object( $purchase_log ) ) {
 		$purchase_log = new WPSC_Purchase_Log( $purchase_log );
-
+	}
 
 	$notification = new WPSC_Purchase_Log_Customer_HTML_Notification( $purchase_log );
 	$output = $notification->get_html_message();
@@ -249,6 +249,25 @@ function wpsc_get_transaction_html_output( $purchase_log ) {
 	// see if the customer trying to view this transaction output is the person
 	// who made the purchase.
 	$checkout_session_id = wpsc_get_customer_meta( 'checkout_session_id' );
+
+	if ( current_user_can('administrator') ) {
+		if ( isset( $_REQUEST['sessionid'] ) ) {
+			$checkout_session_id = $_REQUEST['sessionid'];
+
+			if ( $checkout_session_id != $purchase_log->get( 'sessionid' ) ) {
+				$purchase_log = new WPSC_Purchase_Log( $checkout_session_id, 'sessionid' );
+			}
+		}
+
+		if ( isset( $_REQUEST['purchaseid'] ) ) {
+			$purchase_id = $_REQUEST['purchaseid'];
+
+			if ( $purchase_id != $purchase_log->get( 'id' ) ) {
+				$purchase_log = new WPSC_Purchase_Log( $purchase_id );
+				$checkout_session_id = $purchase_log->get( 'sessionid' ) ;
+			}
+		}
+	}
 
     if ( $checkout_session_id == $purchase_log->get( 'sessionid' ) ) {
     	$output = apply_filters( 'wpsc_get_transaction_html_output', $output, $notification );
