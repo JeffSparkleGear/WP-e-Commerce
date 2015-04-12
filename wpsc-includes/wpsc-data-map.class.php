@@ -212,7 +212,11 @@ final class WPSC_Data_Map {
 
 			// if this is a named map we can try to restore it from the transient store
 			if ( ! empty ( $this->_map_name ) ) {
-				$this->_map_data = get_transient( $this->_map_name );
+				// TODO: Maybe figure out why this causes problems with APC caches, or maybe it doesn't?
+				// In any case because transients can be deleted at any time commenting this out should
+				// merely force a rebuild.
+				// see https://wordpress.org/support/topic/fatal-error-wpsc_countries/page/2?replies=49#post-6812338
+				$this->_map_data = false; // get_transient( $this->_map_name );
 			}
 
 			// if we still don't have a valid map and there is a constructor callback use it

@@ -63,6 +63,24 @@ class WPSC_Countries {
 	const INCLUDE_INVISIBLE        = true;
 	const DO_NOT_INCLUDE_INVISIBLE = false;
 
+	/** Refers to a single instance of this class. */
+	private static $instance = null;
+
+	/**
+	 * Creates or returns an instance of this class.
+	 *
+	 * @return  WPSC_Countries A single instance of this class.
+	 */
+	public static function get_instance() {
+
+		if ( null == self::$instance ) {
+			self::$instance = new self;
+		}
+
+		return self::$instance;
+
+	} // end get_instance;
+
 	/**
 	 * Change an country ISO code into a country id, if a country id is passed it is returned intact
 	 *
@@ -1070,16 +1088,20 @@ class WPSC_Countries {
 	 * @return none
 	 */
 	private function restore() {
+
+		// force a class load in php
 		$data = get_transient( self::transient_name() );
 		$has_data = false;
 
-		$transient_is_valid = true;
+		$transient_is_valid = is_array( $data );
+
 		foreach( self::$_maps_to_save_with_core_class as $map_name => $should_be_saved ) {
 			if ( $should_be_saved ) {
-				if ( ! is_a( $data[ $map_name ], 'WPSC_Data_Map' ) ) {
+				if ( ( null !== $data[ $map_name ] ) && ! is_a( $data[ $map_name ], 'WPSC_Data_Map' ) ) {
 					$transient_is_valid = false;
 					delete_transient( self::transient_name() );
-					error_log( __FUNCTION__ . ' transient data corrupted' );
+					error_log( __CLASS__ . '::' . __FUNCTION__ . ' transient data corrupted for map name:' . $map_name . ', data follows: ' );
+					error_log( var_export( $data[ $map_name ], true ) );
 					break;
 				}
 			}
@@ -1102,13 +1124,16 @@ class WPSC_Countries {
 						break;
 					}
 				}
+
+				self::$_initialized = true;
+				error_log( __CLASS__ . '::' . __FUNCTION__ . ' countries data restored' );
 			}
 		}
 
-		if ( ! $has_data && ( $data !== false ) ) {
+		if ( $transient_is_valid && ! $has_data && ( $data !== false ) ) {
 			delete_transient( self::transient_name() );
-		} else {
-			self::$_initialized = true;
+			self::$_initialized = false;
+			error_log( __CLASS__ . '::' . __FUNCTION__ . ' no data restored' );
 		}
 
 		self::$_dirty = false;
@@ -1588,11 +1613,9 @@ class WPSC_Countries {
 
 }
 
+
 add_action( 'init', '_wpsc_make_countries_data_available', 10 ,1 );
 
 function _wpsc_make_countries_data_available() {
-	static $wpsc_countries = null;
-	if ( $wpsc_countries == null ) {
-		$wpsc_countries = new WPSC_Countries();
-	}
+	$wpsc_countries = WPSC_Countries::get_instance();
 }
