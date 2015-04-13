@@ -894,6 +894,7 @@ class WPSC_Countries {
 	 *
 	 */
 	public function __construct() {
+
 		if ( ! is_a( self::$active_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
 			self::_clean_data_maps();
 			self::restore();
@@ -1072,7 +1073,7 @@ class WPSC_Countries {
 				}
 			}
 
-			set_transient( self::transient_name(), $mydata );
+			special_set_transient( self::transient_name(), $mydata );
 
 			self::$_dirty = false;
 		}
@@ -1090,7 +1091,7 @@ class WPSC_Countries {
 	private function restore() {
 
 		// force a class load in php
-		$data = get_transient( self::transient_name() );
+		$data = special_get_transient( self::transient_name() );
 		$has_data = false;
 
 		$transient_is_valid = is_array( $data );
@@ -1619,3 +1620,23 @@ add_action( 'init', '_wpsc_make_countries_data_available', 10 ,1 );
 function _wpsc_make_countries_data_available() {
 	$wpsc_countries = WPSC_Countries::get_instance();
 }
+
+
+function special_set_transient(  $transient, $value, $expiration = 0 )  {
+	$value = base64_encode( serialize( $value ) );
+	return set_transient( $transient, $value, $expiration );
+}
+
+function special_get_transient( $transient )  {
+	$value = get_transient( $transient );
+	$value = base64_decode( $value );
+	$value = maybe_unserialize( $value );
+	if ( empty( $value ) ) {
+		$value = false;
+		delete_transient( $transient );
+	}
+
+	return $value;
+}
+
+

@@ -186,7 +186,7 @@ final class WPSC_Data_Map {
 			// expiration so that transient storage mechanisms can destroy the map if space is needed
 			if ( ! empty ( $this->_map_name ) ) {
 				if ( ! empty( $this->_map_data ) ) {
-					set_transient( $this->_map_name, $this->_map_data, 13 * WEEK_IN_SECONDS );
+					special_set_transient( $this->_map_name, $this->_map_data, 13 * WEEK_IN_SECONDS );
 				} else {
 					delete_transient( $this->_map_name );
 				}
@@ -216,7 +216,7 @@ final class WPSC_Data_Map {
 				// In any case because transients can be deleted at any time commenting this out should
 				// merely force a rebuild.
 				// see https://wordpress.org/support/topic/fatal-error-wpsc_countries/page/2?replies=49#post-6812338
-				$this->_map_data = false; // get_transient( $this->_map_name );
+				$this->_map_data = special_get_transient( $this->_map_name );
 			}
 
 			// if we still don't have a valid map and there is a constructor callback use it
@@ -240,7 +240,7 @@ final class WPSC_Data_Map {
 					}
 
 					if ( ! empty ( $this->_map_name ) ) {
-						set_transient( $this->_map_name, $this->_map_data );
+						special_set_transient( $this->_map_name, $this->_map_data );
 					}
 
 					// we just loaded and saved the data, that makes it not dirty
