@@ -1101,8 +1101,6 @@ class WPSC_Countries {
 				if ( ( null !== $data[ $map_name ] ) && ! is_a( $data[ $map_name ], 'WPSC_Data_Map' ) ) {
 					$transient_is_valid = false;
 					delete_transient( self::transient_name() );
-					error_log( __CLASS__ . '::' . __FUNCTION__ . ' transient data corrupted for map name:' . $map_name . ', data follows: ' );
-					error_log( var_export( $data[ $map_name ], true ) );
 					break;
 				}
 			}
@@ -1127,14 +1125,12 @@ class WPSC_Countries {
 				}
 
 				self::$_initialized = true;
-				error_log( __CLASS__ . '::' . __FUNCTION__ . ' countries data restored' );
 			}
 		}
 
 		if ( $transient_is_valid && ! $has_data && ( $data !== false ) ) {
 			delete_transient( self::transient_name() );
 			self::$_initialized = false;
-			error_log( __CLASS__ . '::' . __FUNCTION__ . ' no data restored' );
 		}
 
 		self::$_dirty = false;
