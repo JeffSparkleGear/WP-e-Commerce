@@ -106,11 +106,11 @@ function wpsc_flush_theme_transients( $force = false ) {
 		// Loop through current theme files and remove transients
 		if ( $theme_files = wpsc_get_theme_files() ) {
 			foreach( $theme_files as $file ) {
-				delete_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file );
-				delete_transient( WPEC_TRANSIENT_THEME_URL_PREFIX . $file );
+				_wpsc_delete_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file );
+				_wpsc_delete_transient( WPEC_TRANSIENT_THEME_URL_PREFIX . $file );
 			}
 
-			delete_transient( 'wpsc_theme_path' );
+			_wpsc_delete_transient( 'wpsc_theme_path' );
 
 			return true;
 		}

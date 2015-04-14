@@ -393,7 +393,7 @@ final class WPSC_Settings_Page {
 			if ( $this->current_tab->is_update_message_displayed() ) {
 				if ( ! count( get_settings_errors() ) )
 					add_settings_error( 'wpsc-settings', 'settings_updated', __( 'Settings saved.' ), 'updated' );
-				set_transient( 'settings_errors', get_settings_errors(), 30 );
+				_wpsc_set_transient( 'settings_errors', get_settings_errors(), 30 );
 				$query_args['settings-updated'] = true;
 			}
 			wp_redirect( add_query_arg( $query_args ) );

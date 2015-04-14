@@ -297,7 +297,7 @@ class australiapost {
 			$cacheKey = 'wpec_apq_' . md5($fullURL);
 
 			// See if this Australia Post quote is cached
-			$cachedResult = get_transient($cacheKey);
+			$cachedResult = _wpsc_get_transient($cacheKey);
 
 			if ( false === $cachedResult ) {
 
@@ -342,7 +342,7 @@ class australiapost {
 			    $methods[$code]['name'] = $this->services[$code];
 
 			    // Cache this quote for 10 minutes
-			    set_transient($cacheKey, $methods[$code], 600);
+				_wpsc_set_transient($cacheKey, $methods[$code], 600);
 
 			} else {
 			    // This quote is cached so use that result instead

@@ -897,9 +897,9 @@ function _wpsc_doing_it_wrong( $function, $message, $version ) {
  */
 function wpsc_max_purchase_id() {
 	global $wpdb;
-	if ( false === ( $max_purchase_id = get_transient( 'max_purchase_id' ) ) ) {
+	if ( false === ( $max_purchase_id = _wpsc_get_transient( 'max_purchase_id' ) ) ) {
 		 $max_purchase_id = $wpdb->get_var( 'SELECT MAX( id ) FROM ' . WPSC_TABLE_PURCHASE_LOGS );
-		 set_transient( 'max_purchase_id', $max_purchase_id, 60 * 60 * 24 ); // day of seconds
+		_wpsc_set_transient( 'max_purchase_id', $max_purchase_id, 60 * 60 * 24 ); // day of seconds
 	}
 	return (int) $max_purchase_id;
 }
@@ -915,7 +915,7 @@ function wpsc_max_purchase_id() {
  */
 
 function wpsc_invalidate_max_purchase_id_transient () {
-	 delete_transient( 'max_purchase_id' );
+	_wpsc_delete_transient( 'max_purchase_id' );
 }
 
 add_action( 'wpsc_purchase_log_insert', 'wpsc_invalidate_max_purchase_id_transient' );
@@ -988,3 +988,70 @@ function _wpsc_remove_erroneous_files() {
 if ( get_option( 'wpsc_38131_file_check', true ) ) {
 	add_action( 'admin_init', '_wpsc_remove_erroneous_files' );
 }
+
+
+/**
+ * Store a WP eCommerce Transient
+ * Wrapper function to cover WordPress' set transient function.
+ * Note: Initial reason for implmenting this was unusual derserialization errors coming from the APC
+ * component when APC tries to deserialize a transient containing nested objects. This wrapper function
+ * encodes the transient contents so that APC will not try to deserialize it into component objects.
+ *
+ * @since 3.9.3
+ * @param string $transient  Transient name. Expected to not be SQL-escaped. Must be
+ *                           45 characters or fewer in length.
+ * @param mixed  $value      Transient value. Must be serializable if non-scalar.
+ *                           Expected to not be SQL-escaped.
+ * @param int    $expiration Optional. Time until expiration in seconds. Default 0.
+ * @return bool  false if value was not set and true if value was set.*
+ */
+function _wpsc_set_transient(  $transient, $value, $expiration = 0 )  {
+	$value = base64_encode( serialize( $value ) );
+	return set_transient( $transient, $value, $expiration );
+}
+
+/**
+ * Retrieve a WP eCommerce Transient
+ * Wrapper function to cover WordPress' get transient function.
+ * Note: Initial reason for implmenting this was unusual derserialization errors coming from the APC
+ * component when APC tries to deserialize a transient containing nested objects. This wrapper function
+ * decodes the transient contents that were encoded so that APC will would try to deserialize it into
+ * component objects. If the transient contents can not be decoded, the transient is deleted and the
+ * function will return false as if the tranient never existed.
+ *
+ * @since 3.9.3
+ * @param string $transient Transient name. Expected to not be SQL-escaped.
+ * @return mixed value of transient, false if transient did not exist
+ */
+function _wpsc_get_transient( $transient )  {
+	$value = get_transient( $transient );
+	if ( false !== $value ) {
+		if ( ! empty( $value ) && is_string( $value ) ) {
+			$value = @base64_decode( $value );
+			if ( is_string( $value ) ) {
+				$value = @maybe_unserialize( $value );
+			} else {
+				$value = false;
+				_wpsc_delete_transient( $transient );
+			}
+		}
+	}
+
+	return $value;
+}
+
+/**
+ * Delete a WP eCommerce Transient
+ * Wrapper function to cover WordPress' delete transient function.
+ * Note: Initial reason for implmenting this was unusual derserialization errors coming from the APC
+ * component when APC tries to deserialize a transient containing nested objects.
+ *
+ * @since 3.9.3
+ * @param string $transient Transient name. Expected to not be SQL-escaped.
+ * @return mixed value of transient, false if transient did not exist
+ */
+function _wpsc_delete_transient( $transient )  {
+	return delete_transient( $transient );
+}
+
+

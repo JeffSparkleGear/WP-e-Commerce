@@ -535,7 +535,7 @@ class WPSC_Shipwire {
 		$cache_key = self::get_cache_key();
 
 		//Returns live shipping request if no cached response exists, cached response if one does
-		if ( false === ( $rates = get_transient( $cache_key ) ) )
+		if ( false === ( $rates = _wpsc_get_transient( $cache_key ) ) )
 			$rates = self::fetch_fresh_quotes();
 
 		return $rates;
@@ -577,7 +577,7 @@ class WPSC_Shipwire {
 
 		$methods = apply_filters( 'wpsc_shipwire_methods', $methods, $quotes );
 
-		set_transient( self::get_cache_key(), $methods, apply_filters( 'wpsc_shipwire_rates_cache_expiration', 60 * 60 ) );
+		_wpsc_set_transient( self::get_cache_key(), $methods, apply_filters( 'wpsc_shipwire_rates_cache_expiration', 60 * 60 ) );
 
 		return $methods;
 	}

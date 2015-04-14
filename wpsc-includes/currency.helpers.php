@@ -8,7 +8,7 @@ function _wpsc_get_exchange_rate( $from, $to ) {
 
 	$key = "wpsc_exchange_{$from}_{$to}";
 
-	if ( $rate = get_transient( $key ) ) {
+	if ( $rate = _wpsc_get_transient( $key ) ) {
 		return (float) $rate;
 	}
 
@@ -36,7 +36,7 @@ function _wpsc_get_exchange_rate( $from, $to ) {
         $rate = explode( 'bld>', $response );
         $rate = explode( $to, $rate[1] );
 		$rate = trim( $rate[0] );
-		set_transient( $key, $rate, DAY_IN_SECONDS );
+		_wpsc_set_transient( $key, $rate, DAY_IN_SECONDS );
 
 		return (float) $rate;
 	}

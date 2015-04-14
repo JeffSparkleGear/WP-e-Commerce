@@ -253,7 +253,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		// there are lots of logs
 		$today = getdate();
 		$transient_key = 'wpsc_purchase_logs_months_' . $today['year'] . $today['month'];
-		/* if ( $months = get_transient( $transient_key ) )
+		/* if ( $months = _wpsc_get_transient( $transient_key ) )
 			return $months; */
 
 		$sql = "
@@ -265,7 +265,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		";
 
 		$months = $wpdb->get_results( $sql );
-		set_transient( $transient_key, $months, 60 * 24 * 7 );
+		_wpsc_set_transient( $transient_key, $months, 60 * 24 * 7 );
 		return $months;
 	}
 

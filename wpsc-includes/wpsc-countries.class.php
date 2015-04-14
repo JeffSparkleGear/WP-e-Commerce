@@ -1073,7 +1073,7 @@ class WPSC_Countries {
 				}
 			}
 
-			special_set_transient( self::transient_name(), $mydata );
+			_wpsc_set_transient( self::transient_name(), $mydata );
 
 			self::$_dirty = false;
 		}
@@ -1091,7 +1091,7 @@ class WPSC_Countries {
 	private function restore() {
 
 		// force a class load in php
-		$data = special_get_transient( self::transient_name() );
+		$data = _wpsc_get_transient( self::transient_name() );
 		$has_data = false;
 
 		$transient_is_valid = is_array( $data );
@@ -1100,7 +1100,7 @@ class WPSC_Countries {
 			if ( $should_be_saved ) {
 				if ( ( null !== $data[ $map_name ] ) && ! is_a( $data[ $map_name ], 'WPSC_Data_Map' ) ) {
 					$transient_is_valid = false;
-					delete_transient( self::transient_name() );
+					_wpsc_delete_transient( self::transient_name() );
 					break;
 				}
 			}
@@ -1129,7 +1129,7 @@ class WPSC_Countries {
 		}
 
 		if ( $transient_is_valid && ! $has_data && ( $data !== false ) ) {
-			delete_transient( self::transient_name() );
+			_wpsc_delete_transient( self::transient_name() );
 			self::$_initialized = false;
 		}
 
@@ -1150,7 +1150,7 @@ class WPSC_Countries {
 	public static function clear_cache() {
 
 		// delete anthing that is stored in the transient cache
-		delete_transient( self::transient_name() );
+		_wpsc_delete_transient( self::transient_name() );
 
 		// when we clear the cached copy of the sdata, we also clear the resident copy of the data
 		// so it is rebuilt and stays in sync
@@ -1616,23 +1616,4 @@ add_action( 'init', '_wpsc_make_countries_data_available', 10 ,1 );
 function _wpsc_make_countries_data_available() {
 	$wpsc_countries = WPSC_Countries::get_instance();
 }
-
-
-function special_set_transient(  $transient, $value, $expiration = 0 )  {
-	$value = base64_encode( serialize( $value ) );
-	return set_transient( $transient, $value, $expiration );
-}
-
-function special_get_transient( $transient )  {
-	$value = get_transient( $transient );
-	$value = base64_decode( $value );
-	$value = maybe_unserialize( $value );
-	if ( empty( $value ) ) {
-		$value = false;
-		delete_transient( $transient );
-	}
-
-	return $value;
-}
-
 
