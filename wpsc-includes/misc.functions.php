@@ -1006,8 +1006,9 @@ if ( get_option( 'wpsc_38131_file_check', true ) ) {
  * @return bool  false if value was not set and true if value was set.*
  */
 function _wpsc_set_transient(  $transient, $value, $expiration = 0 )  {
-	$value = base64_encode( serialize( $value ) );
-	return set_transient( $transient, $value, $expiration );
+	$serialized_value = serialize( $value );
+	$encoded_value = base64_encode( $serialized_value );
+	return set_transient( $transient, $encoded_value, $expiration );
 }
 
 /**
@@ -1024,14 +1025,22 @@ function _wpsc_set_transient(  $transient, $value, $expiration = 0 )  {
  * @return mixed value of transient, false if transient did not exist
  */
 function _wpsc_get_transient( $transient )  {
-	$value = get_transient( $transient );
-	if ( false !== $value ) {
-		if ( ! empty( $value ) && is_string( $value ) ) {
-			$value = @base64_decode( $value );
-			if ( is_string( $value ) ) {
-				$value = @unserialize( $value );
+	$encoded_value = get_transient( $transient );
+	if ( false !== $encoded_value ) {
+		if ( ! empty( $encoded_value ) && is_string( $encoded_value ) ) {
+			$serialized_value = @base64_decode( $encoded_value );
+			if ( is_string( $serialized_value ) ) {
+				$value = unserialize( $serialized_value );
+				if ( ! $value ) {
+					xdebug_break();
+				}
 			} else {
 				$value = false;
+			}
+
+			// if there was a transient, but it could not be decoded, we delete the transient to get back
+			// to a working state
+			if ( false === $value ) {
 				_wpsc_delete_transient( $transient );
 			}
 		}
