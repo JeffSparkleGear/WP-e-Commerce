@@ -1029,7 +1029,7 @@ function _wpsc_get_transient( $transient )  {
 		if ( ! empty( $value ) && is_string( $value ) ) {
 			$value = @base64_decode( $value );
 			if ( is_string( $value ) ) {
-				$value = @maybe_unserialize( $value );
+				$value = @unserialize( $value );
 			} else {
 				$value = false;
 				_wpsc_delete_transient( $transient );
