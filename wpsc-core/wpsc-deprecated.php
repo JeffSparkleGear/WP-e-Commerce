@@ -1793,7 +1793,6 @@ function wpsc_meta_table_name( $meta_object_type ) {
  * Google checkout not longer available or supported, so we are deprecating this function
  *
  * @access public
-
  * @deprecated since 3.8.14
  */
 function wpsc_google_checkout(){
@@ -2034,7 +2033,7 @@ function wpsc_google_shipping_settings() {
 			$sendback = add_query_arg( 'updated', $updated, $sendback );
 		}
 
-		wp_redirect( $sendback );
+		wp_redirect( esc_url_raw( $sendback ) );
 		exit();
 	}
 }

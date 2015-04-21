@@ -88,6 +88,8 @@ function wpsc_change_currency() {
 		return;
 	}
 
+	global $wpdb;
+
 	if ( is_numeric( $_POST['currencyid'] ) ) {
 		$currency_data = $wpdb->get_results( $wpdb->prepare( "SELECT `symbol`,`symbol_html`,`code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id`=%d LIMIT 1", $_POST['currencyid'] ), ARRAY_A );
 		$price_out = null;
@@ -210,7 +212,7 @@ function wpsc_clean_categories() {
 		$sendback = add_query_arg( 'tab', $_SESSION['wpsc_settings_curr_page'], $sendback );
 	}
 
-	wp_redirect( $sendback );
+	wp_redirect( esc_url_raw( $sendback ) );
 
 	exit();
 }
