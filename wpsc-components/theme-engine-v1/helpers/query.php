@@ -204,7 +204,7 @@ function wpsc_start_the_query() {
 			$need_product_query = true;
 		}
 	}
-
+ 
 	if ( ! $need_product_query ) {
 		return;
 	}
