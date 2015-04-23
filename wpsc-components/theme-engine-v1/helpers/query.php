@@ -198,7 +198,9 @@ function wpsc_start_the_query() {
 		$need_product_query = true;
 	} else {
 		$queried_post_type = get_query_var( 'post_type' );
-		if ( ! is_string( $queried_post_type ) || ( $queried_post_type != 'wpsc-product' ) ) {
+		if ( is_string( $queried_post_type ) && ( $queried_post_type != 'wpsc-product' ) ) {
+			$need_product_query = true;
+		} else if ( is_array( $queried_post_type ) && in_array( 'wpsc-product', $queried_post_type  ) ) {
 			$need_product_query = true;
 		}
 	}
