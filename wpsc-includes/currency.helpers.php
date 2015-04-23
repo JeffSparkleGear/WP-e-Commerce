@@ -8,7 +8,7 @@ function _wpsc_get_exchange_rate( $from, $to ) {
 
 	$key = "wpsc_exchange_{$from}_{$to}";
 
-	if ( $rate = _wpsc_get_transient( $key ) ) {
+	if ( $rate = get_transient( $key ) ) {
 		return (float) $rate;
 	}
 
@@ -21,7 +21,7 @@ function _wpsc_get_exchange_rate( $from, $to ) {
 				'http://www.google.com/finance/converter'
 				);
 
-	$url  = apply_filters( '_wpsc_get_exchange_rate_service_endpoint', $url, $from, $to );
+	$url  = esc_url_raw( apply_filters( '_wpsc_get_exchange_rate_service_endpoint', $url, $from, $to ) );
 
 	$response = wp_remote_retrieve_body( wp_remote_get( $url, array( 'timeout' => 10 ) ) );
 
@@ -36,7 +36,7 @@ function _wpsc_get_exchange_rate( $from, $to ) {
         $rate = explode( 'bld>', $response );
         $rate = explode( $to, $rate[1] );
 		$rate = trim( $rate[0] );
-		_wpsc_set_transient( $key, $rate, DAY_IN_SECONDS );
+		set_transient( $key, $rate, DAY_IN_SECONDS );
 
 		return (float) $rate;
 	}
