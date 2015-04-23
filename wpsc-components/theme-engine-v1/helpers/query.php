@@ -198,11 +198,13 @@ function wpsc_start_the_query() {
 		$need_product_query = true;
 	} else {
 		$queried_post_type = get_query_var( 'post_type' );
-		if ( ! is_string( $queried_post_type ) || ( $queried_post_type != 'wpsc-product' ) ) {
+		if ( is_string( $queried_post_type ) && ( $queried_post_type != 'wpsc-product' ) ) {
+			$need_product_query = true;
+		} else if ( is_array( $queried_post_type ) && in_array( 'wpsc-product', $queried_post_type  ) ) {
 			$need_product_query = true;
 		}
 	}
-
+ 
 	if ( ! $need_product_query ) {
 		return;
 	}
@@ -524,8 +526,7 @@ function wpsc_generate_product_query( $query ) {
 		$query->query_vars['posts_per_page'] = -1;
 		$query->query_vars['nopaging'] = 1;
 	}
-	if ( $query->is_tax == true )
-		new wpsc_products_by_category( $query );
+
 	return $query;
 }
 
