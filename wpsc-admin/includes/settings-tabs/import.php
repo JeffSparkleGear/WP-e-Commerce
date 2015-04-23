@@ -12,7 +12,7 @@ class WPSC_Settings_Tab_Import extends WPSC_Settings_Tab {
 
 		parent::__construct();
 
-		$file = _wpsc_get_transient( 'wpsc_settings_tab_import_file' );
+		$file = get_transient( 'wpsc_settings_tab_import_file' );
 
 		if ( $file ) {
 			$this->file = $file;
@@ -87,7 +87,7 @@ class WPSC_Settings_Tab_Import extends WPSC_Settings_Tab {
 	}
 
 	private function reset_state() {
-		_wpsc_delete_transient( 'wpsc_settings_tab_import_file' );
+		delete_transient( 'wpsc_settings_tab_import_file' );
 		$this->file         = false;
 		$this->completed    = false;
 		$this->display_data = array();
@@ -180,7 +180,7 @@ class WPSC_Settings_Tab_Import extends WPSC_Settings_Tab {
 			$file = $_FILES['csv_file'];
 			$file_path = WPSC_FILE_DIR . $file['name'];
 			if ( move_uploaded_file( $file['tmp_name'], WPSC_FILE_DIR . $file['name'] ) ) {
-				_wpsc_set_transient( 'wpsc_settings_tab_import_file', $file_path );
+				set_transient( 'wpsc_settings_tab_import_file', $file_path );
 				return array( 'step' => 2 );
 			}
 		}
