@@ -207,7 +207,7 @@ function wpsc_get_template_file_path( $file = '' ){
 		return;
 
 	// No cache, so find one and set it
-	if ( false === ( $file_path = _wpsc_get_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file ) ) ) {
+	if ( false === ( $file_path = get_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file ) ) ) {
 
 		// Plugin may override the template file, get the file name and check to be sure file exists
 		$file_path = apply_filters( 'wpsc_get_template_file_path' , false );
@@ -238,10 +238,10 @@ function wpsc_get_template_file_path( $file = '' ){
 		}
 		// Save the transient and update it every 12 hours
 		if ( !empty( $file_path ) )
-			_wpsc_set_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file, $file_path, 60 * 60 * 12 );
+			set_transient( WPEC_TRANSIENT_THEME_PATH_PREFIX . $file, $file_path, 60 * 60 * 12 );
 
 	}elseif(!file_exists($file_path)){
-		_wpsc_delete_transient(WPEC_TRANSIENT_THEME_PATH_PREFIX . $file);
+		delete_transient(WPEC_TRANSIENT_THEME_PATH_PREFIX . $file);
 		wpsc_get_template_file_path($file);
 	}
 
