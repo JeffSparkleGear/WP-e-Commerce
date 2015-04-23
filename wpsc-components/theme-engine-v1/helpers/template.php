@@ -135,7 +135,7 @@ function wpsc_body_class( $classes ) {
 
 			$classes[] = 'wpsc';
 
-			if ( ! is_array( $wpsc_query->query ) ) {
+			if ( ! empty( $wpsc_query ) && ! is_array( $wpsc_query->query ) ) {
 				$classes[] = 'wpsc-home';
 			}
 
