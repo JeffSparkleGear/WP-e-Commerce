@@ -205,7 +205,7 @@ class australiapost {
 			$meta = get_product_meta($cart_item->product_id,'product_metadata',true);
 			$unit = $meta['dimension_unit'];
 			$meta = $meta['dimensions'];
-			 
+
 
 			if ($meta && is_array($meta)) {
 				$productVolume = 1;
@@ -290,14 +290,14 @@ class australiapost {
 		foreach ($this->services as $code => $service) {
 			if (!$this->settings['services'][$code]) continue;
 
-			$fullURL = add_query_arg('Service_Type', $code, $url);
+			$fullURL = esc_url_raw( add_query_arg('Service_Type', $code, $url ) );
 
 			// This cache key should be unique for a cart with these contents and destination
 			// Needs to be less than 45 characters (as per http://core.trac.wordpress.org/ticket/15058)
 			$cacheKey = 'wpec_apq_' . md5($fullURL);
 
 			// See if this Australia Post quote is cached
-			$cachedResult = _wpsc_get_transient($cacheKey);
+			$cachedResult = get_transient($cacheKey);
 
 			if ( false === $cachedResult ) {
 
@@ -342,7 +342,7 @@ class australiapost {
 			    $methods[$code]['name'] = $this->services[$code];
 
 			    // Cache this quote for 10 minutes
-				_wpsc_set_transient($cacheKey, $methods[$code], 600);
+			    set_transient($cacheKey, $methods[$code], 600);
 
 			} else {
 			    // This quote is cached so use that result instead
