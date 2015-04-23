@@ -897,9 +897,9 @@ function _wpsc_doing_it_wrong( $function, $message, $version ) {
  */
 function wpsc_max_purchase_id() {
 	global $wpdb;
-	if ( false === ( $max_purchase_id = _wpsc_get_transient( 'max_purchase_id' ) ) ) {
+	if ( false === ( $max_purchase_id = get_transient( 'max_purchase_id' ) ) ) {
 		 $max_purchase_id = $wpdb->get_var( 'SELECT MAX( id ) FROM ' . WPSC_TABLE_PURCHASE_LOGS );
-		_wpsc_set_transient( 'max_purchase_id', $max_purchase_id, 60 * 60 * 24 ); // day of seconds
+		set_transient( 'max_purchase_id', $max_purchase_id, 60 * 60 * 24 ); // day of seconds
 	}
 	return (int) $max_purchase_id;
 }
@@ -915,7 +915,7 @@ function wpsc_max_purchase_id() {
  */
 
 function wpsc_invalidate_max_purchase_id_transient () {
-	_wpsc_delete_transient( 'max_purchase_id' );
+	delete_transient( 'max_purchase_id' );
 }
 
 add_action( 'wpsc_purchase_log_insert', 'wpsc_invalidate_max_purchase_id_transient' );
@@ -1031,9 +1031,6 @@ function _wpsc_get_transient( $transient )  {
 			$serialized_value = @base64_decode( $encoded_value );
 			if ( is_string( $serialized_value ) ) {
 				$value = unserialize( $serialized_value );
-				if ( ! $value ) {
-					xdebug_break();
-				}
 			} else {
 				$value = false;
 			}
