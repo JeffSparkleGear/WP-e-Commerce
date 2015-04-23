@@ -23,17 +23,17 @@ class WPSC_Update {
 		$this->timeout = ini_get( 'max_execution_time' );
 		$this->script_start = time();
 
-		if ( ! $this->stages = _wpsc_get_transient( 'wpsc_update_progress' ) ) {
+		if ( ! $this->stages = get_transient( 'wpsc_update_progress' ) ) {
 			$this->stages = array();
 		}
 	}
 
 	public function clean_up() {
-		_wpsc_delete_transient( 'wpsc_update_progress' );
-		_wpsc_delete_transient( 'wpsc_update_product_offset' );
-		_wpsc_delete_transient( 'wpsc_update_variation_comb_offset' );
-		_wpsc_delete_transient( 'wpsc_update_current_product' );
-		_wpsc_delete_transient( 'wpsc_update_current_child_products' );
+		delete_transient( 'wpsc_update_progress' );
+		delete_transient( 'wpsc_update_product_offset' );
+		delete_transient( 'wpsc_update_variation_comb_offset' );
+		delete_transient( 'wpsc_update_current_product' );
+		delete_transient( 'wpsc_update_current_child_products' );
 	}
 
 	public function check_timeout() {
@@ -46,7 +46,7 @@ class WPSC_Update {
 			do_action( 'wpsc_update_timeout_terminate' );
 			$location = remove_query_arg( array( 'start_over', 'eta', 'current_percent' ) );
 			$location = add_query_arg( 'run_updates', 1, $location );
-			$location = apply_filters( 'wpsc_update_terminate_location', $location );
+			$location = esc_url( apply_filters( 'wpsc_update_terminate_location', $location ) );
 			?>
 				<script type="text/javascript">
 					location.href = "<?php echo $location; ?>"
@@ -65,7 +65,7 @@ class WPSC_Update {
 		if ( empty( $this->stages[$function] ) ) {
 			call_user_func( 'wpsc_' . $function );
 			$this->stages[ $function ] = true;
-			_wpsc_set_transient( 'wpsc_update_progress', $this->stages, WEEK_IN_SECONDS );
+			set_transient( 'wpsc_update_progress', $this->stages, WEEK_IN_SECONDS );
 		}
 	}
 }
@@ -113,7 +113,7 @@ class WPSC_Update_Progress {
 			$location = add_query_arg( 'eta', $this->eta, $location );
 		else
 			$location = remove_query_arg( 'eta', $location );
-		return $location;
+		return esc_url( $location );
 	}
 
 	private function print_eta() {
@@ -367,7 +367,7 @@ function wpsc_convert_products_to_posts() {
 	if ( ! empty($wpdb->collate) )
 		$charset_collate .= " COLLATE $wpdb->collate";
 
-	if ( ! $offset = _wpsc_get_transient( 'wpsc_update_product_offset' ) )
+	if ( ! $offset = get_transient( 'wpsc_update_product_offset' ) )
 		$offset = 0;
 	$limit = 90;
 	$sql = "
@@ -375,7 +375,7 @@ function wpsc_convert_products_to_posts() {
 		WHERE active = '1'
 		LIMIT %d, %d
 	";
-	$post_created = _wpsc_get_transient( 'wpsc_update_current_product' );
+	$post_created = get_transient( 'wpsc_update_current_product' );
 	$total = $wpdb->get_var( "SELECT COUNT(*) FROM " . WPSC_TABLE_PRODUCT_LIST . " WHERE active='1'" );
 	$progress = new WPSC_Update_Progress( $total );
 
@@ -434,7 +434,7 @@ function wpsc_convert_products_to_posts() {
 					'original_id' => $product['id'],
 					'post_id' => $post_id,
 				);
-				_wpsc_set_transient( 'wpsc_update_current_product', $post_created, 604800 );
+				set_transient( 'wpsc_update_current_product', $post_created, 604800 );
 			}
 			$product_meta_sql = $wpdb->prepare( "
 				SELECT 	IF( ( `custom` != 1	),
@@ -560,7 +560,7 @@ function wpsc_convert_products_to_posts() {
 			}
 			$i ++;
 			$progress->update( $i );
-			_wpsc_set_transient( 'wpsc_update_product_offset', $i, 604800 );
+			set_transient( 'wpsc_update_product_offset', $i, 604800 );
 		}
 
 		$offset += $limit;
@@ -586,7 +586,7 @@ function wpsc_convert_variation_combinations() {
 	global $wpdb, $user_ID, $current_version_number;
 	$wpsc_update = WPSC_Update::get_instance();
 	remove_filter( 'get_terms', 'wpsc_get_terms_category_sort_filter' );
-	if ( ! $offset = _wpsc_get_transient( 'wpsc_update_variation_comb_offset' ) )
+	if ( ! $offset = get_transient( 'wpsc_update_variation_comb_offset' ) )
 		$offset = 0;
 	$limit = 150;
 	wp_defer_term_counting( true );
@@ -634,7 +634,7 @@ function wpsc_convert_variation_combinations() {
 				// otherwise, we have no active variations, skip to the next product
 				$i++;
 				$progress->update( $i );
-				_wpsc_set_transient( 'wpsc_update_variation_comb_offset', $i, 604800 );
+				set_transient( 'wpsc_update_variation_comb_offset', $i, 604800 );
 				continue;
 			}
 
@@ -756,7 +756,7 @@ function wpsc_convert_variation_combinations() {
 						wp_set_object_terms($child_product_id, $term_data['slugs'], 'wpsc-variation');
 						if ( ! $already_exists ) {
 							$child_products[$key] = $child_product_id;
-							_wpsc_set_transient( 'wpsc_update_current_child_products', $child_products, 604800 );
+							set_transient( 'wpsc_update_current_child_products', $child_products, 604800 );
 						}
 					}
 
@@ -766,8 +766,8 @@ function wpsc_convert_variation_combinations() {
 			}
 			$i++;
 			$progress->update( $i );
-			_wpsc_set_transient( 'wpsc_update_variation_comb_offset', $i, 604800 );
-			_wpsc_delete_transient( 'wpsc_update_current_child_products' );
+			set_transient( 'wpsc_update_variation_comb_offset', $i, 604800 );
+			delete_transient( 'wpsc_update_current_child_products' );
 		}
 
 		$offset += $limit;
