@@ -13,7 +13,7 @@ function _wpsc_action_theme_engine_v1_constants() {
 	define( 'WPSC_CORE_THEME_URL' , WPSC_THEME_ENGINE_V1_URL  . '/templates/' );
 
 	// No transient so look for the themes directory
-	if ( false === ( $theme_path = _wpsc_get_transient( 'wpsc_theme_path' ) ) ) {
+	if ( false === ( $theme_path = get_transient( 'wpsc_theme_path' ) ) ) {
 
 		// Use the old path if it exists
 		if ( file_exists( WPSC_OLD_THEMES_PATH . get_option('wpsc_selected_theme') ) )
@@ -24,7 +24,7 @@ function _wpsc_action_theme_engine_v1_constants() {
 			define( 'WPSC_THEMES_PATH', WPSC_CORE_THEME_PATH );
 
 		// Store the theme directory in a transient for safe keeping
-		_wpsc_set_transient( 'wpsc_theme_path', WPSC_THEMES_PATH, 60 * 60 * 12 );
+		set_transient( 'wpsc_theme_path', WPSC_THEMES_PATH, 60 * 60 * 12 );
 
 	// Transient exists, so use that
 	} else {
