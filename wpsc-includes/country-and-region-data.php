@@ -1,338 +1,3475 @@
 <?php
-/*
-** Copyright 2010-2015, Pye Brook Company, Inc.
-**
-**
-** This software is provided under the GNU General Public License, version
-** 2 (GPLv2), that covers its  copying, distribution and modification. The 
-** GPLv2 license specifically states that it only covers only copying,
-** distribution and modification activities. The GPLv2 further states that 
-** all other activities are outside of the scope of the GPLv2.
-**
-** All activities outside the scope of the GPLv2 are covered by the Pye Brook
-** Company, Inc. License. Any right not explicitly granted by the GPLv2, and 
-** not explicitly granted by the Pye Brook Company, Inc. License are reserved
-** by the Pye Brook Company, Inc.
-**
-** This software is copyrighted and the property of Pye Brook Company, Inc.
-**
-** Contact Pye Brook Company, Inc. at info@pyebrook.com for more information.
-**
-** This program is distributed in the hope that it will be useful, but WITHOUT ANY 
-** WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-** A PARTICULAR PURPOSE. 
-**
-*/
-
 
 /**
- * @param $country_id
- * @param $country_name
- * @param $country_iso_code
- * @param $currency_name
- * @param $currency_symbol
- * @param $currency_symbol_html
- * @param $currency_text_code
- * @param $has_regions
- * @param $tax
- * @param $continent
- * @param $visible
  *
  * @return array
  */
-function _wpsc_make_country_array_element( $country_id, $country_name, $country_iso_code, $currency_name, $currency_symbol, $currency_symbol_html, $currency_text_code, $has_regions, $tax, $continent, $visible ) {
+function _wpsc_get_countries_data_array() {
 
-	return array(
-		'id'          => $country_id,
-		'name'        => $country_name,
-		'isocode'     => $country_iso_code,
-		'currency'    => $currency_name,
-		'symbol'      => $currency_symbol,
-		'symbol_html' => $currency_symbol_html,
-		'code'        => $currency_text_code,
-		'has_regions' => $has_regions,
-		'tax'         => $tax,
-		'continent'   => $continent,
-		'visible'     => $visible
-	);
+    $countries = array(
+        1 => array(
+            'name' => __('Mauritania', 'wpsc'),
+            'isocode' => 'MR',
+            'currency_name' => __('Mauritanian Ouguiya', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MRO',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        2 => array(
+            'name' => __('Martinique (French)', 'wpsc'),
+            'isocode' => 'MQ',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        3 => array(
+            'name' => __('Malta', 'wpsc'),
+            'isocode' => 'MT',
+            'currency_name' => __('Maltese Lira', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MTL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        4 => array(
+            'name' => __('Marshall Islands', 'wpsc'),
+            'isocode' => 'MH',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        5 => array(
+            'name' => __('Mali', 'wpsc'),
+            'isocode' => 'ML',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        6 => array(
+            'name' => __('Maldives', 'wpsc'),
+            'isocode' => 'MV',
+            'currency_name' => __('Maldive Rufiyaa', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MVR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        7 => array(
+            'name' => __('Malaysia', 'wpsc'),
+            'isocode' => 'MY',
+            'currency_name' => __('Malaysian Ringgit', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MYR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        8 => array(
+            'name' => __('Malawi', 'wpsc'),
+            'isocode' => 'MW',
+            'currency_name' => __('Malawi Kwacha', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MWK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        9 => array(
+            'name' => __('Madagascar', 'wpsc'),
+            'isocode' => 'MG',
+            'currency_name' => __('Malagasy Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MGF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        10 => array(
+            'name' => __('Macau', 'wpsc'),
+            'isocode' => 'MO',
+            'currency_name' => __('Macau Pataca', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MOP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        11 => array(
+            'name' => __('Macedonia', 'wpsc'),
+            'isocode' => 'MK',
+            'currency_name' => __('Denar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MKD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        12 => array(
+            'name' => __('Luxembourg', 'wpsc'),
+            'isocode' => 'LU',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        13 => array(
+            'name' => __('Lithuania', 'wpsc'),
+            'isocode' => 'LT',
+            'currency_name' => __('Lithuanian Litas', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LTL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        14 => array(
+            'name' => __('Liechtenstein', 'wpsc'),
+            'isocode' => 'LI',
+            'currency_name' => __('Swiss Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CHF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        15 => array(
+            'name' => __('Libya', 'wpsc'),
+            'isocode' => 'LY',
+            'currency_name' => __('Libyan Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LYD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        16 => array(
+            'name' => __('Liberia', 'wpsc'),
+            'isocode' => 'LR',
+            'currency_name' => __('Liberian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'LRD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        17 => array(
+            'name' => __('Lesotho', 'wpsc'),
+            'isocode' => 'LS',
+            'currency_name' => __('Lesotho Loti', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LSL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        18 => array(
+            'name' => __('Lebanon', 'wpsc'),
+            'isocode' => 'LB',
+            'currency_name' => __('Lebanese Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        19 => array(
+            'name' => __('Latvia', 'wpsc'),
+            'isocode' => 'LV',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        20 => array(
+            'name' => __('Laos', 'wpsc'),
+            'isocode' => 'LA',
+            'currency_name' => __('Lao Kip', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LAK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        21 => array(
+            'name' => __('Kyrgyzstan', 'wpsc'),
+            'isocode' => 'KG',
+            'currency_name' => __('Som', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KGS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        22 => array(
+            'name' => __('Kuwait', 'wpsc'),
+            'isocode' => 'KW',
+            'currency_name' => __('Kuwaiti Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KWD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        23 => array(
+            'name' => __('Korea, South', 'wpsc'),
+            'isocode' => 'KR',
+            'currency_name' => __('Korean Won', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KRW',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        24 => array(
+            'name' => __('Korea, North', 'wpsc'),
+            'isocode' => 'KP',
+            'currency_name' => __('North Korean Won', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KPW',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        25 => array(
+            'name' => __('Kiribati', 'wpsc'),
+            'isocode' => 'KI',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        26 => array(
+            'name' => __('Kenya', 'wpsc'),
+            'isocode' => 'KE',
+            'currency_name' => __('Kenyan Shilling', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KES',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        27 => array(
+            'name' => __('Kazakhstan', 'wpsc'),
+            'isocode' => 'KZ',
+            'currency_name' => __('Kazakhstan Tenge', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KZT',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        28 => array(
+            'name' => __('Jordan', 'wpsc'),
+            'isocode' => 'JO',
+            'currency_name' => __('Jordanian Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'JOD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        29 => array(
+            'name' => __('Jersey', 'wpsc'),
+            'isocode' => 'JE',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        30 => array(
+            'name' => __('Japan', 'wpsc'),
+            'isocode' => 'JP',
+            'currency_name' => __('Japanese Yen', 'wpsc'),
+            'currency_symbol' => __( '¥', 'wpsc' ),
+            'currency_symbol_html' => '&#165;',
+            'currency_code' => 'JPY',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        31 => array(
+            'name' => __('Jamaica', 'wpsc'),
+            'isocode' => 'JM',
+            'currency_name' => __('Jamaican Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'JMD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        32 => array(
+            'name' => __('Ivory Coast', 'wpsc'),
+            'isocode' => 'CI',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        33 => array(
+            'name' => __('Italy', 'wpsc'),
+            'isocode' => 'IT',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        34 => array(
+            'name' => __('Isle of Man', 'wpsc'),
+            'isocode' => 'IM',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        35 => array(
+            'name' => __('Israel', 'wpsc'),
+            'isocode' => 'IL',
+            'currency_name' => __('Israeli New Shekel', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ILS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        36 => array(
+            'name' => __('Ireland', 'wpsc'),
+            'isocode' => 'IE',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        37 => array(
+            'name' => __('Iraq', 'wpsc'),
+            'isocode' => 'IQ',
+            'currency_name' => __('Iraqi Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'IQD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        38 => array(
+            'name' => __('Indonesia', 'wpsc'),
+            'isocode' => 'ID',
+            'currency_name' => __('Indonesian Rupiah', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'IDR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        39 => array(
+            'name' => __('Iran', 'wpsc'),
+            'isocode' => 'IR',
+            'currency_name' => __('Iranian Rial', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'IRR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        40 => array(
+            'name' => __('India', 'wpsc'),
+            'isocode' => 'IN',
+            'currency_name' => __('Indian Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'INR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        41 => array(
+            'name' => __('Iceland', 'wpsc'),
+            'isocode' => 'IS',
+            'currency_name' => __('Iceland Krona', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ISK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        42 => array(
+            'name' => __('Hungary', 'wpsc'),
+            'isocode' => 'HU',
+            'currency_name' => __('Hungarian Forint', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'HUF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        43 => array(
+            'name' => __('Hong Kong', 'wpsc'),
+            'isocode' => 'HK',
+            'currency_name' => __('Hong Kong Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'HKD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        44 => array(
+            'name' => __('Honduras', 'wpsc'),
+            'isocode' => 'HN',
+            'currency_name' => __('Honduran Lempira', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'HNL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        45 => array(
+            'name' => __('Heard Island and McDonald Islands', 'wpsc'),
+            'isocode' => 'HM',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        46 => array(
+            'name' => __('Haiti', 'wpsc'),
+            'isocode' => 'HT',
+            'currency_name' => __('Haitian Gourde', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'HTG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        47 => array(
+            'name' => __('Guyana', 'wpsc'),
+            'isocode' => 'GY',
+            'currency_name' => __('Guyana Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'GYD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        48 => array(
+            'name' => __('Guinea Bissau', 'wpsc'),
+            'isocode' => 'GW',
+            'currency_name' => __('Guinea-Bissau Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GWP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        49 => array(
+            'name' => __('Guinea', 'wpsc'),
+            'isocode' => 'GN',
+            'currency_name' => __('Guinea Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GNF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        50 => array(
+            'name' => __('Guernsey', 'wpsc'),
+            'isocode' => 'GF',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        51 => array(
+            'name' => __('Guatemala', 'wpsc'),
+            'isocode' => 'GT',
+            'currency_name' => __('Guatemalan Quetzal', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'QTQ',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        52 => array(
+            'name' => __('Guam (USA)', 'wpsc'),
+            'isocode' => 'GU',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        53 => array(
+            'name' => __('Grenada', 'wpsc'),
+            'isocode' => 'GD',
+            'currency_name' => __('East Carribean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        54 => array(
+            'name' => __('Guadeloupe (French)', 'wpsc'),
+            'isocode' => 'GP',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        55 => array(
+            'name' => __('Greenland', 'wpsc'),
+            'isocode' => 'GL',
+            'currency_name' => __('Danish Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DKK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        56 => array(
+            'name' => __('Greece', 'wpsc'),
+            'isocode' => 'GR',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '19',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        57 => array(
+            'name' => __('Gibraltar', 'wpsc'),
+            'isocode' => 'GI',
+            'currency_name' => __('Gibraltar Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GIP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        58 => array(
+            'name' => __('Ghana', 'wpsc'),
+            'isocode' => 'GH',
+            'currency_name' => __('Ghanaian Cedi', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GHC',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        59 => array(
+            'name' => __('Germany', 'wpsc'),
+            'isocode' => 'DE',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        60 => array(
+            'name' => __('Georgia', 'wpsc'),
+            'isocode' => 'GE',
+            'currency_name' => __('Georgian Lari', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GEL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        61 => array(
+            'name' => __('Gambia', 'wpsc'),
+            'isocode' => 'GM',
+            'currency_name' => __('Gambian Dalasi', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'GMD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        62 => array(
+            'name' => __('Gabon', 'wpsc'),
+            'isocode' => 'GA',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        63 => array(
+            'name' => __('French Southern Territories', 'wpsc'),
+            'isocode' => 'TF',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        64 => array(
+            'name' => __('France', 'wpsc'),
+            'isocode' => 'FR',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        65 => array(
+            'name' => __('Finland', 'wpsc'),
+            'isocode' => 'FI',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        66 => array(
+            'name' => __('Fiji', 'wpsc'),
+            'isocode' => 'FJ',
+            'currency_name' => __('Fiji Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'FJD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        67 => array(
+            'name' => __('Faroe Islands', 'wpsc'),
+            'isocode' => 'FO',
+            'currency_name' => __('Danish Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DKK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        68 => array(
+            'name' => __('Falkland Islands', 'wpsc'),
+            'isocode' => 'FK',
+            'currency_name' => __('Falkland Islands Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'FKP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        69 => array(
+            'name' => __('Ethiopia', 'wpsc'),
+            'isocode' => 'ET',
+            'currency_name' => __('Ethiopian Birr', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ETB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        70 => array(
+            'name' => __('Estonia', 'wpsc'),
+            'isocode' => 'EE',
+            'currency_name' => __('Estonian Kroon', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'EEK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        71 => array(
+            'name' => __('Eritrea', 'wpsc'),
+            'isocode' => 'ER',
+            'currency_name' => __('Eritrean Nakfa', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ERN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        72 => array(
+            'name' => __('Equatorial Guinea', 'wpsc'),
+            'isocode' => 'GQ',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        73 => array(
+            'name' => __('El Salvador', 'wpsc'),
+            'isocode' => 'SV',
+            'currency_name' => __('El Salvador Colon', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SVC',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        74 => array(
+            'name' => __('Egypt', 'wpsc'),
+            'isocode' => 'EG',
+            'currency_name' => __('Egyptian Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'EGP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        75 => array(
+            'name' => __('Ecuador', 'wpsc'),
+            'isocode' => 'EC',
+            'currency_name' => __('Ecuador Sucre', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ECS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        76 => array(
+            'name' => __('East Timor', 'wpsc'),
+            'isocode' => 'TP',
+            'currency_name' => __('Timor Escudo', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TPE',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        77 => array(
+            'name' => __('Dominican Republic', 'wpsc'),
+            'isocode' => 'DO',
+            'currency_name' => __('Dominican Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DOP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        78 => array(
+            'name' => __('Dominica', 'wpsc'),
+            'isocode' => 'DM',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        79 => array(
+            'name' => __('Djibouti', 'wpsc'),
+            'isocode' => 'DJ',
+            'currency_name' => __('Djibouti Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DJF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        80 => array(
+            'name' => __('Denmark', 'wpsc'),
+            'isocode' => 'DK',
+            'currency_name' => __('Danish Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DKK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        81 => array(
+            'name' => __('Democratic Republic of Congo', 'wpsc'),
+            'isocode' => 'CD',
+            'currency_name' => __('Francs', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CDF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        82 => array(
+            'name' => __('Czech Rep.', 'wpsc'),
+            'isocode' => 'CZ',
+            'currency_name' => __('Czech Koruna', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CZK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        83 => array(
+            'name' => __('Cyprus', 'wpsc'),
+            'isocode' => 'CY',
+            'currency_name' => __('Cyprus Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CYP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        84 => array(
+            'name' => __('Cuba', 'wpsc'),
+            'isocode' => 'CU',
+            'currency_name' => __('Cuban Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CUP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        85 => array(
+            'name' => __('Croatia', 'wpsc'),
+            'isocode' => 'HR',
+            'currency_name' => __('Croatian Kuna', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'HRK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        86 => array(
+            'name' => __('Costa Rica', 'wpsc'),
+            'isocode' => 'CR',
+            'currency_name' => __('Costa Rican Colon', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CRC',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        87 => array(
+            'name' => __('Cook Islands', 'wpsc'),
+            'isocode' => 'CK',
+            'currency_name' => __('New Zealand Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        88 => array(
+            'name' => __('Congo', 'wpsc'),
+            'isocode' => 'CG',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        89 => array(
+            'name' => __('Comoros', 'wpsc'),
+            'isocode' => 'KM',
+            'currency_name' => __('Comoros Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KMF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        90 => array(
+            'name' => __('Colombia', 'wpsc'),
+            'isocode' => 'CO',
+            'currency_name' => __('Colombian Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'COP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        91 => array(
+            'name' => __('Cocos (Keeling) Islands', 'wpsc'),
+            'isocode' => 'CC',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        92 => array(
+            'name' => __('Christmas Island', 'wpsc'),
+            'isocode' => 'CX',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        93 => array(
+            'name' => __('Chile', 'wpsc'),
+            'isocode' => 'CL',
+            'currency_name' => __('Chilean Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CLP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        94 => array(
+            'name' => __('China', 'wpsc'),
+            'isocode' => 'CN',
+            'currency_name' => __('Yuan Renminbi', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CNY',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        95 => array(
+            'name' => __('Chad', 'wpsc'),
+            'isocode' => 'TD',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        96 => array(
+            'name' => __('Central African Republic', 'wpsc'),
+            'isocode' => 'CF',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        97 => array(
+            'name' => __('Cayman Islands', 'wpsc'),
+            'isocode' => 'KY',
+            'currency_name' => __('Cayman Islands Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'KYD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        98 => array(
+            'name' => __('Cape Verde', 'wpsc'),
+            'isocode' => 'CV',
+            'currency_name' => __('Cape Verde Escudo', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CVE',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        99 => array(
+            'name' => __('Cameroon', 'wpsc'),
+            'isocode' => 'CM',
+            'currency_name' => __('CFA Franc BEAC', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XAF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        100 => array(
+            'name' => __('Canada', 'wpsc'),
+            'isocode' => 'CA',
+            'currency_name' => __('Canadian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'CAD',
+            'has_regions' => true,
+            'tax' => '',
+            'continent' => 'northamerica',
+            'visible' => true
+        ),
+        101 => array(
+            'name' => __('Cambodia', 'wpsc'),
+            'isocode' => 'KH',
+            'currency_name' => __('Kampuchean Riel', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'KHR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        102 => array(
+            'name' => __('Burundi', 'wpsc'),
+            'isocode' => 'BI',
+            'currency_name' => __('Burundi Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BIF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        103 => array(
+            'name' => __('Burkina Faso', 'wpsc'),
+            'isocode' => 'BF',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        104 => array(
+            'name' => __('Bulgaria', 'wpsc'),
+            'isocode' => 'BG',
+            'currency_name' => __('Bulgarian Lev', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BGL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        105 => array(
+            'name' => __('Brunei Darussalam', 'wpsc'),
+            'isocode' => 'BN',
+            'currency_name' => __('Brunei Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'BND',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        106 => array(
+            'name' => __('British Indian Ocean Territory', 'wpsc'),
+            'isocode' => 'IO',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        107 => array(
+            'name' => __('Brazil', 'wpsc'),
+            'isocode' => 'BR',
+            'currency_name' => __('Brazilian Real', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BRL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        108 => array(
+            'name' => __('Bouvet Island', 'wpsc'),
+            'isocode' => 'BV',
+            'currency_name' => __('Norwegian Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NOK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        109 => array(
+            'name' => __('Botswana', 'wpsc'),
+            'isocode' => 'BW',
+            'currency_name' => __('Botswana Pula', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BWP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        110 => array(
+            'name' => __('Bosnia-Herzegovina', 'wpsc'),
+            'isocode' => 'BA',
+            'currency_name' => __('Marka', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BAM',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        111 => array(
+            'name' => __('Bolivia', 'wpsc'),
+            'isocode' => 'BO',
+            'currency_name' => __('Boliviano', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BOB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        112 => array(
+            'name' => __('Bhutan', 'wpsc'),
+            'isocode' => 'BT',
+            'currency_name' => __('Bhutan Ngultrum', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BTN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        113 => array(
+            'name' => __('Bermuda', 'wpsc'),
+            'isocode' => 'BM',
+            'currency_name' => __('Bermudian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'BMD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        114 => array(
+            'name' => __('Benin', 'wpsc'),
+            'isocode' => 'BJ',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        115 => array(
+            'name' => __('Belize', 'wpsc'),
+            'isocode' => 'BZ',
+            'currency_name' => __('Belize Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'BZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        116 => array(
+            'name' => __('Belgium', 'wpsc'),
+            'isocode' => 'BE',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        117 => array(
+            'name' => __('Belarus', 'wpsc'),
+            'isocode' => 'BY',
+            'currency_name' => __('Belarussian Ruble', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BYB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        118 => array(
+            'name' => __('Barbados', 'wpsc'),
+            'isocode' => 'BB',
+            'currency_name' => __('Barbados Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'BBD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        119 => array(
+            'name' => __('Bangladesh', 'wpsc'),
+            'isocode' => 'BD',
+            'currency_name' => __('Bangladeshi Taka', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BDT',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        120 => array(
+            'name' => __('Bahrain', 'wpsc'),
+            'isocode' => 'BH',
+            'currency_name' => __('Bahraini Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'BHD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        121 => array(
+            'name' => __('Bahamas', 'wpsc'),
+            'isocode' => 'BS',
+            'currency_name' => __('Bahamian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'BSD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        122 => array(
+            'name' => __('Azerbaijan', 'wpsc'),
+            'isocode' => 'AZ',
+            'currency_name' => __('Azerbaijanian Manat', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AZM',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        123 => array(
+            'name' => __('Austria', 'wpsc'),
+            'isocode' => 'AT',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        124 => array(
+            'name' => __('Aruba', 'wpsc'),
+            'isocode' => 'AW',
+            'currency_name' => __('Aruban Guilder', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AWG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        125 => array(
+            'name' => __('Armenia', 'wpsc'),
+            'isocode' => 'AM',
+            'currency_name' => __('Armenian Dram', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AMD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        126 => array(
+            'name' => __('Argentina', 'wpsc'),
+            'isocode' => 'AR',
+            'currency_name' => __('Argentine Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ARS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        127 => array(
+            'name' => __('Antigua and Barbuda', 'wpsc'),
+            'isocode' => 'AG',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        128 => array(
+            'name' => __('Antarctica', 'wpsc'),
+            'isocode' => 'AQ',
+            'currency_name' => __('Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'ATA',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'antarctica',
+           'visible' => true
+        ),
+        129 => array(
+            'name' => __('Anguilla', 'wpsc'),
+            'isocode' => 'AI',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        130 => array(
+            'name' => __('Angola', 'wpsc'),
+            'isocode' => 'AO',
+            'currency_name' => __('Angolan New Kwanza', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AON',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        131 => array(
+            'name' => __('Andorra', 'wpsc'),
+            'isocode' => 'AD',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        132 => array(
+            'name' => __('American Samoa', 'wpsc'),
+            'isocode' => 'AS',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        133 => array(
+            'name' => __('Algeria', 'wpsc'),
+            'isocode' => 'DZ',
+            'currency_name' => __('Algerian Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'DZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        134 => array(
+            'name' => __('Albania', 'wpsc'),
+            'isocode' => 'AL',
+            'currency_name' => __('Albanian Lek', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ALL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        135 => array(
+            'name' => __('Afghanistan', 'wpsc'),
+            'isocode' => 'AF',
+            'currency_name' => __('Afghanistan Afghani', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AFA',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        136 => array(
+            'name' => __('USA', 'wpsc'),
+            'isocode' => 'US',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => true,
+            'tax' => '',
+            'continent' => 'northamerica',
+            'visible' => true
+        ),
+        137 => array(
+            'name' => __('Australia', 'wpsc'),
+            'isocode' => 'AU',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        138 => array(
+            'name' => __('United Kingdom', 'wpsc'),
+            'isocode' => 'GB',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        139 => array(
+            'name' => __('Mauritius', 'wpsc'),
+            'isocode' => 'MU',
+            'currency_name' => __('Mauritius Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        140 => array(
+            'name' => __('Mayotte', 'wpsc'),
+            'isocode' => 'YT',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        141 => array(
+            'name' => __('Mexico', 'wpsc'),
+            'isocode' => 'MX',
+            'currency_name' => __('Mexican Nuevo Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MXN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        142 => array(
+            'name' => __('Micronesia', 'wpsc'),
+            'isocode' => 'FM',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        143 => array(
+            'name' => __('Moldova', 'wpsc'),
+            'isocode' => 'MD',
+            'currency_name' => __('Moldovan Leu', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MDL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        144 => array(
+            'name' => __('Monaco', 'wpsc'),
+            'isocode' => 'MC',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        145 => array(
+            'name' => __('Mongolia', 'wpsc'),
+            'isocode' => 'MN',
+            'currency_name' => __('Mongolian Tugrik', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MNT',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        146 => array(
+            'name' => __('Montserrat', 'wpsc'),
+            'isocode' => 'MS',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        147 => array(
+            'name' => __('Morocco', 'wpsc'),
+            'isocode' => 'MA',
+            'currency_name' => __('Moroccan Dirham', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MAD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        148 => array(
+            'name' => __('Mozambique', 'wpsc'),
+            'isocode' => 'MZ',
+            'currency_name' => __('Mozambique Metical', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MZM',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        149 => array(
+            'name' => __('Myanmar', 'wpsc'),
+            'isocode' => 'MM',
+            'currency_name' => __('Myanmar Kyat', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MMK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        150 => array(
+            'name' => __('Namibia', 'wpsc'),
+            'isocode' => 'NA',
+            'currency_name' => __('Namibian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NAD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        151 => array(
+            'name' => __('Nauru', 'wpsc'),
+            'isocode' => 'NR',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        152 => array(
+            'name' => __('Nepal', 'wpsc'),
+            'isocode' => 'NP',
+            'currency_name' => __('Nepalese Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NPR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        153 => array(
+            'name' => __('Netherlands', 'wpsc'),
+            'isocode' => 'NL',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        154 => array(
+            'name' => __('Netherlands Antilles', 'wpsc'),
+            'isocode' => 'AN',
+            'currency_name' => __('Netherlands Antillean Guilder', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ANG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        155 => array(
+            'name' => __('New Caledonia (French)', 'wpsc'),
+            'isocode' => 'NC',
+            'currency_name' => __('CFP Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XPF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        156 => array(
+            'name' => __('New Zealand', 'wpsc'),
+            'isocode' => 'NZ',
+            'currency_name' => __('New Zealand Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NZD',
+            'has_regions' => false,
+            'tax' => '12.5',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        157 => array(
+            'name' => __('Nicaragua', 'wpsc'),
+            'isocode' => 'NI',
+            'currency_name' => __('Nicaraguan Cordoba Oro', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NIC',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        158 => array(
+            'name' => __('Niger', 'wpsc'),
+            'isocode' => 'NE',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        159 => array(
+            'name' => __('Nigeria', 'wpsc'),
+            'isocode' => 'NG',
+            'currency_name' => __('Nigerian Naira', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NGN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        160 => array(
+            'name' => __('Niue', 'wpsc'),
+            'isocode' => 'NU',
+            'currency_name' => __('New Zealand Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        161 => array(
+            'name' => __('Norfolk Island', 'wpsc'),
+            'isocode' => 'NF',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        162 => array(
+            'name' => __('Northern Mariana Islands', 'wpsc'),
+            'isocode' => 'MP',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        163 => array(
+            'name' => __('Norway', 'wpsc'),
+            'isocode' => 'NO',
+            'currency_name' => __('Norwegian Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NOK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        164 => array(
+            'name' => __('Oman', 'wpsc'),
+            'isocode' => 'OM',
+            'currency_name' => __('Omani Rial', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'OMR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        165 => array(
+            'name' => __('Pakistan', 'wpsc'),
+            'isocode' => 'PK',
+            'currency_name' => __('Pakistan Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PKR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        166 => array(
+            'name' => __('Palau', 'wpsc'),
+            'isocode' => 'PW',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        167 => array(
+            'name' => __('Panama', 'wpsc'),
+            'isocode' => 'PA',
+            'currency_name' => __('Panamanian Balboa', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PAB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        168 => array(
+            'name' => __('Papua New Guinea', 'wpsc'),
+            'isocode' => 'PG',
+            'currency_name' => __('Papua New Guinea Kina', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PGK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        169 => array(
+            'name' => __('Paraguay', 'wpsc'),
+            'isocode' => 'PY',
+            'currency_name' => __('Paraguay Guarani', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PYG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        170 => array(
+            'name' => __('Peru', 'wpsc'),
+            'isocode' => 'PE',
+            'currency_name' => __('Peruvian Nuevo Sol', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PEN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        171 => array(
+            'name' => __('Philippines', 'wpsc'),
+            'isocode' => 'PH',
+            'currency_name' => __('Philippine Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PHP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        172 => array(
+            'name' => __('Pitcairn Island', 'wpsc'),
+            'isocode' => 'PN',
+            'currency_name' => __('New Zealand Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        173 => array(
+            'name' => __('Poland', 'wpsc'),
+            'isocode' => 'PL',
+            'currency_name' => __('Polish Zloty', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'PLN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        174 => array(
+            'name' => __('Polynesia (French)', 'wpsc'),
+            'isocode' => 'PF',
+            'currency_name' => __('CFP Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XPF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        175 => array(
+            'name' => __('Portugal', 'wpsc'),
+            'isocode' => 'PT',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        176 => array(
+            'name' => __('Puerto Rico', 'wpsc'),
+            'isocode' => 'PR',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        177 => array(
+            'name' => __('Qatar', 'wpsc'),
+            'isocode' => 'QA',
+            'currency_name' => __('Qatari Rial', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'QAR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        178 => array(
+            'name' => __('Reunion (French)', 'wpsc'),
+            'isocode' => 'RE',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        179 => array(
+            'name' => __('Romania', 'wpsc'),
+            'isocode' => 'RO',
+            'currency_name' => __('Romanian Leu', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'RON',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        180 => array(
+            'name' => __('Russia', 'wpsc'),
+            'isocode' => 'RU',
+            'currency_name' => __('Russian Ruble', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'RUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        181 => array(
+            'name' => __('Rwanda', 'wpsc'),
+            'isocode' => 'RW',
+            'currency_name' => __('Rwanda Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'RWF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        182 => array(
+            'name' => __('Saint Helena', 'wpsc'),
+            'isocode' => 'SH',
+            'currency_name' => __('St. Helena Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SHP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        183 => array(
+            'name' => __('Saint Kitts & Nevis Anguilla', 'wpsc'),
+            'isocode' => 'KN',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        184 => array(
+            'name' => __('Saint Lucia', 'wpsc'),
+            'isocode' => 'LC',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        185 => array(
+            'name' => __('Saint Pierre and Miquelon', 'wpsc'),
+            'isocode' => 'PM',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        186 => array(
+            'name' => __('Saint Vincent & Grenadines', 'wpsc'),
+            'isocode' => 'VC',
+            'currency_name' => __('East Caribbean Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'XCD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        187 => array(
+            'name' => __('Samoa', 'wpsc'),
+            'isocode' => 'WS',
+            'currency_name' => __('Samoan Tala', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'WST',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        188 => array(
+            'name' => __('San Marino', 'wpsc'),
+            'isocode' => 'SM',
+            'currency_name' => __('Italian Lira', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ITL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        189 => array(
+            'name' => __('Sao Tome and Principe', 'wpsc'),
+            'isocode' => 'ST',
+            'currency_name' => __('Dobra', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'STD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        190 => array(
+            'name' => __('Saudi Arabia', 'wpsc'),
+            'isocode' => 'SA',
+            'currency_name' => __('Saudi Riyal', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SAR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        191 => array(
+            'name' => __('Senegal', 'wpsc'),
+            'isocode' => 'SN',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        192 => array(
+            'name' => __('Seychelles', 'wpsc'),
+            'isocode' => 'SC',
+            'currency_name' => __('Seychelles Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SCR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        193 => array(
+            'name' => __('Sierra Leone', 'wpsc'),
+            'isocode' => 'SL',
+            'currency_name' => __('Sierra Leone Leone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SLL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        194 => array(
+            'name' => __('Singapore', 'wpsc'),
+            'isocode' => 'SG',
+            'currency_name' => __('Singapore Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'SGD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        195 => array(
+            'name' => __('Slovakia', 'wpsc'),
+            'isocode' => 'SK',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        196 => array(
+            'name' => __('Slovenia', 'wpsc'),
+            'isocode' => 'SI',
+            'currency_name' => __('Slovenian Tolar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SIT',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        197 => array(
+            'name' => __('Solomon Islands', 'wpsc'),
+            'isocode' => 'SB',
+            'currency_name' => __('Solomon Islands Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'SBD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        198 => array(
+            'name' => __('Somalia', 'wpsc'),
+            'isocode' => 'SO',
+            'currency_name' => __('Somali Shilling', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SOD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        199 => array(
+            'name' => __('South Africa', 'wpsc'),
+            'isocode' => 'ZA',
+            'currency_name' => __('South African Rand', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ZAR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        200 => array(
+            'name' => __('South Georgia & South Sandwich Islands', 'wpsc'),
+            'isocode' => 'GS',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        201 => array(
+            'name' => __('Spain', 'wpsc'),
+            'isocode' => 'ES',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        202 => array(
+            'name' => __('Sri Lanka', 'wpsc'),
+            'isocode' => 'LK',
+            'currency_name' => __('Sri Lanka Rupee', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'LKR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        203 => array(
+            'name' => __('Sudan', 'wpsc'),
+            'isocode' => 'SD',
+            'currency_name' => __('Sudanese Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SDD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        204 => array(
+            'name' => __('Suriname', 'wpsc'),
+            'isocode' => 'SR',
+            'currency_name' => __('Surinam Guilder', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SRG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        205 => array(
+            'name' => __('Svalbard and Jan Mayen Islands', 'wpsc'),
+            'isocode' => 'SJ',
+            'currency_name' => __('Norwegian Krone', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'NOK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => '',
+           'visible' => true
+        ),
+        206 => array(
+            'name' => __('Swaziland', 'wpsc'),
+            'isocode' => 'SZ',
+            'currency_name' => __('Swaziland Lilangeni', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SZL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        207 => array(
+            'name' => __('Sweden', 'wpsc'),
+            'isocode' => 'SE',
+            'currency_name' => __('Swedish Krona', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SEK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        208 => array(
+            'name' => __('Switzerland', 'wpsc'),
+            'isocode' => 'CH',
+            'currency_name' => __('Swiss Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'CHF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        209 => array(
+            'name' => __('Syria', 'wpsc'),
+            'isocode' => 'SY',
+            'currency_name' => __('Syrian Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SYP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        210 => array(
+            'name' => __('Taiwan', 'wpsc'),
+            'isocode' => 'TW',
+            'currency_name' => __('Taiwan Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'TWD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        211 => array(
+            'name' => __('Tajikistan', 'wpsc'),
+            'isocode' => 'TJ',
+            'currency_name' => __('Tajik Ruble', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TJR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        212 => array(
+            'name' => __('Tanzania', 'wpsc'),
+            'isocode' => 'TZ',
+            'currency_name' => __('Tanzanian Shilling', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TZS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        213 => array(
+            'name' => __('Thailand', 'wpsc'),
+            'isocode' => 'TH',
+            'currency_name' => __('Thai Baht', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'THB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        214 => array(
+            'name' => __('Togo', 'wpsc'),
+            'isocode' => 'TG',
+            'currency_name' => __('CFA Franc BCEAO', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XOF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        215 => array(
+            'name' => __('Tokelau', 'wpsc'),
+            'isocode' => 'TK',
+            'currency_name' => __('New Zealand Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'NZD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        216 => array(
+            'name' => __('Tonga', 'wpsc'),
+            'isocode' => 'TO',
+            'currency_name' => __('Tongan Pa&#699;anga', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TOP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        217 => array(
+            'name' => __('Trinidad and Tobago', 'wpsc'),
+            'isocode' => 'TT',
+            'currency_name' => __('Trinidad and Tobago Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'TTD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        218 => array(
+            'name' => __('Tunisia', 'wpsc'),
+            'isocode' => 'TN',
+            'currency_name' => __('Tunisian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'TND',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        219 => array(
+            'name' => __('Turkey', 'wpsc'),
+            'isocode' => 'TR',
+            'currency_name' => __('Turkish Lira', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TRL',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        220 => array(
+            'name' => __('Turkmenistan', 'wpsc'),
+            'isocode' => 'TM',
+            'currency_name' => __('Manat', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'TMM',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        221 => array(
+            'name' => __('Turks and Caicos Islands', 'wpsc'),
+            'isocode' => 'TC',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        222 => array(
+            'name' => __('Tuvalu', 'wpsc'),
+            'isocode' => 'TV',
+            'currency_name' => __('Australian Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'AUD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        223 => array(
+            'name' => __('U.K.', 'wpsc'),
+            'isocode' => 'UK',
+            'currency_name' => __('Pound Sterling', 'wpsc'),
+            'currency_symbol' => __( '£', 'wpsc' ),
+            'currency_symbol_html' => '&#163;',
+            'currency_code' => 'GBP',
+            'has_regions' => false,
+            'tax' => '17.5',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        224 => array(
+            'name' => __('Uganda', 'wpsc'),
+            'isocode' => 'UG',
+            'currency_name' => __('Uganda Shilling', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'UGS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        225 => array(
+            'name' => __('Ukraine', 'wpsc'),
+            'isocode' => 'UA',
+            'currency_name' => __('Ukraine Hryvnia', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'UAG',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        226 => array(
+            'name' => __('United Arab Emirates', 'wpsc'),
+            'isocode' => 'AE',
+            'currency_name' => __('Arab Emirates Dirham', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'AED',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        227 => array(
+            'name' => __('Uruguay', 'wpsc'),
+            'isocode' => 'UY',
+            'currency_name' => __('Uruguayan Peso', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'UYP',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        228 => array(
+            'name' => __('USA Minor Outlying Islands', 'wpsc'),
+            'isocode' => 'UM',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => '',
+           'visible' => true
+        ),
+        229 => array(
+            'name' => __('Uzbekistan', 'wpsc'),
+            'isocode' => 'UZ',
+            'currency_name' => __('Uzbekistan Sum', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'UZS',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        230 => array(
+            'name' => __('Vanuatu', 'wpsc'),
+            'isocode' => 'VU',
+            'currency_name' => __('Vanuatu Vatu', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'VUV',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        231 => array(
+            'name' => __('Vatican', 'wpsc'),
+            'isocode' => 'VA',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        232 => array(
+            'name' => __('Venezuela', 'wpsc'),
+            'isocode' => 'VE',
+            'currency_name' => __('Venezuelan Bolivar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'VUB',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        233 => array(
+            'name' => __('Vietnam', 'wpsc'),
+            'isocode' => 'VN',
+            'currency_name' => __('Vietnamese Dong', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'VND',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        234 => array(
+            'name' => __('Virgin Islands (British)', 'wpsc'),
+            'isocode' => 'VG',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        235 => array(
+            'name' => __('Virgin Islands (USA)', 'wpsc'),
+            'isocode' => 'VI',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'northamerica',
+           'visible' => true
+        ),
+        236 => array(
+            'name' => __('Wallis and Futuna Islands', 'wpsc'),
+            'isocode' => 'WF',
+            'currency_name' => __('CFP Franc', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'XPF',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        237 => array(
+            'name' => __('Western Sahara', 'wpsc'),
+            'isocode' => 'EH',
+            'currency_name' => __('Moroccan Dirham', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'MAD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        238 => array(
+            'name' => __('Yemen', 'wpsc'),
+            'isocode' => 'YE',
+            'currency_name' => __('Yemeni Rial', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'YER',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        239 => array(
+            'name' => __('Yugoslavia', 'wpsc'),
+            'isocode' => 'YU',
+            'currency_name' => __('Yugoslav New Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'YUN',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        240 => array(
+            'name' => __('Zambia', 'wpsc'),
+            'isocode' => 'ZM',
+            'currency_name' => __('Zambian Kwacha', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'ZMK',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        241 => array(
+            'name' => __('Zimbabwe', 'wpsc'),
+            'isocode' => 'ZW',
+            'currency_name' => __('Zimbabwe Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'ZWD',
+            'has_regions' => false,
+            'tax' => '0',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        242 => array(
+            'name' => __('South Sudan', 'wpsc'),
+            'isocode' => 'SS',
+            'currency_name' => __('South Sudanese Pound', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'SSP',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'africa',
+           'visible' => true
+        ),
+        243 => array(
+            'name' => __('Serbia', 'wpsc'),
+            'isocode' => 'RS',
+            'currency_name' => __('Serbian Dinar', 'wpsc'),
+            'currency_symbol' => '',
+            'currency_symbol_html' => '',
+            'currency_code' => 'RSD',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        244 => array(
+            'name' => __('Montenegro', 'wpsc'),
+            'isocode' => 'ME',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        245 => array(
+            'name' => __('Timor-Leste', 'wpsc'),
+            'isocode' => 'TL',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036',
+            'currency_code' => 'USD',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        246 => array(
+            'name' => __('Aland Islands', 'wpsc'),
+            'isocode' => 'AX',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        247 => array(
+            'name' => __('Saint Barthelemy', 'wpsc'),
+            'isocode' => 'BL',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'europe',
+           'visible' => true
+        ),
+        248 => array(
+            'name' => __('Bonaire, Sint Eustatius and Saba', 'wpsc'),
+            'isocode' => 'BQ',
+            'currency_name' => __('US Dollar', 'wpsc'),
+            'currency_symbol' => __( '$', 'wpsc' ),
+            'currency_symbol_html' => '&#036;',
+            'currency_code' => 'USD',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        249 => array(
+            'name' => __('Curacao', 'wpsc'),
+            'isocode' => 'CW',
+            'currency_name' => __('Netherlands Antillean Guilder', 'wpsc'),
+            'currency_symbol' => __( 'ƒ', 'wpsc' ),
+            'currency_symbol_html' => '&#402;',
+            'currency_code' => 'ANG',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        250 => array(
+            'name' => __('Saint Martin (French Part)', 'wpsc'),
+            'isocode' => 'MF',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        251 => array(
+            'name' => __('Palestinian Territories', 'wpsc'),
+            'isocode' => 'PS',
+            'currency_name' => __('Israeli New Sheqel', 'wpsc'),
+            'currency_symbol' => __( '?', 'wpsc' ),
+            'currency_symbol_html' => '&#8362;',
+            'currency_code' => 'ILS',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'asiapacific',
+           'visible' => true
+        ),
+        252 => array(
+            'name' => __('Sint Maarten (Dutch Part)', 'wpsc'),
+            'isocode' => 'SX',
+            'currency_name' => __('Netherlands Antillean Guilder', 'wpsc'),
+            'currency_symbol' => __( 'ƒ', 'wpsc' ),
+            'currency_symbol_html' => '&#402;',
+            'currency_code' => 'ANG',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+        253 => array(
+            'name' => __('French Guiana', 'wpsc'),
+            'isocode' => 'GF',
+            'currency_name' => __('Euro', 'wpsc'),
+            'currency_symbol' => __( '€', 'wpsc' ),
+            'currency_symbol_html' => '&#8364;',
+            'currency_code' => 'EUR',
+            'has_regions' => '',
+            'tax' => '',
+            'continent' => 'southamerica',
+           'visible' => true
+        ),
+    );
+    /**
+     * Get or modify the countries data used to initalize WP eCommerce ccuntries data structures
+     *
+     * @since  4.1
+     *
+     * @param array array of associative arrays of country data, each array element should have the following required properties
+     *  country_id
+     *  country_name
+     *  country_iso_code
+     *  currency_name
+     *  currency_symbol
+     *  currency_symbol_html
+     *  currency_text_code
+     *  has_regions
+     *  tax
+     *  continent
+     *  visible
+     */
+    $countries = apply_filters('wpsc_get_countries_data_array', $countries);
+
+    return $countries;
 }
 
-/**
- * @return array
- */
-function _wpsc_get_countries_data_array() {
-	$countries = array();
+function _wpsc_get_regions_data_array()
+{
+    $regions = array(
+        1 => array(
+            'country_id' => 100,
+            'name' => __('Alberta', 'wpsc'),
+            'code' => 'AB',
+            'tax' => '0'
+        ),
+        2 => array(
+            'country_id' => 100,
+            'name' => __('British Columbia', 'wpsc'),
+            'code' => 'BC',
+            'tax' => '0'
+        ),
+        3 => array(
+            'country_id' => 100,
+            'name' => __('Manitoba', 'wpsc'),
+            'code' => 'MB',
+            'tax' => '0'
+        ),
+        4 => array(
+            'country_id' => 100,
+            'name' => __('New Brunswick', 'wpsc'),
+            'code' => 'NB',
+            'tax' => '0'
+        ),
+        5 => array(
+            'country_id' => 100,
+            'name' => 'Newfoundland and Labrador',
+            'code' => 'NL',
+            'tax' => '0'
+        ),
+        6 => array(
+            'country_id' => 100,
+            'name' => __('Northwest Territories', 'wpsc'),
+            'code' => 'NT',
+            'tax' => '0'
+        ),
+        7 => array(
+            'country_id' => 100,
+            'name' => __('Nova Scotia', 'wpsc'),
+            'code' => 'NS',
+            'tax' => '0'
+        ),
+        8 => array(
+            'country_id' => 100,
+            'name' => __('Nunavut', 'wpsc'),
+            'code' => 'NU',
+            'tax' => '0'
+        ),
+        8 => array(
+            'country_id' => 100,
+            'name' => __('Ontario', 'wpsc'),
+            'code' => 'ON',
+            'tax' => '0'
+        ),
+        10 => array(
+            'country_id' => 100,
+            'name' => __('Prince Edward Island', 'wpsc'),
+            'code' => 'PE',
+            'tax' => '0'
+        ),
+        11 => array(
+            'country_id' => 100,
+            'name' => __('Quebec', 'wpsc'),
+            'code' => 'QC',
+            'tax' => '0'
+        ),
+        12 => array(
+            'country_id' => 100,
+            'name' => __('Saskatchewan', 'wpsc'),
+            'code' => 'SK',
+            'tax' => '0'
+        ),
+        13 => array(
+            'country_id' => 100,
+            'name' => __('Yukon', 'wpsc'),
+            'code' => 'YT',
+            'tax' => '0'
+        ),
+        14 => array(
+            'country_id' => 136,
+            'name' => __('Alabama', 'wpsc'),
+            'code' => 'AL',
+            'tax' => '0'
+        ),
+        15 => array(
+            'country_id' => 136,
+            'name' => __('Alaska', 'wpsc'),
+            'code' => 'AK',
+            'tax' => '0'
+        ),
+        16 => array(
+            'country_id' => 136,
+            'name' => __('Arizona', 'wpsc'),
+            'code' => 'AZ',
+            'tax' => '0'
+        ),
+        17 => array(
+            'country_id' => 136,
+            'name' => __('Arkansas', 'wpsc'),
+            'code' => 'AR',
+            'tax' => '0'
+        ),
+        18 => array(
+            'country_id' => 136,
+            'name' => __('California', 'wpsc'),
+            'code' => 'CA',
+            'tax' => '0'
+        ),
+        19 => array(
+            'country_id' => 136,
+            'name' => __('Colorado', 'wpsc'),
+            'code' => 'CO',
+            'tax' => '0'
+        ),
+        20 => array(
+            'country_id' => 136,
+            'name' => __('Connecticut', 'wpsc'),
+            'code' => 'CT',
+            'tax' => '0'
+        ),
+        21 => array(
+            'country_id' => 136,
+            'name' => __('Delaware', 'wpsc'),
+            'code' => 'DE',
+            'tax' => '0'
+        ),
+        22 => array(
+            'country_id' => 136,
+            'name' => __('Florida', 'wpsc'),
+            'code' => 'FL',
+            'tax' => '0'
+        ),
+        23 => array(
+            'country_id' => 136,
+            'name' => __('Georgia', 'wpsc'),
+            'code' => 'GA',
+            'tax' => '0'
+        ),
+        24 => array(
+            'country_id' => 136,
+            'name' => __('Hawaii', 'wpsc'),
+            'code' => 'HI',
+            'tax' => '0'
+        ),
+        25 => array(
+            'country_id' => 136,
+            'name' => __('Idaho', 'wpsc'),
+            'code' => 'ID',
+            'tax' => '0'
+        ),
+        26 => array(
+            'country_id' => 136,
+            'name' => __('Illinois', 'wpsc'),
+            'code' => 'IL',
+            'tax' => '0'
+        ),
+        27 => array(
+            'country_id' => 136,
+            'name' => __('Indiana', 'wpsc'),
+            'code' => 'IN',
+            'tax' => '0'
+        ),
+        28 => array(
+            'country_id' => 136,
+            'name' => __('Iowa', 'wpsc'),
+            'code' => 'IA',
+            'tax' => '0'
+        ),
+        29 => array(
+            'country_id' => 136,
+            'name' => __('Kansas', 'wpsc'),
+            'code' => 'KS',
+            'tax' => '0'
+        ),
+        30 => array(
+            'country_id' => 136,
+            'name' => __('Kentucky', 'wpsc'),
+            'code' => 'KY',
+            'tax' => '0'
+        ),
+        31 => array(
+            'country_id' => 136,
+            'name' => __('Louisiana', 'wpsc'),
+            'code' => 'LA',
+            'tax' => '0'
+        ),
+        32 => array(
+            'country_id' => 136,
+            'name' => __('Maine', 'wpsc'),
+            'code' => 'ME',
+            'tax' => '0'
+        ),
+        33 => array(
+            'country_id' => 136,
+            'name' => __('Maryland', 'wpsc'),
+            'code' => 'MD',
+            'tax' => '0'
+        ),
+        34 => array(
+            'country_id' => 136,
+            'name' => __('Massachusetts', 'wpsc'),
+            'code' => 'MA',
+            'tax' => '0'
+        ),
+        35 => array(
+            'country_id' => 136,
+            'name' => __('Michigan', 'wpsc'),
+            'code' => 'MI',
+            'tax' => '0'
+        ),
+        36 => array(
+            'country_id' => 136,
+            'name' => __('Minnesota', 'wpsc'),
+            'code' => 'MN',
+            'tax' => '0'
+        ),
+        37 => array(
+            'country_id' => 136,
+            'name' => __('Mississippi', 'wpsc'),
+            'code' => 'MS',
+            'tax' => '0'
+        ),
+        38 => array(
+            'country_id' => 136,
+            'name' => __('Missouri', 'wpsc'),
+            'code' => 'MO',
+            'tax' => '0'
+        ),
+        39 => array(
+            'country_id' => 136,
+            'name' => __('Montana', 'wpsc'),
+            'code' => 'MT',
+            'tax' => '0'
+        ),
+        40 => array(
+            'country_id' => 136,
+            'name' => __('Nebraska', 'wpsc'),
+            'code' => 'NE',
+            'tax' => '0'
+        ),
+        41 => array(
+            'country_id' => 136,
+            'name' => __('Nevada', 'wpsc'),
+            'code' => 'NV',
+            'tax' => '0'
+        ),
+        42 => array(
+            'country_id' => 136,
+            'name' => __('New Hampshire', 'wpsc'),
+            'code' => 'NH',
+            'tax' => '0'
+        ),
+        43 => array(
+            'country_id' => 136,
+            'name' => __('New Jersey', 'wpsc'),
+            'code' => 'NJ',
+            'tax' => '0'
+        ),
+        44 => array(
+            'country_id' => 136,
+            'name' => __('New Mexico', 'wpsc'),
+            'code' => 'NM',
+            'tax' => '0'
+        ),
+        45 => array(
+            'country_id' => 136,
+            'name' => __('New York', 'wpsc'),
+            'code' => 'NY',
+            'tax' => '0'
+        ),
+        46 => array(
+            'country_id' => 136,
+            'name' => __('North Carolina', 'wpsc'),
+            'code' => 'NC',
+            'tax' => '0'
+        ),
+        47 => array(
+            'country_id' => 136,
+            'name' => __('North Dakota', 'wpsc'),
+            'code' => 'ND',
+            'tax' => '0'
+        ),
+        48 => array(
+            'country_id' => 136,
+            'name' => __('Ohio', 'wpsc'),
+            'code' => 'OH',
+            'tax' => '0'
+        ),
+        49 => array(
+            'country_id' => 136,
+            'name' => __('Oklahoma', 'wpsc'),
+            'code' => 'OK',
+            'tax' => '0'
+        ),
+        50 => array(
+            'country_id' => 136,
+            'name' => __('Oregon', 'wpsc'),
+            'code' => 'OR',
+            'tax' => '0'
+        ),
+        51 => array(
+            'country_id' => 136,
+            'name' => __('Pennsylvania', 'wpsc'),
+            'code' => 'PA',
+            'tax' => '0'
+        ),
+        52 => array(
+            'country_id' => 136,
+            'name' => __('Rhode Island', 'wpsc'),
+            'code' => 'RI',
+            'tax' => '0'
+        ),
+        53 => array(
+            'country_id' => 136,
+            'name' => __('South Carolina', 'wpsc'),
+            'code' => 'SC',
+            'tax' => '0'
+        ),
+        54 => array(
+            'country_id' => 136,
+            'name' => __('South Dakota', 'wpsc'),
+            'code' => 'SD',
+            'tax' => '0'
+        ),
+        55 => array(
+            'country_id' => 136,
+            'name' => __('Tennessee', 'wpsc'),
+            'code' => 'TN',
+            'tax' => '0'
+        ),
+        56 => array(
+            'country_id' => 136,
+            'name' => __('Texas', 'wpsc'),
+            'code' => 'TX',
+            'tax' => '0'
+        ),
+        57 => array(
+            'country_id' => 136,
+            'name' => __('Utah', 'wpsc'),
+            'code' => 'UT',
+            'tax' => '0'
+        ),
+        58 => array(
+            'country_id' => 136,
+            'name' => __('Vermont', 'wpsc'),
+            'code' => 'VT',
+            'tax' => '0'
+        ),
+        59 => array(
+            'country_id' => 136,
+            'name' => __('Virginia', 'wpsc'),
+            'code' => 'VA',
+            'tax' => '0'
+        ),
+        60 => array(
+            'country_id' => 136,
+            'name' => __('Washington', 'wpsc'),
+            'code' => 'WA',
+            'tax' => '0'
+        ),
+        61 => array(
+            'country_id' => 136,
+            'name' => __('Washington DC', 'wpsc'),
+            'code' => 'DC',
+            'tax' => '0'
+        ),
+        62 => array(
+            'country_id' => 136,
+            'name' => __('West Virginia', 'wpsc'),
+            'code' => 'WV',
+            'tax' => '0'
+        ),
+        63 => array(
+            'country_id' => 136,
+            'name' => __('Wisconsin', 'wpsc'),
+            'code' => 'WI',
+            'tax' => '0'
+        ),
+        64 => array(
+            'country_id' => 136,
+            'name' => __('Wyoming', 'wpsc'),
+            'code' => 'WY',
+            'tax' => '0'
+        ),
+    );
 
-	$countries[] = _wpsc_make_country_array_element( 1, __( 'Mauritania', 'wpsc' ), 'MR', __( 'Mauritanian Ouguiya', 'wpsc' ), '', '', __( 'MRO', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 2, __( 'Martinique( French )', 'wpsc' ), 'MQ', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 3, __( 'Malta', 'wpsc' ), 'MT', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 4, __( 'Marshall Islands', 'wpsc' ), 'MH', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 5, __( 'Mali', 'wpsc' ), 'ML', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 6, __( 'Maldives', 'wpsc' ), 'MV', __( 'Maldive Rufiyaa', 'wpsc' ), '', '', __( 'MVR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 7, __( 'Malaysia', 'wpsc' ), 'MY', __( 'Malaysian Ringgit', 'wpsc' ), '', '', __( 'MYR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 8, __( 'Malawi', 'wpsc' ), 'MW', __( 'Malawi Kwacha', 'wpsc' ), '', '', __( 'MWK', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 9, __( 'Madagascar', 'wpsc' ), 'MG', __( 'Malagasy Ariary', 'wpsc' ), '', '', __( 'MGA', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 10, __( 'Macau', 'wpsc' ), 'MO', __( 'Macau Pataca', 'wpsc' ), '', '', __( 'MOP', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 11, __( 'Macedonia', 'wpsc' ), 'MK', __( 'Denar', 'wpsc' ), '', '', __( 'MKD', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 12, __( 'Luxembourg', 'wpsc' ), 'LU', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 13, __( 'Lithuania', 'wpsc' ), 'LT', __( 'Lithuanian Litas', 'wpsc' ), '', '', __( 'LTL', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 14, __( 'Liechtenstein', 'wpsc' ), 'LI', __( 'Swiss Franc', 'wpsc' ), '', '', __( 'CHF', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 15, __( 'Libya', 'wpsc' ), 'LY', __( 'Libyan Dinar', 'wpsc' ), '', '', __( 'LYD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 16, __( 'Liberia', 'wpsc' ), 'LR', __( 'Liberian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'LRD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 17, __( 'Lesotho', 'wpsc' ), 'LS', __( 'Lesotho Loti', 'wpsc' ), '', '', __( 'LSL', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 18, __( 'Lebanon', 'wpsc' ), 'LB', __( 'Lebanese Pound', 'wpsc' ), '', '', __( 'LBP', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 19, __( 'Latvia', 'wpsc' ), 'LV', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 20, __( 'Laos', 'wpsc' ), 'LA', __( 'Lao Kip', 'wpsc' ), '', '', __( 'LAK', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 21, __( 'Kyrgyzstan', 'wpsc' ), 'KG', __( 'Som', 'wpsc' ), '', '', __( 'KGS', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 22, __( 'Kuwait', 'wpsc' ), 'KW', __( 'Kuwaiti Dinar', 'wpsc' ), '', '', __( 'KWD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 23, __( 'Korea, South', 'wpsc' ), 'KR', __( 'Korean Won', 'wpsc' ), '', '', __( 'KRW', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 24, __( 'Korea, North', 'wpsc' ), 'KP', __( 'North Korean Won', 'wpsc' ), '', '', __( 'KPW', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 25, __( 'Kiribati', 'wpsc' ), 'KI', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 26, __( 'Kenya', 'wpsc' ), 'KE', __( 'Kenyan Shilling', 'wpsc' ), '', '', __( 'KES', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 27, __( 'Kazakhstan', 'wpsc' ), 'KZ', __( 'Kazakhstan Tenge', 'wpsc' ), '', '', __( 'KZT', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 28, __( 'Jordan', 'wpsc' ), 'JO', __( 'Jordanian Dinar', 'wpsc' ), '', '', __( 'JOD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 29, __( 'Jersey', 'wpsc' ), 'JE', __( 'Pound Sterling', 'wpsc' ), __( '£', 'wpsc' ), __( ' &#163;', 'wpsc' ), __( 'GBP', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 30, __( 'Japan', 'wpsc' ), 'JP', __( 'Japanese Yen', 'wpsc' ), __( '¥', 'wpsc' ), __( ' &#165;', 'wpsc' ), __( 'JPY', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 31, __( 'Jamaica', 'wpsc' ), 'JM', __( 'Jamaican Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'JMD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 32, __( 'Ivory Coast', 'wpsc' ), 'CI', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 33, __( 'Italy', 'wpsc' ), 'IT', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 34, __( 'Isle of Man', 'wpsc' ), 'IM', __( 'Pound Sterling', 'wpsc' ), __( '£', 'wpsc' ), __( ' &#163;', 'wpsc' ), __( 'GBP', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 35, __( 'Israel', 'wpsc' ), 'IL', __( 'Israeli New Shekel', 'wpsc' ), __( '?', 'wpsc' ), __( ' &#8362;', 'wpsc' ), __( 'ILS', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 36, __( 'Ireland', 'wpsc' ), 'IE', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 37, __( 'Iraq', 'wpsc' ), 'IQ', __( 'Iraqi Dinar', 'wpsc' ), '', '', __( 'IQD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 38, __( 'Indonesia', 'wpsc' ), 'ID', __( 'Indonesian Rupiah', 'wpsc' ), '', '', __( 'IDR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 39, __( 'Iran', 'wpsc' ), 'IR', __( 'Iranian Rial', 'wpsc' ), '', '', __( 'IRR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 40, __( 'India', 'wpsc' ), 'IN', __( 'Indian Rupee', 'wpsc' ), '', '', __( 'INR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 41, __( 'Iceland', 'wpsc' ), 'IS', __( 'Iceland Krona', 'wpsc' ), '', '', __( 'ISK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 42, __( 'Hungary', 'wpsc' ), 'HU', __( 'Hungarian Forint', 'wpsc' ), '', '', __( 'HUF', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 43, __( 'Hong Kong', 'wpsc' ), 'HK', __( 'Hong Kong Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'HKD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 44, __( 'Honduras', 'wpsc' ), 'HN', __( 'Honduran Lempira', 'wpsc' ), '', '', __( 'HNL', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 45, __( 'Heard Island and McDonald Islands', 'wpsc' ), 'HM', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 46, __( 'Haiti', 'wpsc' ), 'HT', __( 'Haitian Gourde', 'wpsc' ), '', '', __( 'HTG', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 47, __( 'Guyana', 'wpsc' ), 'GY', __( 'Guyana Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'GYD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 48, __( 'Guinea Bissau', 'wpsc' ), 'GW', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 49, __( 'Guinea', 'wpsc' ), 'GN', __( 'Guinea Franc', 'wpsc' ), '', '', __( 'GNF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 50, __( 'Guernsey', 'wpsc' ), 'GG', __( 'Pound Sterling', 'wpsc' ), __( '£', 'wpsc' ), __( ' &#163;', 'wpsc' ), __( 'GBP', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 51, __( 'Guatemala', 'wpsc' ), 'GT', __( 'Guatemalan Quetzal', 'wpsc' ), '', '', __( 'GTQ', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 52, __( 'Guam( USA )', 'wpsc' ), 'GU', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 53, __( 'Grenada', 'wpsc' ), 'GD', __( 'East Carribean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 54, __( 'Guadeloupe( French )', 'wpsc' ), 'GP', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 55, __( 'Greenland', 'wpsc' ), 'GL', __( 'Danish Krone', 'wpsc' ), '', '', __( 'DKK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 56, __( 'Greece', 'wpsc' ), 'GR', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '19', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 57, __( 'Gibraltar', 'wpsc' ), 'GI', __( 'Gibraltar Pound', 'wpsc' ), '', '', __( 'GIP', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 58, __( 'Ghana', 'wpsc' ), 'GH', __( 'Ghanaian Cedi', 'wpsc' ), '', '', __( 'GHS', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 59, __( 'Germany', 'wpsc' ), 'DE', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 60, __( 'Georgia', 'wpsc' ), 'GE', __( 'Georgian Lari', 'wpsc' ), '', '', __( 'GEL', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 61, __( 'Gambia', 'wpsc' ), 'GM', __( 'Gambian Dalasi', 'wpsc' ), '', '', __( 'GMD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 62, __( 'Gabon', 'wpsc' ), 'GA', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 63, __( 'French Southern Territories', 'wpsc' ), 'TF', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 64, __( 'France', 'wpsc' ), 'FR', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 65, __( 'Finland', 'wpsc' ), 'FI', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 66, __( 'Fiji', 'wpsc' ), 'FJ', __( 'Fiji Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'FJD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 67, __( 'Faroe Islands', 'wpsc' ), 'FO', __( 'Danish Krone', 'wpsc' ), '', '', __( 'DKK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 68, __( 'Falkland Islands', 'wpsc' ), 'FK', __( 'Falkland Islands Pound', 'wpsc' ), '', '', __( 'FKP', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 69, __( 'Ethiopia', 'wpsc' ), 'ET', __( 'Ethiopian Birr', 'wpsc' ), '', '', __( 'ETB', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 70, __( 'Estonia', 'wpsc' ), 'EE', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 71, __( 'Eritrea', 'wpsc' ), 'ER', __( 'Eritrean Nakfa', 'wpsc' ), '', '', __( 'ERN', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 72, __( 'Equatorial Guinea', 'wpsc' ), 'GQ', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 73, __( 'El Salvador', 'wpsc' ), 'SV', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 74, __( 'Egypt', 'wpsc' ), 'EG', __( 'Egyptian Pound', 'wpsc' ), '', '', __( 'EGP', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 75, __( 'Ecuador', 'wpsc' ), 'EC', __( 'Ecuador Sucre', 'wpsc' ), '', '', __( 'ECS', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 76, __( 'Timor - Leste', 'wpsc' ), 'TL', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 77, __( 'Dominican Republic', 'wpsc' ), 'DO', __( 'Dominican Peso', 'wpsc' ), '', '', __( 'DOP', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 78, __( 'Dominica', 'wpsc' ), 'DM', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 79, __( 'Djibouti', 'wpsc' ), 'DJ', __( 'Djibouti Franc', 'wpsc' ), '', '', __( 'DJF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 80, __( 'Denmark', 'wpsc' ), 'DK', __( 'Danish Krone', 'wpsc' ), '', '', __( 'DKK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 81, __( 'Democratic Republic of Congo', 'wpsc' ), 'CD', __( 'Francs', 'wpsc' ), '', '', __( 'CDF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 82, __( 'Czech Rep . ', 'wpsc' ), 'CZ', __( 'Czech Koruna', 'wpsc' ), '', '', __( 'CZK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 83, __( 'Cyprus', 'wpsc' ), 'CY', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 84, __( 'Cuba', 'wpsc' ), 'CU', __( 'Cuban Peso', 'wpsc' ), '', '', __( 'CUP', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 85, __( 'Croatia', 'wpsc' ), 'HR', __( 'Croatian Kuna', 'wpsc' ), '', '', __( 'HRK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 86, __( 'Costa Rica', 'wpsc' ), 'CR', __( 'Costa Rican Colon', 'wpsc' ), '', '', __( 'CRC', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 87, __( 'Cook Islands', 'wpsc' ), 'CK', __( 'New Zealand Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NZD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 88, __( 'Republic of the Congo', 'wpsc' ), 'CG', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 89, __( 'Comoros', 'wpsc' ), 'KM', __( 'Comoros Franc', 'wpsc' ), '', '', __( 'KMF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 90, __( 'Colombia', 'wpsc' ), 'CO', __( 'Colombian Peso', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'COP', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 91, __( 'Cocos( Keeling ) Islands', 'wpsc' ), 'CC', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), 'AUD', '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 92, __( 'Christmas Island', 'wpsc' ), 'CX', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 93, __( 'Chile', 'wpsc' ), 'CL', __( 'Chilean Peso', 'wpsc' ), '', '', __( 'CLP', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 94, __( 'China', 'wpsc' ), 'CN', __( 'Yuan Renminbi', 'wpsc' ), '', '', __( 'CNY', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 95, __( 'Chad', 'wpsc' ), 'TD', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 96, __( 'Central African Republic', 'wpsc' ), 'CF', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 97, __( 'Cayman Islands', 'wpsc' ), 'KY', __( 'Cayman Islands Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'KYD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 98, __( 'Cape Verde', 'wpsc' ), 'CV', __( 'Cape Verde Escudo', 'wpsc' ), '', '', __( 'CVE', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 99, __( 'Cameroon', 'wpsc' ), 'CM', __( 'CFA Franc BEAC', 'wpsc' ), '', '', __( 'XAF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 100, __( 'Canada', 'wpsc' ), 'CA', __( 'Canadian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'CAD', 'wpsc' ), '1', '', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 101, __( 'Cambodia', 'wpsc' ), 'KH', __( 'Kampuchean Riel', 'wpsc' ), '', '', __( 'KHR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 102, __( 'Burundi', 'wpsc' ), 'BI', __( 'Burundi Franc', 'wpsc' ), '', '', __( 'BIF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 103, __( 'Burkina Faso', 'wpsc' ), 'BF', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 104, __( 'Bulgaria', 'wpsc' ), 'BG', __( 'Bulgarian Lev', 'wpsc' ), '', '', __( 'BGN', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 105, __( 'Brunei Darussalam', 'wpsc' ), 'BN', __( 'Brunei Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'BND', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 106, __( 'British Indian Ocean Territory', 'wpsc' ), 'IO', __( 'US Dollar', 'wpsc' ), '$', '&#036;', 'USD', '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 107, __( 'Brazil', 'wpsc' ), 'BR', __( 'Brazilian Real', 'wpsc' ), '', '', __( 'BRL', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 108, __( 'Bouvet Island', 'wpsc' ), 'BV', __( 'Norwegian Krone', 'wpsc' ), '', '', __( 'NOK', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 109, __( 'Botswana', 'wpsc' ), 'BW', __( 'Botswana Pula', 'wpsc' ), '', '', __( 'BWP', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 110, __( 'Bosnia - Herzegovina', 'wpsc' ), 'BA', __( 'Marka', 'wpsc' ), '', '', __( 'BAM', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 111, __( 'Bolivia', 'wpsc' ), 'BO', __( 'Boliviano', 'wpsc' ), '', '', __( 'BOB', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 112, __( 'Bhutan', 'wpsc' ), 'BT', __( 'Bhutan Ngultrum', 'wpsc' ), '', '', __( 'BTN', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 113, __( 'Bermuda', 'wpsc' ), 'BM', __( 'Bermudian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'BMD', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 114, __( 'Benin', 'wpsc' ), 'BJ', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 115, __( 'Belize', 'wpsc' ), 'BZ', __( 'Belize Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'BZD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 116, __( 'Belgium', 'wpsc' ), 'BE', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 117, __( 'Belarus', 'wpsc' ), 'BY', __( 'Belarussian Ruble', 'wpsc' ), '', '', __( 'BYR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 118, __( 'Barbados', 'wpsc' ), 'BB', __( 'Barbados Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'BBD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 119, __( 'Bangladesh', 'wpsc' ), 'BD', __( 'Bangladeshi Taka', 'wpsc' ), '', '', __( 'BDT', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 120, __( 'Bahrain', 'wpsc' ), 'BH', __( 'Bahraini Dinar', 'wpsc' ), '', '', __( 'BHD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 121, __( 'Bahamas', 'wpsc' ), 'BS', __( 'Bahamian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'BSD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 122, __( 'Azerbaijan', 'wpsc' ), 'AZ', __( 'Azerbaijani Manat', 'wpsc' ), _x( 'm', 'azerbaijani manat symbol', 'wpsc' ), _x( 'm', 'azerbaijani manat symbol html', 'wpsc' ), __( 'AZN', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 123, __( 'Austria', 'wpsc' ), 'AT', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 124, __( 'Aruba', 'wpsc' ), 'AW', __( 'Aruban Florin', 'wpsc' ), __( 'Afl . ', 'wpsc' ), __( 'Afl . ', 'wpsc' ), __( 'AWG', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 125, __( 'Armenia', 'wpsc' ), 'AM', __( 'Armenian Dram', 'wpsc' ), '', '', __( 'AMD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 126, __( 'Argentina', 'wpsc' ), 'AR', __( 'Argentine Peso', 'wpsc' ), '', '', __( 'ARS', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 127, __( 'Antigua and Barbuda', 'wpsc' ), 'AG', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 128, __( 'Antarctica', 'wpsc' ), 'AQ', __( 'Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'ATA', 'wpsc' ), '0', '0', 'antarctica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 129, __( 'Anguilla', 'wpsc' ), 'AI', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 130, __( 'Angola', 'wpsc' ), 'AO', __( 'Angolan Kwanza', 'wpsc' ), __( 'Kz', 'wpsc' ), __( 'Kz', 'wpsc' ), __( 'AOA', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 131, __( 'Andorra', 'wpsc' ), 'AD', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 132, __( 'American Samoa', 'wpsc' ), 'AS', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 133, __( 'Algeria', 'wpsc' ), 'DZ', __( 'Algerian Dinar', 'wpsc' ), '', '', __( 'DZD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 134, __( 'Albania', 'wpsc' ), 'AL', __( 'Albanian Lek', 'wpsc' ), '', '', __( 'ALL', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 135, __( 'Afghanistan', 'wpsc' ), 'AF', __( 'Afghanistan Afghani', 'wpsc' ), '', '', __( 'AFA', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 136, __( 'USA', 'wpsc' ), 'US', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '1', '', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 137, __( 'Australia', 'wpsc' ), 'AU', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 139, __( 'Mauritius', 'wpsc' ), 'MU', __( 'Mauritius Rupee', 'wpsc' ), '', '', __( 'MUR', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 140, __( 'Mayotte', 'wpsc' ), 'YT', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 141, __( 'Mexico', 'wpsc' ), 'MX', __( 'Mexican Peso', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'MXN', 'wpsc' ), '1', '', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 142, __( 'Micronesia', 'wpsc' ), 'FM', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 143, __( 'Moldova', 'wpsc' ), 'MD', __( 'Moldovan Leu', 'wpsc' ), '', '', __( 'MDL', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 144, __( 'Monaco', 'wpsc' ), 'MC', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 145, __( 'Mongolia', 'wpsc' ), 'MN', __( 'Mongolian Tugrik', 'wpsc' ), '', '', __( 'MNT', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 146, __( 'Montserrat', 'wpsc' ), 'MS', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 147, __( 'Morocco', 'wpsc' ), 'MA', __( 'Moroccan Dirham', 'wpsc' ), '', '', __( 'MAD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 148, __( 'Mozambique', 'wpsc' ), 'MZ', __( 'Mozambique Metical', 'wpsc' ), '', '', __( 'MZN', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 149, __( 'Myanmar', 'wpsc' ), 'MM', __( 'Myanmar Kyat', 'wpsc' ), '', '', __( 'MMK', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 150, __( 'Namibia', 'wpsc' ), 'NA', __( 'Namibian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NAD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 151, __( 'Nauru', 'wpsc' ), 'NR', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 152, __( 'Nepal', 'wpsc' ), 'NP', __( 'Nepalese Rupee', 'wpsc' ), '', '', __( 'NPR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 153, __( 'Netherlands', 'wpsc' ), 'NL', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 154, __( 'Netherlands Antilles', 'wpsc' ), 'AN', __( 'Netherlands Antillean Guilder', 'wpsc' ), __( 'ƒ', 'wpsc' ), __( ' &#402;', 'wpsc' ), __( 'ANG', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 155, __( 'New Caledonia ( French )', 'wpsc' ), 'NC', __( 'CFP Franc', 'wpsc' ), '', '', __( 'XPF', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 156, __( 'New Zealand', 'wpsc' ), 'NZ', __( 'New Zealand Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NZD', 'wpsc' ), '0', '12.5', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 157, __( 'Nicaragua', 'wpsc' ), 'NI', __( 'Nicaraguan Cordoba Oro', 'wpsc' ), '', '', __( 'NIO', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 158, __( 'Niger', 'wpsc' ), 'NE', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 159, __( 'Nigeria', 'wpsc' ), 'NG', __( 'Nigerian Naira', 'wpsc' ), '', '', __( 'NGN', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 160, __( 'Niue', 'wpsc' ), 'NU', __( 'New Zealand Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NZD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 161, __( 'Norfolk Island', 'wpsc' ), 'NF', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 162, __( 'Northern Mariana Islands', 'wpsc' ), 'MP', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 163, __( 'Norway', 'wpsc' ), 'NO', __( 'Norwegian Krone', 'wpsc' ), '', '', __( 'NOK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 164, __( 'Oman', 'wpsc' ), 'OM', __( 'Omani Rial', 'wpsc' ), '', '', __( 'OMR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 165, __( 'Pakistan', 'wpsc' ), 'PK', __( 'Pakistan Rupee', 'wpsc' ), '', '', __( 'PKR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 166, __( 'Palau', 'wpsc' ), 'PW', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 167, __( 'Panama', 'wpsc' ), 'PA', __( 'Panamanian Balboa', 'wpsc' ), '', '', __( 'PAB', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 168, __( 'Papua New Guinea', 'wpsc' ), 'PG', __( 'Papua New Guinea Kina', 'wpsc' ), '', '', __( 'PGK', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 169, __( 'Paraguay', 'wpsc' ), 'PY', __( 'Paraguay Guarani', 'wpsc' ), '', '', __( 'PYG', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 170, __( 'Peru', 'wpsc' ), 'PE', __( 'Peruvian Nuevo Sol', 'wpsc' ), '', '', __( 'PEN', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 171, __( 'Philippines', 'wpsc' ), 'PH', __( 'Philippine Peso', 'wpsc' ), '', '', __( 'PHP', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 172, __( 'Pitcairn Island', 'wpsc' ), 'PN', __( 'New Zealand Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NZD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 173, __( 'Poland', 'wpsc' ), 'PL', __( 'Polish Zloty', 'wpsc' ), '', '', __( 'PLN', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 174, __( 'Polynesia( French )', 'wpsc' ), 'PF', __( 'CFP Franc', 'wpsc' ), '', '', __( 'XPF', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 175, __( 'Portugal', 'wpsc' ), 'PT', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 176, __( 'Puerto Rico', 'wpsc' ), 'PR', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 177, __( 'Qatar', 'wpsc' ), 'QA', __( 'Qatari Rial', 'wpsc' ), '', '', __( 'QAR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 178, __( 'Reunion( French )', 'wpsc' ), 'RE', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 179, __( 'Romania', 'wpsc' ), 'RO', __( 'Romanian New Leu', 'wpsc' ), '', '', __( 'RON', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 180, __( 'Russia', 'wpsc' ), 'RU', __( 'Russian Ruble', 'wpsc' ), '', '', __( 'RUB', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 181, __( 'Rwanda', 'wpsc' ), 'RW', __( 'Rwanda Franc', 'wpsc' ), '', '', __( 'RWF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 182, __( 'Saint Helena', 'wpsc' ), 'SH', __( 'St . Helena Pound', 'wpsc' ), '', '', __( 'SHP', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 183, __( 'Saint Kitts & Nevis Anguilla', 'wpsc' ), 'KN', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 184, __( 'Saint Lucia', 'wpsc' ), 'LC', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 185, __( 'Saint Pierre and Miquelon', 'wpsc' ), 'PM', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 186, __( 'Saint Vincent & Grenadines', 'wpsc' ), 'VC', __( 'East Caribbean Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'XCD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 187, __( 'Samoa', 'wpsc' ), 'WS', __( 'Samoan Tala', 'wpsc' ), '', '', __( 'WST', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 188, __( 'San Marino', 'wpsc' ), 'SM', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 189, __( 'Sao Tome and Principe', 'wpsc' ), 'ST', __( 'Dobra', 'wpsc' ), '', '', __( 'STD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 190, __( 'Saudi Arabia', 'wpsc' ), 'SA', __( 'Saudi Riyal', 'wpsc' ), '', '', __( 'SAR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 191, __( 'Senegal', 'wpsc' ), 'SN', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 192, __( 'Seychelles', 'wpsc' ), 'SC', __( 'Seychelles Rupee', 'wpsc' ), '', '', __( 'SCR', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 193, __( 'Sierra Leone', 'wpsc' ), 'SL', __( 'Sierra Leone Leone', 'wpsc' ), '', '', __( 'SLL', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 194, __( 'Singapore', 'wpsc' ), 'SG', __( 'Singapore Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'SGD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 195, __( 'Slovakia', 'wpsc' ), 'SK', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 196, __( 'Slovenia', 'wpsc' ), 'SI', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 197, __( 'Solomon Islands', 'wpsc' ), 'SB', __( 'Solomon Islands Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), 'SBD', '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 198, __( 'Somalia', 'wpsc' ), 'SO', __( 'Somali Shilling', 'wpsc' ), '', '', __( 'SOS', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 199, __( 'South Africa', 'wpsc' ), 'ZA', __( 'South African Rand', 'wpsc' ), '', '', __( 'ZAR', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 200, __( 'South Georgia & South Sandwich Islands', 'wpsc' ), 'GS', __( 'Pound Sterling', 'wpsc' ), __( '£', 'wpsc' ), __( ' &#163;', 'wpsc' ), __( 'GBP', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 201, __( 'Spain', 'wpsc' ), 'ES', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 202, __( 'Sri Lanka', 'wpsc' ), 'LK', __( 'Sri Lanka Rupee', 'wpsc' ), '', '', __( 'LKR', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 203, __( 'Sudan', 'wpsc' ), 'SD', __( 'Sudanese Pound', 'wpsc' ), '', '', __( 'SDG', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 204, __( 'Suriname', 'wpsc' ), 'SR', __( 'Surinamese Dollar', 'wpsc' ), '', '', __( 'SRD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 205, __( 'Svalbard and Jan Mayen Islands', 'wpsc' ), 'SJ', __( 'Norwegian Krone', 'wpsc' ), '', '', __( 'NOK', 'wpsc' ), '0', '0', '', '1' );
-	$countries[] = _wpsc_make_country_array_element( 206, __( 'Swaziland', 'wpsc' ), 'SZ', __( 'Swaziland Lilangeni', 'wpsc' ), '', '', __( 'SZL', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 207, __( 'Sweden', 'wpsc' ), 'SE', __( 'Swedish Krona', 'wpsc' ), '', '', __( 'SEK', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 208, __( 'Switzerland', 'wpsc' ), 'CH', __( 'Swiss Franc', 'wpsc' ), '', '', __( 'CHF', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 209, __( 'Syria', 'wpsc' ), 'SY', __( 'Syrian Pound', 'wpsc' ), '', '', __( 'SYP', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 210, __( 'Taiwan', 'wpsc' ), 'TW', __( 'New Taiwan Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'TWD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 211, __( 'Tajikistan', 'wpsc' ), 'TJ', __( 'Tajik Somoni', 'wpsc' ), '', '', __( 'TJS', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 212, __( 'Tanzania', 'wpsc' ), 'TZ', __( 'Tanzanian Shilling', 'wpsc' ), '', '', __( 'TZS', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 213, __( 'Thailand', 'wpsc' ), 'TH', __( 'Thai Baht', 'wpsc' ), '', '', __( 'THB', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 214, __( 'Togo', 'wpsc' ), 'TG', __( 'CFA Franc BCEAO', 'wpsc' ), '', '', __( 'XOF', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 215, __( 'Tokelau', 'wpsc' ), 'TK', __( 'New Zealand Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'NZD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 216, __( 'Tonga', 'wpsc' ), 'TO', __( 'Tongan Pa &#699;anga', 'wpsc' ), '', '', __( 'TOP', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 217, __( 'Trinidad and Tobago', 'wpsc' ), 'TT', __( 'Trinidad and Tobago Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'TTD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 218, __( 'Tunisia', 'wpsc' ), 'TN', __( 'Tunisian Dinar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'TND', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 219, __( 'Turkey', 'wpsc' ), 'TR', __( 'Turkish Lira', 'wpsc' ), '', '', __( 'TRY', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 220, __( 'Turkmenistan', 'wpsc' ), 'TM', __( 'Manat', 'wpsc' ), '', '', __( 'TMM', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 221, __( 'Turks and Caicos Islands', 'wpsc' ), 'TC', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 222, __( 'Tuvalu', 'wpsc' ), 'TV', __( 'Australian Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'AUD', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 223, __( 'United Kingdom', 'wpsc' ), 'GB', __( 'Pound Sterling', 'wpsc' ), __( '£', 'wpsc' ), __( ' &#163;', 'wpsc' ), __( 'GBP', 'wpsc' ), '0', '17.5', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 224, __( 'Uganda', 'wpsc' ), 'UG', __( 'Uganda Shilling', 'wpsc' ), '', '', __( 'UGX', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 225, __( 'Ukraine', 'wpsc' ), 'UA', __( 'Ukraine Hryvnia', 'wpsc' ), __( '?', 'wpsc' ), __( ' &#8372;', 'wpsc' ), __( 'UAH', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 226, __( 'United Arab Emirates', 'wpsc' ), 'AE', __( 'Arab Emirates Dirham', 'wpsc' ), '', '', __( 'AED', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 227, __( 'Uruguay', 'wpsc' ), 'UY', __( 'Uruguayan Peso', 'wpsc' ), '', '', __( 'UYU', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 228, __( 'USA Minor Outlying Islands', 'wpsc' ), 'UM', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', '', '1' );
-	$countries[] = _wpsc_make_country_array_element( 229, __( 'Uzbekistan', 'wpsc' ), 'UZ', __( 'Uzbekistan Sum', 'wpsc' ), '', '', __( 'UZS', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 230, __( 'Vanuatu', 'wpsc' ), 'VU', __( 'Vanuatu Vatu', 'wpsc' ), '', '', __( 'VUV', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 231, __( 'Vatican', 'wpsc' ), 'VA', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 232, __( 'Venezuela', 'wpsc' ), 'VE', __( 'Venezuelan Bolivar Fuerte', 'wpsc' ), '', '', __( 'VEF', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 233, __( 'Vietnam', 'wpsc' ), 'VN', __( 'Vietnamese Dong', 'wpsc' ), '', '', __( 'VND', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 234, __( 'Virgin Islands( British )', 'wpsc' ), 'VG', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 235, __( 'Virgin Islands( USA )', 'wpsc' ), 'VI', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'northamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 236, __( 'Wallis and Futuna Islands', 'wpsc' ), 'WF', __( 'CFP Franc', 'wpsc' ), '', '', __( 'XPF', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 237, __( 'Western Sahara', 'wpsc' ), 'EH', __( 'Moroccan Dirham', 'wpsc' ), '', '', __( 'MAD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 238, __( 'Yemen', 'wpsc' ), 'YE', __( 'Yemeni Rial', 'wpsc' ), '', '', __( 'YER', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 240, __( 'Zambia', 'wpsc' ), 'ZM', __( 'Zambian Kwacha', 'wpsc' ), '', '', __( 'ZMK', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 241, __( 'Zimbabwe', 'wpsc' ), 'ZW', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 242, __( 'South Sudan', 'wpsc' ), 'SS', __( 'South Sudanese Pound', 'wpsc' ), '', '', __( 'SSP', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 243, __( 'Serbia', 'wpsc' ), 'RS', __( 'Serbian Dinar', 'wpsc' ), '', '', __( 'RSD', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 244, __( 'Montenegro', 'wpsc' ), 'ME', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 246, __( 'Aland Islands', 'wpsc' ), 'AX', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 247, __( 'Saint Barthelemy', 'wpsc' ), 'BL', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'europe', '1' );
-	$countries[] = _wpsc_make_country_array_element( 248, __( 'Bonaire, Sint Eustatius and Saba', 'wpsc' ), 'BQ', __( 'US Dollar', 'wpsc' ), __( '$', 'wpsc' ), __( ' &#036;', 'wpsc' ), __( 'USD', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 249, __( 'Curacao', 'wpsc' ), 'CW', __( 'Netherlands Antillean Guilder', 'wpsc' ), __( 'ƒ', 'wpsc' ), __( ' &#402;', 'wpsc' ), __( 'ANG', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 250, __( 'Saint Martin( French Part)', 'wpsc' ), 'MF', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'southamerica', '1' );
-	$countries[] = _wpsc_make_country_array_element( 251, __( 'Palestinian Territories', 'wpsc' ), 'PS', __( 'Israeli New Shekel', 'wpsc' ), __( '?', 'wpsc' ), __( ' &#8362;', 'wpsc' ), __( 'ILS', 'wpsc' ), '0', '0', 'asiapacific', '1' );
-	$countries[] = _wpsc_make_country_array_element( 252, __( 'Sint Maarten( Dutch Part)', 'wpsc' ), 'SX', __( 'Netherlands Antillean Guilder', 'wpsc' ), __( 'ƒ', 'wpsc' ), __( ' &#402;', 'wpsc' ), __( 'ANG', 'wpsc' ), '0', '0', 'africa', '1' );
-	$countries[] = _wpsc_make_country_array_element( 253, __( 'French Guiana', 'wpsc' ), 'GF', __( 'Euro', 'wpsc' ), __( '€', 'wpsc' ), __( ' &#8364;', 'wpsc' ), __( 'EUR', 'wpsc' ), '0', '0', 'southamerica', '1' );
+    /**
+     * Get or modify the countries data used to initalize WP eCommerce regions data structures
+     *
+     * @since  4.1
+     *
+     * @param array array of associative arrays of country data, each array element should have the following required properties
+     *  id
+     *  country_id
+     *  name
+     *  code
+     *  tax
+     */
+    $regions = apply_filters('wpsc_get_regions_data_array', $regions);
 
-	/**
-	 * Get or modify the countries data used to initalize WP eCommerce ccuntries data structures
-	 *
-	 * @since  4.1
-	 *
-	 * @param array array of associative arrays of country data, each array element should have the following required properties
-	 *  country_id
-	 *  country_name
-	 *  country_iso_code
-	 *  currency_name
-	 *  currency_symbol
-	 *  currency_symbol_html
-	 *  currency_text_code
-	 *  has_regions
-	 *  tax
-	 *  continent
-	 *  visible
-	 */
-	$countries = apply_filters( 'wpsc_get_countries_data_array', $countries );
-	return $countries;
+    return $regions;
 }
 
