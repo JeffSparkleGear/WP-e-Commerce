@@ -893,7 +893,7 @@ class WPSC_Countries {
 	 * @since 3.8.14
 	 *
 	 */
-	public function __construct() {
+	private function __construct() {
 
 		if ( ! is_a( self::$active_wpsc_country_by_country_id, 'WPSC_Data_Map' ) ) {
 			self::_clean_data_maps();
