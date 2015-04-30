@@ -2113,3 +2113,114 @@ function _wpsc_action_user_update_errors( $errors, $update, $user ) {
 }
 
 // add_action( 'user_profile_update_errors', '_wpsc_action_user_update_errors', 10, 3 );
+
+
+/**
+ * Adjust countires data structures to contain information that is in the database, where the countries
+ * data was mainatined prior to this change
+ *
+ * @param array countries data
+ *
+ * @deprecated 4.1
+ *
+ * @return array
+ */
+function _wpsc_merge_legacy_countries_data_from_db( $countries ) {
+
+	$legacy_countries_data = get_option( 'wpsc_legacy_countries_data', - 1 );
+	if ( - 1 == $legacy_countries_data ) {
+		if ( function_exists( '_wpsc_extract_legacy_countries_data' ) ) {
+			$legacy_countries_data = _wpsc_extract_legacy_countries_data( $countries );
+		} else {
+			$legacy_countries_data = array();
+		}
+
+		update_option( 'wpsc_legacy_countries_data', $legacy_countries_data );
+	}
+
+	foreach ( $legacy_countries_data as $country_id => $country_array ) {
+		if ( empty( $country_array ) && isset( $countries[ $country_id ] ) ) {
+			unset( $countries[ $country_id ] );
+		} else {
+			$countries[ $country_id ] = $country_array;
+		}
+	}
+
+	return $countries;
+}
+
+add_action( 'wpsc_get_countries_data_array', '_wpsc_merge_legacy_countries_data_from_db', 1, 1 );
+
+
+/**
+ * Compare countries data to what is in the database and compute an arrray of differences
+ * @param array $countries_data
+ *
+ * @deprecated 4.1
+ *
+ * @return array
+ */
+function _wpsc_extract_legacy_countries_data( $countries_data ) {
+
+	$differences = array();
+
+		// TODO: code it
+
+	return $differences;
+
+}
+
+/**
+ * Adjust countires data structures to contain information that is in the database, where the countries
+ * data was mainatined prior to this change
+ *
+ * @param $regions
+ *
+ * @deprecated 4.1
+ *
+ * @return array
+ */
+function _wpsc_merge_legacy_region_data_from_db( $regions ) {
+
+	$legacy_regions_data = get_option( 'wpsc_legacy_regions_data', - 1 );
+	if ( - 1 == $legacy_regions_data ) {
+		if ( function_exists( '_wpsc_extract_legacy_regions_data' ) ) {
+			$legacy_regions_data = _wpsc_extract_legacy_regions_data( $regions );
+		} else {
+			$legacy_regions_data = array();
+		}
+
+		update_option( 'wpsc_legacy_regions_data', $legacy_regions_data );
+	}
+
+	foreach ( $legacy_regions_data as $region_id => $region_array ) {
+		if ( empty( $region_array ) && isset( $regions[ $region_id ] ) ) {
+			unset( $regions[ $region_id ] );
+		} else {
+			$regions[ $region_id ] = $region_array;
+		}
+	}
+
+	return $regions;
+}
+
+add_action( 'wpsc_get_regions_data_array', '_wpsc_merge_legacy_regions_data_from_db', 1, 1 );
+
+
+/**
+ * Compare regions data to what is in the database and compute an arrray of differences
+ * @param array $regions_data
+ *
+ * @deprecated 4.1
+ *
+ * @return array
+ */
+function _wpsc_extract_legacy_regions_data( $countries_data ) {
+
+	$differences = array();
+
+		// TODO: code it
+
+	return $differences;
+
+}

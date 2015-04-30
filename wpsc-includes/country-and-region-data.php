@@ -262,6 +262,7 @@ function _wpsc_get_countries_data_array() {
 		array('id' => '253','name' => 'French Guiana','isocode' => 'GF','currency_name' => 'Euro','currency_symbol' => '€','currency_symbol_html' => '&#8364;','currency_code' => 'EUR','has_regions' => '','tax' => '','continent' => 'southamerica','visible' => '0')
 	);
 
+
 	/**
 	 * Get or modify the countries data used to initalize WP eCommerce ccuntries data structures
 	 *
@@ -352,6 +353,7 @@ function _wpsc_get_regions_data_array() {
 		array('id' => '64','country_id' => '136','name' => 'Wyoming','code' => 'WY','tax' => '0')
 	);
 
+
 	/**
 	 * Get or modify the countries data used to initalize WP eCommerce regions data structures
 	 *
@@ -365,5 +367,26 @@ function _wpsc_get_regions_data_array() {
 	 *  tax
 	 */
 	$regions = apply_filters( 'wpsc_get_regions_data_array', $regions );
+
 	return $regions;
+}
+
+if ( defined( 'WPSC_LOAD_DEPRECATED' ) && WPSC_LOAD_DEPRECATED ) {
+	if ( is_admin() ) {
+		add_action( 'query', '_wpsc_check_for_countries_regions_changes', 10, 1 );
+		function _wpsc_check_for_countries_regions_changes( $query ) {
+
+			if ( is_admin() ) {
+				$changing_a_table_we_care_about = ( false !== stripos( $query, WPSC_TABLE_CURRENCY_LIST ) )
+				                                  || ( false !== stripos( $query, WPSC_TABLE_REGION_TAX ) );
+				if ( $changing_a_table_we_care_about ) {
+					if ( stripos( $query, 'update' ) || stripos( $query, 'delete' ) || stripos( $query, 'insert' ) ) {
+						// delete the options to force them to rebuild on the next request
+						delete_option( 'wpsc_legacy_countries_data' );
+						delete_option( 'wpsc_legacy_regions_data' );
+					}
+				}
+			}
+		}
+	}
 }
