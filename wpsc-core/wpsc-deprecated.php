@@ -2022,7 +2022,6 @@ function wpsc_google_shipping_settings() {
 		foreach ( (array) $_POST['google_shipping'] as $key => $country ) {
 			if ( $country == 'on' ) {
 				$google_shipping_country[] = $key;
-				$updated++;
 			}
 		}
 		update_option( 'google_shipping_country', $google_shipping_country );
@@ -2223,4 +2222,27 @@ function _wpsc_extract_legacy_regions_data( $countries_data ) {
 
 	return $differences;
 
+}
+
+if (is_admin()) {
+	add_action('query', '_wpsc_check_for_countries_regions_changes', 10, 1);
+	/**
+	 * Check if a query is updating the countries, region or currencies data and if so we remove any
+	 * information we have about the changes to the default data
+	 *
+	 * @param $query
+     */
+	function _wpsc_check_for_countries_regions_changes( $query ) {
+
+		if (is_admin()) {
+			$changing_a_table_we_care_about = (false !== stripos($query, WPSC_TABLE_CURRENCY_LIST)) || (false !== stripos($query, WPSC_TABLE_REGION_TAX));
+			if ($changing_a_table_we_care_about) {
+				if (stripos($query, 'update') || stripos($query, 'delete') || stripos($query, 'insert')) {
+					// delete the options to force them to rebuild on the next request
+					delete_option('wpsc_legacy_countries_data');
+					delete_option('wpsc_legacy_regions_data');
+				}
+			}
+		}
+	}
 }
