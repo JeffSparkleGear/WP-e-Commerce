@@ -54,6 +54,7 @@ class WPSC_Country {
 
 		$this->_regions_by_region_id   = array();
 		$this->_regions_by_region_name = array();
+		$this->_regions_by_region_code = array();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// As a result of merging the legacy WPSC_Country class we no longer need the "col" constructor parameter
@@ -356,17 +357,20 @@ class WPSC_Country {
 
 		if ( $region ) {
 			if ( is_numeric( $region ) ) {
-				$region_id   = intval( $region );
-				$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
+				$region_id = intval( $region );
+				if ( isset( $this->_regions_by_region_id[ $region_id ] ) ) {
+					$wpsc_region = $this->_regions_by_region_id[ $region_id ];
+				} else {
+					$wpsc_region = false;
+				}
 			} else {
 				// check to see if it is a valid region code
-				if ( $region_id = $this->_region_id_by_region_code->value( $region ) ) {
-					$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
+				if ( isset( $this->_regions_by_region_code[ $region ] ) ) {
+					$wpsc_region = $this->_regions_by_region_code[ $region ];
+				} else if ( isset( $this->_regions_by_region_name[ strtolower( $region ) ] ) ) {
+					$wpsc_region = $this->_regions_by_region_name[ strtolower( $region ) ];
 				} else {
-					// check to see if we have a valid region name
-					if ( $region_id = $this->_region_id_by_region_name->value( strtolower( $region ) ) ) {
-						$wpsc_region = $this->_regions->value( $region_id, $wpsc_region );
-					}
+					$wpsc_region = false;
 				}
 			}
 		}
@@ -435,8 +439,9 @@ class WPSC_Country {
 	 * @return $this
 	 */
 	public function add_region( &$wpsc_region ) {
-		$this->_regions_by_region_id[ $wpsc_region->get_id() ]     = $wpsc_region;
-		$this->_regions_by_region_code[ $wpsc_region->get_code() ] = $wpsc_region;
+		$this->_regions_by_region_id[ $wpsc_region->get_id() ]                   = $wpsc_region;
+		$this->_regions_by_region_code[ $wpsc_region->get_code() ]               = $wpsc_region;
+		$this->_regions_by_region_name[ strtolower( $wpsc_region->get_name() ) ] = $wpsc_region;
 
 		return $this;
 	}
@@ -490,13 +495,15 @@ class WPSC_Country {
 	 *
 	 * @param string $region_name the name of the region for which we are looking for an id, case insensitive!
 	 *
-	 * @return int region id
+	 * @return int|bool region id or false if region does not exist
 	 */
 	public function get_region_id_by_region_code( $region_code ) {
-		$region_id = false;
 
-		if ( $region_code ) {
-			$region_id = $this->_region_id_by_region_code->value( $region_code, $region_id );
+		if ( $region_code && isset( $this->_regions_by_region_code[ $region_code ] ) ) {
+			$wpsc_region = $this->_regions_by_region_code[ $region_code ];
+			$region_id = $wpsc_region->get_id();
+		} else {
+			$region_id = false;
 		}
 
 		return $region_id;
@@ -514,10 +521,12 @@ class WPSC_Country {
 	 * @return int region id
 	 */
 	public function get_region_id_by_region_name( $region_name ) {
-		$region_id = false;
 
-		if ( $region_name ) {
-			$region_id = $this->_region_id_by_region_name->value( strtolower( $region_name ) );
+		if ( $region_name && isset( $this->_regions_by_region_code[ strtolower( $region_name ) ] ) ) {
+			$wpsc_region = $this->_regions_by_region_name[ strtolower( $region_name )  ];
+			$region_id = $wpsc_region->get_id();
+		} else {
+			$region_id = false;
 		}
 
 		return $region_id;
@@ -622,10 +631,48 @@ class WPSC_Country {
 	private $_continent = '';
 	private $_visible = true;
 
+	/**
+	 * Array of regions, indexed by region id
+	 *
+	 * @access private
+	 * @static
+	 *
+	 * @since 4.1
+	 *
+	 * @var WPSC_Region[]
+	 */
+	private $_regions_by_region_id   = array();
+
+	/**
+	 * Array of regions, indexed by lower case of region name
+	 *
+	 * @access private
+	 * @static
+	 *
+	 * @since 4.1
+	 *
+	 * @var WPSC_Region[]
+	 */
+	private $_regions_by_region_name = array();
+
+	/**
+	 * Array of regions, indexed by region code
+	 *
+	 * @access private
+	 * @static
+	 *
+	 * @since 4.1
+	 *
+	 * @var WPSC_Region[]
+	 */
+	private $_regions_by_region_code = array();
+
+
 	public function get_array() {
 		return array(
 			'id'                   => $this->_id,
 			'name'                 => $this->_name,
+			'country'              => $this->_name, // backwards compatability
 			'isocode'              => $this->_isocode,
 			'currency_name'        => $this->_currency_name,
 			'currency_code'        => $this->_currency_code,
