@@ -250,7 +250,6 @@ class WPSC_Countries {
 		// set default return value
 		$wpsc_region = false;
 
-
 		if ( is_numeric( $region ) ) {
 			$region_id = intval( $region );
 		} else {

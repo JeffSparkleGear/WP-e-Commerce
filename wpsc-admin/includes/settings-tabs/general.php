@@ -13,6 +13,7 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 		else
 			$base_country = get_option( 'base_country' );
 		$from = WPSC_TABLE_REGION_TAX . ' AS r';
+
 		$join = WPSC_TABLE_CURRENCY_LIST . ' AS c';
 		$sql = $wpdb->prepare( "
 			SELECT r.id, r.name
