@@ -954,9 +954,15 @@ class WPSC_Countries {
 }
 
 
-add_action( 'init', '_wpsc_make_countries_data_available', 10, 1 );
-
+/**
+ * Make the countries data available to WP eCommerce
+ *
+ * @return void
+ */
 function _wpsc_make_countries_data_available() {
 	$wpsc_countries = WPSC_Countries::get_instance();
 }
+
+add_action( 'wpsc_loaded', '_wpsc_make_countries_data_available' );
+
 

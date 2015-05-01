@@ -350,7 +350,7 @@ class wpec_taxes {
 		if ( ! empty( $region ) ) {
 			$country_id = WPSC_Countries::get_country_id_by_region_id( $region );
 			if ( $country_id ) {
-				$wpsc_country = new WPSC_Country( $country_id );
+				$wpsc_country = wpsc_get_country_object( $country_id );
 			}
 
 			if ( isset( $wpsc_country ) ) {
