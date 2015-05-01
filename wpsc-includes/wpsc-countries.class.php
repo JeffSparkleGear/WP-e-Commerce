@@ -808,8 +808,8 @@ class WPSC_Countries {
 		$regions_data_arrays = _wpsc_get_regions_data_array();
 
 		foreach ( $regions_data_arrays as $region_id => $region_data_array ) {
-			$region_data_array['id]'] = $region_id;
-			$wpsc_region              = new WPSC_Region( $region_data_array['country_id'], $region_data_array );
+			$region_data_array['id'] = $region_id;
+			$wpsc_region             = new WPSC_Region( $region_data_array['country_id'], $region_data_array );
 
 			self::$regions_by_region_id[ $wpsc_region->get_id() ] = $wpsc_region;
 
@@ -889,6 +889,11 @@ class WPSC_Countries {
 		return $result;
 
 	}
+
+	static function get_all_regions( ) {
+		return self::$regions_by_region_id;
+	}
+
 	/**
 	 * Returns a count of how many fields are in the checkout form
 	 *

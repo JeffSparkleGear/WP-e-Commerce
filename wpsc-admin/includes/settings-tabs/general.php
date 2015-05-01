@@ -7,20 +7,19 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 	}
 
 	private function get_regions() {
-		global $wpdb;
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_POST['country'] ) )
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_POST['country'] ) ) {
 			$base_country = $_POST['country'];
-		else
+		} else {
 			$base_country = get_option( 'base_country' );
-		$from = WPSC_TABLE_REGION_TAX . ' AS r';
+		}
 
-		$join = WPSC_TABLE_CURRENCY_LIST . ' AS c';
-		$sql = $wpdb->prepare( "
-			SELECT r.id, r.name
-			FROM {$from}
-			INNER JOIN {$join} ON r.country_id = c.id AND c.isocode = %s
-		", $base_country );
-		$this->regions = $wpdb->get_results( $sql );
+		if ( ! empty( $base_country ) ) {
+			$wpsc_country = wpsc_get_country_object( $base_country );
+
+			if ( $wpsc_country && $wpsc_country->has_regions() ) {
+				$this->regions = $wpsc_country->get_regions();
+			}
+		}
 	}
 
 	public function display_region_drop_down() {
@@ -28,8 +27,8 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 		if ( ! empty( $this->regions ) ):
 			?>
 				<select name='wpsc_options[base_region]'>
-					<?php foreach ( $this->regions as $region ): ?>
-						<option value='<?php echo esc_attr( $region->id ); ?>' <?php selected( $region->id, $base_region ); ?>><?php echo esc_html( $region->name ); ?></option>
+					<?php foreach ( $this->regions as $region_id => $wpsc_region ): ?>
+						<option value='<?php echo esc_attr( $region_id ); ?>' <?php selected( $region_id, $base_region ); ?>><?php echo esc_html( $wpsc_region->get_name() ); ?></option>
 					<?php endforeach ?>
 				</select>
 			<?php
@@ -130,23 +129,7 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 		<h3 class="form_group"><?php esc_html_e( 'Currency Settings', 'wpsc' ); ?></h3>
 		<table class='wpsc_options form-table'>
 			<?php
-			$currency_type_country_id = intval( get_option( 'currency_type', -1 ) );
-
-			// get the country for the current currency type, make sure it is valid, if not
-			// we will move on as if a currency type was not set
-			if ( -1 != $currency_type_country_id ) {
-				$wpsc_country_of_currency_type = wpsc_get_country_object( $currency_type_country_id );
-				if ( ! $wpsc_country_of_currency_type ) {
-					$currency_type_country_id = -1;
-				}
-			}
-
-			if ( -1 == $currency_type_country_id ) {
-				$wpsc_country_of_currency_type = wpsc_get_country_object( 'US' );
-				if ( $wpsc_country_of_currency_type ) {
-					$currency_type_country_id = $wpsc_country_of_currency_type->get_id();
-				}
-			}
+				$currency_type_country_id = wpsc_get_currency_type_country_id();
 			?>
 			<tr>
 				<th scope="row"><label for="wpsc_options_currency_type"><?php esc_html_e( 'Currency Type', 'wpsc' ); ?></label></th>
@@ -160,14 +143,20 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 			</tr>
 
 			<?php
-				$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol_html();
+				$wpsc_country_of_currency_type = wpsc_get_currency_type_country_object();
 
-				if ( empty( $currency_sign ) ) {
-					$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol();
-				}
+				if ( $wpsc_country_of_currency_type ) {
+					$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol_html();
 
-				if ( empty( $currency_sign ) ) {
-					$currency_sign = $wpsc_country_of_currency_type->get_currency_code();
+					if ( empty( $currency_sign ) ) {
+						$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol();
+					}
+
+					if ( empty( $currency_sign ) ) {
+						$currency_sign = $wpsc_country_of_currency_type->get_currency_code();
+					}
+				} else {
+					$currency_sign = '';
 				}
 
 				$currency_sign_location = esc_attr( get_option( 'currency_sign_location' ) );

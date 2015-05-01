@@ -79,8 +79,8 @@ class WPSC_Region {
 				$region_id = WPSC_Countries::get_region_id( $country_id, $region_id_or_code );
 
 				if ( $country_id && $region_id ) {
-					$wpsc_country = new WPSC_Country( $country_id );
-					$wpsc_region  = $wpsc_country->get_region( $region_id );
+					$this->wpsc_country = WPSC_Countries::get_country( $country_id );
+					$wpsc_region  = $this->wpsc_country->get_region( $region_id );
 
 					if ( $wpsc_region ) {
 						$this->_code       = $wpsc_region->_code;
@@ -159,6 +159,16 @@ class WPSC_Region {
 		return $this->_country_id;
 	}
 
+	/**
+	 * Get the country that this region belongs within
+	 *
+	 * @since 4.1
+	 *
+	 * @return WPSC_Country
+	 */
+	public function get_country() {
+		return $this->wpsc_country;
+	}
 
 	/**
 	 * get a region's information as an array
@@ -258,5 +268,6 @@ class WPSC_Region {
 	private $_name = '';
 	private $_code = '';
 	private $_tax = 0;
+	private $wpsc_country = null;
 }
 

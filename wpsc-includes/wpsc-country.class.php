@@ -491,18 +491,7 @@ class WPSC_Country {
 
 			if ( $as_array ) {
 				foreach ( $regions_list as $region_key => $wpsc_region ) {
-					$region = get_object_vars( $wpsc_region );
-
-					$keys = array_keys( $region );
-					foreach ( $keys as $index => $key ) {
-						if ( substr( $key, 0, 1 ) == '_' ) {
-							$keys[ $index ] = substr( $key, 1 );
-						}
-					}
-
-					$region = array_combine( $keys, array_values( $region ) );
-
-					$regions_list[ $region_key ] = $region;
+					$regions_list[ $region_key ] = $wpsc_region->as_array();
 				}
 			}
 		} else {

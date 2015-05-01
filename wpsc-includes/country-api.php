@@ -126,3 +126,68 @@ function wpsc_get_visible_countries( $sort_by_name = true ) {
 	return WPSC_Countries::get_countries( false, $sort_by_name );
 }
 
+/**
+ * Get all known regions
+ *
+ * @since 4.1
+ *
+ * @return WPSC_Region[]
+ *
+ */
+function wpsc_get_all_regions() {
+	return WPSC_Countries::get_all_regions();
+}
+
+/**
+ * Get the country object correcposnding to the currently configured store currency type, might be the default
+ * currency type if store admin has not configured currency type
+ *
+ * @since 4.1
+ *
+ * @return WPSC_Country|boolean the country, or false on failure
+ */
+function wpsc_get_currency_type_country_object() {
+
+	$wpsc_country_of_currency_type = false;
+
+	$currency_type_country_id = intval( get_option( 'currency_type', - 1 ) );
+
+	// get the country for the current currency type, make sure it is valid, if not
+	// we will move on as if a currency type was not set
+	if ( - 1 != $currency_type_country_id ) {
+		$wpsc_country_of_currency_type = wpsc_get_country_object( $currency_type_country_id );
+		if ( ! $wpsc_country_of_currency_type ) {
+			$currency_type_country_id = - 1;
+		}
+	}
+
+	if ( - 1 == $currency_type_country_id ) {
+		$wpsc_country_of_currency_type = wpsc_get_country_object( 'US' );
+		if ( $wpsc_country_of_currency_type ) {
+			$currency_type_country_id = $wpsc_country_of_currency_type->get_id();
+		}
+	}
+
+	return $wpsc_country_of_currency_type;
+}
+
+
+/**
+ * Get the country id correcposnding to the currently configured store currency type, might be the default
+ * currency type countri id if store admin has not configured currency type
+ *
+ * @since 4.1
+ *
+ * @return int country id matching the current currency type, 0 if there isn't a current value
+ */
+function wpsc_get_currency_type_country_id() {
+
+	$wpsc_country_of_currency_type = wpsc_get_currency_type_country_object();
+	if ( $wpsc_country_of_currency_type ) {
+		$currency_type_country_id = $wpsc_country_of_currency_type->get_id();
+	} else {
+		$currency_type_country_id = 0; // should never happen
+	}
+
+	return $currency_type_country_id;
+}

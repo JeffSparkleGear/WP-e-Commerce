@@ -657,7 +657,10 @@ final class WPSC_Settings_Page {
 		}
 
 		if ( $previous_currency != get_option( 'currency_type' ) ) {
-			$currency_code = $wpdb->get_var( "SELECT `code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id` IN ('" . absint( get_option( 'currency_type' ) ) . "')" );
+			$wpsc_currency_type_country = wpsc_get_currency_type_country_object();
+			if ( $wpsc_currency_type_country ) {
+				$currency_code = $wpsc_currency_type_country->get_currency_code();
+			}
 
 			$selected_gateways = get_option( 'custom_gateway_options' );
 			$already_changed = array( );
