@@ -21,21 +21,71 @@ class WPSC_Country {
 	 *                                                                or the integer country id, or an array of data used
 	 *                                                                to create a new country
 	 *
-	 * @return object WPSC_Country
 	 */
 	public function __construct( $country, $deprecated = null ) {
 
+		$this->_regions_by_region_id   = array();
+		$this->_regions_by_region_name = array();
+		$this->_regions_by_region_code = array();
+
 		if ( is_array( $country ) ) {
-			foreach ( $country as $property => $value ) {
-				// copy the properties in this copy of the country
-				$property = '_' . $property;
 
-				if ( ! property_exists( $this, $property ) ) {
-					error_log( __CLASS__ . ' property ' . $property . ' does no exist' );
-				}
+			$this->_id = $country['id'];
 
-				$this->$property = $value;
+			if ( isset( $country['country'] ) ) {
+				$this->_name = $country['country'];   // backwards compatibility to before 3.8.14
+				_wpsc_deprecated_argument( __FUNCTION__, '3.8.14', $this->_parameter_no_longer_used_message( 'country', __FUNCTION__ ) );
 			}
+
+			if ( isset( $country['name'] ) ) {
+				$this->_name = $country['name'];
+			}
+
+			if ( isset( $country['isocode'] ) ) {
+				$this->_isocode = $country['isocode'];
+			}
+
+			if ( isset( $country['has_regions'] ) ) {
+				$this->_has_regions = $country['has_regions'];
+			}
+
+			if ( isset( $country['tax'] ) ) {
+				$this->_tax = $country['tax'];
+			}
+
+			if ( isset( $country['continent'] ) ) {
+				$this->_continent = $country['continent'];
+			}
+
+			if ( isset( $country['visible'] ) ) {
+				$this->_visible = $country['visible'];
+			}
+
+			// TODO: Perhaps the currency data belongs in a WPSC_Currency object?
+			if ( isset( $country['currency_name'] ) ) {
+				$this->_currency_name = $country['currency_name'];
+			}
+
+			if ( isset( $country['currency_symbol'] ) ) {
+				$this->_currency_symbol = $country['currency_symbol'];
+			}
+
+			if ( isset( $country['currency_symbol_html'] ) ) {
+				$this->_currency_symbol_html = $country['currency_symbol_html'];
+			}
+
+			if ( isset( $country['currency_code'] ) ) {
+				$this->_currency_code = $country['currency_code'];
+			}
+
+			// we are going to keep track of the default visibility so that we can
+			// save changes to the visibilty persistantly
+			if ( ! isset( $country['_default_visible'] ) && isset( $country['_visible'] ) ) {
+				$this->_default_visible = $this->_visible;
+			}
+
+			// NOTE: when initializing an object using an array od data the regions data requires additional
+			// calls to setup.  see the WPSC_Countries calss for initialization examples.
 
 		} else {
 
@@ -52,9 +102,6 @@ class WPSC_Country {
 			}
 		}
 
-		$this->_regions_by_region_id   = array();
-		$this->_regions_by_region_name = array();
-		$this->_regions_by_region_code = array();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// As a result of merging the legacy WPSC_Country class we no longer need the "col" constructor parameter
@@ -75,6 +122,8 @@ class WPSC_Country {
 
 		// setup default properties filter
 		add_filter( 'wpsc_country_get_property', array( __CLASS__, '_wpsc_country_default_properties' ), 10, 2 );
+
+		$this->_visible = apply_filters( 'wpsc_is_country_visible', $this->_visible, $this );
 	}
 
 
@@ -277,6 +326,36 @@ class WPSC_Country {
 	public function is_visible() {
 		return $this->_visible;
 	}
+
+	/**
+	 * should the country be displayed to the user
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return boolean true if the country should be displayed, false otherwise
+	 */
+	public function default_is_visible() {
+		return $this->_default_visible;
+	}
+
+	/**
+	 * should the country be displayed to the user
+	 *
+	 * @access public
+	 *
+	 * @since 3.8.14
+	 *
+	 * @return boolean true if the country should be displayed, false otherwise
+	 */
+	public function set_visible( $visibility = true ) {
+		if ( $this->_visible != $visibility ) {
+			$this->_visible = $visibility;
+			do_action( 'wpsc_country_visibility_changed', $this );
+		}
+	}
+
 
 	/**
 	 * returns a country's property matching the key, either a well know property or a property defined elsewhere
@@ -501,7 +580,7 @@ class WPSC_Country {
 
 		if ( $region_code && isset( $this->_regions_by_region_code[ $region_code ] ) ) {
 			$wpsc_region = $this->_regions_by_region_code[ $region_code ];
-			$region_id = $wpsc_region->get_id();
+			$region_id   = $wpsc_region->get_id();
 		} else {
 			$region_id = false;
 		}
@@ -523,8 +602,8 @@ class WPSC_Country {
 	public function get_region_id_by_region_name( $region_name ) {
 
 		if ( $region_name && isset( $this->_regions_by_region_code[ strtolower( $region_name ) ] ) ) {
-			$wpsc_region = $this->_regions_by_region_name[ strtolower( $region_name )  ];
-			$region_id = $wpsc_region->get_id();
+			$wpsc_region = $this->_regions_by_region_name[ strtolower( $region_name ) ];
+			$region_id   = $wpsc_region->get_id();
 		} else {
 			$region_id = false;
 		}
@@ -555,7 +634,7 @@ class WPSC_Country {
 		$this->_continent     = $country->continent;
 		$this->_visible       = $country->visible;
 
-		// TODO: perhaps the currency information embedded in a country should reference a WPSC_Currency object by code?
+		// TODO: perhaps the currency information embedded in a country should reference a WPSC_Currency object by currency code?
 		$this->_currency_symbol      = $country->symbol;
 		$this->_currency_symbol_html = $country->symbol_html;
 		$this->_currency_code        = $country->code;
@@ -630,6 +709,7 @@ class WPSC_Country {
 	private $_tax = '';
 	private $_continent = '';
 	private $_visible = true;
+	private $_default_visible = true;
 
 	/**
 	 * Array of regions, indexed by region id
@@ -641,7 +721,7 @@ class WPSC_Country {
 	 *
 	 * @var WPSC_Region[]
 	 */
-	private $_regions_by_region_id   = array();
+	private $_regions_by_region_id = array();
 
 	/**
 	 * Array of regions, indexed by lower case of region name

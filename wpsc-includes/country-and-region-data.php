@@ -17,7 +17,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         2 => array(
             'name' => __('Martinique (French)', 'wpsc'),
@@ -29,7 +29,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         3 => array(
             'name' => __('Malta', 'wpsc'),
@@ -41,7 +41,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         4 => array(
             'name' => __('Marshall Islands', 'wpsc'),
@@ -53,7 +53,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         5 => array(
             'name' => __('Mali', 'wpsc'),
@@ -65,7 +65,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         6 => array(
             'name' => __('Maldives', 'wpsc'),
@@ -77,7 +77,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         7 => array(
             'name' => __('Malaysia', 'wpsc'),
@@ -89,7 +89,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         8 => array(
             'name' => __('Malawi', 'wpsc'),
@@ -101,7 +101,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         9 => array(
             'name' => __('Madagascar', 'wpsc'),
@@ -113,7 +113,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         10 => array(
             'name' => __('Macau', 'wpsc'),
@@ -125,7 +125,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         11 => array(
             'name' => __('Macedonia', 'wpsc'),
@@ -137,7 +137,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         12 => array(
             'name' => __('Luxembourg', 'wpsc'),
@@ -149,7 +149,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         13 => array(
             'name' => __('Lithuania', 'wpsc'),
@@ -161,7 +161,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         14 => array(
             'name' => __('Liechtenstein', 'wpsc'),
@@ -173,7 +173,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         15 => array(
             'name' => __('Libya', 'wpsc'),
@@ -185,7 +185,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         16 => array(
             'name' => __('Liberia', 'wpsc'),
@@ -197,7 +197,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         17 => array(
             'name' => __('Lesotho', 'wpsc'),
@@ -209,7 +209,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         18 => array(
             'name' => __('Lebanon', 'wpsc'),
@@ -221,7 +221,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         19 => array(
             'name' => __('Latvia', 'wpsc'),
@@ -233,7 +233,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         20 => array(
             'name' => __('Laos', 'wpsc'),
@@ -245,7 +245,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         21 => array(
             'name' => __('Kyrgyzstan', 'wpsc'),
@@ -257,7 +257,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         22 => array(
             'name' => __('Kuwait', 'wpsc'),
@@ -269,7 +269,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         23 => array(
             'name' => __('Korea, South', 'wpsc'),
@@ -281,7 +281,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         24 => array(
             'name' => __('Korea, North', 'wpsc'),
@@ -293,7 +293,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         25 => array(
             'name' => __('Kiribati', 'wpsc'),
@@ -305,7 +305,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         26 => array(
             'name' => __('Kenya', 'wpsc'),
@@ -317,7 +317,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         27 => array(
             'name' => __('Kazakhstan', 'wpsc'),
@@ -329,7 +329,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         28 => array(
             'name' => __('Jordan', 'wpsc'),
@@ -341,7 +341,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         29 => array(
             'name' => __('Jersey', 'wpsc'),
@@ -353,7 +353,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         30 => array(
             'name' => __('Japan', 'wpsc'),
@@ -365,7 +365,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         31 => array(
             'name' => __('Jamaica', 'wpsc'),
@@ -377,7 +377,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         32 => array(
             'name' => __('Ivory Coast', 'wpsc'),
@@ -389,7 +389,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         33 => array(
             'name' => __('Italy', 'wpsc'),
@@ -401,7 +401,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         34 => array(
             'name' => __('Isle of Man', 'wpsc'),
@@ -413,7 +413,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         35 => array(
             'name' => __('Israel', 'wpsc'),
@@ -425,7 +425,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         36 => array(
             'name' => __('Ireland', 'wpsc'),
@@ -437,7 +437,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         37 => array(
             'name' => __('Iraq', 'wpsc'),
@@ -449,7 +449,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         38 => array(
             'name' => __('Indonesia', 'wpsc'),
@@ -461,7 +461,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         39 => array(
             'name' => __('Iran', 'wpsc'),
@@ -473,7 +473,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         40 => array(
             'name' => __('India', 'wpsc'),
@@ -485,7 +485,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         41 => array(
             'name' => __('Iceland', 'wpsc'),
@@ -497,7 +497,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         42 => array(
             'name' => __('Hungary', 'wpsc'),
@@ -509,7 +509,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         43 => array(
             'name' => __('Hong Kong', 'wpsc'),
@@ -521,7 +521,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         44 => array(
             'name' => __('Honduras', 'wpsc'),
@@ -533,7 +533,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         45 => array(
             'name' => __('Heard Island and McDonald Islands', 'wpsc'),
@@ -545,7 +545,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         46 => array(
             'name' => __('Haiti', 'wpsc'),
@@ -557,7 +557,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         47 => array(
             'name' => __('Guyana', 'wpsc'),
@@ -569,7 +569,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         48 => array(
             'name' => __('Guinea Bissau', 'wpsc'),
@@ -581,7 +581,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         49 => array(
             'name' => __('Guinea', 'wpsc'),
@@ -593,7 +593,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         50 => array(
             'name' => __('Guernsey', 'wpsc'),
@@ -605,7 +605,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         51 => array(
             'name' => __('Guatemala', 'wpsc'),
@@ -617,7 +617,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         52 => array(
             'name' => __('Guam (USA)', 'wpsc'),
@@ -629,7 +629,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         53 => array(
             'name' => __('Grenada', 'wpsc'),
@@ -641,7 +641,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         54 => array(
             'name' => __('Guadeloupe (French)', 'wpsc'),
@@ -653,7 +653,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         55 => array(
             'name' => __('Greenland', 'wpsc'),
@@ -665,7 +665,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         56 => array(
             'name' => __('Greece', 'wpsc'),
@@ -677,7 +677,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '19',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         57 => array(
             'name' => __('Gibraltar', 'wpsc'),
@@ -689,7 +689,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         58 => array(
             'name' => __('Ghana', 'wpsc'),
@@ -701,7 +701,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         59 => array(
             'name' => __('Germany', 'wpsc'),
@@ -713,7 +713,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         60 => array(
             'name' => __('Georgia', 'wpsc'),
@@ -725,7 +725,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         61 => array(
             'name' => __('Gambia', 'wpsc'),
@@ -737,7 +737,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         62 => array(
             'name' => __('Gabon', 'wpsc'),
@@ -749,7 +749,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         63 => array(
             'name' => __('French Southern Territories', 'wpsc'),
@@ -761,7 +761,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         64 => array(
             'name' => __('France', 'wpsc'),
@@ -773,7 +773,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         65 => array(
             'name' => __('Finland', 'wpsc'),
@@ -785,7 +785,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         66 => array(
             'name' => __('Fiji', 'wpsc'),
@@ -797,7 +797,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         67 => array(
             'name' => __('Faroe Islands', 'wpsc'),
@@ -809,7 +809,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         68 => array(
             'name' => __('Falkland Islands', 'wpsc'),
@@ -821,7 +821,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         69 => array(
             'name' => __('Ethiopia', 'wpsc'),
@@ -833,7 +833,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         70 => array(
             'name' => __('Estonia', 'wpsc'),
@@ -845,7 +845,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         71 => array(
             'name' => __('Eritrea', 'wpsc'),
@@ -857,7 +857,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         72 => array(
             'name' => __('Equatorial Guinea', 'wpsc'),
@@ -869,7 +869,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         73 => array(
             'name' => __('El Salvador', 'wpsc'),
@@ -881,7 +881,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         74 => array(
             'name' => __('Egypt', 'wpsc'),
@@ -893,7 +893,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         75 => array(
             'name' => __('Ecuador', 'wpsc'),
@@ -905,7 +905,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         76 => array(
             'name' => __('East Timor', 'wpsc'),
@@ -917,7 +917,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         77 => array(
             'name' => __('Dominican Republic', 'wpsc'),
@@ -929,7 +929,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         78 => array(
             'name' => __('Dominica', 'wpsc'),
@@ -941,7 +941,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         79 => array(
             'name' => __('Djibouti', 'wpsc'),
@@ -953,7 +953,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         80 => array(
             'name' => __('Denmark', 'wpsc'),
@@ -965,7 +965,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         81 => array(
             'name' => __('Democratic Republic of Congo', 'wpsc'),
@@ -977,7 +977,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         82 => array(
             'name' => __('Czech Rep.', 'wpsc'),
@@ -989,7 +989,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         83 => array(
             'name' => __('Cyprus', 'wpsc'),
@@ -1001,7 +1001,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         84 => array(
             'name' => __('Cuba', 'wpsc'),
@@ -1013,7 +1013,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         85 => array(
             'name' => __('Croatia', 'wpsc'),
@@ -1025,7 +1025,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         86 => array(
             'name' => __('Costa Rica', 'wpsc'),
@@ -1037,7 +1037,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         87 => array(
             'name' => __('Cook Islands', 'wpsc'),
@@ -1049,7 +1049,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         88 => array(
             'name' => __('Congo', 'wpsc'),
@@ -1061,7 +1061,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         89 => array(
             'name' => __('Comoros', 'wpsc'),
@@ -1073,7 +1073,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         90 => array(
             'name' => __('Colombia', 'wpsc'),
@@ -1085,7 +1085,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         91 => array(
             'name' => __('Cocos (Keeling) Islands', 'wpsc'),
@@ -1097,7 +1097,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         92 => array(
             'name' => __('Christmas Island', 'wpsc'),
@@ -1109,7 +1109,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         93 => array(
             'name' => __('Chile', 'wpsc'),
@@ -1121,7 +1121,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         94 => array(
             'name' => __('China', 'wpsc'),
@@ -1133,7 +1133,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         95 => array(
             'name' => __('Chad', 'wpsc'),
@@ -1145,7 +1145,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         96 => array(
             'name' => __('Central African Republic', 'wpsc'),
@@ -1157,7 +1157,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         97 => array(
             'name' => __('Cayman Islands', 'wpsc'),
@@ -1169,7 +1169,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         98 => array(
             'name' => __('Cape Verde', 'wpsc'),
@@ -1181,7 +1181,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         99 => array(
             'name' => __('Cameroon', 'wpsc'),
@@ -1193,7 +1193,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         100 => array(
             'name' => __('Canada', 'wpsc'),
@@ -1217,7 +1217,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         102 => array(
             'name' => __('Burundi', 'wpsc'),
@@ -1229,7 +1229,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         103 => array(
             'name' => __('Burkina Faso', 'wpsc'),
@@ -1241,7 +1241,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         104 => array(
             'name' => __('Bulgaria', 'wpsc'),
@@ -1253,7 +1253,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         105 => array(
             'name' => __('Brunei Darussalam', 'wpsc'),
@@ -1265,7 +1265,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         106 => array(
             'name' => __('British Indian Ocean Territory', 'wpsc'),
@@ -1277,7 +1277,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         107 => array(
             'name' => __('Brazil', 'wpsc'),
@@ -1289,7 +1289,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         108 => array(
             'name' => __('Bouvet Island', 'wpsc'),
@@ -1301,7 +1301,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         109 => array(
             'name' => __('Botswana', 'wpsc'),
@@ -1313,7 +1313,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         110 => array(
             'name' => __('Bosnia-Herzegovina', 'wpsc'),
@@ -1325,7 +1325,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         111 => array(
             'name' => __('Bolivia', 'wpsc'),
@@ -1337,7 +1337,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         112 => array(
             'name' => __('Bhutan', 'wpsc'),
@@ -1349,7 +1349,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         113 => array(
             'name' => __('Bermuda', 'wpsc'),
@@ -1361,7 +1361,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         114 => array(
             'name' => __('Benin', 'wpsc'),
@@ -1373,7 +1373,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         115 => array(
             'name' => __('Belize', 'wpsc'),
@@ -1385,7 +1385,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         116 => array(
             'name' => __('Belgium', 'wpsc'),
@@ -1397,7 +1397,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         117 => array(
             'name' => __('Belarus', 'wpsc'),
@@ -1409,7 +1409,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         118 => array(
             'name' => __('Barbados', 'wpsc'),
@@ -1421,7 +1421,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         119 => array(
             'name' => __('Bangladesh', 'wpsc'),
@@ -1433,7 +1433,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         120 => array(
             'name' => __('Bahrain', 'wpsc'),
@@ -1445,7 +1445,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         121 => array(
             'name' => __('Bahamas', 'wpsc'),
@@ -1457,7 +1457,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         122 => array(
             'name' => __('Azerbaijan', 'wpsc'),
@@ -1469,7 +1469,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         123 => array(
             'name' => __('Austria', 'wpsc'),
@@ -1481,7 +1481,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         124 => array(
             'name' => __('Aruba', 'wpsc'),
@@ -1493,7 +1493,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         125 => array(
             'name' => __('Armenia', 'wpsc'),
@@ -1505,7 +1505,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         126 => array(
             'name' => __('Argentina', 'wpsc'),
@@ -1517,7 +1517,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         127 => array(
             'name' => __('Antigua and Barbuda', 'wpsc'),
@@ -1529,7 +1529,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         128 => array(
             'name' => __('Antarctica', 'wpsc'),
@@ -1541,7 +1541,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'antarctica',
-            'visible' => false
+           'visible' => true
         ),
         129 => array(
             'name' => __('Anguilla', 'wpsc'),
@@ -1553,7 +1553,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         130 => array(
             'name' => __('Angola', 'wpsc'),
@@ -1565,7 +1565,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         131 => array(
             'name' => __('Andorra', 'wpsc'),
@@ -1577,7 +1577,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         132 => array(
             'name' => __('American Samoa', 'wpsc'),
@@ -1589,7 +1589,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         133 => array(
             'name' => __('Algeria', 'wpsc'),
@@ -1601,7 +1601,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         134 => array(
             'name' => __('Albania', 'wpsc'),
@@ -1613,7 +1613,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         135 => array(
             'name' => __('Afghanistan', 'wpsc'),
@@ -1625,7 +1625,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         136 => array(
             'name' => __('USA', 'wpsc'),
@@ -1649,7 +1649,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         138 => array(
             'name' => __('United Kingdom', 'wpsc'),
@@ -1661,7 +1661,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         139 => array(
             'name' => __('Mauritius', 'wpsc'),
@@ -1673,7 +1673,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         140 => array(
             'name' => __('Mayotte', 'wpsc'),
@@ -1685,7 +1685,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         141 => array(
             'name' => __('Mexico', 'wpsc'),
@@ -1697,7 +1697,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         142 => array(
             'name' => __('Micronesia', 'wpsc'),
@@ -1709,7 +1709,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         143 => array(
             'name' => __('Moldova', 'wpsc'),
@@ -1721,7 +1721,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         144 => array(
             'name' => __('Monaco', 'wpsc'),
@@ -1733,7 +1733,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         145 => array(
             'name' => __('Mongolia', 'wpsc'),
@@ -1745,7 +1745,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         146 => array(
             'name' => __('Montserrat', 'wpsc'),
@@ -1757,7 +1757,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         147 => array(
             'name' => __('Morocco', 'wpsc'),
@@ -1769,7 +1769,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         148 => array(
             'name' => __('Mozambique', 'wpsc'),
@@ -1781,7 +1781,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         149 => array(
             'name' => __('Myanmar', 'wpsc'),
@@ -1793,7 +1793,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         150 => array(
             'name' => __('Namibia', 'wpsc'),
@@ -1805,7 +1805,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         151 => array(
             'name' => __('Nauru', 'wpsc'),
@@ -1817,7 +1817,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         152 => array(
             'name' => __('Nepal', 'wpsc'),
@@ -1829,7 +1829,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         153 => array(
             'name' => __('Netherlands', 'wpsc'),
@@ -1841,7 +1841,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         154 => array(
             'name' => __('Netherlands Antilles', 'wpsc'),
@@ -1853,7 +1853,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         155 => array(
             'name' => __('New Caledonia (French)', 'wpsc'),
@@ -1865,7 +1865,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         156 => array(
             'name' => __('New Zealand', 'wpsc'),
@@ -1877,7 +1877,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '12.5',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         157 => array(
             'name' => __('Nicaragua', 'wpsc'),
@@ -1889,7 +1889,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         158 => array(
             'name' => __('Niger', 'wpsc'),
@@ -1901,7 +1901,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         159 => array(
             'name' => __('Nigeria', 'wpsc'),
@@ -1913,7 +1913,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         160 => array(
             'name' => __('Niue', 'wpsc'),
@@ -1925,7 +1925,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         161 => array(
             'name' => __('Norfolk Island', 'wpsc'),
@@ -1937,7 +1937,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         162 => array(
             'name' => __('Northern Mariana Islands', 'wpsc'),
@@ -1949,7 +1949,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         163 => array(
             'name' => __('Norway', 'wpsc'),
@@ -1961,7 +1961,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         164 => array(
             'name' => __('Oman', 'wpsc'),
@@ -1973,7 +1973,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         165 => array(
             'name' => __('Pakistan', 'wpsc'),
@@ -1985,7 +1985,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         166 => array(
             'name' => __('Palau', 'wpsc'),
@@ -1997,7 +1997,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         167 => array(
             'name' => __('Panama', 'wpsc'),
@@ -2009,7 +2009,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         168 => array(
             'name' => __('Papua New Guinea', 'wpsc'),
@@ -2021,7 +2021,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         169 => array(
             'name' => __('Paraguay', 'wpsc'),
@@ -2033,7 +2033,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         170 => array(
             'name' => __('Peru', 'wpsc'),
@@ -2045,7 +2045,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         171 => array(
             'name' => __('Philippines', 'wpsc'),
@@ -2057,7 +2057,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         172 => array(
             'name' => __('Pitcairn Island', 'wpsc'),
@@ -2069,7 +2069,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         173 => array(
             'name' => __('Poland', 'wpsc'),
@@ -2081,7 +2081,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         174 => array(
             'name' => __('Polynesia (French)', 'wpsc'),
@@ -2093,7 +2093,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         175 => array(
             'name' => __('Portugal', 'wpsc'),
@@ -2105,7 +2105,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         176 => array(
             'name' => __('Puerto Rico', 'wpsc'),
@@ -2117,7 +2117,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         177 => array(
             'name' => __('Qatar', 'wpsc'),
@@ -2129,7 +2129,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         178 => array(
             'name' => __('Reunion (French)', 'wpsc'),
@@ -2141,7 +2141,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         179 => array(
             'name' => __('Romania', 'wpsc'),
@@ -2153,7 +2153,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         180 => array(
             'name' => __('Russia', 'wpsc'),
@@ -2165,7 +2165,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         181 => array(
             'name' => __('Rwanda', 'wpsc'),
@@ -2177,7 +2177,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         182 => array(
             'name' => __('Saint Helena', 'wpsc'),
@@ -2189,7 +2189,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         183 => array(
             'name' => __('Saint Kitts & Nevis Anguilla', 'wpsc'),
@@ -2201,7 +2201,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         184 => array(
             'name' => __('Saint Lucia', 'wpsc'),
@@ -2213,7 +2213,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         185 => array(
             'name' => __('Saint Pierre and Miquelon', 'wpsc'),
@@ -2225,7 +2225,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         186 => array(
             'name' => __('Saint Vincent & Grenadines', 'wpsc'),
@@ -2237,7 +2237,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         187 => array(
             'name' => __('Samoa', 'wpsc'),
@@ -2249,7 +2249,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         188 => array(
             'name' => __('San Marino', 'wpsc'),
@@ -2261,7 +2261,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         189 => array(
             'name' => __('Sao Tome and Principe', 'wpsc'),
@@ -2273,7 +2273,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         190 => array(
             'name' => __('Saudi Arabia', 'wpsc'),
@@ -2285,7 +2285,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         191 => array(
             'name' => __('Senegal', 'wpsc'),
@@ -2297,7 +2297,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         192 => array(
             'name' => __('Seychelles', 'wpsc'),
@@ -2309,7 +2309,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         193 => array(
             'name' => __('Sierra Leone', 'wpsc'),
@@ -2321,7 +2321,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         194 => array(
             'name' => __('Singapore', 'wpsc'),
@@ -2333,7 +2333,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         195 => array(
             'name' => __('Slovakia', 'wpsc'),
@@ -2345,7 +2345,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         196 => array(
             'name' => __('Slovenia', 'wpsc'),
@@ -2357,7 +2357,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         197 => array(
             'name' => __('Solomon Islands', 'wpsc'),
@@ -2369,7 +2369,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         198 => array(
             'name' => __('Somalia', 'wpsc'),
@@ -2381,7 +2381,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         199 => array(
             'name' => __('South Africa', 'wpsc'),
@@ -2393,7 +2393,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         200 => array(
             'name' => __('South Georgia & South Sandwich Islands', 'wpsc'),
@@ -2405,7 +2405,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         201 => array(
             'name' => __('Spain', 'wpsc'),
@@ -2417,7 +2417,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         202 => array(
             'name' => __('Sri Lanka', 'wpsc'),
@@ -2429,7 +2429,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         203 => array(
             'name' => __('Sudan', 'wpsc'),
@@ -2441,7 +2441,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         204 => array(
             'name' => __('Suriname', 'wpsc'),
@@ -2453,7 +2453,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         205 => array(
             'name' => __('Svalbard and Jan Mayen Islands', 'wpsc'),
@@ -2465,7 +2465,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => '',
-            'visible' => false
+           'visible' => true
         ),
         206 => array(
             'name' => __('Swaziland', 'wpsc'),
@@ -2477,7 +2477,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         207 => array(
             'name' => __('Sweden', 'wpsc'),
@@ -2489,7 +2489,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         208 => array(
             'name' => __('Switzerland', 'wpsc'),
@@ -2501,7 +2501,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         209 => array(
             'name' => __('Syria', 'wpsc'),
@@ -2513,7 +2513,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         210 => array(
             'name' => __('Taiwan', 'wpsc'),
@@ -2525,7 +2525,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         211 => array(
             'name' => __('Tajikistan', 'wpsc'),
@@ -2537,7 +2537,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         212 => array(
             'name' => __('Tanzania', 'wpsc'),
@@ -2549,7 +2549,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         213 => array(
             'name' => __('Thailand', 'wpsc'),
@@ -2561,7 +2561,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         214 => array(
             'name' => __('Togo', 'wpsc'),
@@ -2573,7 +2573,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         215 => array(
             'name' => __('Tokelau', 'wpsc'),
@@ -2585,7 +2585,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         216 => array(
             'name' => __('Tonga', 'wpsc'),
@@ -2597,7 +2597,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         217 => array(
             'name' => __('Trinidad and Tobago', 'wpsc'),
@@ -2609,7 +2609,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         218 => array(
             'name' => __('Tunisia', 'wpsc'),
@@ -2621,7 +2621,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         219 => array(
             'name' => __('Turkey', 'wpsc'),
@@ -2633,7 +2633,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         220 => array(
             'name' => __('Turkmenistan', 'wpsc'),
@@ -2645,7 +2645,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         221 => array(
             'name' => __('Turks and Caicos Islands', 'wpsc'),
@@ -2657,7 +2657,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         222 => array(
             'name' => __('Tuvalu', 'wpsc'),
@@ -2669,7 +2669,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         223 => array(
             'name' => __('U.K.', 'wpsc'),
@@ -2681,7 +2681,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '17.5',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         224 => array(
             'name' => __('Uganda', 'wpsc'),
@@ -2693,7 +2693,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         225 => array(
             'name' => __('Ukraine', 'wpsc'),
@@ -2705,7 +2705,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         226 => array(
             'name' => __('United Arab Emirates', 'wpsc'),
@@ -2717,7 +2717,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         227 => array(
             'name' => __('Uruguay', 'wpsc'),
@@ -2729,7 +2729,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         228 => array(
             'name' => __('USA Minor Outlying Islands', 'wpsc'),
@@ -2741,7 +2741,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => '',
-            'visible' => false
+           'visible' => true
         ),
         229 => array(
             'name' => __('Uzbekistan', 'wpsc'),
@@ -2753,7 +2753,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         230 => array(
             'name' => __('Vanuatu', 'wpsc'),
@@ -2765,7 +2765,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         231 => array(
             'name' => __('Vatican', 'wpsc'),
@@ -2777,7 +2777,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         232 => array(
             'name' => __('Venezuela', 'wpsc'),
@@ -2789,7 +2789,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         233 => array(
             'name' => __('Vietnam', 'wpsc'),
@@ -2801,7 +2801,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         234 => array(
             'name' => __('Virgin Islands (British)', 'wpsc'),
@@ -2813,7 +2813,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         235 => array(
             'name' => __('Virgin Islands (USA)', 'wpsc'),
@@ -2825,7 +2825,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'northamerica',
-            'visible' => false
+           'visible' => true
         ),
         236 => array(
             'name' => __('Wallis and Futuna Islands', 'wpsc'),
@@ -2837,7 +2837,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         237 => array(
             'name' => __('Western Sahara', 'wpsc'),
@@ -2849,7 +2849,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         238 => array(
             'name' => __('Yemen', 'wpsc'),
@@ -2861,7 +2861,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         239 => array(
             'name' => __('Yugoslavia', 'wpsc'),
@@ -2873,7 +2873,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         240 => array(
             'name' => __('Zambia', 'wpsc'),
@@ -2885,7 +2885,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         241 => array(
             'name' => __('Zimbabwe', 'wpsc'),
@@ -2897,7 +2897,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => false,
             'tax' => '0',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         242 => array(
             'name' => __('South Sudan', 'wpsc'),
@@ -2909,7 +2909,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'africa',
-            'visible' => false
+           'visible' => true
         ),
         243 => array(
             'name' => __('Serbia', 'wpsc'),
@@ -2921,7 +2921,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         244 => array(
             'name' => __('Montenegro', 'wpsc'),
@@ -2933,7 +2933,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         245 => array(
             'name' => __('Timor-Leste', 'wpsc'),
@@ -2945,7 +2945,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         246 => array(
             'name' => __('Aland Islands', 'wpsc'),
@@ -2957,7 +2957,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         247 => array(
             'name' => __('Saint Barthelemy', 'wpsc'),
@@ -2969,7 +2969,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'europe',
-            'visible' => false
+           'visible' => true
         ),
         248 => array(
             'name' => __('Bonaire, Sint Eustatius and Saba', 'wpsc'),
@@ -2981,7 +2981,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         249 => array(
             'name' => __('Curacao', 'wpsc'),
@@ -2993,7 +2993,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         250 => array(
             'name' => __('Saint Martin (French Part)', 'wpsc'),
@@ -3005,7 +3005,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         251 => array(
             'name' => __('Palestinian Territories', 'wpsc'),
@@ -3017,7 +3017,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'asiapacific',
-            'visible' => false
+           'visible' => true
         ),
         252 => array(
             'name' => __('Sint Maarten (Dutch Part)', 'wpsc'),
@@ -3029,7 +3029,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
         253 => array(
             'name' => __('French Guiana', 'wpsc'),
@@ -3041,7 +3041,7 @@ function _wpsc_get_countries_data_array() {
             'has_regions' => '',
             'tax' => '',
             'continent' => 'southamerica',
-            'visible' => false
+           'visible' => true
         ),
     );
     /**

@@ -136,10 +136,7 @@ class WP_eCommerce {
 		$wpdb->wpsc_visitors            = WPSC_TABLE_VISITORS;
 		$wpdb->wpsc_visitormeta         = WPSC_TABLE_VISITOR_META;
 
-		if ( defined( 'WPSC_LOAD_DEPRECATED') && WPSC_LOAD_DEPRECATED ) {
-			$wpdb->wpsc_currency_list = WPSC_TABLE_CURRENCY_LIST;
-			$wpdb->wpsc_region_tax          = WPSC_TABLE_REGION_TAX;
-		}
+		do_action( 'wpsc_setup_table_names' );
 	}
 
 	/**

@@ -37,7 +37,7 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 	}
 
 	public function display() {
-		global $wpdb;
+		$all_countries = wpsc_get_all_countries();
 		?>
 		<h3><?php echo esc_html_e( 'General Settings', 'wpsc' ); ?></h3>
 		<table class='wpsc_options form-table'>
@@ -60,10 +60,6 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 				</td>
 			</tr>
 
-			<?php
-				/* START OF TARGET MARKET SELECTION */
-				$countrylist = WPSC_Countries::get_countries_array( true, true );
-			?>
 			<tr>
 				<th scope="row">
 					<?php esc_html_e( 'Target Markets', 'wpsc' ); ?>
@@ -79,13 +75,13 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 								<?php printf( __( 'Select: <a href="%1$s"  class="wpsc-select-all" title="All">All</a> <a href="%2$s" class="wpsc-select-none" title="None">None</a>' , 'wpsc') , esc_url( add_query_arg( array( 'selected_all' => 'all' ) ) ), esc_url( add_query_arg( array( 'selected_all' => 'none' ) ) ) ); ?>
 							</span><br />
 							<div id='wpsc-target-markets' class='ui-widget-content multiple-select'>
-								<?php foreach ( (array)$countrylist as $country ) : ?>
-									<?php if ( $country['visible'] == 1 ) : ?>
-										<input type='checkbox' id="countrylist2-<?php echo $country['id']; ?>" name='countrylist2[]' value='<?php echo $country['id']; ?>' checked='checked' />
-										<label for="countrylist2-<?php echo $country['id']; ?>"><?php esc_html_e( $country['country'] ); ?></label><br />
+								<?php foreach ( $all_countries as $country_id => $wpsc_country ) : ?>
+									<?php if ( $wpsc_country->is_visible() ) : ?>
+										<input type='checkbox' id="countrylist2-<?php echo $country_id; ?>" name='countrylist2[]' value='<?php echo $country_id; ?>' checked='checked' />
+										<label for="countrylist2-<?php echo $country_id; ?>"><?php esc_html_e( $wpsc_country->get_name() ); ?></label><br />
 									<?php else : ?>
-										<input type='checkbox' id="countrylist2-<?php echo $country['id']; ?>" name='countrylist2[]' value='<?php echo $country['id']; ?>'  />
-										<label for="countrylist2-<?php echo $country['id']; ?>"><?php esc_html_e( $country['country'] ); ?></label><br />
+										<input type='checkbox' id="countrylist2-<?php echo $country_id; ?>" name='countrylist2[]' value='<?php echo $country_id; ?>'  />
+										<label for="countrylist2-<?php echo $country_id; ?>"><?php esc_html_e( $wpsc_country->get_name() ); ?></label><br />
 									<?php endif; ?>
 								<?php endforeach; ?>
 							</div>
@@ -134,27 +130,44 @@ class WPSC_Settings_Tab_General extends WPSC_Settings_Tab {
 		<h3 class="form_group"><?php esc_html_e( 'Currency Settings', 'wpsc' ); ?></h3>
 		<table class='wpsc_options form-table'>
 			<?php
-				$currency_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
-				$currency_type = esc_attr( get_option( 'currency_type' ) );
+			$currency_type_country_id = intval( get_option( 'currency_type', -1 ) );
+
+			// get the country for the current currency type, make sure it is valid, if not
+			// we will move on as if a currency type was not set
+			if ( -1 != $currency_type_country_id ) {
+				$wpsc_country_of_currency_type = wpsc_get_country_object( $currency_type_country_id );
+				if ( ! $wpsc_country_of_currency_type ) {
+					$currency_type_country_id = -1;
+				}
+			}
+
+			if ( -1 == $currency_type_country_id ) {
+				$wpsc_country_of_currency_type = wpsc_get_country_object( 'US' );
+				if ( $wpsc_country_of_currency_type ) {
+					$currency_type_country_id = $wpsc_country_of_currency_type->get_id();
+				}
+			}
 			?>
 			<tr>
 				<th scope="row"><label for="wpsc_options_currency_type"><?php esc_html_e( 'Currency Type', 'wpsc' ); ?></label></th>
 				<td>
 					<select id="wpsc_options_currency_type" name='wpsc_options[currency_type]' onchange='getcurrency(this.options[this.selectedIndex].value);'>
-					<?php foreach ( $currency_data as $currency ) : ?>
-						<option value='<?php echo $currency['id']; ?>' <?php selected( $currency['id'], $currency_type ); ?>><?php esc_html_e( $currency['country'] ); ?> (<?php echo $currency['currency']; ?>)</option>
+					<?php foreach ( $all_countries as $country_id => $wpsc_country ) : ?>
+						<option value='<?php echo $country_id; ?>' <?php selected( $country_id, $currency_type_country_id ); ?>><?php esc_html_e( $wpsc_country->get_name() ); ?> (<?php echo $wpsc_country->get_currency_name(); ?>)</option>
 					<?php endforeach; ?>
 					</select>
 				</td>
 			</tr>
 
 			<?php
-				$currency_data = $wpdb->get_row( "SELECT `symbol`,`symbol_html`,`code` FROM `" . WPSC_TABLE_CURRENCY_LIST . "` WHERE `id`='" . esc_attr( get_option( 'currency_type' ) ) . "' LIMIT 1", ARRAY_A );
+				$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol_html();
 
-				if ( $currency_data['symbol'] != '' ) {
-					$currency_sign = esc_attr( $currency_data['symbol_html'] );
-				} else {
-					$currency_sign = esc_attr( $currency_data['code'] );
+				if ( empty( $currency_sign ) ) {
+					$currency_sign = $wpsc_country_of_currency_type->get_currency_symbol();
+				}
+
+				if ( empty( $currency_sign ) ) {
+					$currency_sign = $wpsc_country_of_currency_type->get_currency_code();
 				}
 
 				$currency_sign_location = esc_attr( get_option( 'currency_sign_location' ) );

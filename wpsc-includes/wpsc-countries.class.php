@@ -126,6 +126,17 @@ class WPSC_Countries {
 	 */
 	private static $currencies = array();
 
+	/**
+	 * Array of countryiso codes that have had thier visibility modified from the default
+	 *
+	 * @access private
+	 * @static
+	 *
+	 * @since 4.1
+	 *
+	 * @var bool[]
+	 */
+	private static $country_visibility_overrides;
 
 	/**
 	 * Creates or returns an instance of this class.
@@ -625,7 +636,8 @@ class WPSC_Countries {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @param boolean return the result as an array, default is to return the result as an object
+	 * @param $code $as_array return the result as an array, default is to return the result as an object
+	 * @param boolean $as_array return the result as an array, default is to return the result as an object
 	 *
 	 * @return boolean|WPSC_Currency|array
 	 */
@@ -764,6 +776,12 @@ class WPSC_Countries {
 	 */
 	protected function __construct() {
 
+		self::$country_visibility_overrides = get_option( 'wpsc_country_visibility_overrides', array() );
+
+		if ( ! empty( self::$country_visibility_overrides ) ) {
+			add_action( 'wpsc_is_country_visible', array( &$this, '_get_country_visible_override' ) , 10, 2 );
+		}
+
 		self::$countries_by_id         = array();
 		self::$visible_countries_by_id = array();
 		self::$countries_by_iso_code   = array();
@@ -798,11 +816,79 @@ class WPSC_Countries {
 			if ( isset( self::$countries_by_id[ $wpsc_region->get_country_id() ] ) ) {
 				self::$countries_by_id[ $wpsc_region->get_country_id() ]->add_region( $wpsc_region );
 			}
-
 		}
 
+		add_action( 'wpsc_country_visibility_changed', array( &$this, 'save_country_visibility_override' ) , 10, 1 );
 	}
 
+	/**
+	 * @param WPSC_Country $wpsc_country
+	 */
+	function _get_country_visible_override( $visibility, $wpsc_country ) {
+		if ( isset( self::$country_visibility_overrides[ $wpsc_country->get_isocode() ] ) ) {
+			$visibility =  self::$country_visibility_overrides[ $wpsc_country->get_isocode() ];
+		}
+
+		return $visibility;
+	}
+
+
+	static function set_visibility( $visibility ) {
+		foreach ( self::$countries_by_id as $country_id => $wpsc_country ) {
+			$wpsc_country->set_visible( $visibility );
+		}
+	}
+
+	/**
+	 * Save any cahnges to a countries visibility persistantly
+	 *
+	 * @param WPSC_Country $wpsc_country
+	 */
+	function save_country_visibility_override( $wpsc_country ) {
+		$update_saved_option = false;
+
+		$country_visibility_overrides = get_option( 'wpsc_country_visibility_overrides', -1 );
+		if ( -1 == $country_visibility_overrides ) {
+			// make sure the option is initialized
+			$update_saved_option = true;
+			$country_visibility_overrides = array();
+		}
+
+		if ( isset( $country_visibility_overrides[ $wpsc_country->get_isocode() ] ) ) {
+			if ( $wpsc_country->is_visible() == $wpsc_country->default_is_visible() ) {
+				unset( $country_visibility_overrides[ $wpsc_country->get_isocode() ] );
+				$update_saved_option = true;
+			}
+		} else {
+			if ( $wpsc_country->is_visible() != $wpsc_country->default_is_visible() ) {
+				$country_visibility_overrides[ $wpsc_country->get_isocode() ] = $wpsc_country->is_visible();
+				$update_saved_option = true;
+			}
+		}
+
+		if ( $update_saved_option ) {
+			update_option( 'wpsc_country_visibility_overrides', $country_visibility_overrides );
+		}
+	}
+
+
+	/**
+	 * @param WPSC_Country $wpsc_country
+	 * @param bool $default
+	 *
+	 * @return bool
+	 */
+	private function get_country_visibilty_with_override( $wpsc_country, $default = true ) {
+
+		$result = $default;
+		$country_visibility_overrides = get_option( 'wpsc_country_visibility_overrides', -1 );
+		if ( is_array( $country_visibility_overrides ) && isset( $country_visibility_overrides[ $wpsc_country->get_isocode() ] ) ) {
+			$result = $country_visibility_overrides[ $wpsc_country->get_isocode() ];
+		}
+
+		return $result;
+
+	}
 	/**
 	 * Returns a count of how many fields are in the checkout form
 	 *
