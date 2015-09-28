@@ -16,7 +16,7 @@ class WP_Widget_Product_Categories extends WP_Widget {
 			'classname' => 'widget_wpsc_categorisation',
 			'description' => __( 'Product Grouping Widget', 'wpsc' )
 		);
-		$this->WP_Widget( 'wpsc_categorisation', __( '(WPEC) Product Categories', 'wpsc' ), $widget_ops );
+		parent::__construct( 'wpsc_categorisation', __( '(WPEC) Product Categories', 'wpsc' ), $widget_ops );
 	}
 
 	/**

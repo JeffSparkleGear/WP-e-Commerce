@@ -18,7 +18,7 @@ class WP_Widget_Admin_Menu extends WP_Widget {
 			'description' => __( 'Admin Menu Widget', 'wpsc' )
 		);
 
-		$this->WP_Widget( 'wpsc_admin_menu', __( '(WPEC) Admin Menu', 'wpsc' ), $widget_ops );
+		parent::__construct( 'wpsc_admin_menu', __( '(WPEC) Admin Menu', 'wpsc' ), $widget_ops );
 
 	}
 

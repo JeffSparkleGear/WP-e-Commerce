@@ -19,7 +19,7 @@ class WP_Widget_Donations extends WP_Widget {
 			'description' => __( 'Donations Widget', 'wpsc' )
 		);
 
-		$this->WP_Widget( 'wpsc_donations', __( '(WPEC) Product Donations', 'wpsc' ), $widget_ops );
+		parent::__construct( 'wpsc_donations', __( '(WPEC) Product Donations', 'wpsc' ), $widget_ops );
 
 	}
 
