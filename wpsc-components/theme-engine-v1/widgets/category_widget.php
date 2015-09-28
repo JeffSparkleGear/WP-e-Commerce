@@ -11,7 +11,7 @@ class WP_Widget_Product_Categories extends WP_Widget {
 	/**
 	 * Widget Constuctor
 	 */
-	function WP_Widget_Product_Categories() {
+	function __construct() {
 		$widget_ops = array(
 			'classname' => 'widget_wpsc_categorisation',
 			'description' => __( 'Product Grouping Widget', 'wpsc' )

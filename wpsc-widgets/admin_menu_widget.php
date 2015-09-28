@@ -9,7 +9,7 @@ class WP_Widget_Admin_Menu extends WP_Widget {
 	/**
 	 * Widget Constuctor
 	 */
-	function WP_Widget_Admin_Menu() {
+	function __construct() {
 		$widget_ops = array(
 			'classname'   => 'widget_wpsc_admin_menu',
 			'description' => __( 'Admin Menu Widget', 'wpsc' )

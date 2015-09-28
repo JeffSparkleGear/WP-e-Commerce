@@ -8,6 +8,7 @@ $wpsc_title_data    = array();
  * _wpsc_is_session_started()
  *
  * Check if PHP session is started using method suggested on php.net
+ *
  * @since 3.8.14
  * @return boolean
  */
@@ -30,6 +31,7 @@ function _wpsc_is_session_started() {
  * wpsc_core_load_session()
  *
  * Load up the WPEC session
+ *
  * @return boolean
  */
 function wpsc_core_load_session() {
@@ -53,15 +55,15 @@ function wpsc_core_constants() {
 
 	// Define Plugin version
 	if ( ! defined( 'WPSC_VERSION' ) ) {
-		define( 'WPSC_VERSION'            , '3.9.3' );
+		define( 'WPSC_VERSION'            , '3.10.1' );
 	}
 
 	if ( ! defined( 'WPSC_MINOR_VERSION' ) ) {
-		define( 'WPSC_MINOR_VERSION'      , '7fdd6de' );
+		define( 'WPSC_MINOR_VERSION'      , 'd31303e' );
 	}
 
 	if ( ! defined( 'WPSC_PRESENTABLE_VERSION' ) ) {
-		define( 'WPSC_PRESENTABLE_VERSION', '3.9.3' );
+		define( 'WPSC_PRESENTABLE_VERSION', '3.10.1' );
 	}
 
 	// Define a salt to use when we hash, WPSC_SALT may be defined for us in our config file, so check first
@@ -210,6 +212,7 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_CART_CONTENTS',          "{$wp_table_prefix}wpsc_cart_contents" );
 	define( 'WPSC_TABLE_SUBMITED_FORM_DATA',     "{$wp_table_prefix}wpsc_submited_form_data" );
 	define( 'WPSC_TABLE_SUBMITTED_FORM_DATA',    "{$wp_table_prefix}wpsc_submited_form_data" );
+	define( 'WPSC_TABLE_CURRENCY_LIST',          "{$wp_table_prefix}wpsc_currency_list" );
 
 	// These tables may be needed in some situations, but are not vital to
 	// the core functionality of the plugin
@@ -241,6 +244,7 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_VARIATION_VALUES',       "{$wp_table_prefix}wpsc_variation_values" );
 	define( 'WPSC_TABLE_VARIATION_VALUES_ASSOC', "{$wp_table_prefix}wpsc_variation_values_assoc" );
 	define( 'WPSC_TABLE_VARIATION_COMBINATIONS', "{$wp_table_prefix}wpsc_variation_combinations" );
+	define( 'WPSC_TABLE_REGION_TAX',             "{$wp_table_prefix}wpsc_region_tax" );
 
 	define( 'WPSC_TABLE_CART_ITEM_META',         "{$wp_table_prefix}wpsc_cart_item_meta" );
 	define( 'WPSC_TABLE_PURCHASE_META',          "{$wp_table_prefix}wpsc_purchase_meta" );
@@ -248,10 +252,6 @@ function wpsc_core_constants_table_names() {
 	define( 'WPSC_TABLE_VISITORS',         		 "{$wp_table_prefix}wpsc_visitors" );
 	define( 'WPSC_TABLE_VISITOR_META',           "{$wp_table_prefix}wpsc_visitor_meta" );
 
-	if ( defined( 'WPEC_LOAD_DEPRECATED' ) && WPEC_LOAD_DEPRECATED ) {
-		define( 'WPSC_TABLE_REGION_TAX', "{$wp_table_prefix}wpsc_region_tax" );
-		define( 'WPSC_TABLE_CURRENCY_LIST', "{$wp_table_prefix}wpsc_currency_list" );
-	}
 }
 
 /**

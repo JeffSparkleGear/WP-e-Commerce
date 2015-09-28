@@ -12,7 +12,7 @@ class WP_Widget_Price_Range extends WP_Widget {
 	/**
 	 * Widget Constuctor
 	 */
-	function WP_Widget_Price_Range() {
+	function __construct() {
 
 		$widget_ops = array(
 			'classname'   => 'widget_wpsc_price_range',

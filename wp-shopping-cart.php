@@ -3,7 +3,7 @@
   * Plugin Name: WP eCommerce
   * Plugin URI: http://wpecommerce.org/
   * Description: A plugin that provides a WordPress Shopping Cart. See also: <a href="http://wpecommerce.org" target="_blank">WPeCommerce.org</a> | <a href="https://wordpress.org/support/plugin/wp-e-commerce/" target="_blank">Support Forum</a> | <a href="http://docs.wpecommerce.org/" target="_blank">Documentation</a>
-  * Version: 3.9.3
+  * Version: 3.10.1
   * Author: WP eCommerce
   * Author URI: http://wpecommerce.org/
   **/
@@ -26,7 +26,7 @@ class WP_eCommerce {
 	 * Start WPEC on plugins loaded
 	 *
 	 * @uses add_action()   Attaches to 'plugins_loaded' hook
-	 * @uses add_filter()   Attaches to 'wpsc_components' hook
+	 * @uses add_action()   Attaches to 'wpsc_components' hook
 	 */
 	public function __construct() {
 		add_action( 'plugins_loaded' , array( $this, 'init' ), 8 );
@@ -119,13 +119,22 @@ class WP_eCommerce {
 		do_action( 'wpsc_started' );
 	}
 
+	/**
+	 * Sets table names as WPDB properties.
+	 *
+	 * @since  4.0
+	 * @return array Array of custom tables
+	 */
 	public function setup_table_names() {
 		global $wpdb;
+
 		$wpdb->wpsc_meta                = WPSC_TABLE_META;
 		$wpdb->wpsc_also_bought         = WPSC_TABLE_ALSO_BOUGHT;
+		$wpdb->wpsc_region_tax          = WPSC_TABLE_REGION_TAX;
 		$wpdb->wpsc_coupon_codes        = WPSC_TABLE_COUPON_CODES;
 		$wpdb->wpsc_cart_contents       = WPSC_TABLE_CART_CONTENTS;
 		$wpdb->wpsc_claimed_stock       = WPSC_TABLE_CLAIMED_STOCK;
+		$wpdb->wpsc_currency_list       = WPSC_TABLE_CURRENCY_LIST;
 		$wpdb->wpsc_purchase_logs       = WPSC_TABLE_PURCHASE_LOGS;
 		$wpdb->wpsc_checkout_forms      = WPSC_TABLE_CHECKOUT_FORMS;
 		$wpdb->wpsc_product_rating      = WPSC_TABLE_PRODUCT_RATING;
@@ -136,7 +145,26 @@ class WP_eCommerce {
 		$wpdb->wpsc_visitors            = WPSC_TABLE_VISITORS;
 		$wpdb->wpsc_visitormeta         = WPSC_TABLE_VISITOR_META;
 
-		do_action( 'wpsc_setup_table_names' );
+		return array(
+			$wpdb->wpsc_meta               ,
+			$wpdb->wpsc_also_bought        ,
+			$wpdb->wpsc_region_tax         ,
+			$wpdb->wpsc_coupon_codes       ,
+			$wpdb->wpsc_cart_contents      ,
+			$wpdb->wpsc_claimed_stock      ,
+			$wpdb->wpsc_currency_list      ,
+			$wpdb->wpsc_purchase_logs      ,
+			$wpdb->wpsc_checkout_forms     ,
+			$wpdb->wpsc_product_rating     ,
+			$wpdb->wpsc_download_status    ,
+			$wpdb->wpsc_submitted_form_data,
+			$wpdb->wpsc_cart_itemmeta      ,
+			$wpdb->wpsc_purchasemeta       ,
+			$wpdb->wpsc_visitors           ,
+			$wpdb->wpsc_visitormeta        ,
+		);
+
+
 	}
 
 	/**
@@ -201,7 +229,7 @@ class WP_eCommerce {
 			foreach ( $registered as $component ) {
 
 				if ( ! is_array( $component['includes'] ) ) {
-					$component['includes'] = array( $component['includes'] );
+					$component['includes'] = array( $component['includes' ] );
 				}
 
 				foreach ( $component['includes'] as $include ) {
@@ -243,12 +271,12 @@ class WP_eCommerce {
 		add_action( 'init', '_wpsc_action_setup_customer', 1 );
 
 		// WPEC is ready to use as soon as WordPress and customer is setup and loaded
-		add_action( 'init', array( $this, '_wpsc_fire_ready_action' ), 100 );
+		add_action( 'init', array( &$this, '_wpsc_fire_ready_action' ), 100 );
 
 		// Load the purchase log statuses
 		wpsc_core_load_purchase_log_statuses();
 
-		// Load unique names and checkout form types
+		// Load unique names and checout form types
 		wpsc_core_load_checkout_data();
 
 		// Load the gateways

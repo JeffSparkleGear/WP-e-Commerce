@@ -127,10 +127,12 @@ function wpsc_price_control_forms() {
 	}
 
 	$product_data['meta']['_wpsc_price'] = wpsc_format_number( $product_data['meta']['_wpsc_price'] );
-	$currency_data = wpsc_get_all_countries();
+
+	$currency_data = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CURRENCY_LIST . "` ORDER BY `country` ASC", ARRAY_A );
 
 	/* Get country name and symbol */
-	$country       = wpsc_get_currency_type_country_object();
+	$currency_type = get_option( 'currency_type' );
+	$country       = new WPSC_Country( $currency_type );
 
 	$ct_code = $country->get_currency_code();   // Country currency code
 	$ct_symb = $country->get_currency_symbol(); // Country symbol
@@ -195,9 +197,9 @@ function wpsc_price_control_forms() {
 								<td class="remove"><a href="#" class="wpsc_delete_currency_layer<?php echo $currency_delete_class; ?>" rel="<?php echo $iso; ?>"><?php echo $currency_delete_text; ?></a></td>
 								<td>
 									<select name="newCurrency[]" class="newCurrency">
-										<?php foreach ( $currency_data as $country_id => $wpsc_country ) : ?>
-											<option value="<?php echo absint( $country_id); ?>" <?php selected( $iso, $wpsc_country->get_isocode() ); ?>>
-												<?php echo esc_html( $wpsc_country->get_name() ); ?> (<?php echo esc_html( $wpsc_country->get_currency() ); ?>)
+										<?php foreach ( $currency_data as $currency ) : ?>
+											<option value="<?php echo absint( $currency['id'] ); ?>" <?php selected( $iso, $currency['isocode'] ); ?>>
+												<?php echo esc_html( $currency['country'] ); ?> (<?php echo esc_html( $currency['currency'] ); ?>)
 											</option>
 										<?php endforeach; ?>
 									</select>
@@ -212,9 +214,9 @@ function wpsc_price_control_forms() {
 						<td class="remove"><a href="#" class="wpsc_delete_currency_layer<?php echo $currency_delete_class; ?>"><?php echo $currency_delete_text; ?></a></td>
 						<td>
 							<select name="newCurrency[]" class="newCurrency">
-								<?php foreach ( $currency_data as $country_id => $wpsc_country ) { ?>
-									<option value="<?php echo absint( $country_id ); ?>">
-										<?php echo esc_html( $wpsc_country->get_name() ); ?>
+								<?php foreach ( (array) $currency_data as $currency ) { ?>
+									<option value="<?php echo absint( $currency['id'] ); ?>">
+										<?php echo esc_html( $currency['country'] ); ?>
 									</option>
 								<?php } ?>
 							</select>
@@ -903,23 +905,15 @@ function wpsc_product_gallery( $post ) {
 				// get the thumbnail URL
 				$thumb_url  = wp_get_attachment_thumb_url( absint( $image_id ) );
 				// output each item
-				$output .= '<li><div class="list_gallery_image">';
-						$output .= '<img src="' . esc_url( $thumb_url ) . '">';
-						$output .= '<input type="hidden" name="wpsc-product-gallery-imgs[]" value="' . absint( $image_id ) . '">';
-
-						$output .= '<span class="product_gallery_image_delete_button dashicons dashicons-no-alt"></span></div>';
-						$output .= '<input type="hidden" class="product_gallery_image_id" value="'.$image_id.'">';
-						$output .= '<input type="hidden" class="product_gallery_post_id" value="'.$post->ID.'">';
+				$output .= '<li>';
+					$output .= '<img src="' . esc_url( $thumb_url ) . '">';
+					$output .= '<input type="hidden" name="wpsc-product-gallery-imgs[]" value="' . absint( $image_id ) . '">';
 				$output .= '</li>';
 			}
 		}
 		$output .= '</ul>';
 		$output .= '<div class="clear"></div>';
 	$output .= '</div>';
-	$nonce_var = wp_create_nonce( 'wpsc_gallery_nonce' );
-  ?>
-  <input type="hidden" class="nonce_class" value="<?php echo $nonce_var; ?>">
-  <?php
 	// button for old iframe for non JS people
 	$output .= '<p class="hide-if-no-js">';
 		$output .= '<a class="button button-small thickbox" title="' . esc_attr__( 'Manage Product Image Gallery...', 'wpsc' ).'" href="' . $upload_iframe_src . '" id="wpsc-manage-product-gallery">';
@@ -1259,7 +1253,7 @@ function wpsc_save_quickedit_box( $post_id ) {
 	global $doaction;
 
 	// Only save product if saving (not autosaving) via AJAX.
-	if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || get_post_type( $post_id ) != 'wpsc-product' ) {	
+	if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || get_post_type( $post_id ) != 'wpsc-product' ) {
 		return;
 	}
 
@@ -1336,8 +1330,12 @@ function wpsc_save_quickedit_box( $post_id ) {
 				case 'sku':
 					if ( $value == __( 'N/A', 'wpsc' ) ) {
 						$value = '';
+					} else {
+						$value = sanitize_text_field( $value );
 					}
 					break;
+				default :
+					$value = sanitize_text_field( $value );
 
 			}
 
@@ -1551,7 +1549,7 @@ function save_term_prices( $term_id ) {
 
 		$term_prices = get_option( 'term_prices' );
 
-		$term_prices[$term_id]["price"] = $_POST["variation_price"];
+		$term_prices[$term_id]["price"] = sanitize_text_field( $_POST["variation_price"] );
 		$term_prices[$term_id]["checked"] = (isset( $_POST["apply_to_current"] )) ? "checked" : "unchecked";
 
 		update_option( 'term_prices', $term_prices );
@@ -1652,7 +1650,7 @@ function wpsc_get_admin_product_gallery( $product_id = 0 ) {
 	// in their galleries
 	foreach( $gallery as $key => $image_id ) {
 		if ( get_post_type( $image_id ) !== 'attachment' ) {
-			unset( $gallery[ $key ] );
+			unset( $gallery[$key] );
 		}
 	}
 
@@ -1707,5 +1705,4 @@ function wpsc_new_gallery_save( $product_id = 0 ) {
 	do_action( 'wpsc_after_gallery_save', $product_id, $image_ids );
 
 }
-
 add_action( 'wpsc_edit_product', 'wpsc_new_gallery_save' );

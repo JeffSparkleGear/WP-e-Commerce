@@ -151,6 +151,7 @@ function wpsc_show_update_link() {
 	else
 		return false;
 }
+
 /**
  * wpsc_admin_pages function, all the definitons of admin pages are stores here.
  * No parameters, returns nothing
@@ -185,13 +186,14 @@ function wpsc_admin_pages() {
 			}
 	}
 
-	// Add to Dashboard
-	// $page_hooks[] = $purchase_log_page = add_submenu_page( 'index.php', __( 'Store Sales', 'wpsc' ), __( 'Store Sales', 'wpsc' ), 'administrator', 'wpsc-sales-logs', 'wpsc_display_sales_logs' );
-
-	if ( wpsc_show_update_link() )
-		$page_hooks[] = add_submenu_page( 'index.php', __( 'Update Store', 'wpsc' ), __( 'Store Update', 'wpsc' ), 'administrator', 'wpsc-update', 'wpsc_display_update_page' );
-
 	$store_upgrades_cap = apply_filters( 'wpsc_upgrades_cap', 'administrator' );
+
+	$page_hooks = array();
+
+	if ( wpsc_show_update_link() ) {
+		$page_hooks[] = add_submenu_page( 'index.php', __( 'Update Store', 'wpsc' ), __( 'Store Update', 'wpsc' ), $store_upgrades_cap, 'wpsc-update', 'wpsc_display_update_page' );
+	}
+
 	$page_hooks[] = add_submenu_page( 'index.php', __( 'Store Upgrades', 'wpsc' ), __( 'Store Upgrades', 'wpsc' ), $store_upgrades_cap, 'wpsc-upgrades', 'wpsc_display_upgrades_page' );
 
 	$purchase_logs_cap = apply_filters( 'wpsc_purchase_logs_cap', 'administrator' );
@@ -635,7 +637,7 @@ function wpsc_admin_include_css_and_js_refac( $pagehook ) {
 
 		wp_enqueue_script( 'wp-e-commerce-product-variations', WPSC_URL . '/wpsc-admin/js/product-variations.js', array( 'jquery' ), $version_identifier );
 		wp_localize_script( 'wp-e-commerce-product-variations', 'WPSC_Product_Variations', array(
-			'product_id'              => $_REQUEST['product_id'],
+			'product_id'              => absint( $_REQUEST['product_id'] ),
 			'add_variation_set_nonce' => _wpsc_create_ajax_nonce( 'add_variation_set' ),
 		) );
 	}
@@ -1218,7 +1220,8 @@ function wpsc_ajax_ie_save() {
 		update_product_meta( $product['ID'], 'product_metadata', $product_meta );
 		update_product_meta( $product['ID'], 'price', (float)$_POST['price'] );
 		update_product_meta( $product['ID'], 'special_price', (float)$_POST['special_price'] );
-		update_product_meta( $product['ID'], 'sku', $_POST['sku'] );
+		update_product_meta( $product['ID'], 'sku', sanitize_text_field( $_POST['sku'] ) );
+
 		if ( !is_numeric($_POST['stock']) )
 			update_product_meta( $product['ID'], 'stock', '' );
 		else

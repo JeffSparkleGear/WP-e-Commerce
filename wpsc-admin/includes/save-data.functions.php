@@ -20,7 +20,7 @@ function wpsc_ajax_set_variation_order(){
 
 		$value = preg_replace( '/[^0-9]/', '', $value );
 
-		if ( ! wpsc_update_meta( $value, 'sort_order', $key, 'wpsc_variation' ) ) {
+		if ( ! wpsc_update_meta( $value, 'sort_order', absint( $key ), 'wpsc_variation' ) ) {
 			$result = false;
 		}
 	}
@@ -95,12 +95,13 @@ function wpsc_custom_category_column_data( $string, $column_name, $term_id ) {
 	if ( 'image' == $column_name ) {
 		$term = get_term_by( 'id', $term_id, 'wpsc_product_category' );
 		$image = wpsc_get_categorymeta( $term_id, 'image' );
+		$noimage = defined( 'WPSC_CORE_THEME_URL' ) ? WPSC_CORE_THEME_URL . '/wpsc-images/noimage.png' : WPSC_TE_V2_URL . '/theming/assets/images/noimage.png';
 
 		$format = '<img src="%s" title="%s" alt="%2$s" width="30" height="30" />';
 		if ( ! empty( $image ) ) {
 			$string = sprintf( $format, WPSC_CORE_IMAGES_URL . $image, esc_attr( $term->name ) );
 		} else {
-			$string = sprintf( $format, WPSC_CORE_IMAGES_URL . '/no-image-uploaded.gif', esc_attr( $term->name ) );
+			$string = sprintf( $format, $noimage, esc_attr( $term->name ) );
 		}
 	}
 	return $string;
@@ -539,7 +540,7 @@ function wpsc_save_category_set( $category_id, $tt_id ) {
 		}
 
 		if ( ! empty( $_POST['use_additional_form_set'] ) ) {
-			wpsc_update_categorymeta( $category_id, 'use_additional_form_set', $_POST['use_additional_form_set'] );
+			wpsc_update_categorymeta( $category_id, 'use_additional_form_set', absint( $_POST['use_additional_form_set'] ) );
 		} else {
 			wpsc_delete_categorymeta( $category_id, 'use_additional_form_set' );
 		}

@@ -1,10 +1,10 @@
 === WP eCommerce ===
-Contributors: JustinSainton
+Contributors: JustinSainton, mufasa
 Donate link: https://wpecommerce.org
 Tags: e-commerce, wp-e-commerce, shop, cart, paypal, authorize, stock control, ecommerce, shipping, tax
-Requires at least: 3.9
-Tested up to: 4.2
-Stable tag: 4.0-dev
+Requires at least: 4.1
+Tested up to: 4.3
+Stable tag: 3.10.1
 
 WP eCommerce is a free, powerful plugin that empowers you to sell anything online, quickly and easily.
 
@@ -36,6 +36,27 @@ After upgrading from earlier versions look for link "Update Store". This will up
 
 == Changelog ==
 
+= 3.10.1 =
+
+* Fix: Uses version_compare() for comparing wpsc_version constant in legacy code (from 5 years ago).  Using comparators was causing 3.10.0 to be "less than" 3.8, resulting in an unnecessary admin notice.
+* Fix: Changes internal mechanism for detecting which theme engine is in use. The way we were checking for it before caused many core actions to be unhooked, leading to unsavory results, like Fancy Notifications no longer working.
+* Fix: Patched in a few fixes for incorrect usage of esc_url(). This resolves scenarios like the selecting a custom checkout form in the Dashboard failing because of double-encoded ampersands.
+
+= 3.10.0 =
+
+* Enhancement: Added updated PayPal gateways.  We now support Digital Goods and Pro Hosted, and have updated the Express Checkout gateway. We now recommend all existing users of the 2.0 Express Checkout gateway update to the 3.0 version.
+
+= 3.9.5 =
+
+* Fix: 4.3 Compatibility w/ WP_Widget constructors.
+
+= 3.9.4 =
+
+* Security Fix: Harden several instances of $_POST input that were not sanitized properly. Specifically, PayPal settings and Quick Edit fields for products.
+* Security Fix: Do not return visitor meta if WP eCommerce presumes a user to be a bot.
+* Enhancement: Provide a notice for users to repair their WP eCommerce tables if visitor and visitor meta tables are in need of repair. See [#1901](https://github.com/wp-e-commerce/WP-e-Commerce/issues/1901).
+* Fix: Notices on stats saving for products.
+
 = 3.9.3 =
 
 * Fix: Fix potential reflexive XSS issue with add_query_arg() and remove_query_arg() usage.  Update is _highly_ recommended.
@@ -47,6 +68,9 @@ After upgrading from earlier versions look for link "Update Store". This will up
 * Fix: Taxes were broken following some refactoring of the admin saving callbacks.
 * Fix: Quick edit was overwriting variation SKUs and sale prices.
 * Fix: RSS Feed error.
+* Fix: Ensure flat rates settings are pre-populated by default, to avoid notices on new installs.
+* Fix: Forcing SSL when no SSL certificate is installed caused some core post type admin pages to fail to load.
+* Fix: In some circumstances, the javascript for country/region selection would fail.  See [#1404](https://github.com/wp-e-commerce/WP-e-Commerce/issues/1404)
 
 = 3.9.1 =
 

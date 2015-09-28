@@ -12,7 +12,7 @@ class WP_Widget_Product_Tags extends WP_Widget {
 	/**
 	 * Widget Constuctor
 	 */
-	function WP_Widget_Product_Tags() {
+	function __construct() {
 
 		$widget_ops = array(
 			'classname'   => 'widget_wpsc_product_tags',

@@ -1,7 +1,6 @@
 <?php
 
 class WPSC_Settings_Tab_Checkout extends WPSC_Settings_Tab {
-
 	private $require_register;
 	private $shipping_same_as_billing;
 	private $force_ssl;
@@ -9,7 +8,6 @@ class WPSC_Settings_Tab_Checkout extends WPSC_Settings_Tab {
 	private $current_checkout_set;
 	private $field_types;
 	private $user_field_types;
-	private $form_fields;
 
 	public function __construct() {
 		global $wpdb;
@@ -33,7 +31,6 @@ class WPSC_Settings_Tab_Checkout extends WPSC_Settings_Tab {
 			WHERE checkout_set = %s
 			ORDER BY checkout_order
 		", $this->current_checkout_set );
-
 		$this->form_fields = $wpdb->get_results( $form_sql );
 
 		$columns = array(
@@ -80,7 +77,7 @@ class WPSC_Settings_Tab_Checkout extends WPSC_Settings_Tab {
 		}
 
 		if ( isset( $_POST['checkout_set'] ) ) {
-			$_SERVER['REQUEST_URI'] = esc_url( add_query_arg( 'checkout_set', $_POST['checkout_set'] ) );
+			$_SERVER['REQUEST_URI'] = esc_url_raw( add_query_arg( 'checkout_set', $_POST['checkout_set'] ) );
 		}
 
 		if ( ! isset( $_POST['form_name'] ) && ! isset( $_POST['new_field_name'] ) )
@@ -213,40 +210,42 @@ class WPSC_Settings_Tab_Checkout extends WPSC_Settings_Tab {
 	 * As a result, to determine whether a field is default or not, we have to rely on the field's
 	 * unique name and "active" status.
 	 *
-	 * @param  object $field Field object
-	 * @return boolean       True if the field is default.
+	 * @param  {Object} $field Field object
+	 * @return {Boolean} True if the field is default.
 	 */
 	private function is_field_default( $field ) {
 		global $wpdb;
 
-		if ( $field->default == 1 ) {
+		if ( $field->default == 1 )
 			return true;
-		}
 
-		if ( empty( $field->unique_name) || $this->current_checkout_set !== 0 || empty( $field->active ) ) {
+		if ( empty( $field->unique_name) || $this->current_checkout_set !== 0 || empty( $field->active ) )
 			return false;
-		}
 
 		$default_fields = array(
-			'billingfirstname',
-			'billinglastname',
-			'billingaddress',
-			'billingcity',
-			'billingstate',
-			'billingcountry',
-			'billingpostcode',
-			'billingemail',
-			'billingphone',
-			'shippingfirstname',
-			'shippinglastname',
-			'shippingaddress',
-			'shippingcity',
-			'shippingstate',
-			'shippingcountry',
-			'shippingpostcode',
-			'shippingemail',
-		);
-		return in_array( $field->unique_name, $default_fields );
+				'billingfirstname',
+				'billinglastname',
+				'billingaddress',
+				'billingcity',
+				'billingstate',
+				'billingcountry',
+				'billingpostcode',
+				'billingemail',
+				'billingphone',
+				'shippingfirstname',
+				'shippinglastname',
+				'shippingaddress',
+				'shippingcity',
+				'shippingstate',
+				'shippingcountry',
+				'shippingpostcode',
+				'shippingemail',
+			);
+
+		if ( in_array( $field->unique_name, $default_fields ) )
+			return true;
+
+		return false;
 	}
 
 	private function prototype_field( $mode = 'hidden' ) {

@@ -4,7 +4,7 @@ class WPSC_Settings_Tab_Shipping extends WPSC_Settings_Tab {
 		parent::__construct();
 
 		if ( isset( $_REQUEST['shipping_module_id'] ) )
-			update_user_option( get_current_user_id(), 'wpsc_settings_selected_shipping_module', $_REQUEST['shipping_module_id'] );
+			update_user_option( get_current_user_id(), 'wpsc_settings_selected_shipping_module', sanitize_text_field( $_REQUEST['shipping_module_id'] ) );
 
 		add_action( 'admin_notices', array( $this, 'no_shipping_notice' ) );
 	}
@@ -40,9 +40,9 @@ class WPSC_Settings_Tab_Shipping extends WPSC_Settings_Tab {
 			$_POST['update_gateways'] = '';
 
 		if ( ! isset( $_POST['custom_shipping_options'] ) )
-			$_POST['custom_shipping_options'] = null;
+			$_POST['custom_shipping_options'] = array();
 
-		update_option( 'custom_shipping_options', $_POST['custom_shipping_options'] );
+		update_option( 'custom_shipping_options', array_map( 'sanitize_text_field', $_POST['custom_shipping_options'] ) );
 
 		$shipadd = 0;
 		foreach ( $wpsc_shipping_modules as $shipping ) {
@@ -61,7 +61,7 @@ class WPSC_Settings_Tab_Shipping extends WPSC_Settings_Tab {
 			update_option( 'do_not_use_shipping', '1' );
 			return array( 'shipping_disabled' => 1 );
 		} else {
-			$_SERVER['REQUEST_URI'] = esc_url( remove_query_arg( 'shipping_disabled' ) );
+			$_SERVER['REQUEST_URI'] = esc_url_raw( remove_query_arg( 'shipping_disabled' ) );
 		}
 	}
 
@@ -168,7 +168,7 @@ class WPSC_Settings_Tab_Shipping extends WPSC_Settings_Tab {
 					<input type='hidden' value='0' name='wpsc_options[shipwire]' />
 					<input type='checkbox' onclick='jQuery("#wpsc_shipwire_setting").toggle( jQuery(this).prop("checked") );' value='1' name='wpsc_options[shipwire]' id='shipwire' <?php checked( '1',  get_option( 'shipwire' ) ); ?> />
 					<label for='shipwire'><?php _e( 'Enable Shipwire Integration', 'wpsc' ); ?></label>
-					<p class='description'><?php printf( __( '<a href="%1$s" target="_blank">Shipwire</a> provide e-commerce fulfillment warehouses. WP eCommerce can integrate stock inventory and shipping tracking with their service.', 'wpsc' ), 'http://www.shipwire.com/pp/o.php?id=11922' ); ?></p>
+					<p class='description'><?php printf( __( '<a href="%1$s" target="_blank">Shipwire</a> provide e-commerce fulfillment warehouses. WP eCommerce can integrate stock inventory and shipping tracking with their service.', 'wpsc' ), 'http://www.shipwire.com/' ); ?></p>
 				</td>
 			</tr>
 			<?php

@@ -26,6 +26,8 @@ class PHP_Merchant_Paypal_Digital_Goods extends PHP_Merchant_Paypal_Express_Chec
 			$request += array( "L_PAYMENTREQUEST_0_ITEMCATEGORY{$i}" => 'Digital' );
 		}	
 
+		$request['BUTTONSOURCE'] = 'WPeC_Cart_DG';
+
 		return $request;
 	}
 
