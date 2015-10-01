@@ -450,4 +450,4 @@ function wpsc_image_quality( $quality = 75 ) {
 	$quality = apply_filters( 'jpeg_quality', $quality );
 	return apply_filters( 'wpsc_jpeg_quality', $quality );
 }
-?>
+
