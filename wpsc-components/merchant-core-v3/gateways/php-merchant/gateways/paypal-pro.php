@@ -52,10 +52,10 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 		foreach ( $this->options['items'] as $item ) {
 			// Options Fields
 			$item_optionals = array(
-				'tax'      => "tax{$i}",
+				'tax'      => "tax{$i}",	
 			);
 
-			// Format Amount Field
+			// Format Amount Field 
 			$item['amount'] = $this->format( $item['amount'] );
 
 			// Required Fields
@@ -96,42 +96,6 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 
 			// If discount amount is larger than or equal to the item total, we need to set item total to 0.01
 			// because PayPal does not accept 0 item total. 
-			if ( $discount >= $sub_total ) {
-				$discount = $sub_total - 0.01;
-			}
-
-			// if there's shipping, we'll take 0.01 from there
-			if ( ! empty( $this->options['shipping'] ) ) {
-				$this->options['shipping'] -= 0.01;
-			} else {
-				$this->options['amount'] = 0.01;
-			}
-
-			// Add the Discount as an Item
-			$this->options['items'][] = array(
-				'name' => __( 'Discount', 'wpsc' ),
-				'amount' => - $discount,
-				'quantity' => '1',
-			);
-		}
-	}
-
-	/**
- 	 * Add Discount for the Shopping Cart.
-	 *
-	 * Since PayPal doesn't have distinct support for discounts, we have to add the discount
-	 * as a separate item with a negative value.
-	 *
-	 * @return void
- 	 */
-	protected function add_discount() {
-		// Verify if a discount is set
-		if ( isset( $this->options['discount'] ) && (float) $this->options['discount'] != 0 ) {
-			$discount = (float) $this->options['discount'];
-			$sub_total = (float) $this->options['subtotal'];
-
-			// If discount amount is larger than or equal to the item total, we need to set item total to 0.01
-			// because PayPal does not accept 0 item total.
 			if ( $discount >= $sub_total ) {
 				$discount = $sub_total - 0.01;
 			}
@@ -212,7 +176,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	/**
 	 * Gateway implementation for BMCreateButton
 	 *
-	 * @param array $options
+	 * @param array $options 
 	 * @return PHP_Merchant_Paypal_Pro_Response
 	 * @since 3.9
 	 */
@@ -224,14 +188,14 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 		$request['BUTTONCODE'] = 'TOKEN';
 		$request['BUTTONTYPE'] = 'PAYMENT';
 		$request['cmd'] = '_cart';
-
+	
 		$response_str = $this->commit( 'BMCreateButton', $request );
 		return new PHP_Merchant_Paypal_Pro_Response( $response_str );
 	}
 
 	/**
 	 * Build the request array
-	 *
+	 * 
 	 * @param array $options
 	 * @return array
 	 * @since 3.9
@@ -253,7 +217,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 
 		if ( $action != false ) {
 			$request += $this->add_payment( $action );
-			$request['display'] = '1';
+			$request['display'] = '1';	
 		}
 
 		if ( ! empty( $this->options['shipping_address'] ) ) {
@@ -270,7 +234,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 
 		// Common Fields
 		$request += phpme_map( $this->options, array(
-			'amount'          => 'amount',
+			'amount'          => 'amount',			
 			'subtotal' => 'subtotal',
 			'tax' => 'tax',
 			'shipping' => 'shipping',
@@ -280,7 +244,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 			'vendor'      => 'merchant_email',
 			'invoice'	   => 'invoice',
 			'currency' => 'currency',
-		) );
+		) );	
 
 		$request = $this->add_sub( 'L_BUTTONVAR', $request );
 
@@ -296,7 +260,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	 * @since 3.9
 	 */
 	function build_checkout_request( $action, $options = array() ) {
-		$request = array();
+		$request = array();	
 
 		// Common Fields
 		$request += phpme_map( $this->options, array(
@@ -320,9 +284,9 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 			'REFUNDADVICE' => 'refund_advice',
 		) );
 		// BN Code
-		$request['BUTTONSOURCE'] = 'WPeC_Cart_HSS';
+		$request['BUTTONSOURCE'] = 'WPECOM_ECM';
 
-		return $request;
+		return $request;	
 	}
 
 	/**
@@ -333,7 +297,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	 * @return array
 	 * @since 3.9
 	 */
-	private function add_sub( $sub, $arr ) {
+	private function add_sub( $sub, $arr ) {	
 		$request = array();
 
 		$i = 0;
@@ -346,7 +310,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	}
 
 	/**
-	 * Gateway implementation for "purchase" operation
+	 * Gateway implementation for "purchase" operation 
 	 *
 	 * @param array $options
 	 * @return PHP_Merchant_Paypal_Pro_Response
@@ -357,7 +321,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	}
 
 	/**
-	 * Gateway implementation for "authorize" operation
+	 * Gateway implementation for "authorize" operation 
 	 *
 	 * @param array $options
 	 * @return PHP_Merchant_Paypal_Pro_Response
@@ -368,7 +332,7 @@ class PHP_Merchant_Paypal_Pro extends PHP_Merchant_Paypal
 	}
 
 	/**
-	 * Gateway implementation for "capture" operation
+	 * Gateway implementation for "capture" operation 
 	 *
 	 * @param array $options
 	 * @return PHP_Merchant_Paypal_Pro_Response

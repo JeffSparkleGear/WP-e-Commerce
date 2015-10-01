@@ -1,9 +1,9 @@
 <?php
-
 /**
  * The PayPal Pro Gateway class
  *
  */
+
 class WPSC_Payment_Gateway_Paypal_Pro extends WPSC_Payment_Gateway {
 	private $gateway;
 
@@ -80,13 +80,8 @@ class WPSC_Payment_Gateway_Paypal_Pro extends WPSC_Payment_Gateway {
 	 */
 	public static function pro_script() {
 		if ( wpsc_is_checkout() ) {
-			$pro_loc = array(
-				'spinner_url' => wpsc_get_ajax_spinner(),
-				'loading'     => __( 'Loading...', 'wpsc' ),
-			);
 			wp_enqueue_script( 'pro-script-internal', WPSC_URL . '/wpsc-components/merchant-core-v3/gateways/pro.js', array( 'jquery' ) );
-			wp_enqueue_style( 'pro-style-internal', WPSC_URL . '/wpsc-components/merchant-core-v3/gateways/pro.css' );
-			wp_localize_script( 'pro-script-internal', 'pro_loc', $pro_loc );
+			wp_enqueue_style( 'pro-syle-internal', WPSC_URL . '/wpsc-components/merchant-core-v3/gateways/pro.css' );
 		}
 	}
 
@@ -580,7 +575,7 @@ class WPSC_Payment_Gateway_Paypal_Pro extends WPSC_Payment_Gateway {
 			wpsc_update_customer_meta( 'paypal_pro_checkout_errors', $response->get_errors() );
 
 			$url = add_query_arg( array(
-				'payment_gateway'          => 'paypal-pro',
+				'payment_gateway'          => 'paypal-pro-checkout',
 				'payment_gateway_callback' => 'display_paypal_error',
 			), $this->get_return_url() );
 
@@ -602,10 +597,6 @@ class WPSC_Payment_Gateway_Paypal_Pro extends WPSC_Payment_Gateway {
 	 */
 	public function log_error( $response ) {
 		if ( $this->setting->get( 'debugging' ) ) {
-
-			add_filter( 'wpsc_logging_post_type_args', 'WPSC_Logging::force_ui' );
-			add_filter( 'wpsc_logging_taxonomy_args ', 'WPSC_Logging::force_ui' );
-
 			$log_data = array(
 				'post_title'    => 'PayPal Pro Operation Failure',
 				'post_content'  =>  'There was an error processing the payment. Find details in the log entry meta fields.',
