@@ -383,13 +383,9 @@ class wpsc_cart {
 
 				$shipping_quotes = null;
 
-				foreach ( (array) $custom_shipping as $shipping_module ) {
+				foreach ( $custom_shipping as $shipping_module ) {
 
-					if ( empty( $wpsc_shipping_modules[ $shipping_module ] ) || ! is_callable( array( $wpsc_shipping_modules[ $shipping_module ], 'getQuote' ) ) ) {
-						continue;
-					}
-
-					$raw_quotes = $wpsc_shipping_modules[ $shipping_module ]->getQuote();
+					$raw_quotes = $this->_get_shipping_quote( $shipping_module );
 
 					if ( empty( $raw_quotes ) || ! is_array( $raw_quotes ) ) {
 						continue;
@@ -428,12 +424,10 @@ class wpsc_cart {
 	 * @return none
 	 */
 	function get_shipping_option() {
-		global $wpdb, $wpsc_shipping_modules;
+		global $wpsc_shipping_modules;
 
-		if ( ( count( $this->shipping_quotes ) < 1 ) &&
-		     isset( $wpsc_shipping_modules[$this->selected_shipping_method] ) &&
-		     is_callable( array( $wpsc_shipping_modules[$this->selected_shipping_method], 'getQuote' ) ) ) {
-			$this->shipping_quotes = $wpsc_shipping_modules[$this->selected_shipping_method]->getQuote();
+		if ( ( count( $this->shipping_quotes ) < 1 ) && isset( $wpsc_shipping_modules[$this->selected_shipping_method] ) ) {
+			$this->shipping_quotes = $this->_get_shipping_quote( $this->selected_shipping_method );
 		}
 
 		if ( ! isset( $wpsc_shipping_modules[$this->selected_shipping_method] ) ) {
@@ -1026,14 +1020,10 @@ class wpsc_cart {
 	 * @return float returns the shipping as a floating point value
 	 */
 	function calculate_base_shipping() {
-		global $wpdb, $wpsc_shipping_modules;
+		global $wpsc_shipping_modules;
 
 		if ( $this->uses_shipping() ) {
-			if (    isset( $wpsc_shipping_modules[ $this->selected_shipping_method ] )
-				 && is_callable( array( $wpsc_shipping_modules[ $this->selected_shipping_method ], 'getQuote' ) )
-				) {
-					$this->shipping_quotes = $wpsc_shipping_modules[ $this->selected_shipping_method ]->getQuote();
-			}
+			$this->shipping_quotes = $this->_get_shipping_quote( $this->selected_shipping_method );
 
 			if ( $this->selected_shipping_option == null ) {
 				$this->get_shipping_option();
@@ -1046,6 +1036,34 @@ class wpsc_cart {
 		}
 
 		return $total;
+	}
+
+	private function _get_shipping_quote( $method ) {
+		global $wpsc_shipping_modules;
+
+		if ( !isset( $wpsc_shipping_modules[ $method ] ) ) {
+			return false;
+		}
+
+		if ( ! is_callable( array( $wpsc_shipping_modules[ $method ], 'getQuote' ) ) ) {
+			return false;
+		}
+
+		$shipping_quote_cache_key = $method . '-' . apply_filters( 'wpsc_shipping_quote_cache_key', '', $this );
+
+		$quote = get_transient( $shipping_quote_cache_key );
+
+		if ( ! $quote ) {
+
+			$quote = $wpsc_shipping_modules[ $method ]->getQuote();
+
+			if ( $quote ) {
+				set_transient( $shipping_quote_cache_key, $quote, HOUR_IN_SECONDS );
+				error_log( __FILE__ . '::' . __LINE__ . '  new shipping quote into cache ' . $shipping_quote_cache_key );
+			}
+		}
+
+		return $quote;
 	}
 
 	/**
@@ -1205,14 +1223,13 @@ class wpsc_cart {
 	 */
 	function get_shipping_quotes() {
 
-		global $wpdb, $wpsc_shipping_modules;
 		$this->shipping_quotes = array();
 		if ( $this->shipping_method == null ) {
 			$this->get_shipping_method();
 		}
-		if ( isset( $wpsc_shipping_modules[$this->shipping_method] ) && is_callable( array( $wpsc_shipping_modules [$this->shipping_method], 'getQuote' ) ) ) {
-			$unprocessed_shipping_quotes = $wpsc_shipping_modules[$this->shipping_method]->getQuote();
-		}
+
+		$unprocessed_shipping_quotes = $this->_get_shipping_quote( $this->shipping_method );
+
 		$num = 0;
 		if ( ! empty( $unprocessed_shipping_quotes ) ) {
 			foreach ( ( array ) $unprocessed_shipping_quotes as $shipping_key => $shipping_value ) {
@@ -1254,11 +1271,7 @@ class wpsc_cart {
 			$custom_shipping = get_option( 'custom_shipping_options' );
 			$shipping_quotes = null;
 			if ( $this->selected_shipping_method != null ) {
-				$this->shipping_quotes = $wpsc_shipping_modules [$this->selected_shipping_method]->getQuote();
-				// use the selected shipping module
-				if ( is_callable( array( $wpsc_shipping_modules [$this->selected_shipping_method], 'getQuote' ) ) ) {
-					$this->shipping_quotes = $wpsc_shipping_modules [$this->selected_shipping_method]->getQuote();
-				}
+				$this->shipping_quotes = $this->_get_shipping_quote( $this->selected_shipping_method );
 			} else {
 				// otherwise select the first one with any quotes
 				foreach ( ( array ) $custom_shipping as $shipping_module ) {
@@ -1266,10 +1279,7 @@ class wpsc_cart {
 					// if the shipping module does not require a weight, or requires one and the weight is larger than
 					// zero
 					$this->selected_shipping_method = $shipping_module;
-					if ( is_callable( array( $wpsc_shipping_modules [$this->selected_shipping_method], 'getQuote' ) ) ) {
-
-						$this->shipping_quotes = $wpsc_shipping_modules [$this->selected_shipping_method]->getQuote();
-					}
+					$this->shipping_quotes = $this->_get_shipping_quote( $this->selected_shipping_method );
 
 					// if we have any shipping quotes, break the loop.
 					if ( count( $this->shipping_quotes ) > $shipping_quote_count ) {
@@ -1349,3 +1359,32 @@ function _wpsc_calculate_shipping_quotes_before_product_page() {
 }
 
 add_action( 'wpsc_before_shipping_of_shopping_cart', '_wpsc_calculate_shipping_quotes_before_product_page' , 1 );
+
+function _wpsc_create_default_shipping_quote_cache_key( $key, $cart ) {
+	$shipping_metas = array(
+		'shippingregion' => '',
+		'shippingcountry' => '',
+		'shippingpostcode' => '',
+		'shippingstate' => '',
+		'shippingaddress' => '',
+		'billingphone' => '', // some shipping modules will not quote without a valid phone ( Fedex, etc )
+	);
+
+	foreach ( $shipping_metas as $key => $value ) {
+		$shipping_metas[$key] = wpsc_get_customer_meta( $key );
+	}
+
+	foreach ( $cart->cart_items as $index => $cart_item ) {
+		$shipping_metas[$cart_item->product_id] = $cart_item->quantity;
+	}
+
+	$shipping_metas['weight'] = $cart->calculate_total_weight();
+	$shipping_metas['subtotal'] = $cart->subtotal;
+	$shipping_metas['item_count'] = $cart->cart_item_count;
+
+	$key = md5( serialize( $shipping_metas ) );
+
+	return $key;
+}
+
+add_filter( 'wpsc_shipping_quote_cache_key', '_wpsc_create_default_shipping_quote_cache_key', 1, 2 );

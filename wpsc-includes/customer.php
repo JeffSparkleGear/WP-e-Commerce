@@ -62,7 +62,7 @@ function wpsc_get_current_customer_id( $visitor_id_to_set = false ) {
 		$visitor_id = _wpsc_create_customer_id();
 	}
 
-	return $visitor_id;
+	return intval( $visitor_id );
 }
 
 

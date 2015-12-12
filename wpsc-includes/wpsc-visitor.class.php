@@ -10,12 +10,36 @@ class WPSC_Visitor {
 
 	public $valid = true;
 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	// Here are the well known attributes, functionality outside of WPEC should not
+	// access these attributes directly, as they are subject to change as the implementation
+	// evolves.  Instead use the get and set methods.
+	public $_id          = false;
+	public $_user_id     = false;
+	public $_last_active = false;
+	public $_expires     = false;
+	public $_created     = false;
+	public $_cart        = false;
+
+	public static $visitor_table_attribute_list = false;
+
 	/**
 	 * Create visitor class from visitor id
 	 * @param  $visitor_id int unique visitor id
 	 * @since 3.8.14
 	 */
 	function __construct( $visitor_id ) {
+
+		if ( empty( self::$visitor_table_attribute_list ) ) {
+			self::$visitor_table_attribute_list = array(
+				// well known attributes from the 'wpsc_visitors table', true false if change allowed
+				'id'          => false,
+				'user_id'     => true,
+				'last_active' => false,
+				'expires'     => false,
+				'created'     => false,
+			);
+		}
 
 		$this->_cart = new wpsc_cart();
 
@@ -82,7 +106,14 @@ class WPSC_Visitor {
 		}
 
 		$property_name = '_' . $attribute;
-		return $this->$property_name;
+
+		if ( isset( $this->$property_name ) ) {
+			$value = $this->$property_name;
+		} else {
+			$value = '';
+		}
+
+		return $value;
 	}
 
 	/**
@@ -100,7 +131,7 @@ class WPSC_Visitor {
 
 		if ( in_array( $attribute, self::$visitor_table_attribute_list ) ) {
 			// test if change of the attribute is permitted
-			if ( self::$visitor_table_attribute_list( $attribute ) ) {
+			if ( isset( self::$visitor_table_attribute_list[$attribute] ) ) {
 				wpsc_update_visitor( $this->_id, array( $attribute => $value ) );
 			}
 		} else {
@@ -118,7 +149,7 @@ class WPSC_Visitor {
 	function delete( $attribute ) {
 		$property_name = '_' . $attribute;
 		if ( isset( $this->$property_name ) ) {
-			unset( $a->$property_name ) ;
+			unset( $attribute->$property_name ) ;
 		}
 
 		wpsc_delete_visitor_meta( $this->_id, $attribute );
@@ -147,26 +178,5 @@ class WPSC_Visitor {
 	function cart() {
 		return $this->_cart;
 	}
-
-
-	//////////////////////////////////////////////////////////////////////////////////////////
-	// Here are the well known attributes, functionality outside of WPEC should not
-	// access these attributes directly, as they are subject to change as the implementation
-	// evolves.  Instead use the get and set methods.
-	public $_id          = false;
-	public $_user_id     = false;
-	public $_last_active = false;
-	public $_expires     = false;
-	public $_created     = false;
-	public $_cart        = false;
-
-	public static $visitor_table_attribute_list = array(
-		// well known attributes from the 'wpsc_visitors table', true false if change allowed
-		'id'          => false,
-		'user_id'     => true,
-		'last_active' => false,
-		'expires'     => false,
-		'created'     => false,
-	);
 
 }

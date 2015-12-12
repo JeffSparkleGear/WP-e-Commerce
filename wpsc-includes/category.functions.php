@@ -82,6 +82,7 @@ add_filter('get_terms','wpsc_get_terms_category_sort_filter');
 
 
 function wpsc_get_terms_variation_sort_filter($terms){
+
 	$new_terms = array();
 	$unsorted = array();
 

@@ -1,5 +1,15 @@
 <?php
 
+
+/**
+ * rewind cart items function, no parameters
+ * @return void
+ */
+function wpsc_rewind_cart_items() {
+   global $wpsc_cart;
+   $wpsc_cart->rewind_cart_items();
+}
+
 /**
 * have cart items function, no parameters
 * @return boolean true if there are cart items left

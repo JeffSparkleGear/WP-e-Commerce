@@ -594,7 +594,11 @@ class WPSC_Product {
 		$this->variation_sets  = array();
 
 		// get all the attached variation terms
-		$terms = wpsc_get_product_terms( $this->post->ID, 'wpsc-variation' );
+		if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
+			$terms = wpsc_get_product_terms( $this->post->ID, 'wpsc-variation' );
+		} else {
+			$terms = array();
+		}
 
 		foreach ( $terms as $term ) {
 			// Terms with no parents are variation sets (e.g. Color, Size)

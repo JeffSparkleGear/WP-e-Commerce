@@ -21,7 +21,13 @@ class WPSC_Product_Variations {
 
 	private function __construct( $product_id ) {
 		$this->product_id = $product_id;
-		$terms = wpsc_get_product_terms( $product_id, 'wpsc-variation' );
+
+		if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
+			$terms = wpsc_get_product_terms( $product_id, 'wpsc-variation' );
+		} else {
+			$terms = array();
+		}
+
 		foreach ( $terms as $term ) {
 			if ( $term->parent == 0 ) {
 				$this->variation_sets[ $term->term_id ] = $term->name;

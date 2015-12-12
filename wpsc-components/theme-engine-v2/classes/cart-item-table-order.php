@@ -27,7 +27,11 @@ class WPSC_Cart_Item_Table_Order extends WPSC_Cart_Item_Table {
 			$obj = new stdClass();
 			$obj->product_id = $item->prodid;
 
-			$variations = wpsc_get_product_terms( $item->prodid, 'wpsc-variation' );
+			if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
+				$variations = wpsc_get_product_terms( $item->prodid, 'wpsc-variation' );
+			} else {
+				$variations = array();
+			}
 
 			$obj->variation_values = array();
 

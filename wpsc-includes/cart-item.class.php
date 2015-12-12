@@ -145,7 +145,11 @@ class wpsc_cart_item {
 		if ( empty( $variation_product_ids ) )
 			return;
 
-		self::$variation_cache = wp_get_object_terms( $variation_product_ids, 'wpsc-variation', array( 'fields' => 'all_with_object_id' ) );
+		if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
+			self::$variation_cache = wp_get_object_terms( $variation_product_ids, 'wpsc-variation', array( 'fields' => 'all_with_object_id' ) );
+		} else {
+			self::$variation_cache = array();
+		}
 
 		foreach ( self::$variation_cache as $term ) {
 			if ( ! array_key_exists( $term->object_id, self::$variation_cache ) )

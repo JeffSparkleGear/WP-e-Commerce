@@ -151,7 +151,7 @@ function wpsc_create_option(  displaytext, value ) {
 // if you are going to user it always check to be sure it is not false
 var wpsc_visitor_id = false;
 
-if ( document.cookie.indexOf("wpsc_customer_cookie") < 0 ) {
+if ( false && document.cookie.indexOf("wpsc_customer_cookie") < 0 ) {
 	if ( document.cookie.indexOf("wpsc_attempted_validate") < 0 ) {
 		// create a cookie to signal that we have attempted validation.  If we find the cookie is set
 		// we don't re-attempt validation.  This means will only try to validate once and not slow down
@@ -747,7 +747,7 @@ function wpsc_copy_meta_value_to_similiar( element ) {
  *
  * @since 3.8.14
  *
- * @param string 	name		unqiue name of the checkout item
+ * @param string 	name		unique name of the checkout item
  *
  * @return int|boolean			element id if it is in the checkout form, false if the element is not in the checkout form
  */
