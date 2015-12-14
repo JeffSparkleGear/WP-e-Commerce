@@ -588,6 +588,8 @@ class WPSC_Purchase_Log {
 		if ( ! $this->args['col'] || ! $this->args['value'] )
 			return;
 
+		$col = '';
+		$value = '';
 		extract( $this->args );
 
 		$format = self::get_column_format( $col );

@@ -473,7 +473,10 @@ function wpsc_admin_include_coupon_js() {
 
 	// Coupon CSS
 	wp_enqueue_style( 'wp-e-commerce-admin_2.7',        WPSC_URL         . '/wpsc-admin/css/settingspage.css', false, false,               'all' );
-	wp_enqueue_style( 'wp-e-commerce-admin',            WPSC_URL         . '/wpsc-admin/css/admin.css',        false, $version_identifier, 'all' );
+
+	// admin css
+	$admin_style_timestamp = ( filemtime( dirname( __FILE__ ) . '/css/admin.css' ) );
+	wp_enqueue_style( 'wp-e-commerce-admin',            WPSC_URL         . '/wpsc-admin/css/admin.css',        false, $admin_style_timestamp, 'all' );
 
 	// Coupon JS
 	wp_enqueue_script( 'livequery',                     WPSC_URL         . '/wpsc-admin/js/jquery.livequery.js',             array( 'jquery' ),         '1.0.3' );
@@ -602,8 +605,12 @@ function wpsc_admin_include_css_and_js_refac( $pagehook ) {
 					'thickbox_title' => __( 'Add Media - %s', 'wpsc' ),
 				)
 			);
+
 		}
-		wp_enqueue_style( 'wp-e-commerce-admin', WPSC_URL . '/wpsc-admin/css/admin.css', false, $version_identifier, 'all' );
+		$admin_style_timestamp = ( filemtime( dirname( __FILE__ ) . '/css/admin.css' ) );
+		wp_enqueue_style( 'wp-e-commerce-admin',            WPSC_URL         . '/wpsc-admin/css/admin.css',        false, $admin_style_timestamp, 'all' );
+
+//		wp_enqueue_style( 'wp-e-commerce-admin', WPSC_URL . '/wpsc-admin/css/admin.css', false, $version_identifier, 'all' );
 
 		static $_wpsc_admin_l10n_loaded;
 
@@ -660,8 +667,10 @@ function wpsc_admin_include_css_and_js_refac( $pagehook ) {
 		}
 	}
 
-	if ( 'dashboard_page_wpsc-upgrades' == $pagehook || 'dashboard_page_wpsc-update' == $pagehook )
-		wp_enqueue_style( 'wp-e-commerce-admin', WPSC_URL . '/wpsc-admin/css/admin.css', false, $version_identifier, 'all' );
+	if ( 'dashboard_page_wpsc-upgrades' == $pagehook || 'dashboard_page_wpsc-update' == $pagehook ) {
+		$admin_style_timestamp = ( filemtime( dirname( __FILE__ ) . '/css/admin.css' ) );
+		wp_enqueue_style( 'wp-e-commerce-admin',            WPSC_URL         . '/wpsc-admin/css/admin.css',        false, $admin_style_timestamp, 'all' );
+	}
 }
 
 
@@ -865,7 +874,10 @@ add_action( 'wpsc_admin_pre_activity', 'wpsc_admin_latest_activity' );
 function wpsc_dashboard_widget_setup() {
 	$version_identifier = WPSC_VERSION . "." . WPSC_MINOR_VERSION;
 	// Enqueue the styles and scripts necessary
-	wp_enqueue_style( 'wp-e-commerce-admin', WPSC_URL . '/wpsc-admin/css/admin.css', false, $version_identifier, 'all' );
+	$admin_style_timestamp = ( filemtime( dirname( __FILE__ ) . '/css/admin.css' ) );
+	wp_enqueue_style( 'wp-e-commerce-admin',            WPSC_URL         . '/wpsc-admin/css/admin.css',        false, $admin_style_timestamp, 'all' );
+
+	//wp_enqueue_style( 'wp-e-commerce-admin', WPSC_URL . '/wpsc-admin/css/admin.css', false, $version_identifier, 'all' );
 	wp_enqueue_script( 'datepicker-ui', WPSC_URL . "/wpsc-core/js/ui.datepicker.js", array( 'jquery', 'jquery-ui-core', 'jquery-ui-sortable' ), $version_identifier );
 
 	$news_cap            = apply_filters( 'wpsc_dashboard_news_cap'           , 'manage_options' );

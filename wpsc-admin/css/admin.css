@@ -211,6 +211,7 @@ th#status {
 
 #wpsc_items_ordered {
 	clear: both;
+    z-index: -1;
 }
 
 .wpsc_pushdown_img {
@@ -299,6 +300,7 @@ th#status {
 	margin: .4em;
 	padding: .6em;
 	margin-right: 5em;
+    z-index: 100;
 }
 
 #wpsc_billing_details_box {
@@ -306,6 +308,7 @@ th#status {
 	float: left;
 	margin: .4em;
 	padding: .6em;
+    z-index: 100;
 }
 
 #wpsc_shipping_details_box em.field-blank,
@@ -2543,4 +2546,74 @@ a.wpsc_remove_meta {
 .manage-column.column-customer,
 .customer.column-customer {
     white-space: nowrap;
+}
+
+.wpsc_purchase_status_stamp_box {
+    position: absolute;
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    opacity: 0.1;
+    /*width:100%;*/
+    top: 175px;
+    text-align:center;
+    z-index: -1;
+    left: 50%;
+}
+
+.wpsc_purchase_status_stamp_box-inside {
+    position: relative;
+    left: -50%;
+    z-index: -1;
+}
+
+.stamp-text-green {
+    color:white;
+    background:darkgreen;
+    font-size:60px;
+    line-height: 60px;
+    font-weight: bold;
+    margin-top: 0px;
+    padding-top: 0px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align:center;
+    font-family: serif;;
+
+    transform:rotate(45deg);
+    -webkit-transform:rotate(45deg);
+
+    z-index: -1;
+
+    border-radius: 25px;
+    border: 2px solid;
+    padding:20px;
+}
+
+.stamp-text-red {
+    color:white;
+    background:red;
+    padding:20px;
+    font-size:60px;
+    font-weight: bold;
+    line-height: 60px;
+    margin-top: 0px;
+    padding-top: 0px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align:center;
+    font-family: serif;
+
+    transform:rotate(45deg);
+    -webkit-transform:rotate(45deg);
+
+    z-index: -1;
+    border-radius: 25px;
+    border: 2px solid;
+
 }

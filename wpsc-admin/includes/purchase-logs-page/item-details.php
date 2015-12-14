@@ -162,4 +162,14 @@
 		</ul>
 	</div>
 
+	<div class="wpsc_purchase_status_stamp_box">
+		<div class="wpsc_purchase_status_stamp_box-inside">
+			<?php if ( wpsc_display_purchlog_is_paid() ) { ?>
+				<p class="stamp-text-green"><?php echo wpsc_display_purchlog_status_name();?></p>
+			<?php } else {?>
+				<p class="stamp-text-red"><?php echo wpsc_display_purchlog_status_name();?></p>
+			<?php } ?>
+		</div>
+	</div>
+
 </div>

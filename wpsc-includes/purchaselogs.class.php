@@ -535,6 +535,20 @@ function wpsc_display_purchlog_shipping_name() {
    return esc_html( $purchlogitem->shippinginfo['shippingfirstname']['value'] ) . ' ' . esc_html( $purchlogitem->shippinginfo['shippinglastname']['value'] );
 }
 
+function wpsc_display_purchlog_status_name() {
+	global $purchlogitem;
+	$status = $purchlogitem->extrainfo->processed;
+	return wpsc_find_purchlog_status_name( $status );
+}
+
+function wpsc_display_purchlog_is_paid() {
+	global $purchlogitem;
+	$paid = ($purchlogitem->extrainfo->processed == WPSC_Purchase_Log::ACCEPTED_PAYMENT) || ($purchlogitem->extrainfo->processed == WPSC_Purchase_Log::CLOSED_ORDER);
+	return $paid;
+}
+
+
+
 function wpsc_display_purchlog_shipping_address() {
 	global $purchlogitem;
 

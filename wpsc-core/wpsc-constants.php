@@ -55,7 +55,7 @@ function wpsc_core_constants() {
 
 	// Define Plugin version
 	if ( ! defined( 'WPSC_VERSION' ) ) {
-		define( 'WPSC_VERSION'            , '3.10.1' );
+		define( 'WPSC_VERSION'            , '3.10.1-working' );
 	}
 
 	if ( ! defined( 'WPSC_MINOR_VERSION' ) ) {
