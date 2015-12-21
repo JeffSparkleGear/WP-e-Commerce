@@ -90,10 +90,14 @@ class wpsc_cart {
 	public $_signature = '';
 
 
-    function wpsc_cart() {
+    function wpsc_cart( $init_cart = true ) {
 		$coupon = 'percentage';
-		$this->update_location();
-		$this->wpsc_refresh_cart_items();
+
+	    if ( $init_cart ) {
+		    $this->update_location();
+		    $this->wpsc_refresh_cart_items();
+	    }
+
 		$this->unique_id = sha1( uniqid( rand(), true ) );
 
 		add_action( 'wpsc_visitor_location_changing', array( &$this, 'shopper_location_changing' ), 10, 2);
