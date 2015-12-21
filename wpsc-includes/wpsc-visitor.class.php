@@ -5,41 +5,88 @@
  *
  * @since 3.8.14
  */
-
 class WPSC_Visitor {
 
+	/**
+	 * @var bool
+	 */
 	public $valid = true;
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Here are the well known attributes, functionality outside of WPEC should not
 	// access these attributes directly, as they are subject to change as the implementation
 	// evolves.  Instead use the get and set methods.
-	public $_id          = false;
-	public $_user_id     = false;
-	public $_last_active = false;
-	public $_expires     = false;
-	public $_created     = false;
-	public $_cart        = false;
 
-	public static $visitor_table_attribute_list = false;
+	/**
+	 * @var bool | int
+	 */
+	public $_id = false;
+	/**
+	 * @var bool | int
+	 */
+	public $_user_id = false;
+	/**
+	 * @var bool | int
+	 */
+	public $_last_active = false;
+	/**
+	 * @var bool | int
+	 */
+	public $_expires = false;
+	/**
+	 * @var bool | int
+	 */
+	public $_created = false;
+	/**
+	 * @var wpsc_cart|bool|WP_Error
+	 */
+	public $_cart = false;
+
+	/**
+	 * @var array
+	 */
+	private static $_visitor_meta_attribute_list = array(
+		'shippingfirstname',
+		'shippinglastname',
+		'shippingregion',
+		'shippingcountry',
+		'shippingpostcode',
+		'shippingpostcode',
+		'shippingSameBilling',
+		'shippingstate',
+		'billingfirstname',
+		'billinglastname',
+		'billingemail',
+		'billingaddress',
+		'billingcity',
+		'billingregion',
+		'billingstate',
+		'billingcountry',
+		'billingphone',
+		'billingpostcode',
+	);
+
+	// well known attributes from the 'wpsc_visitors table', true false if change allowed
+
+	/**
+	 * @var array
+	 */
+	public static $visitor_table_attribute_list = array(
+		'id'          => false,
+		'user_id'     => true,
+		'last_active' => false,
+		'expires'     => false,
+		'created'     => false,
+	);
 
 	/**
 	 * Create visitor class from visitor id
+	 *
 	 * @param  $visitor_id int unique visitor id
+	 *
 	 * @since 3.8.14
 	 */
 	function __construct( $visitor_id ) {
-
-		if ( empty( self::$visitor_table_attribute_list ) ) {
-			self::$visitor_table_attribute_list = array(
-				// well known attributes from the 'wpsc_visitors table', true false if change allowed
-				'id'          => false,
-				'user_id'     => true,
-				'last_active' => false,
-				'expires'     => false,
-				'created'     => false,
-			);
-		}
 
 		$this->_cart = new wpsc_cart( false );
 
@@ -51,7 +98,7 @@ class WPSC_Visitor {
 
 		if ( $visitor ) {
 			foreach ( $visitor as $key => $value ) {
-				$property_name = '_' . $key;
+				$property_name        = '_' . $key;
 				$this->$property_name = $value;
 			}
 		}
@@ -61,10 +108,10 @@ class WPSC_Visitor {
 		if ( ! empty( $visitor_meta ) ) {
 			foreach ( $visitor_meta as $meta_key => $meta_value ) {
 				if ( ( $i = strpos( $meta_key, 'cart.' ) ) === false ) {
-					$property_name = '_' . $meta_key;
+					$property_name        = '_' . $meta_key;
 					$this->$property_name = $meta_value[0];
 				} else {
-					$property_name = substr( $meta_key, strlen( '_wpsc_cart.' ) );
+					$property_name               = substr( $meta_key, strlen( '_wpsc_cart.' ) );
 					$this->_cart->$property_name = $meta_value[0];
 				}
 			}
@@ -77,11 +124,12 @@ class WPSC_Visitor {
 	 * Get visitor expiration
 	 *
 	 * @param  $unix_time boolean  true returns time as unix time, false returns time as string
+	 *
 	 * @return string expiration time
 	 * @since 3.8.14
 	 */
 	function expiration( $unix_time = true ) {
-		if ( ! ($unix_time = strtotime( $this->_expires ) ) ) {
+		if ( ! ( $unix_time = strtotime( $this->_expires ) ) ) {
 			return false;
 		}
 
@@ -89,13 +137,14 @@ class WPSC_Visitor {
 			return $unix_time;
 		}
 
-		return  $this->_expires;
+		return $this->_expires;
 	}
 
 	/**
 	 * Get visitor attribute
 	 *
 	 * @param  $attribute attribute name
+	 *
 	 * @return varies, attribute value
 	 * @since 3.8.14
 	 */
@@ -121,35 +170,39 @@ class WPSC_Visitor {
 	 *
 	 * @param  $attribute attribute name
 	 * @param  $value attribute value
+	 *
 	 * @return this
 	 * @since 3.8.14
 	 */
 	function set( $attribute, $value ) {
 
-		$property_name = '_' . $attribute;
+		$property_name        = '_' . $attribute;
 		$this->$property_name = $value;
 
 		if ( in_array( $attribute, self::$visitor_table_attribute_list ) ) {
 			// test if change of the attribute is permitted
-			if ( isset( self::$visitor_table_attribute_list[$attribute] ) ) {
+			if ( isset( self::$visitor_table_attribute_list[ $attribute ] ) ) {
 				wpsc_update_visitor( $this->_id, array( $attribute => $value ) );
 			}
 		} else {
 			wpsc_update_visitor_meta( $this->_id, $attribute, $value );
+
 			return $this;
 		}
 	}
 
 	/**
 	 * Delete visitor attribute
+	 *
 	 * @param  $attribute attribute name
+	 *
 	 * @return this
 	 * @since 3.8.14
 	 */
 	function delete( $attribute ) {
 		$property_name = '_' . $attribute;
 		if ( isset( $this->$property_name ) ) {
-			unset( $attribute->$property_name ) ;
+			unset( $attribute->$property_name );
 		}
 
 		wpsc_delete_visitor_meta( $this->_id, $attribute );
@@ -159,24 +212,77 @@ class WPSC_Visitor {
 	}
 
 	// helper function for well known variables
+	/**
+	 * @return int
+	 */
 	function id() {
 		return $this->_id;
 	}
 
+	/**
+	 * @return bool | int
+	 */
 	function user_id() {
 		return $this->_user_id;
 	}
 
+	/**
+	 * @return int
+	 */
 	function last_active() {
 		return $this->_last_active;
 	}
 
+	/**
+	 * Is this shopper active now?
+	 *
+	 * @param $interval int seconds to check, default is one hour
+	 * @return bool
+	 */
+	function is_active( $interval = HOUR_IN_SECONDS ) {
+		$active = ( time() - $interval ) < strtotime( $this->_last_active );
+		return $active;
+	}
+
+	/**
+	 * @return int
+	 */
 	function created() {
 		return $this->_created;
 	}
 
+	/**
+	 * @return wpsc_cart
+	 */
 	function cart() {
 		return $this->_cart;
+	}
+
+	/**
+	 * @return bool
+	 */
+	function is_empty() {
+		$result = true;
+
+		if ( $this->_user_id ) {
+			$result = false;
+		}
+
+		if ( $this->cart()->have_cart_items() ) {
+			$result = false;
+		}
+
+		if ( $result ) {
+			foreach ( self::$_visitor_meta_attribute_list as $property_name ) {
+				$value = $this->get( $property_name );
+				if ( ! empty( $value ) ) {
+					$result = false;
+					break;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 }
