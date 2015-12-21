@@ -41,7 +41,7 @@ class WPSC_Visitor {
 			);
 		}
 
-		$this->_cart = new wpsc_cart();
+		$this->_cart = new wpsc_cart( false );
 
 		$visitor = _wpsc_get_visitor( $visitor_id );
 		if ( $visitor == false ) {

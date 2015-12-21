@@ -556,13 +556,13 @@ function wpsc_get_visitor_list( $include_expired_visitors ) {
  */
 function wpsc_get_visitor_cart( $visitor_id ) {
 
-	$wpsc_cart = new wpsc_cart();
-
+	$wpsc_cart = new wpsc_cart( false );
 	if ( _wpsc_visitor_database_ready() ) {
 
 		foreach ( $wpsc_cart as $key => $value ) {
 			$cart_property_meta_key = _wpsc_get_visitor_meta_key( 'cart.' . $key );
 			$meta_value = wpsc_get_visitor_meta( $visitor_id, $cart_property_meta_key, true );
+
 			if ( ! empty( $meta_value ) ) {
 
 				switch ( $key ) {
@@ -1334,6 +1334,7 @@ function wpsc_delete_visitor_ajax() {
 		// This nonce is not valid.
 		die( 'Security check' );
 	} else {
+		error_log( __FUNCTION__ . ' deleting vistor id ' . $visitor_id_to_delete );
 		wpsc_delete_visitor( $visitor_id_to_delete );
 	}
 
