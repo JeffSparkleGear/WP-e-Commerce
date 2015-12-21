@@ -26,7 +26,7 @@ class australiapost {
 	/**
 	 * Constructor
 	 */
-	function australiapost () {
+	public function __construct () {
 		$this->internal_name = "australiapost";
 		$this->name = __( 'Australia Post', 'wpsc' );
 		$this->is_external = true;
