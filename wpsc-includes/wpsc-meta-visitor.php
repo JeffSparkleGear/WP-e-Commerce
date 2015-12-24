@@ -445,36 +445,38 @@ function wpsc_delete_visitor( $visitor_id ) {
 									&& wpsc_visitor_post_count( $visitor_id )
 										&& wpsc_visitor_comment_count( $visitor_id ) );
 
+	$ok_to_delete_visitor = apply_filters( 'wpsc_before_delete_visitor', $ok_to_delete_visitor, $visitor_id );
+
 	if ( ! $ok_to_delete_visitor ) {
 		wpsc_visitor_remove_expiration( $visitor_id );
 	} else {
 
 		global $wpdb;
 
-		$ok_to_delete_visitor = apply_filters( 'wpsc_before_delete_visitor', $ok_to_delete_visitor, $visitor_id );
+		if ( $ok_to_delete_visitor ) {
+			// we explicitly empty the cart to allow WPEC hooks to run
+			$cart = wpsc_get_visitor_cart( $visitor_id );
+			$cart->empty_cart();
 
-		// we explicitly empty the cart to allow WPEC hooks to run
-		$cart = wpsc_get_visitor_cart( $visitor_id );
-		$cart->empty_cart();
+			// Delete all of the visitor meta
+			$visitor_meta = wpsc_get_visitor_meta( $visitor_id );
+			foreach ( $visitor_meta as $visitor_meta_key => $visitor_meta_value ) {
+				wpsc_delete_visitor_meta( $visitor_id, $visitor_meta_key );
+			}
 
-		// Delete all of the visitor meta
-		$visitor_meta = wpsc_get_visitor_meta( $visitor_id );
-		foreach ( $visitor_meta as $visitor_meta_key => $visitor_meta_value ) {
-			wpsc_delete_visitor_meta( $visitor_id, $visitor_meta_key );
+			// Delete the visitor record
+			$result = $wpdb->delete( $wpdb->wpsc_visitors, array( 'id' => $visitor_id ) );
+
+			// if a WordPress user references the visitor being deleted we need to remove the reference
+			$sql      = 'SELECT user_id FROM ' . $wpdb->usermeta . ' WHERE meta_key = "_wpsc_visitor_id" AND meta_value = ' . $visitor_id;
+			$user_ids = $wpdb->get_col( $sql, 0 );
+
+			foreach ( $user_ids as $user_id ) {
+				delete_user_meta( $user_id, '_wpsc_visitor_id' );
+			}
+
+			do_action( 'wpsc_after_delete_visitor', $visitor_id );
 		}
-
-		// Delete the visitor record
-		$result = $wpdb->delete( $wpdb->wpsc_visitors, array( 'id' => $visitor_id ) );
-
-		// if a WordPress user references the visitor being deleted we need to remove the reference
-		$sql = 'SELECT user_id FROM ' . $wpdb->usermeta . ' WHERE meta_key = "_wpsc_visitor_id" AND meta_value = ' .  $visitor_id;
-		$user_ids = $wpdb->get_col( $sql, 0 );
-
-		foreach ( $user_ids as $user_id ) {
-			delete_user_meta( $user_id, '_wpsc_visitor_id' );
-		}
-
-		do_action( 'wpsc_after_delete_visitor', $visitor_id );
 	}
 
 	// one row should be updated on success

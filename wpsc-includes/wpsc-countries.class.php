@@ -273,11 +273,11 @@ class WPSC_Countries {
 
 		// we want to get to the unique region id to retrieve the region object, it might have been passed, or we
 		// will have to figure it out from the country and the region
-		if ( is_int( $region ) ) {
+		if ( is_int( $region_id ) ) {
 
 			$region_id = $region;
-			if ( isset( self::$regions_by_region_id[ $region ] ) ) {
-				$wpsc_region = self::$regions_by_region_id[ $region ];
+			if ( isset( self::$regions_by_region_id[ $region_id ] ) ) {
+				$wpsc_region = self::$regions_by_region_id[ $region_id ];
 			}
 		} else {
 			$wpsc_country = self::get_country_using_code_or_id( $country );

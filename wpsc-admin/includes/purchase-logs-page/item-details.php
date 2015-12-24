@@ -25,8 +25,8 @@
 						<?php echo ( wpsc_display_purchlog_shipping_name() != ""           ) ? wpsc_display_purchlog_shipping_name() . "<br />"               : '<span class="field-blank">' . __( 'Anonymous', 'wpsc' ) . '</span>' ; ?>
 					</strong>
 					<?php echo ( wpsc_display_purchlog_shipping_address() != ""            ) ? wpsc_display_purchlog_shipping_address() . "<br />"            : '' ; ?>
-					<?php echo ( wpsc_display_purchlog_shipping_city() != ""               ) ? wpsc_display_purchlog_shipping_city() . "<br />"               : '' ; ?>
-					<?php echo ( wpsc_display_purchlog_shipping_state_and_postcode() != "" ) ? wpsc_display_purchlog_shipping_state_and_postcode() . "<br />" : '' ; ?>
+					<?php // echo ( wpsc_display_purchlog_shipping_city() != ""               ) ? wpsc_display_purchlog_shipping_city() . "<br />"               : '' ; ?>
+					<?php echo ( wpsc_display_purchlog_shipping_city_state_and_postcode() != "" ) ? wpsc_display_purchlog_shipping_city_state_and_postcode() . "<br />" : '' ; ?>
 					<?php echo ( wpsc_display_purchlog_shipping_country() != ""            ) ? wpsc_display_purchlog_shipping_country() . "<br />"            : '<span class="field-blank">' . __( 'Country not specified', 'wpsc' ) . '</span>' ; ?>
 				</blockquote>
 				<h4><?php esc_html_e( 'Shipping Details', 'wpsc' ); ?></h4>
@@ -64,8 +64,8 @@
 					<?php echo ( wpsc_display_purchlog_buyers_name() != ""           ) ? wpsc_display_purchlog_buyers_name() . "<br />"               : '<span class="field-blank">' . __( 'Anonymous', 'wpsc' ) . '</span>' ; ?>
 				</strong>
 				<?php echo ( wpsc_display_purchlog_buyers_address() != ""            ) ? wpsc_display_purchlog_buyers_address() . "<br />"            : '' ; ?>
-				<?php echo ( wpsc_display_purchlog_buyers_city() != ""               ) ? wpsc_display_purchlog_buyers_city() . "<br />"               : '' ; ?>
-				<?php echo ( wpsc_display_purchlog_buyers_state_and_postcode() != "" ) ? wpsc_display_purchlog_buyers_state_and_postcode() . "<br />" : '' ; ?>
+				<?php // echo ( wpsc_display_purchlog_buyers_city() != ""               ) ? wpsc_display_purchlog_buyers_city() . "<br />"               : '' ; ?>
+				<?php echo ( wpsc_display_purchlog_buyers_city_state_and_postcode() != "" ) ? wpsc_display_purchlog_buyers_city_state_and_postcode() . "<br />" : '' ; ?>
 				<?php echo ( wpsc_display_purchlog_buyers_country() != ""            ) ? wpsc_display_purchlog_buyers_country() . "<br />"            : '<span class="field-blank">' . __( 'Country not specified', 'wpsc' ) . '</span>' ; ?>
 			</blockquote>
 			<h4><?php esc_html_e( 'Payment Details', 'wpsc' ); ?></h4>
