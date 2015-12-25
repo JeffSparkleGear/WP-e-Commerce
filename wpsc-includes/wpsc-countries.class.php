@@ -180,7 +180,7 @@ class WPSC_Countries {
 					_wpsc_doing_it_wrong( 'WPSC_Countries::country_id', __( 'Method "get_country_id" of WPSC_Countries requires a valid integer country code or a string ISO code ', 'wpsc' ), '4.1' );
 				}
 			} else {
-				_wpsc_doing_it_wrong( 'WPSC_Countries::country_id', __( 'Method "get_country_id" of WPSC_Countries requires an integer country code or a string ISO code ', 'wp-e-commerce' ), '3.8.14' );
+				_wpsc_doing_it_wrong( 'WPSC_Countries::country_id', __( 'Method "get_country_id" of WPSC_Countries requires an integer country code or a string ISO code ', 'wpsc' ), '3.8.14' );
 			}
 		}
 
@@ -253,7 +253,7 @@ class WPSC_Countries {
 	 * @param int|string required if non-numeric country is treated as an region code, number is the region id,
 	 *        if the region id is passed then country_id is ignored
 	 *
-	 * @return false|WPSC_Region WPSC_Region object or false on failure
+	 * @return WPSC_Region boolean object or false on failure
 	 *
 	 */
 	public static function get_region( $country, $region ) {
@@ -273,11 +273,11 @@ class WPSC_Countries {
 
 		// we want to get to the unique region id to retrieve the region object, it might have been passed, or we
 		// will have to figure it out from the country and the region
-		if ( is_int( $region_id ) ) {
+		if ( is_int( $region ) ) {
 
 			$region_id = $region;
-			if ( isset( self::$regions_by_region_id[ $region_id ] ) ) {
-				$wpsc_region = self::$regions_by_region_id[ $region_id ];
+			if ( isset( self::$regions_by_region_id[ $region ] ) ) {
+				$wpsc_region = self::$regions_by_region_id[ $region ];
 			}
 		} else {
 			$wpsc_country = self::get_country_using_code_or_id( $country );
@@ -588,7 +588,7 @@ class WPSC_Countries {
 	 * @param int|string $country country being checked, if noon-numeric country is treated as an isocode,
 	 *                                     number is the country
 	 *
-	 * @return boolean True if the country has regions, false otherwise
+	 * @return true if the country has regions, false otherwise
 	 */
 	public static function country_has_regions( $country ) {
 
@@ -718,6 +718,7 @@ class WPSC_Countries {
 		}
 
 		if ( ! $region_id ) {
+			_wpsc_doing_it_wrong( 'WPSC_Countries::get_country_id_by_region_id', __( 'Function "get_country_id_by_region_id" requires an integer $region_id', 'wpsc' ), '3.8.14' );
 
 			return false;
 		}
@@ -762,7 +763,7 @@ class WPSC_Countries {
 	 *
 	 * @since 3.8.14
 	 *
-	 * @var mixed array|null|WPSC_Data_Map
+	 * @var array
 	 */
 	private static $country_id_by_country_name = null;
 
@@ -776,29 +777,9 @@ class WPSC_Countries {
 	protected function __construct() {
 
 		self::$country_visibility_overrides = get_option( 'wpsc_country_visibility_overrides', array() );
-			self::get_countries_meta();
 
 		if ( ! empty( self::$country_visibility_overrides ) ) {
 			add_action( 'wpsc_is_country_visible', array( &$this, '_get_country_visible_override' ) , 10, 2 );
-	 *
-	 * Returns and caches meta data for all countries to eliminate
-	 * multiple database request for each meta value later.
-	 *
-	 * @return  array  Countries meta
-	 */
-	public static function get_countries_meta() {
-
-		$ids = array();
-
-		foreach ( self::$active_wpsc_country_by_country_id->data() as $c ) {
-			$ids[] = $c->get_id();
-		}
-
-		return wpsc_update_meta_cache( 'WPSC_Country', $ids );
-
-	}
-
-	/**
 		}
 
 		self::$countries_by_id         = array();
