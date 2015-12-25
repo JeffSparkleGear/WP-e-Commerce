@@ -51,7 +51,7 @@ function _wpsc_get_field_output( $field, $r ) {
 	}
 
 	$before_field = apply_filters( 'wpsc_field_before', $r['before_field'], $field, $r );
-	$before_field = sprintf( $before_field, $field['id'], $field['class']);
+	$before_field = sprintf( $before_field, $field['id'], $field['class'] );
 
 	$output .= $before_field;
 	$output .= apply_filters( 'wpsc_control_before'          , $r['before_controls'], $field, $r );
@@ -154,7 +154,7 @@ function _wpsc_get_fieldset_output( $fieldset, $r ) {
 	$output = '<fieldset' . $id . '>';
 	$output .= '<legend>' . $fieldset['title'] . '</legend>';
 
-	foreach ( $fieldset['fields'] as $field) {
+	foreach ( $fieldset['fields'] as $field ) {
 		$output .= _wpsc_get_field_output( $field, $r );
 	}
 
@@ -264,7 +264,7 @@ function _wpsc_filter_control_heading( $output, $field, $args ) {
 	if ( get_option( 'shippingsameasbilling', 0 ) && ! empty( $field['shipping_heading'] ) ) {
 		$title = apply_filters(
 			'wpsc_copy_billing_details_button_title',
-			__( 'Copy billing details', 'wpsc' )
+			__( 'Copy billing details', 'wp-e-commerce' )
 		);
 
 		$button = wpsc_form_input(
@@ -313,21 +313,24 @@ function _wpsc_filter_control_select_country( $output, $field, $args ) {
 	$options      = array();
 
 	foreach ( $country_data as $country ) {
-		$isocode = $country->get_isocode();
+		$isocode      = $country->get_isocode();
 		$alternatives = array( $country->get_isocode());
+
 		switch ( $isocode ) {
 			case 'US':
-				$alternatives[] = __( 'United States of America', 'wpsc' );
+				$alternatives[] = __( 'United States of America', 'wp-e-commerce' );
 				break;
 			case 'GB':
-				$alternatives[] = __( 'Great Britain', 'wpsc' );
-				$alternatives[] = __( 'England', 'wpsc' );
-				$alternatives[] = __( 'Wales', 'wpsc' );
-				$alternatives[] = __( 'UK', 'wpsc' );
-				$alternatives[] = __( 'Scotland', 'wpsc' );
-				$alternatives[] = __( 'Northern Ireland', 'wpsc' );
+				$alternatives[] = __( 'Great Britain', 'wp-e-commerce' );
+				$alternatives[] = __( 'England', 'wp-e-commerce' );
+				$alternatives[] = __( 'Wales', 'wp-e-commerce' );
+				$alternatives[] = __( 'UK', 'wp-e-commerce' );
+				$alternatives[] = __( 'Scotland', 'wp-e-commerce' );
+				$alternatives[] = __( 'Northern Ireland', 'wp-e-commerce' );
 				break;
 		}
+
+		$alternatives = apply_filters( 'wpsc_country_alternative_spellings', $alternatives, $isocode, $country );
 
 		$options[ $country->get_isocode() ] = array(
 			'title'      => $country->get_name(),
@@ -358,10 +361,8 @@ function _wpsc_filter_control_select_region( $output, $field, $args ) {
 
 	if ( $country == 'all' ) {
 
-		$state_data = wpsc_get_all_regions();
-
-		$options[__( 'No State', 'wpsc' )] = array(
-			'' => __( 'No State', 'wpsc' ),
+		$options[__( 'No State', 'wp-e-commerce' )] = array(
+			'' => __( 'No State', 'wp-e-commerce' ),
 		);
 
 		foreach ( $state_data as $region_id => $wpsc_region ) {
@@ -792,7 +793,7 @@ function wpsc_form_submit( $name, $value = '', $atts = array(), $echo = true ) {
 	}
 
 	$atts['name']  = $name;
-	$atts['value'] = empty( $value ) ? _x( 'Submit', 'generic submit button title', 'wpsc' ) : $value;
+	$atts['value'] = empty( $value ) ? _x( 'Submit', 'generic submit button title', 'wp-e-commerce' ) : $value;
 	$atts['type']  = 'submit';
 
 	return _wpsc_input_type_field( $atts, $echo );

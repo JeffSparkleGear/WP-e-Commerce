@@ -34,13 +34,13 @@ class WPSC_Shipwire {
 	 */
 	public static function get_instance() {
 
-		if ( empty( self::$instance ) )
+		if ( empty( self::$instance ) ) {
 			self::$instance = new WPSC_Shipwire();
+		}
 
-		if ( self::is_active() )
+		if ( self::is_active() ) {
 			return self::$instance;
-
-		return false;
+		}
 	}
 
 	/**
@@ -51,11 +51,11 @@ class WPSC_Shipwire {
 	 */
 	private function __construct() {
 
-		self::$email     = get_option( 'shipwireemail' );
-		self::$passwd    = get_option( 'shipwirepassword' );
+		self::$email     = sanitize_email( get_option( 'shipwireemail' ) );
+		self::$passwd    = sanitize_text_field( get_option( 'shipwirepassword' ) );
 		self::$server    = apply_filters( 'wpsc_shipwire_server'   , 'Production' );
 		self::$warehouse = apply_filters( 'wpsc_shipwire_warehouse', '00' );
-		self::$endpoint  = ( bool ) get_option( 'shipwire_test_server' ) ? 'https://api.beta.shipwire.com/exec/' : 'https://api.shipwire.com/exec/';
+		self::$endpoint  = (bool) get_option( 'shipwire_test_server' ) ? 'https://api.beta.shipwire.com/exec/' : 'https://api.shipwire.com/exec/';
 
 		if ( ! self::is_active() )
 			return;
@@ -72,13 +72,13 @@ class WPSC_Shipwire {
 
 	private static function set_posted_properties() {
 		if ( isset( $_POST['email'] ) )
-			self::$email = $_POST['email'];
+			self::$email = sanitize_email( $_POST['email'] );
 
 		if ( isset( $_POST['password'] ) )
-			self::$passwd = $_POST['password'];
+			self::$passwd = sanitize_text_field( $_POST['password'] );
 
 		if ( isset( $_POST['server'] ) ) {
-			self::$endpoint = ( bool ) $_POST['server'] ? 'https://api.beta.shipwire.com/exec/' : 'https://api.shipwire.com/exec/';
+			self::$endpoint = (bool) $_POST['server'] ? 'https://api.beta.shipwire.com/exec/' : 'https://api.shipwire.com/exec/';
 		}
 
 	}
@@ -172,8 +172,9 @@ class WPSC_Shipwire {
 
 		$referrer = apply_filters( 'wpsc_shipwire_show_affiliate', false );
 
-		if ( $referrer )
+		if ( $referrer ) {
 			$xml .= '<Referer>' . $referrer . '</Referer>';
+		}
 
 		$xml .= '<Warehouse>' . self::$warehouse . '</Warehouse>';
 		$xml .= '<Order id="' . $log_id . '">';
@@ -252,15 +253,15 @@ class WPSC_Shipwire {
 	 */
 	public static function get_dimensions( $product_id ) {
 
-		$product_meta = get_post_meta( $product_id, '_wpsc_product_metadata', true );
+		$product_meta        = get_post_meta( $product_id, '_wpsc_product_metadata', true );
 		$original_dimensions = $product_meta['dimensions'];
 
 		$dimensions = array();
 
 		$dimensions['weight'] = ( 'pound' == $original_dimensions['weight_unit'] ) ? $original_dimensions['weight'] : wpsc_convert_weight( $original_dimensions['weight'], $original_dimensions['weight_unit'] );
-		$dimensions['length'] = ( 'in' == $original_dimensions['length_unit'] ) ? $original_dimensions['length'] : $this->convert_dimensions( $original_dimensions['length'], $original_dimensions['length_unit'] );
-		$dimensions['width']  = ( 'in' == $original_dimensions['width_unit'] ) ? $original_dimensions['width'] : $this->convert_dimensions( $original_dimensions['width'], $original_dimensions['width_unit'] );
-		$dimensions['height'] = ( 'in' == $original_dimensions['height_unit'] ) ? $original_dimensions['height'] : $this->convert_dimensions( $original_dimensions['height'], $original_dimensions['height_unit'] );
+		$dimensions['length'] = ( 'in' == $original_dimensions['length_unit'] ) ? $original_dimensions['length']    : self::convert_dimensions( $original_dimensions['length'], $original_dimensions['length_unit'] );
+		$dimensions['width']  = ( 'in' == $original_dimensions['width_unit'] ) ? $original_dimensions['width']      : self::convert_dimensions( $original_dimensions['width'], $original_dimensions['width_unit'] );
+		$dimensions['height'] = ( 'in' == $original_dimensions['height_unit'] ) ? $original_dimensions['height']    : self::convert_dimensions( $original_dimensions['height'], $original_dimensions['height_unit'] );
 
 		return $dimensions;
 	}
@@ -456,8 +457,9 @@ class WPSC_Shipwire {
 
 		}
 
-		if ( empty( $products_xml ) )
-			return false;
+		if ( empty( $products_xml ) ) {
+			return '';
+		}
 
 	 	$xml  = '<?xml version="1.0" encoding="utf-8"?>';
 		$xml .= '<RateRequest>';
@@ -529,8 +531,11 @@ class WPSC_Shipwire {
 	public static function get_shipping_quotes() {
 
 		//Returns false if no products in cart
-		if ( ! self::get_shipping_xml() )
+		$xml = self::get_shipping_xml();
+
+		if ( empty( $xml ) ) {
 			return false;
+		}
 
 		$cache_key = self::get_cache_key();
 
@@ -606,7 +611,7 @@ class WPSC_Shipwire {
 
 			self::set_posted_properties();
 			if ( ! _wpsc_ajax_verify_nonce( 'shipping_module_settings_form' ) ) {
-				die( __( 'Session expired. Try refreshing your Shipping Settings page.', 'wpsc' ) );
+				die( __( 'Session expired. Try refreshing your Shipping Settings page.', 'wp-e-commerce' ) );
 			}
 
 			// A bit tricky here - as we'd like this method available for all processes, not just AJAX, we have the product_code variable.
@@ -618,7 +623,7 @@ class WPSC_Shipwire {
 
 		$product_code  = isset( $_POST['product_code'] ) ? $_POST['product_code'] : $product_code;
 		$tracking      = self::get_tracking_info();
-		$inventory     = self::get_inventory_info( $product_code );
+		$inventory     = self::get_inventory_info( sanitize_text_field( $product_code ) );
 
 		do_action( 'wpsc_shipwire_pre_sync', $tracking, $inventory );
 
@@ -664,8 +669,8 @@ class WPSC_Shipwire {
 		do_action( 'wpsc_shipwire_post_sync', $tracking, $inventory );
 
 		$sync_response = array(
-							'tracking'  => sprintf( _n( 'Shipwire updated %d tracking number.', 'Shipwire updated %d tracking numbers.', $tracking_updates, 'wpsc' ), $tracking_updates ),
-							'inventory' => sprintf( _n( 'Shipwire updated inventory on %d product.', 'Shipwire updated inventory on %d products.', $inventory_updates, 'wpsc' ), $inventory_updates ),
+							'tracking'  => sprintf( _n( 'Shipwire updated %d tracking number.', 'Shipwire updated %d tracking numbers.', $tracking_updates, 'wp-e-commerce' ), $tracking_updates ),
+							'inventory' => sprintf( _n( 'Shipwire updated inventory on %d product.', 'Shipwire updated inventory on %d products.', $inventory_updates, 'wp-e-commerce' ), $inventory_updates ),
 						);
 
 		if ( defined ( 'DOING_AJAX' ) && DOING_AJAX )
@@ -677,19 +682,24 @@ class WPSC_Shipwire {
 
 	/**
 	 * Essentially copies functionality from wpsc_purchase_log_send_tracking_email().
+	 *
 	 * We should consider making "AJAX" functions like that process-agnostic.  Would be great to be able to utilize it from here.
 	 * A simple DOING_AJAX check for the nonces and die() and adding a parameter to the function to check before the $_POST would suffice.
 	 * Making private, primarily because I'd prefer this not to be used, even internally, pending AJAX refactor as suggested
 	 *
 	 * @access private
 	 * @global $wpdb
+	 *
 	 * @param int $order_id
 	 * @param mixed $tracking_numbers Expects the $tracking_number object from self::get_tracking_info()
+	 *
 	 * @todo Use new Notification class from Issue 490 when that is implemented
+	 *
 	 * @since 3.8.9
+	 *
 	 * @return bool Whether or not the email was sent successfully
 	 */
-	public static function _send_tracking_email( $order_id, $tracking_number = '' ) {
+	public static function _send_tracking_email( $order_id, $tracking_number = array() ) {
 		global $wpdb;
 
 		$id = absint( $order_id );
@@ -819,7 +829,7 @@ class WPSC_Shipwire {
 				'timeout'   => 30
 			);
 
-		$request = wp_remote_post( $url, $args );
+		$request = wp_safe_remote_post( $url, $args );
 
 		if ( ! is_wp_error( $request ) )
 			return $request['body'];
@@ -852,28 +862,28 @@ function convert_code_to_service( $service ) {
 
 	switch ( $service ) :
 		case 'GD' :
-			$service = _x( 'Ground', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Ground', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case '1D' :
-			$service = _x( 'One-Day Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'One-Day Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case '2D' :
-			$service = _x( 'Two-Day Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Two-Day Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case 'INTL' :
-			$service = _x( 'Standard Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Standard Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case 'FT' :
-			$service = _x( 'Freight Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Freight Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case 'E-INTL' :
-			$service = _x( 'Economy Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Economy Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case 'PL-INTL' :
-			$service = _x( 'Plus Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Plus Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		case 'PM-INTL' :
-			$service = _x( 'Premium Shipping', 'shipwire shipping method', 'wpsc' );
+			$service = _x( 'Premium Shipping', 'shipwire shipping method', 'wp-e-commerce' );
 			break;
 		endswitch;
 
@@ -889,28 +899,28 @@ function convert_code_to_service( $service ) {
 function convert_service_to_code( $service ) {
 
 	switch ( $service ) :
-		case _x( 'Ground', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Ground', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'GD';
 			break;
-		case _x( 'One-Day Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'One-Day Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = '1D';
 			break;
-		case _x( 'Two-Day Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Two-Day Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = '2D';
 			break;
-		case _x( 'Standard Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Standard Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'INTL';
 			break;
-		case _x( 'Freight Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Freight Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'FT';
 			break;
-		case _x( 'Economy Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Economy Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'E-INTL';
 			break;
-		case _x( 'Plus Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Plus Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'PL-INTL';
 			break;
-		case _x( 'Premium Shipping', 'shipwire shipping method', 'wpsc' ) :
+		case _x( 'Premium Shipping', 'shipwire shipping method', 'wp-e-commerce' ) :
 			$service = 'PM-INTL';
 			break;
 		endswitch;

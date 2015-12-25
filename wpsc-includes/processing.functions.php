@@ -126,12 +126,16 @@ function wpsc_decrement_claimed_stock( $purchase_log_id ) {
 			case 4:
 			case 5:
 				foreach ( (array) $all_claimed_stock as $claimed_stock ) {
-					$product = get_post($claimed_stock->product_id);
-					$current_stock = get_post_meta($product->ID, '_wpsc_stock', true);
+
+					$product         = get_post( $claimed_stock->product_id );
+					$current_stock   = get_post_meta( $product->ID, '_wpsc_stock', true );
 					$remaining_stock = $current_stock - $claimed_stock->stock_claimed;
-					update_product_meta($product->ID, 'stock', $remaining_stock);
-					$product_meta = get_product_meta($product->ID,'product_metadata',true);
-					if( $remaining_stock < 1 ) {
+
+					update_product_meta( $product->ID, 'stock', $remaining_stock );
+
+					$product_meta = get_product_meta( $product->ID, 'product_metadata', true );
+
+					if ( $remaining_stock < 1 ) {
 						// this is to make sure after upgrading to 3.8.9, products will have
 						// "notify_when_none_left" enabled by default if "unpublish_when_none_left"
 						// is enabled.
@@ -143,7 +147,7 @@ function wpsc_decrement_claimed_stock( $purchase_log_id ) {
 							}
 						}
 
-						$email_message = sprintf( __( 'The product "%s" is out of stock.', 'wpsc' ), $product->post_title );
+						$email_message = sprintf( __( 'The product "%s" is out of stock.', 'wp-e-commerce' ), $product->post_title );
 
 						if ( ! empty( $product_meta["unpublish_when_none_left"] ) ) {
 							$result = wp_update_post( array(
@@ -152,11 +156,11 @@ function wpsc_decrement_claimed_stock( $purchase_log_id ) {
 							) );
 
 							if ( $result )
-								$email_message = sprintf( __( 'The product "%s" is out of stock and has been unpublished.', 'wpsc' ), $product->post_title );
+								$email_message = sprintf( __( 'The product "%s" is out of stock and has been unpublished.', 'wp-e-commerce' ), $product->post_title );
 						}
 
 						if ( $product_meta["notify_when_none_left"] == 1 )
-							wp_mail(get_option('purch_log_email'), sprintf(__('%s is out of stock', 'wpsc'), $product->post_title), $email_message );
+							wp_mail(get_option('purch_log_email'), sprintf(__('%s is out of stock', 'wp-e-commerce'), $product->post_title), $email_message );
 					}
 				}
 			case 6:
@@ -218,7 +222,8 @@ function wpsc_get_mimetype($file, $check_reliability = false) {
 		$mimetype = false;
 		$is_reliable = false;
 	}
-	if($check_reliability == true) {
+
+	if ( $check_reliability ) {
 		return array('mime_type' => $mimetype, 'is_reliable' => $is_reliable );
 	} else {
 		return $mimetype;
@@ -299,7 +304,7 @@ function wpsc_convert_weight( $in_weight, $in_unit, $out_unit = 'pound', $raw = 
 	return round( $weight, 2 );
 }
 
-function wpsc_ping_services( $post_id ) {
+function wpsc_ping_services() {
 	wp_schedule_single_event( time(), 'do_wpsc_pings' );
 }
 
@@ -333,12 +338,6 @@ function wpsc_send_ping($server) {
 	}
 }
 
-
-function wpsc_sanitise_keys($value) {
-  /// Function used to cast array items to integer.
-  return (int)$value;
-}
-
 add_action( 'publish_wpsc-product', 'wpsc_ping_services' );
 add_action( 'do_wpsc_pings', 'wpsc_ping' );
 
@@ -362,7 +361,7 @@ function wpsc_check_stock($state, $product) {
 
 		if( $out_of_stock === true ) {
 			$state['state'] = true;
-			$state['messages'][] = __( 'This product has no available stock', 'wpsc' );
+			$state['messages'][] = __( 'This product has no available stock', 'wp-e-commerce' );
 		}
 	}else{
 		$no_stock = $wpdb->get_col('
@@ -383,16 +382,15 @@ function wpsc_check_stock($state, $product) {
 			AND
 			`pm`.`meta_value` = "0"
 	');
-		if( !empty( $no_stock ) ){
-			$state['state'] = true;
-			$state['messages'][] = __( 'One or more of this products variations are out of stock.', 'wpsc' );
+
+		if ( ! empty( $no_stock ) ) {
+			$state['state']      = true;
+			$state['messages'][] = __( 'One or more of this products variations are out of stock.', 'wp-e-commerce' );
 		}
-
-
 	}
+
 	return array( 'state' => $state['state'], 'messages' => $state['messages'] );
 }
-
 
 /*
  * if UPS is on, this function checks every product on the products page to see if it has a weight
@@ -420,7 +418,7 @@ function wpsc_check_weight($state, $product) {
 
 		if( $has_no_weight === true ) {
 			$state['state'] = true;
-			$state['messages'][] = implode( ',',$shipping_modules ). __(' does not support products without a weight set. Please either disable shipping for this product or give it a weight', 'wpsc' );
+			$state['messages'][] = implode( ',',$shipping_modules ). __(' does not support products without a weight set. Please either disable shipping for this product or give it a weight', 'wp-e-commerce' );
 		}
 	}
 	return array( 'state' => $state['state'], 'messages' => $state['messages'] );
@@ -428,8 +426,6 @@ function wpsc_check_weight($state, $product) {
 
 add_filter('wpsc_product_alert', 'wpsc_check_stock', 10, 2);
 add_filter('wpsc_product_alert', 'wpsc_check_weight', 10, 2);
-
-
 
 /**
  * WPSC Image Quality
@@ -450,4 +446,3 @@ function wpsc_image_quality( $quality = 75 ) {
 	$quality = apply_filters( 'jpeg_quality', $quality );
 	return apply_filters( 'wpsc_jpeg_quality', $quality );
 }
-

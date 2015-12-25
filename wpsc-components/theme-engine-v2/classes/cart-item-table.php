@@ -13,11 +13,12 @@ class WPSC_Cart_Item_Table extends WPSC_Table {
 		return self::$instance;
 	}
 
-	public $columns         = array();
-	public $show_shipping   = true;
-	public $show_tax        = true;
-	public $show_total      = true;
-	public $show_thumbnails = true;
+	public $columns           = array();
+	public $show_shipping     = true;
+	public $show_tax          = true;
+	public $show_total        = true;
+	public $show_thumbnails   = true;
+	public $show_coupon_field = true;
 
 	public function __construct() {
 		global $wpsc_cart;
@@ -31,10 +32,10 @@ class WPSC_Cart_Item_Table extends WPSC_Table {
 		$this->prepare_cache();
 
 		$this->columns = array(
-			'items'       => __( 'Items'     , 'wpsc' ),
-			'unit_price'  => __( 'Unit Price', 'wpsc' ),
-			'quantity'    => __( 'Quantity'  , 'wpsc' ),
-			'item_total'  => __( 'Item Total', 'wpsc' ),
+			'items'       => __( 'Items'     , 'wp-e-commerce' ),
+			'unit_price'  => __( 'Unit Price', 'wp-e-commerce' ),
+			'quantity'    => __( 'Quantity'  , 'wp-e-commerce' ),
+			'item_total'  => __( 'Item Total', 'wp-e-commerce' ),
 		);
 
 		$this->columns = apply_filters( 'wpsc_cart_item_table_columns', $this->columns );
@@ -91,6 +92,10 @@ class WPSC_Cart_Item_Table extends WPSC_Table {
 	protected function get_total_price() {
 		global $wpsc_cart;
 		return $wpsc_cart->calculate_total_price();
+	}
+
+	protected function get_total_discount() {
+		return wpsc_coupon_amount( false );
 	}
 
 	protected function get_tax() {
@@ -173,7 +178,7 @@ class WPSC_Cart_Item_Table extends WPSC_Table {
 				</div>
 				<div class="wpsc-cart-item-details">
 					<?php if ( ! empty( $item->sku ) ) : ?>
-						<span class="wpsc-cart-item-sku"><span><?php esc_html_e( 'SKU', 'wpsc' ); ?>:</span> <?php echo esc_html( $item->sku ); ?></span>
+						<span class="wpsc-cart-item-sku"><span><?php esc_html_e( 'SKU', 'wp-e-commerce' ); ?>:</span> <?php echo esc_html( $item->sku ); ?></span>
 					<?php endif ?>
 
 					<?php if ( $separator ) : ?>

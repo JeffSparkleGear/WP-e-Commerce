@@ -9,13 +9,13 @@
   * for internal operations.
   */
 $nzshpcrt_gateways[$num] = array(
-	'name' => __( 'PayPal Payments Standard 2.0', 'wpsc' ),
+	'name' => __( 'PayPal Payments Standard 2.0', 'wp-e-commerce' ),
 	'api_version' => 2.0,
 	'image' => WPSC_URL . '/images/paypal.gif',
 	'class_name' => 'wpsc_merchant_paypal_standard',
 	'has_recurring_billing' => true,
 	'wp_admin_cannot_cancel' => true,
-	'display_name' => __( 'PayPal Payments Standard', 'wpsc' ),
+	'display_name' => __( 'PayPal Payments Standard', 'wp-e-commerce' ),
 	'requirements' => array(
 		/// so that you can restrict merchant modules to PHP 5, if you use PHP 5 features
 		'php_version' => 4.3,
@@ -34,8 +34,6 @@ $nzshpcrt_gateways[$num] = array(
 	)
 );
 
-
-
 /**
 	* WP eCommerce PayPal Standard Merchant Class
 	*
@@ -48,9 +46,12 @@ $nzshpcrt_gateways[$num] = array(
 class wpsc_merchant_paypal_standard extends wpsc_merchant {
   var $name = '';
   var $paypal_ipn_values = array();
+  var $rate;
+  var $local_currency_code;
+  var $paypal_currency_code;
 
   function __construct( $purchase_id = null, $is_receiving = false ) {
-	$this->name = __( 'PayPal Payments Standard', 'wpsc' );
+	$this->name = __( 'PayPal Payments Standard', 'wp-e-commerce' );
 	parent::__construct( $purchase_id, $is_receiving );
   }
 
@@ -111,8 +112,9 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 
 		$return_url = add_query_arg( 'sessionid', $this->cart_data['session_id'], $this->cart_data['transaction_results_url'] );
 
-		if ( $buy_now )
+		if ( $buy_now ) {
 			$return_url = add_query_arg( 'wpsc_buy_now_return', 1, $return_url );
+		}
 
 		// Store settings to be sent to paypal
 		$paypal_vars += array(
@@ -319,7 +321,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 					}
 
 				} else {
-					$paypal_vars['item_name_'.$i] = __( "Your Shopping Cart", 'wpsc' );
+					$paypal_vars['item_name_'.$i] = __( "Your Shopping Cart", 'wp-e-commerce' );
 					$paypal_vars['amount_'.$i] = $this->convert( $this->cart_data['total_price'] ) - $this->convert( $this->cart_data['base_shipping'] );
 					$paypal_vars['quantity_'.$i] = 1;
 					$paypal_vars['shipping_'.$i] = 0;
@@ -375,7 +377,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 		}
 
 		if ( defined( 'WPSC_ADD_DEBUG_PAGE' ) && WPSC_ADD_DEBUG_PAGE ) {
-			echo "<a href='" . esc_url( $redirect ) . "'>" . __( "Test the URL here", 'wpsc' ) . "</a>";
+			echo "<a href='" . esc_url( $redirect ) . "'>" . __( "Test the URL here", 'wp-e-commerce' ) . "</a>";
 			echo "<pre>" . print_r( $this->collected_gateway_data, true ) . "</pre>";
 			exit();
 		} else {
@@ -406,7 +408,7 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 			'user-agent'  => ( 'WP eCommerce/' . WPSC_PRESENTABLE_VERSION )
 		);
 
-		$response = wp_remote_post( $paypal_url, $options );
+		$response = wp_safe_remote_post( $paypal_url, $options );
 
 		if ( 'VERIFIED' == $response['body'] ) {
 			$this->paypal_ipn_values = $received_values;
@@ -626,37 +628,34 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
  */
 function submit_paypal_multiple (){
 	if ( isset ( $_POST['paypal_multiple_business'] ) ) {
-		update_option( 'paypal_multiple_business', $_POST['paypal_multiple_business'] );
+		update_option( 'paypal_multiple_business', sanitize_email( $_POST['paypal_multiple_business'] ) );
 	}
 
 	if ( isset ( $_POST['paypal_multiple_url'] ) ) {
-		update_option( 'paypal_multiple_url', $_POST['paypal_multiple_url'] );
+		update_option( 'paypal_multiple_url', esc_url_raw( $_POST['paypal_multiple_url'] ) );
 	}
 
 	if ( isset ( $_POST['paypal_curcode'] ) ) {
-		update_option( 'paypal_curcode', $_POST['paypal_curcode'] );
-	}
-
-	if ( isset ( $_POST['paypal_curcode'] ) ) {
-		update_option( 'paypal_curcode', $_POST['paypal_curcode'] );
+		update_option( 'paypal_curcode', sanitize_text_field( $_POST['paypal_curcode'] ) );
 	}
 
 	if ( isset ( $_POST['paypal_ipn'] ) ) {
-		update_option( 'paypal_ipn', (int)$_POST['paypal_ipn'] );
+		update_option( 'paypal_ipn', (int) $_POST['paypal_ipn'] );
 	}
 
 	if ( isset ( $_POST['address_override'] ) ) {
-		update_option( 'address_override', (int)$_POST['address_override'] );
+		update_option( 'address_override', (int) $_POST['address_override'] );
 	}
 	if ( isset ( $_POST['paypal_ship'] ) ) {
-		update_option( 'paypal_ship', (int)$_POST['paypal_ship'] );
+		update_option( 'paypal_ship', (int) $_POST['paypal_ship'] );
 	}
 
-	if ( ! isset( $_POST['paypal_form'] ) )
+	if ( ! isset( $_POST['paypal_form'] ) ) {
 		$_POST['paypal_form'] = array();
+	}
 
-	foreach( (array)$_POST['paypal_form'] as $form => $value ) {
-		update_option( ( 'paypal_form_' . $form ), $value );
+	foreach( (array) $_POST['paypal_form'] as $form => $value ) {
+		update_option( 'paypal_form_' . $form, sanitize_text_field( $value ) );
 	}
 
 	return true;
@@ -676,23 +675,23 @@ function form_paypal_multiple() {
 
 	$account_type = get_option( 'paypal_multiple_url' );
 	$account_types = array(
-		'https://www.paypal.com/cgi-bin/webscr' => __( 'Live Account', 'wpsc' ),
-		'https://www.sandbox.paypal.com/cgi-bin/webscr' => __( 'Sandbox Account', 'wpsc' ),
+		'https://www.paypal.com/cgi-bin/webscr' => __( 'Live Account', 'wp-e-commerce' ),
+		'https://www.sandbox.paypal.com/cgi-bin/webscr' => __( 'Sandbox Account', 'wp-e-commerce' ),
 	);
 
 	$output = "
 	<tr>
-		<td>" . __( 'Username:', 'wpsc' ) . "</td>
+		<td>" . __( 'Username:', 'wp-e-commerce' ) . "</td>
 		<td>
 			<input type='text' size='40' value='" . get_option( 'paypal_multiple_business') . "' name='paypal_multiple_business' />
 			<p class='description'>
-				" . __( 'This is your PayPal email address.', 'wpsc' ) . "
+				" . __( 'This is your PayPal email address.', 'wp-e-commerce' ) . "
 			</p>
 		</td>
 	</tr>
 
 	<tr>
-		<td>" . __( 'Account Type:', 'wpsc' ) . "</td>
+		<td>" . __( 'Account Type:', 'wp-e-commerce' ) . "</td>
 		<td>
 			<select name='paypal_multiple_url'>\n";
 
@@ -703,7 +702,7 @@ function form_paypal_multiple() {
 	$output .= "
 			</select>
 			<p class='description'>
-				" . __( 'If you have a PayPal developers Sandbox account please use Sandbox mode, if you just have a standard PayPal account then you will want to use Live mode.', 'wpsc' ) . "
+				" . __( 'If you have a PayPal developers Sandbox account, please use Sandbox mode. If you just have a standard PayPal account, then you will want to use Live mode.', 'wp-e-commerce' ) . "
 			</p>
 		</td>
 	</tr>\n";
@@ -751,34 +750,34 @@ function form_paypal_multiple() {
 	}
 	$output .= "
 	<tr>
-		<td>" . __( "IPN", 'wpsc' ) . ":</td>
+		<td>" . __( "IPN", 'wp-e-commerce' ) . ":</td>
 		<td>
-			<input type='radio' value='1' name='paypal_ipn' id='paypal_ipn1' " . $paypal_ipn1 . " /> <label for='paypal_ipn1'>" . __( 'Yes', 'wpsc' ) . "</label> &nbsp;
-			<input type='radio' value='0' name='paypal_ipn' id='paypal_ipn2' " . $paypal_ipn2 . " /> <label for='paypal_ipn2'>" . __( 'No', 'wpsc' ) . "</label>
+			<input type='radio' value='1' name='paypal_ipn' id='paypal_ipn1' " . $paypal_ipn1 . " /> <label for='paypal_ipn1'>" . __( 'Yes', 'wp-e-commerce' ) . "</label> &nbsp;
+			<input type='radio' value='0' name='paypal_ipn' id='paypal_ipn2' " . $paypal_ipn2 . " /> <label for='paypal_ipn2'>" . __( 'No', 'wp-e-commerce' ) . "</label>
 			<p class='description'>
-				" . __( "IPN (instant payment notification) will automatically update your sales logs to 'Accepted payment' when a customers payment is successful. For IPN to work you also need to have IPN turned on in your Paypal settings. If it is not turned on, the sales sill remain as 'Order Pending' status until manually changed. It is highly recommend using IPN, especially if you are selling digital products.", 'wpsc' ) . "
+				" . __( "IPN (instant payment notification) will automatically update your sales logs to 'Accepted payment' when a customer's payment is successful. For IPN to work you also need to have IPN turned on in your PayPal settings. If it is not turned on, the sales will remain as 'Order Pending' status until manually changed. It is highly recommended using IPN, especially if you are selling digital products.", 'wp-e-commerce' ) . "
 			</p>
 		</td>
 	</tr>
 	<tr>
-		<td style='padding-bottom: 0px;'>" . __( "Send shipping details", 'wpsc' ) . "</td>
+		<td style='padding-bottom: 0px;'>" . __( "Send shipping details", 'wp-e-commerce' ) . "</td>
 		<td style='padding-bottom: 0px;'>
-			<input type='radio' value='1' name='paypal_ship' id='paypal_ship1' " . $paypal_ship1 . " /> <label for='paypal_ship1'>" . __( 'Yes', 'wpsc' ) . "</label> &nbsp;
-			<input type='radio' value='0' name='paypal_ship' id='paypal_ship2' " . $paypal_ship2 . " /> <label for='paypal_ship2'>" . __( 'No', 'wpsc' ) . "</label>
+			<input type='radio' value='1' name='paypal_ship' id='paypal_ship1' " . $paypal_ship1 . " /> <label for='paypal_ship1'>" . __( 'Yes', 'wp-e-commerce' ) . "</label> &nbsp;
+			<input type='radio' value='0' name='paypal_ship' id='paypal_ship2' " . $paypal_ship2 . " /> <label for='paypal_ship2'>" . __( 'No', 'wp-e-commerce' ) . "</label>
 			<p class='description'>
-				" . __( "Note: If your checkout page does not have a shipping details section, or if you don't want to send Paypal shipping information. You should change Send shipping details option to No.", 'wpsc' ) . "
+				" . __( "Note: If your checkout page does not have a shipping details section, or if you don't want to send PayPal shipping information, you should change the Send shipping details option to 'No'.", 'wp-e-commerce' ) . "
 			</p>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			" . __( 'Address Override:', 'wpsc' ) . "
+			" . __( 'Address Override:', 'wp-e-commerce' ) . "
 		</td>
 		<td>
-			<input type='radio' value='1' name='address_override' id='address_override1' " . $address_override1 . " /> <label for='address_override1'>" . __( 'Yes', 'wpsc' ) . "</label> &nbsp;
-			<input type='radio' value='0' name='address_override' id='address_override2' " . $address_override2 . " /> <label for='address_override2'>" . __( 'No', 'wpsc' ) . "</label>
+			<input type='radio' value='1' name='address_override' id='address_override1' " . $address_override1 . " /> <label for='address_override1'>" . __( 'Yes', 'wp-e-commerce' ) . "</label> &nbsp;
+			<input type='radio' value='0' name='address_override' id='address_override2' " . $address_override2 . " /> <label for='address_override2'>" . __( 'No', 'wp-e-commerce' ) . "</label>
 			<p class='description'>
-				" . __( "This setting affects your PayPal purchase log. If your customers already have a PayPal account PayPal will try to populate your PayPal Purchase Log with their PayPal address. This setting tries to replace the address in the PayPal purchase log with the Address customers enter on your Checkout page.", 'wpsc' ) . "
+				" . __( "This setting affects your PayPal purchase log. If your customers already have a PayPal account, PayPal will try to populate your PayPal Purchase Log with their PayPal address. This setting tries to replace the address in the PayPal purchase log with the address customers enter on your Checkout page.", 'wp-e-commerce' ) . "
 			</p>
 		</td>
 	</tr>\n";
@@ -795,19 +794,19 @@ function form_paypal_multiple() {
 		<tr>
 			<td>
 			</td>
-			<td><strong class='form_group'>" . __( 'Currency Converter', 'wpsc' ) . "</td>
+			<td><strong class='form_group'>" . __( 'Currency Converter', 'wp-e-commerce' ) . "</td>
 		</tr>
 		<tr>
 			<td>
 			</td>
 			<td>
-			".sprintf( __( 'Your website uses <strong>%s</strong>. This currency is not supported by PayPal, please  select a currency using the drop down menu below. Buyers on your site will still pay in your local currency however we will send the order through to Paypal using the currency you choose below.', 'wpsc' ), $store_currency_data['currency'] )."
+			".sprintf( __( 'Your website uses <strong>%s</strong>. This currency is not supported by PayPal. Please select an accepted currency using the drop down menu below. Buyers on your site will still pay in your local currency. However, we will send the order through to PayPal using the currency you choose below.', 'wp-e-commerce' ), $store_currency_data['currency'] )."
 			</td>
 		</tr>
 
 		<tr>
 			<td>
-				" . __( 'Select Currency:', 'wpsc' ) . "
+				" . __( 'Select Currency:', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_curcode'>\n";
@@ -833,12 +832,12 @@ function form_paypal_multiple() {
 		$output .= "
 		<tr>
 			<td colspan='2'>
-				<strong class='form_group'>" . __( 'Forms Sent to Gateway', 'wpsc' ) . "</strong>
+				<strong class='form_group'>" . __( 'Forms Sent to Gateway', 'wp-e-commerce' ) . "</strong>
 			</td>
 		</tr>
 
 		<tr>
-			<td>" . __( 'First Name Field', 'wpsc' ) . "</td>
+			<td>" . __( 'First Name Field', 'wp-e-commerce' ) . "</td>
 			<td>
 				<select name='paypal_form[first_name]'>
 				" . nzshpcrt_form_field_list( get_option( 'paypal_form_first_name' ) ) . "
@@ -846,7 +845,7 @@ function form_paypal_multiple() {
 			</td>
 		</tr>
 		<tr>
-			<td>" . __( 'Last Name Field', 'wpsc' ) . "</td>
+			<td>" . __( 'Last Name Field', 'wp-e-commerce' ) . "</td>
 			<td>
 				<select name='paypal_form[last_name]'>
 				" . nzshpcrt_form_field_list( get_option( 'paypal_form_last_name' ) ) . "
@@ -855,7 +854,7 @@ function form_paypal_multiple() {
 		</tr>
 		<tr>
 			<td>
-			" . __( 'Address Field', 'wpsc' ) . "
+			" . __( 'Address Field', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_form[address]'>
@@ -865,7 +864,7 @@ function form_paypal_multiple() {
 		</tr>
 		<tr>
 			<td>
-			" . __( 'City Field', 'wpsc' ) . "
+			" . __( 'City Field', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_form[city]'>
@@ -875,7 +874,7 @@ function form_paypal_multiple() {
 		</tr>
 		<tr>
 			<td>
-			" . __( 'State Field', 'wpsc' ) . "
+			" . __( 'State Field', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_form[state]'>
@@ -885,7 +884,7 @@ function form_paypal_multiple() {
 		</tr>
 		<tr>
 			<td>
-			" . __( 'Postal / ZIP Code Field', 'wpsc' ) . "
+			" . __( 'Postal / ZIP Code Field', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_form[post_code]'>
@@ -895,7 +894,7 @@ function form_paypal_multiple() {
 		</tr>
 		<tr>
 			<td>
-			" . __( 'Country Field', 'wpsc' ) . "
+			" . __( 'Country Field', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_form[country]'>
@@ -906,7 +905,7 @@ function form_paypal_multiple() {
 		<tr>
 			<td colspan='2'>
 				<p class='description'>
-				" . sprintf( __( "For more help configuring Paypal Standard, please read our documentation <a href='%s'>here</a>", 'wpsc' ), esc_url( 'http://docs.wpecommerce.org/documentation/paypal-payments-standard/' ) ) . "
+				" . sprintf( __( "For more help configuring PayPal Standard, please read our documentation <a href='%s'>here</a>", 'wp-e-commerce' ), esc_url( 'http://docs.wpecommerce.org/documentation/paypal-payments-standard/' ) ) . "
 				</p>
 			</td>
 		</tr>\n";

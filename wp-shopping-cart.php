@@ -3,9 +3,10 @@
   * Plugin Name: WP eCommerce
   * Plugin URI: http://wpecommerce.org/
   * Description: A plugin that provides a WordPress Shopping Cart. See also: <a href="http://wpecommerce.org" target="_blank">WPeCommerce.org</a> | <a href="https://wordpress.org/support/plugin/wp-e-commerce/" target="_blank">Support Forum</a> | <a href="http://docs.wpecommerce.org/" target="_blank">Documentation</a>
-  * Version: 3.10.1
+  * Version: 3.11.1
   * Author: WP eCommerce
   * Author URI: http://wpecommerce.org/
+  * Text Domain: wp-e-commerce
   **/
 
 /**
@@ -46,7 +47,6 @@ class WP_eCommerce {
 	public function init() {
 		// Previous to initializing
 		do_action( 'wpsc_pre_init' );
-
 		// Initialize
 		$this->start();
 		$this->constants();
@@ -70,19 +70,19 @@ class WP_eCommerce {
 	 */
 	public function _register_core_components( $components ) {
 		$components['merchant']['core-v2'] = array(
-			'title'    => __( 'WP eCommerce Merchant API v2', 'wpsc' ),
+			'title'    => __( 'WP eCommerce Merchant API v2', 'wp-e-commerce' ),
 			'includes' =>
 				WPSC_FILE_PATH . '/wpsc-components/merchant-core-v2/merchant-core-v2.php'
 		);
 
 		$components['merchant']['core-v3'] = array(
-			'title'    => __( 'WP eCommerce Merchant API v3', 'wpsc' ),
+			'title'    => __( 'WP eCommerce Merchant API v3', 'wp-e-commerce' ),
 			'includes' =>
 				WPSC_FILE_PATH . '/wpsc-components/merchant-core-v3/merchant-core-v3.php'
 		);
 
 		$components['marketplace']['core-v1'] = array(
-			'title'    => __( 'WP eCommerce Marketplace API v1', 'wpsc' ),
+			'title'    => __( 'WP eCommerce Marketplace API v1', 'wp-e-commerce' ),
 			'includes' =>
 				WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/marketplace-core-v1.php'
 		);
@@ -110,13 +110,29 @@ class WP_eCommerce {
 		define( 'WPSC_FOLDER',    dirname( WPSC_PLUGIN_BASENAME ) );
 		define( 'WPSC_URL',       plugins_url( '', __FILE__ ) );
 
+		add_filter( 'load_textdomain_mofile', array( $this, 'load_old_textdomain' ), 10, 2 );
+
 		//load text domain
-		if ( ! load_plugin_textdomain( 'wpsc', false, '../languages/' ) ) {
-			load_plugin_textdomain( 'wpsc', false, dirname( WPSC_PLUGIN_BASENAME ) . '/wpsc-languages/' );
+		if ( ! load_plugin_textdomain( 'wp-e-commerce', false, '../languages/' ) ) {
+			load_plugin_textdomain( 'wp-e-commerce', false, dirname( WPSC_PLUGIN_BASENAME ) . '/wpsc-languages/' );
 		}
 
 		// Finished starting
 		do_action( 'wpsc_started' );
+	}
+
+	/**
+	 * Load a .mo file for the old textdomain if one exists
+	 * Necessary to maintain backwards compatibility after changing text-domains.
+	 *
+	 * @since  3.11.0
+	 * @link: https://github.com/10up/grunt-wp-plugin/issues/21#issuecomment-62003284
+	 */
+	public function load_old_textdomain( $mofile, $textdomain ) {
+		if ( $textdomain === 'wp-e-commerce' && ! file_exists( $mofile ) ) {
+			$mofile = dirname( $mofile ) . DIRECTORY_SEPARATOR . str_replace( $textdomain, 'wpsc', basename( $mofile ) );
+		}
+		return $mofile;
 	}
 
 	/**

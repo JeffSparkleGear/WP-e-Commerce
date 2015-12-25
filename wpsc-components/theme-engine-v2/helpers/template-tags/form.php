@@ -34,7 +34,7 @@ function wpsc_get_add_to_cart_form_args( $id = null ) {
 			array(
 				'name'  => 'quantity',
 				'type'  => 'textfield',
-				'title' => __( 'Quantity', 'wpsc' ),
+				'title' => __( 'Quantity', 'wp-e-commerce' ),
 				'value' => 1,
 			),
 		),
@@ -65,7 +65,7 @@ function wpsc_get_add_to_cart_form_args( $id = null ) {
 			),
 			'title'   => apply_filters(
 				'wpsc_add_to_cart_button_title',
-				__( 'Add to Cart', 'wpsc' )
+				__( 'Add to Cart', 'wp-e-commerce' )
 			),
 		),
 
@@ -136,7 +136,7 @@ function wpsc_get_login_form_args() {
 				'id'    => 'wpsc-login-username',
 				'name'  => 'username',
 				'type'  => 'textfield',
-				'title' => __( 'Username', 'wpsc' ),
+				'title' => __( 'Username', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'username' ),
 				'rules' => 'required',
 			),
@@ -144,27 +144,27 @@ function wpsc_get_login_form_args() {
 				'id'    => 'wpsc-login-password',
 				'name'  => 'password',
 				'type'  => 'password',
-				'title' => __( 'Password', 'wpsc' ),
+				'title' => __( 'Password', 'wp-e-commerce' ),
 				'value' => '',
 				'rules' => 'required',
 				'description' => sprintf(
 					'<a class="wpsc-lost-password-link" href="%1$s">%2$s</a>',
 					esc_url( wpsc_get_password_reminder_url() ),
-					__( 'Lost your password?', 'wpsc' )
+					__( 'Lost your password?', 'wp-e-commerce' )
 				),
 			),
 			array(
 				'id' => 'wpsc-login-remember',
 				'name' => 'remember',
 				'type' => 'checkbox',
-				'title' => __( 'Remember Me', 'wpsc' ),
+				'title' => __( 'Remember Me', 'wp-e-commerce' ),
 			),
 		),
 		'form_actions' => array(
 			array(
 				'type' => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_login_button_title', __( 'Log in', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_login_button_title', __( 'Log in', 'wp-e-commerce' ) ),
 			),
 			array(
 				'type'    => 'hidden',
@@ -203,16 +203,16 @@ function wpsc_get_register_form_args() {
 				'id'    => 'wpsc-register-username',
 				'name'  => 'username',
 				'type'  => 'textfield',
-				'title' => __( 'Username', 'wpsc' ),
+				'title' => __( 'Username', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'username' ),
 				'rules' => 'trim|required|username|sanitize_username',
 			),
 			array(
 				'id'    => 'wpsc-register-email',
 				'name'  => 'email',
-				'description' => __( 'A password will be e-mailed to you', 'wpsc' ),
+				'description' => __( 'A password will be emailed to you', 'wp-e-commerce' ),
 				'type'  => 'textfield',
-				'title' => __( 'E-mail', 'wpsc' ),
+				'title' => __( 'Email', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'email' ),
 				'rules' => 'trim|required|account_email',
 			),
@@ -221,7 +221,7 @@ function wpsc_get_register_form_args() {
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_register_button_title', __( 'Register', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_register_button_title', __( 'Register', 'wp-e-commerce' ) ),
 			),
 			array(
 				'type'    => 'hidden',
@@ -231,7 +231,7 @@ function wpsc_get_register_form_args() {
 			array(
 				'type'    => 'hidden',
 				'name'    => '_wp_nonce',
-				'value'   => wp_create_nonce( "wpsc-register" ),
+				'value'   => wp_create_nonce( 'wpsc-register' ),
 			),
 		),
 	);
@@ -260,7 +260,7 @@ function wpsc_get_password_reminder_form_args() {
 				'id'    => 'wpsc-password-reminder-username',
 				'name'  => 'username',
 				'type'  => 'textfield',
-				'title' => __( 'Username or E-mail', 'wpsc' ),
+				'title' => __( 'Username or Email', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'username' ),
 				'rules' => 'trim|required|valid_username_or_email',
 			),
@@ -269,7 +269,7 @@ function wpsc_get_password_reminder_form_args() {
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_password_reminder_button_title', __( 'Get New Password', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_password_reminder_button_title', __( 'Get New Password', 'wp-e-commerce' ) ),
 			),
 			array(
 				'type'    => 'hidden',
@@ -279,7 +279,7 @@ function wpsc_get_password_reminder_form_args() {
 			array(
 				'type'    => 'hidden',
 				'name'    => '_wp_nonce',
-				'value'   => wp_create_nonce( "wpsc-password-reminder" ),
+				'value'   => wp_create_nonce( 'wpsc-password-reminder' ),
 			),
 		),
 	);
@@ -305,14 +305,14 @@ function wpsc_get_password_reset_form_args() {
 			array(
 				'name'  => 'pass1',
 				'type'  => 'password',
-				'title' => __( 'New password', 'wpsc' ),
+				'title' => __( 'New password', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'pass1' ),
 				'rules' => 'trim|required',
 			),
 			array(
 				'name'  => 'pass2',
 				'type'  => 'password',
-				'title' => __( 'Confirm new password', 'wpsc' ),
+				'title' => __( 'Confirm new password', 'wp-e-commerce' ),
 				'value' => wpsc_submitted_value( 'pass2' ),
 				'rules' => 'trim|required|matches[pass1]',
 			),
@@ -321,7 +321,7 @@ function wpsc_get_password_reset_form_args() {
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_password_reset_button_title', __( 'Reset Password', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_password_reset_button_title', __( 'Reset Password', 'wp-e-commerce' ) ),
 			),
 			array(
 				'type'    => 'hidden',
@@ -358,13 +358,12 @@ function wpsc_get_checkout_form_args() {
 		'action' => '',
 		'id'     => "wpsc-checkout-form",
 		'inline_validation_errors' => true,
-		'fields' => array(
-		),
+		'fields' => array(),
 		'form_actions' => array(
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_checkout_form_button_title', __( 'Continue', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_checkout_form_button_title', __( 'Continue', 'wp-e-commerce' ) ),
 				'name'    => 'wpsc_submit_checkout',
 			),
 			array(
@@ -381,15 +380,35 @@ function wpsc_get_checkout_form_args() {
 	);
 
 	$args['fields'] = _wpsc_convert_checkout_form_fields();
-	return $args;
+	return apply_filters( 'wpsc_get_checkout_form_args', $args );
 }
 
 function _wpsc_convert_checkout_form_fields( $customer_settings = false ) {
 	$form   = WPSC_Checkout_Form::get();
 	$fields = $form->get_fields();
+
+	if ( empty( $fields ) ) {
+		return array();
+	}
+
 	$args   = array();
 
 	$purchase_log_exists = false;
+
+	$fieldsets = array(
+		'billing'  => array(
+			'type'   => 'fieldset',
+			'title'  => apply_filters( 'wpsc_checkout_billing_header_label', __( '<h2>Billing &amp; Shipping Details</h2>', 'wp-e-commerce' ) ),
+			'id'     => 'wpsc-checkout-form-billing',
+			'fields' => array()
+		),
+		'shipping' => array(
+			'type'   => 'fieldset',
+			'title'  => apply_filters( 'wpsc_checkout_shipping_header_label', __( '<h2>Shipping Details</h2>', 'wp-e-commerce' ) ),
+			'id'     => 'wpsc-checkout-form-shipping',
+			'fields' => array()
+		),
+	);
 
 	if ( ! $customer_settings ) {
 
@@ -423,15 +442,19 @@ function _wpsc_convert_checkout_form_fields( $customer_settings = false ) {
 	foreach ( $fields as $field ) {
 		$id = empty( $field->unique_name ) ? $field->id : $field->unique_name;
 
+		$is_shipping = false !== strpos( $field->unique_name, 'shipping' );
+		$is_billing  = false !== strpos( $field->unique_name, 'billing' );
+
 		$default_value =   array_key_exists( $field->id, $customer_details )
 		                 ? $customer_details[ $field->id ]
 		                 : '';
 
-		if (
-			   $purchase_log_exists
-			&& $field->type != 'heading'
-			&& isset( $form_data[ $field->id ] )
-		) {
+		/* Doing our college-best to check for one of the two original headings */
+		if ( 'heading' == $field->type && ( 'delivertoafriend' == $field->unique_name || '1' === $field->id ) ) {
+			continue;
+		}
+
+		if ( $purchase_log_exists && isset( $form_data[ $field->id ] ) ) {
 			$default_value = $form_data[ $field->id ]->value;
 		}
 
@@ -504,14 +527,25 @@ function _wpsc_convert_checkout_form_fields( $customer_settings = false ) {
 
 		$field_arr['rules'] = implode( '|', $validation_rules );
 
-		$args[ $i ] = $field_arr;
+		if ( $is_shipping ) {
+			$fieldsets['shipping']['fields'][ $i ] = $field_arr;
+		} else if ( $is_billing ) {
+			$fieldsets['billing']['fields'][ $i ]  = $field_arr;
+		} else {
+			$args[ $i ] = $field_arr;
+		}
+
 		$i++;
 
-		if ( $optional_state_field ) {
-			$args[ $i ]         = $args[ $i - 1 ];
-			$args[ $i ]['type'] = 'textfield';
-			$args[ $i ]['id']   = 'wpsc-checkout-field-' . $id . '-text';
-			$i ++;
+		if ( $optional_state_field && $is_billing ) {
+			$fieldsets['billing']['fields'][ $i ]         = $fieldsets['billing']['fields'][ $i - 1 ];
+			$fieldsets['billing']['fields'][ $i ]['type'] = 'textfield';
+			$fieldsets['billing']['fields'][ $i ]['id']   = 'wpsc-checkout-field-' . $id . '-text';
+			$i++;
+		} else if ( $optional_state_field && $is_shipping ) {
+			$fieldsets['shipping']['fields'][ $i ]         = $fieldsets['shipping']['fields'][ $i - 1 ];
+			$fieldsets['shipping']['fields'][ $i ]['type'] = 'textfield';
+			$fieldsets['shipping']['fields'][ $i ]['id']   = 'wpsc-checkout-field-' . $id . '-text';
 		}
 	}
 
@@ -520,8 +554,8 @@ function _wpsc_convert_checkout_form_fields( $customer_settings = false ) {
 			'type'  => 'checkbox',
 			'id'    => 'wpsc-terms-and-conditions',
 			'title' => sprintf(
-				__( "I agree to the <a class='thickbox' target='_blank' href='%s' class='termsandconds'>Terms and Conditions</a>", "wpsc"),
-				esc_url( site_url( "?termsandconds=true&amp;width=360&amp;height=400" ) )
+				__( "I agree to the <a class='thickbox' target='_blank' href='%s' class='termsandconds'>Terms and Conditions</a>", 'wp-e-commerce'),
+				esc_url( add_query_arg( array( 'termsandconds' => 'true', 'width' => 360, 'height' => 400 ) ) )
 			),
 			'value'   => 1,
 			'name'    => 'wpsc_terms_conditions',
@@ -530,29 +564,56 @@ function _wpsc_convert_checkout_form_fields( $customer_settings = false ) {
 		);
 	}
 
-	foreach ( $state_country_pairs as $field ) {
-		if ( isset ( $field['key'] ) ) {
-			$args[ $field['key'] ]['rules'] .= '|state_of[' . $field['country_field_id'] . ']';
-			$args[ $field['key'] ]['rules']  = ltrim( $args[ $field['key'] ]['rules'], '|' );
+	foreach ( $state_country_pairs as $state => $field ) {
+		$is_shipping = 'shipping_state' == $state;
+
+		if ( isset( $field['key'] ) && $is_shipping ) {
+			$fieldsets['shipping']['fields'][ $field['key'] ]['rules'] .= '|state_of[' . $field['country_field_id'] . ']';
+			$fieldsets['shipping']['fields'][ $field['key'] ]['rules']  = ltrim( $fieldsets['shipping']['fields'][ $field['key'] ]['rules'], '|' );
+		} else if ( isset( $field['key'] ) ) {
+			$fieldsets['billing']['fields'][ $field['key'] ]['rules'] .= '|state_of[' . $field['country_field_id'] . ']';
+			$fieldsets['billing']['fields'][ $field['key'] ]['rules']  = ltrim( $fieldsets['billing']['fields'][ $field['key'] ]['rules'], '|' );
 		}
 	}
 
-	return $args;
+	/* Add 'shipping same as billing' box to end of billing, rather than shipping header. */
+	if ( ! empty( $fieldsets['billing']['fields'] ) && ! empty( $fieldsets['shipping']['fields'] ) ) {
+
+		$checked = 	wpsc_get_customer_meta( 'wpsc_copy_billing_details' );
+
+		$fieldsets['billing']['fields'][ $i++ ] = array(
+			'type'  => 'checkbox',
+			'id'    => 'wpsc-terms-and-conditions',
+			'title' => apply_filters( 'wpsc_shipping_same_as_billing', __( 'Shipping address is same as billing', 'wp-e-commerce' ) ),
+			'value'   => 1,
+			'name'    => 'wpsc_copy_billing_details',
+			'checked' => empty( $checked ) || '1' == $checked
+		);
+	}
+
+	if ( empty( $fieldsets['billing']['fields'] ) ) {
+		unset( $fieldsets['billing'] );
+	}
+
+	if ( empty( $fieldsets['shipping']['fields'] ) ) {
+		unset( $fieldsets['shipping'] );
+	}
+
+	return $fieldsets + $args;
 }
 
 function wpsc_get_customer_settings_form_args() {
 	$args = array(
+		'inline_validation_errors' => true,
 		'class'  => 'wpsc-form wpsc-form-horizontal wpsc-customer-settings-form',
 		'action' => '',
-		'id'     => "wpsc-customer-settings-form",
-		'inline_validation_errors' => true,
-		'fields' => array(
-		),
+		'id'     => 'wpsc-customer-settings-form',
+		'fields' => array(),
 		'form_actions' => array(
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_customer_settings_form_button_title', __( 'Save settings', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_customer_settings_form_button_title', __( 'Save settings', 'wp-e-commerce' ) ),
 				'name'    => 'wpsc_submit_customer_settings',
 			),
 			array(
@@ -597,7 +658,7 @@ function wpsc_get_checkout_shipping_form_args() {
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_checkout_shipping_method_form_button_title', __( 'Continue', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_checkout_shipping_method_form_button_title', __( 'Continue', 'wp-e-commerce' ) ),
 				'name'    => 'wpsc_submit_checkout',
 			),
 			array(
@@ -613,8 +674,7 @@ function wpsc_get_checkout_shipping_form_args() {
 		),
 	);
 
-	$args = _wpsc_convert_checkout_shipping_form_args( $args );
-	return $args;
+	return apply_filters( 'wpsc_get_checkout_shipping_method_form_args', _wpsc_convert_checkout_shipping_form_args( $args ) );
 }
 
 function _wpsc_convert_checkout_shipping_form_args( $args ) {
@@ -689,7 +749,7 @@ function wpsc_get_checkout_payment_method_form_args() {
 			array(
 				'type'    => 'submit',
 				'primary' => true,
-				'title'   => apply_filters( 'wpsc_checkout_payment_method_form_button_title', __( 'Place Your Order', 'wpsc' ) ),
+				'title'   => apply_filters( 'wpsc_checkout_payment_method_form_button_title', __( 'Place Your Order', 'wp-e-commerce' ) ),
 				'name'    => 'wpsc_submit_checkout',
 			),
 			array(
@@ -705,7 +765,7 @@ function wpsc_get_checkout_payment_method_form_args() {
 		),
 	);
 
-	$args = _wpsc_convert_checkout_payment_method_form_args( $args );
+	$args = apply_filters( 'wpsc_get_checkout_payment_method_form_args', _wpsc_convert_checkout_payment_method_form_args( $args ) );
 	return $args;
 }
 
@@ -721,7 +781,7 @@ function wpsc_checkout_payment_method_form() {
 /**
  * Return the HTML for "Begin Checkout" button
  *
- * @since  0.1
+ * @since  4.0
  *
  * @uses   apply_filters() Applies 'wpsc_begin_checkout_button_title'
  * @uses   apply_filters() Applies 'wpsc_begin_checkout_button_icon'
@@ -733,7 +793,7 @@ function wpsc_checkout_payment_method_form() {
 function wpsc_get_begin_checkout_button() {
 	$title = apply_filters(
 		'wpsc_begin_checkout_button_title',
-		__( 'Begin Checkout', 'wpsc' )
+		__( 'Begin Checkout', 'wp-e-commerce' )
 	);
 
 	$icon = apply_filters(

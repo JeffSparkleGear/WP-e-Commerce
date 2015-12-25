@@ -27,6 +27,38 @@ module.exports = function( grunt ) {
 				'!wpsc-admin/js/jquery-*.js'
 			]
 		},
+		// Check textdomain errors.
+		checktextdomain: {
+			options:{
+				text_domain: 'wp-e-commerce',
+				keywords: [
+					'__:1,2d',
+					'_e:1,2d',
+					'_x:1,2c,3d',
+					'esc_html__:1,2d',
+					'esc_html_e:1,2d',
+					'esc_html_x:1,2c,3d',
+					'esc_attr__:1,2d',
+					'esc_attr_e:1,2d',
+					'esc_attr_x:1,2c,3d',
+					'_ex:1,2c,3d',
+					'_n:1,2,4d',
+					'_nx:1,2,4c,5d',
+					'_n_noop:1,2,3d',
+					'_nx_noop:1,2,3c,4d'
+				]
+			},
+			files: {
+				src:  [
+					'**/*.php', // Include all files
+					'!node_modules/**', // Exclude node_modules/
+					'!tests/**', // Exclude tests/
+					'!bin/**', // Exclude bin/
+					'!tmp/**' // Exclude tmp/
+				],
+				expand: true
+			}
+		},
 
 		makepot: {
 			target: {
@@ -38,7 +70,7 @@ module.exports = function( grunt ) {
 								'images/.*'
 							],
 					mainFile: 'wp-shopping-cart.php',    // Main project file.
-					potFilename: 'wpsc.pot',    // Name of the POT file.
+					potFilename: 'wp-e-commerce.pot',    // Name of the POT file.
 					potHeaders: {
 					poedit: true,                 // Includes common Poedit headers.
 						'x-poedit-keywordslist': true // Include a list of all possible gettext functions.

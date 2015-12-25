@@ -9,13 +9,13 @@
   * for internal operations.
   */
 $nzshpcrt_gateways[$num] = array(
-	'name' =>  __( 'PayPal Express Checkout 2.0', 'wpsc' ),
+	'name' =>  __( 'PayPal Express Checkout 2.0', 'wp-e-commerce' ),
 	'api_version' => 2.0,
 	'image' => WPSC_URL . '/images/paypal.gif',
 	'class_name' => 'wpsc_merchant_paypal_express',
 	'has_recurring_billing' => false,
 	'wp_admin_cannot_cancel' => true,
-	'display_name' => __( 'PayPal Express', 'wpsc' ),
+	'display_name' => __( 'PayPal Express', 'wp-e-commerce' ),
 	'requirements' => array(
 		/// so that you can restrict merchant modules to PHP 5, if you use PHP 5 features
 		'php_version' => 4.3,
@@ -50,7 +50,7 @@ class wpsc_merchant_paypal_express extends wpsc_merchant {
 	var $paypal_ipn_values = array();
 
 	function __construct( $purchase_id = null, $is_receiving = false ) {
-		$this->name = __( 'PayPal Express', 'wpsc' );
+		$this->name = __( 'PayPal Express', 'wp-e-commerce' );
 		parent::__construct( $purchase_id, $is_receiving );
 	}
 
@@ -125,7 +125,7 @@ class wpsc_merchant_paypal_express extends wpsc_merchant {
 			'user-agent' => ('WP eCommerce/'.WPSC_PRESENTABLE_VERSION)
 		);
 
-		$response = wp_remote_post( $paypal_url, $options );
+		$response = wp_safe_remote_post( $paypal_url, $options );
 
 		do_action( 'wpsc_paypal_express_ipn', $received_values, $this );
 
@@ -184,7 +184,6 @@ class wpsc_merchant_paypal_express extends wpsc_merchant {
 			echo "<br />Error Severity Code: " . $ErrorSeverityCode;
 		}
 		exit();
-
 	}
 
 	function format_price( $price ) {
@@ -468,47 +467,47 @@ function form_paypal_express() {
 	$paypal_ipn = get_option( 'paypal_ipn' );
 	$output = "
 	<tr>
-		<td>" . __('API Username', 'wpsc' ) . "
+		<td>" . __('API Username', 'wp-e-commerce' ) . "
 		</td>
 		<td>
 			<input type='text' size='40' value='" . get_option( 'paypal_certified_apiuser') . "' name='paypal_certified_apiuser' />
 		</td>
 	</tr>
 	<tr>
-		<td>" . __('API Password', 'wpsc' ) . "
+		<td>" . __('API Password', 'wp-e-commerce' ) . "
 		</td>
 		<td>
 			<input type='text' size='40' value='" . get_option( 'paypal_certified_apipass') . "' name='paypal_certified_apipass' />
 		</td>
 	</tr>
 	<tr>
-		<td>" . __('API Signature', 'wpsc' ) . "
+		<td>" . __('API Signature', 'wp-e-commerce' ) . "
 		</td>
 		<td>
 			<input type='text' size='70' value='" . get_option( 'paypal_certified_apisign') . "' name='paypal_certified_apisign' />
 		</td>
 	</tr>
 	<tr>
-		<td>" . __('Server Type', 'wpsc' ) . "
+		<td>" . __('Server Type', 'wp-e-commerce' ) . "
 		</td>
 		<td>
-			<input $serverType1 type='radio' name='paypal_certified_server_type' value='sandbox' id='paypal_certified_server_type_sandbox' /> <label for='paypal_certified_server_type_sandbox'>" . __('Sandbox (For testing)', 'wpsc' ) . "</label> &nbsp;
-			<input $serverType2 type='radio' name='paypal_certified_server_type' value='production' id='paypal_certified_server_type_production' /> <label for='paypal_certified_server_type_production'>" . __('Production', 'wpsc' ) . "</label>
+			<input $serverType1 type='radio' name='paypal_certified_server_type' value='sandbox' id='paypal_certified_server_type_sandbox' /> <label for='paypal_certified_server_type_sandbox'>" . __('Sandbox (For testing)', 'wp-e-commerce' ) . "</label> &nbsp;
+			<input $serverType2 type='radio' name='paypal_certified_server_type' value='production' id='paypal_certified_server_type_production' /> <label for='paypal_certified_server_type_production'>" . __('Production', 'wp-e-commerce' ) . "</label>
 			<p class='description'>
-				" . sprintf( __( "Only use the sandbox server if you have a sandbox account with PayPal you can find out more about this <a href='%s'>here</a>", 'wpsc' ), esc_url( 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_testing_sandbox' ) ) . "
+				" . sprintf( __( "Only use the sandbox server if you have a sandbox account with PayPal. You can find out more about this <a href='%s'>here</a>.", 'wp-e-commerce' ), esc_url( 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_testing_sandbox' ) ) . "
 			</p>
 		</td>
 	</tr>
 
 	<tr>
 		<td>
-		" . __( 'IPN', 'wpsc' ) . "
+		" . __( 'IPN', 'wp-e-commerce' ) . "
 		</td>
 		<td>
-			<input type='radio' value='1' name='paypal_ipn' id='paypal_ipn1' " . checked( $paypal_ipn, 1, false ) . " /> <label for='paypal_ipn1'>".__('Yes', 'wpsc')."</label> &nbsp;
-			<input type='radio' value='0' name='paypal_ipn' id='paypal_ipn2' " . checked( $paypal_ipn, 0, false ) . " /> <label for='paypal_ipn2'>".__('No', 'wpsc')."</label>
+			<input type='radio' value='1' name='paypal_ipn' id='paypal_ipn1' " . checked( $paypal_ipn, 1, false ) . " /> <label for='paypal_ipn1'>".__('Yes', 'wp-e-commerce')."</label> &nbsp;
+			<input type='radio' value='0' name='paypal_ipn' id='paypal_ipn2' " . checked( $paypal_ipn, 0, false ) . " /> <label for='paypal_ipn2'>".__('No', 'wp-e-commerce')."</label>
 			<p class='description'>
-			" . __( "IPN (instant payment notification) will automatically update your sales logs to 'Accepted payment' when a customers payment is successful. For IPN to work you also need to have IPN turned on in your Paypal settings. If it is not turned on, the sales sill remain as 'Order Pending' status until manually changed. It is highly recommend using IPN, especially if you are selling digital products.", 'wpsc' ) . "
+			" . __( "IPN (instant payment notification) will automatically update your sales logs to 'Accepted payment' when a customer's payment is successful. For IPN to work you also need to have IPN turned on in your PayPal settings. If it is not turned on, the sales will remain as 'Order Pending' status until manually changed. It is highly recommended using IPN, especially if you are selling digital products.", 'wp-e-commerce' ) . "
 			</p>
 		</td>
   	</tr>\n";
@@ -523,16 +522,16 @@ function form_paypal_express() {
 		$current_currency = $store_currency_code;
 	}
 	if ( $current_currency != $store_currency_code ) {
-		$output .= "<tr> <td colspan='2'><strong class='form_group'>" . __( 'Currency Converter', 'wpsc' ) . "</td> </tr>
+		$output .= "<tr> <td colspan='2'><strong class='form_group'>" . __( 'Currency Converter', 'wp-e-commerce' ) . "</td> </tr>
 		<tr>
 			<td colspan='2'>
-			" . __( 'Your website is using a currency not accepted by PayPal, select an accepted currency using the drop down menu bellow. Buyers on your site will still pay in your local currency however we will convert the currency and send the order through to PayPal using the currency you choose below.', 'wpsc' ) . "
+			" . __( 'Your website is using a currency not accepted by PayPal. Please select an accepted currency using the drop down menu below. Buyers on your site will still pay in your local currency. However, we will convert the currency and send the order through to PayPal using the currency you choose below.', 'wp-e-commerce' ) . "
 			</td>
 		</tr>
 
 		<tr>
 			<td>
-			" . __('Convert to', 'wpsc' ) . "
+			" . __('Convert to', 'wp-e-commerce' ) . "
 			</td>
 			<td>
 				<select name='paypal_curcode'>\n";
@@ -573,7 +572,7 @@ function form_paypal_express() {
 	<tr>
 		<td colspan='2'>
 			<p class='description'>
-	 		" . sprintf( __( "For more help configuring Paypal Express, please read our documentation <a href='%s'>here</a>", 'wpsc' ), esc_url( 'http://docs.wpecommerce.org/documentation/paypal-express-checkout/' ) ) . "
+	 		" . sprintf( __( "For more help configuring PayPal Express, please read our documentation <a href='%s'>here</a>", 'wp-e-commerce' ), esc_url( 'http://docs.wpecommerce.org/documentation/paypal-express-checkout/' ) ) . "
 	 		</p>
 		</td>
    	</tr>\n";
@@ -608,7 +607,7 @@ function paypal_processingfunctions(){
 		<center>
 		<table width="700" align="left">
 		<tr>
-			<td colspan="2" class="header">' . __('The PayPal API has returned an error!', 'wpsc' ) . '</td>
+			<td colspan="2" class="header">' . __('The PayPal API has returned an error!', 'wp-e-commerce' ) . '</td>
 		</tr>
 		';
 
@@ -654,15 +653,15 @@ function paypal_processingfunctions(){
 				$count=$count+1;
 				$paypal_express_message .="
 					<tr>
-						<td>" . __('Error Number:', 'wpsc' ) . "</td>
+						<td>" . __('Error Number:', 'wp-e-commerce' ) . "</td>
 						<td> $errorCode </td>
 					</tr>
 					<tr>
-						<td>" . __('Short Message:', 'wpsc' ) . "</td>
+						<td>" . __('Short Message:', 'wp-e-commerce' ) . "</td>
 						<td> $shortMessage </td>
 					</tr>
 					<tr>
-						<td>" . __('Long Message:', 'wpsc' ) . "</td>
+						<td>" . __('Long Message:', 'wp-e-commerce' ) . "</td>
 						<td> $longMessage </td>
 					</tr>";
 
@@ -684,7 +683,7 @@ function paypal_processingfunctions(){
 		$currCodeType = urlencode( wpsc_get_paypal_currency_code() );
 		$payerID = urlencode( $_REQUEST['PayerID'] );
 		$serverName = urlencode( $_SERVER['SERVER_NAME'] );
-		$BN = 'Instinct_e-commerce_wp-shopping-cart_NZ';
+		$BN     = 'WPeC_Cart_EC';
 		$nvpstr = '&TOKEN=' . $token . '&PAYERID=' . $payerID . '&PAYMENTREQUEST_0_PAYMENTACTION=Sale&PAYMENTREQUEST_0_CURRENCYCODE=' . $currCodeType . '&IPADDRESS=' . $serverName . "&BUTTONSOURCE=" . $BN . "&PAYMENTREQUEST_0_INVNUM=" . urlencode( $sessionid );
 		// IPN data
 		if ( get_option( 'paypal_ipn' ) == 1 ) {
@@ -883,7 +882,7 @@ function paypal_processingfunctions(){
 				*/
 				if ( isset( $_REQUEST['token'] ) && ! isset( $_REQUEST['PayerID'] ) ) {
 
-					wpsc_update_customer_meta( 'paypal_express_message', _x( '<h4>TRANSACTION CANCELED</h4>', 'paypal express cancel header', 'wpsc' ) );
+					wpsc_update_customer_meta( 'paypal_express_message', _x( '<h4>TRANSACTION CANCELLED</h4>', 'paypal express cancel header', 'wp-e-commerce' ) );
 
 				} else {
 
@@ -902,44 +901,44 @@ function paypal_processingfunctions(){
 					$output ="
 					   <table width='400' class='paypal_express_form'>
 						<tr>
-							<td align='left' class='firstcol'><b>" . __( 'Order Total:', 'wpsc' ) . "</b></td>
+							<td align='left' class='firstcol'><b>" . __( 'Order Total:', 'wp-e-commerce' ) . "</b></td>
 							<td align='left'>" . wpsc_currency_display( wpsc_get_customer_meta( 'paypal_express_original_amount' ) ) . "</td>
 						</tr>
 						<tr>
-							<td align='left' colspan='2'><b>" . __( 'Shipping Address:', 'wpsc' ) . " </b></td>
+							<td align='left' colspan='2'><b>" . __( 'Shipping Address:', 'wp-e-commerce' ) . " </b></td>
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'Street 1:', 'wpsc' ) . "</td>
+								" . __( 'Street 1:', 'wp-e-commerce' ) . "</td>
 							<td align='left'>" . $resArray['SHIPTOSTREET'] . "</td>
 
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'Street 2:', 'wpsc' ) . "</td>
+								" . __( 'Street 2:', 'wp-e-commerce' ) . "</td>
 							<td align='left'>" . $resArray['SHIPTOSTREET2'] . "
 							</td>
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'City:', 'wpsc' ) . "</td>
+								" . __( 'City:', 'wp-e-commerce' ) . "</td>
 
 							<td align='left'>" . $resArray['SHIPTOCITY'] . "</td>
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'State:', 'wpsc' ) . "</td>
+								" . __( 'State:', 'wp-e-commerce' ) . "</td>
 							<td align='left'>" . $resArray['SHIPTOSTATE'] . "</td>
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'Postal code:', 'wpsc' ) . "</td>
+								" . __( 'Postal Code:', 'wp-e-commerce' ) . "</td>
 
 							<td align='left'>" . $resArray['SHIPTOZIP'] . "</td>
 						</tr>
 						<tr>
 							<td align='left' class='firstcol'>
-								" . __( 'Country:', 'wpsc' ) . "</td>
+								" . __( 'Country:', 'wp-e-commerce' ) . "</td>
 							<td align='left'>" . $resArray['SHIPTOCOUNTRYNAME'] . "</td>
 						</tr>
 						<tr>
@@ -956,7 +955,7 @@ function paypal_processingfunctions(){
 					$output .= "	<input type='hidden' name='token' value='"  .  wpsc_get_customer_meta( 'paypal_express_token' )  .  "' />\n";
 					$output .= "	<input type='hidden' name='PayerID' value='"  .  wpsc_get_customer_meta( 'paypal_express_payer_id' )  .  "' />\n";
 					$output .= "	<input type='hidden' name='act' value='do' />\n";
-					$output .= "	<p>  <input name='usePayPal' type='submit' value='" . __('Confirm Payment','wpsc') . "' /></p>\n";
+					$output .= "	<p>  <input name='usePayPal' type='submit' value='" . __('Confirm Payment','wp-e-commerce') . "' /></p>\n";
 					$output .= "</form>";
 					$output .=" </td>
 							</tr>
@@ -1012,7 +1011,7 @@ function paypal_hash_call( $methodName, $nvpStr ) {
 
 	wpsc_update_customer_meta( 'paypal_express_nvp_req_array', $nvpReqArray );
 
-	$res = wp_remote_post( $API_Endpoint, $options );
+	$res = wp_safe_remote_post( $API_Endpoint, $options );
 
 	if ( is_wp_error( $res ) ) {
 		wpsc_update_customer_meta( 'paypal_express_curl_error_msg', 'WP HTTP Error: ' . $res->get_error_message() );

@@ -61,7 +61,7 @@ function _wpsc_theme_engine_v1_has_actions() {
 		'wpsc_before_form_of_shopping_cart'          => '_wpsc_shipping_error_messages',
 		'wpsc_user_profile_section_purchase_history' => '_wpsc_action_purchase_history_section',
 		'wpsc_user_profile_section_edit_profile'     => '_wpsc_action_edit_profile_section',
-		'wpsc_user_profile_section_downloads'        => '_wpsc_action_downloads_section'
+		'wpsc_user_profile_section_downloads'        => array( '_wpsc_action_downloads_section', 'wpsc_update_user_downloads' )
 	);
 
 	$has_actions = array();
@@ -75,6 +75,11 @@ function _wpsc_theme_engine_v1_has_actions() {
 				foreach ( $core_exceptions[ $action ] as $core_hook ) {
 					// Admitted hack until we build a better detection API.
 					$priority =  ( '_wpsc_calculate_shipping_quotes_before_product_page' == $core_hook ) ? 1 : 10;
+
+					if ( 'wpsc_update_user_downloads' == $core_hook ) {
+						$priority = 5;
+					}
+
 					remove_action( $action, $core_hook, $priority );
 				}
 
@@ -124,13 +129,14 @@ function _wpsc_theme_engine_v2_has_old_templates() {
  */
 function _wpsc_enable_theme_engine_v1( $components ) {
 	$components['theme-engine']['core-v1'] = array(
-		'title'    => __( 'WP eCommerce Theme Engine v1', 'wpsc' ),
+		'title'    => __( 'WP eCommerce Theme Engine v1', 'wp-e-commerce' ),
 		'includes' =>
 			WPSC_FILE_PATH . '/wpsc-components/theme-engine-v1/theme-engine-v1.php'
 	);
 
 	return $components;
 }
+
 /**
  * Enables the 2.0 theme engine.
  *
@@ -140,7 +146,7 @@ function _wpsc_enable_theme_engine_v1( $components ) {
  */
 function _wpsc_enable_theme_engine_v2( $components ) {
 	$components['theme-engine']['core-v2'] = array(
-		'title'    => __( 'WP eCommerce Theme Engine v2', 'wpsc' ),
+		'title'    => __( 'WP eCommerce Theme Engine v2', 'wp-e-commerce' ),
 		'includes' =>
 			WPSC_FILE_PATH . '/wpsc-components/theme-engine-v2/core.php'
 	);
@@ -158,7 +164,7 @@ function _wpsc_enable_theme_engine_v2( $components ) {
  */
 function _wpsc_maybe_activate_theme_engine_v2() {
 
-	$activate = true;
+	$activate = false;
 
 	global $wp_rewrite;
 
@@ -191,8 +197,25 @@ function _wpsc_maybe_activate_theme_engine_v2() {
 		$activate = false;
 	}
 
-	return apply_filters( '_wpsc_maybe_activate_theme_engine_v2', $activate );
+	$activate         = apply_filters( '_wpsc_maybe_activate_theme_engine_v2', $activate );
+	$new_theme_engine = $activate ? '2.0' : '1.0';
+	$old_theme_engine = get_option( 'wpsc_get_active_theme_engine' );
+
+	if ( $old_theme_engine !== $new_theme_engine ) {
+
+		do_action( 'wpsc_updated_theme_engine', $new_theme_engine, $old_theme_engine );
+
+		do_action( "wpsc_updated_theme_engine_from_{$old_theme_engine}_to_{$new_theme_engine}" );
+
+		add_action( 'shutdown', '_wpsc_action_flush_rewrite_rules' );
+
+		update_option( 'wpsc_get_active_theme_engine', $new_theme_engine );
+	}
+
+	return $activate;
 }
+
+add_action( 'wpsc_updated_theme_engine_from_2.0_to_1.0', 'wpsc_install' );
 
 /**
  * Simple router for using either the 1.0 or 2.0 theme engine, based on result of _wpsc_maybe_activate_theme_engine_v2().
@@ -211,7 +234,6 @@ function _wpsc_theme_engine_router( $components ) {
 }
 
 add_filter( 'wpsc_components', '_wpsc_theme_engine_router' );
-
 
 /**
  * Deactivates the former feature-as-a-plugin plugin for the 2.0 theme engine, if it is active.

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Some parts of this code were copied from functions.bb-meta.php in bbpress
  */
@@ -8,95 +9,202 @@ function wpsc_sanitize_meta_key( $key ) {
 }
 
 /**
- * Gets meta data from the database
- * This needs caching implemented for it, but I have not yet figured out how to make this work for it
+ * Get meta data from the database
+ *
+ * Gets and caches an object's meta using the WordPress Object Cache API
+ * and returns meta for a specific key.
+ *
  * @internal
+ *
+ * @param   integer  $object_id    Object ID.
+ * @param   string   $meta_key     Meta key.
+ * @param   string   $object_type  Object type.
+ * @return  mixed                  Meta value.
  */
-function wpsc_get_meta( $object_id = 0, $meta_key, $type ) {
+function wpsc_get_meta( $object_id = 0, $meta_key, $object_type ) {
+
 	global $wpdb;
-	$cache_object_id = $object_id = (int)$object_id;
-	$object_type = $type;
-	$value = wp_cache_get( $cache_object_id, $object_type );
+
+	$cache_object_id = $object_id = (int) $object_id;
 	$meta_key = wpsc_sanitize_meta_key( $meta_key );
-	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key', 'meta_value', 'type' );
+
+	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key' );
 	$meta_tuple = apply_filters( 'wpsc_get_meta', $meta_tuple );
-	extract( $meta_tuple, EXTR_OVERWRITE );
-	$meta_value = $wpdb->get_var( $wpdb->prepare( "SELECT `meta_value` FROM `".WPSC_TABLE_META."` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s", $object_type, $object_id, $meta_key ) );
-	$meta_value = maybe_unserialize( $meta_value );
-	return $meta_value;
+
+	// Get cached meta
+	$meta_value = wp_cache_get( $cache_object_id, $meta_tuple['object_type'] );
+
+	// If not cached, get and cache all object meta
+	if ( $meta_value === false ) {
+		$meta_values = wpsc_update_meta_cache( $meta_tuple['object_type'], $meta_tuple['object_id'] );
+		$meta_value = $meta_values[ $meta_tuple['object_id'] ];
+	}
+
+	if ( isset( $meta_value[ $meta_tuple['meta_key'] ] ) ) {
+		return maybe_unserialize( $meta_value[ $meta_tuple['meta_key'] ] );
+	}
+
+	return '';
+
 }
 
 /**
  * Adds and updates meta data in the database
  *
  * @internal
+ *
+ * @param   integer  $object_id    Object ID.
+ * @param   string   $meta_key     Meta key.
+ * @param   mixed    $meta_value   Meta value.
+ * @param   string   $object_type  Object type.
+ * @param   boolean  $global       ?
+ * @return  boolean
  */
-function wpsc_update_meta( $object_id = 0, $meta_key, $meta_value, $type, $global = false ) {
+function wpsc_update_meta( $object_id = 0, $meta_key, $meta_value, $object_type, $global = false ) {
+
 	global $wpdb;
-	if ( !is_numeric( $object_id ) || empty( $object_id ) && !$global ) {
+
+	if ( ! is_numeric( $object_id ) || empty( $object_id ) && ! $global ) {
 		return false;
 	}
+
 	$cache_object_id = $object_id = (int) $object_id;
-
-	$object_type = $type;
-
 	$meta_key = wpsc_sanitize_meta_key( $meta_key );
 
-	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key', 'meta_value', 'type' );
+	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key', 'meta_value' );
 	$meta_tuple = apply_filters( 'wpsc_update_meta', $meta_tuple );
-	extract( $meta_tuple, EXTR_OVERWRITE );
 
-	$meta_value = $_meta_value = maybe_serialize( $meta_value );
+	$meta_value = $_meta_value = maybe_serialize( $meta_tuple['meta_value'] );
 	$meta_value = maybe_unserialize( $meta_value );
 
-	$cur = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPSC_TABLE_META."` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s", $object_type, $object_id, $meta_key ) );
-	if ( !$cur ) {
-		$wpdb->insert( WPSC_TABLE_META, array( 'object_type' => $object_type, 'object_id' => $object_id, 'meta_key' => $meta_key, 'meta_value' => $_meta_value ) );
-	} elseif ( $cur->meta_value != $meta_value ) {
-		$wpdb->update( WPSC_TABLE_META, array( 'meta_value' => $_meta_value), array( 'object_type' => $object_type, 'object_id' => $object_id, 'meta_key' => $meta_key ) );
-	}
-	wp_cache_delete( $cache_object_id, $object_type );
+	$cur = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_META . "` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s", $meta_tuple['object_type'], $meta_tuple['object_id'], $meta_tuple['meta_key'] ) );
 
-	if ( !$cur ) {
+	if ( ! $cur ) {
+		$wpdb->insert( WPSC_TABLE_META, array( 'object_type' => $meta_tuple['object_type'], 'object_id' => $meta_tuple['object_id'], 'meta_key' => $meta_tuple['meta_key'], 'meta_value' => $_meta_value ) );
+	} elseif ( $cur->meta_value != $meta_value ) {
+		$wpdb->update( WPSC_TABLE_META, array( 'meta_value' => $_meta_value ), array( 'object_type' => $meta_tuple['object_type'], 'object_id' => $meta_tuple['object_id'], 'meta_key' => $meta_tuple['meta_key'] ) );
+	}
+
+	wp_cache_delete( $cache_object_id, $meta_tuple['object_type'] );
+
+	if ( ! $cur ) {
 		return true;
 	}
+
 }
 
 /**
  * Deletes meta data from the database
  *
  * @internal
+ *
+ * @param   integer  $object_id    Object ID.
+ * @param   string   $meta_key     Meta key.
+ * @param   mixed    $meta_value   Meta value.
+ * @param   string   $object_type  Object type.
+ * @param   boolean  $global       ?
+ * @return  boolean
  */
-function wpsc_delete_meta( $object_id = 0, $meta_key, $meta_value, $type, $global = false ) {
+function wpsc_delete_meta( $object_id = 0, $meta_key, $meta_value, $object_type, $global = false ) {
+
 	global $wpdb;
-	if ( !is_numeric( $object_id ) || empty( $object_id ) && !$global )
+
+	if ( ! is_numeric( $object_id ) || empty( $object_id ) && ! $global ) {
 		return false;
+	}
 
 	$cache_object_id = $object_id = (int) $object_id;
-
-	$object_type = $type;
-
 	$meta_key = wpsc_sanitize_meta_key( $meta_key );
 
-	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key', 'meta_value', 'type' );
+	$meta_tuple = compact( 'object_type', 'object_id', 'meta_key', 'meta_value' );
 	$meta_tuple = apply_filters( 'wpsc_delete_meta', $meta_tuple );
-	extract( $meta_tuple, EXTR_OVERWRITE );
 
-	$meta_value = maybe_serialize( $meta_value );
+	$meta_value = maybe_serialize( $meta_tuple['meta_value'] );
 
-	if ( empty( $meta_value ) )
-		$meta_sql = $wpdb->prepare( "SELECT `meta_id` FROM `".WPSC_TABLE_META."` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s", $object_type, $object_id, $meta_key );
-	else
-		$meta_sql = $wpdb->prepare( "SELECT `meta_id` FROM `".WPSC_TABLE_META."` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s AND `meta_value` = %s", $object_type, $object_id, $meta_key, $meta_value );
+	if ( empty( $meta_value ) ) {
+		$meta_sql = $wpdb->prepare( "SELECT `meta_id` FROM `" . WPSC_TABLE_META . "` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s", $meta_tuple['object_type'], $meta_tuple['object_id'], $meta_tuple['meta_key'] );
+	} else {
+		$meta_sql = $wpdb->prepare( "SELECT `meta_id` FROM `" . WPSC_TABLE_META . "` WHERE `object_type` = %s AND `object_id` = %d AND `meta_key` = %s AND `meta_value` = %s", $meta_tuple['object_type'], $meta_tuple['object_id'], $meta_tuple['meta_key'], $meta_value );
+	}
 
-	if ( !$meta_id = $wpdb->get_var( $meta_sql ) )
+	if ( ! $meta_id = $wpdb->get_var( $meta_sql ) ) {
 		return false;
+	}
+	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPSC_TABLE_META . "` WHERE `meta_id` = %d", $meta_id ) );
 
-	$wpdb->query( $wpdb->prepare( "DELETE FROM `".WPSC_TABLE_META."` WHERE `meta_id` = %d", $meta_id ) );
-	wp_cache_delete( $cache_object_id, $object_type );
+	wp_cache_delete( $cache_object_id, $meta_tuple['object_type'] );
+
 	return true;
+
 }
 
+/**
+ * Update Meta Cache
+ *
+ * Query database to get meta for objects, update the cache and return the object meta.
+ *
+ * @param   string     $object_type  Object type.
+ * @param   int|array  $object_ids   Object ID or IDs.
+ * @return  array                    Array of objects and cached values.
+ */
+function wpsc_update_meta_cache( $object_type, $object_ids ) {
+
+	global $wpdb;
+
+	if ( ! $object_type || ! $object_ids ) {
+		return false;
+	}
+
+	// If $object_ids is a string, convert to array
+	if ( ! is_array( $object_ids ) ) {
+		$object_ids = preg_replace( '|[^0-9,]|', '', $object_ids );
+		$object_ids = explode( ',', $object_ids );
+	}
+
+	$object_ids = array_map( 'intval', $object_ids );
+
+	$ids = array();
+	$cache = array();
+
+	// Only need to retrieve objects that aren't already cached
+	foreach ( $object_ids as $id ) {
+		$cached_object = wp_cache_get( $id, $object_type );
+		if ( false === $cached_object ) {
+			$ids[] = $id;
+		} else {
+			$cache[ $id ] = $cached_object;
+		}
+	}
+
+	if ( empty( $ids ) ) {
+		return $cache;
+	}
+
+	$id_list = join( ',', $ids );
+	$meta_list = $wpdb->get_results( $wpdb->prepare( "SELECT object_id, meta_key, meta_value FROM " . WPSC_TABLE_META . " WHERE `object_type` = '%s' AND `object_id` IN ( " . $id_list . " )", $object_type ), ARRAY_A );
+
+	// Add results to cache array
+	if ( ! empty( $meta_list ) ) {
+		foreach ( $meta_list as $metarow ) {
+			$mpid = intval( $metarow[ 'object_id' ] );
+			$mkey = $metarow['meta_key'];
+			$mval = $metarow['meta_value'];
+
+			// Add a value to the current pid/key:
+			$cache[ $mpid ][ $mkey ] = $mval;
+		}
+	}
+
+	// Update cache
+	foreach ( $ids as $id ) {
+		if ( ! isset( $cache[ $id ] ) ) {
+			$cache[ $id ] = array();
+		}
+		wp_cache_add( $id, $cache[ $id ], $object_type );
+	}
+
+	return $cache;
+}
 
 /**
  * category meta functions are as follows:

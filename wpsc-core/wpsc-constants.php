@@ -1,8 +1,8 @@
 <?php
+
 // Left Overs
 $wpsc_currency_data = array();
 $wpsc_title_data    = array();
-
 
 /**
  * _wpsc_is_session_started()
@@ -55,15 +55,15 @@ function wpsc_core_constants() {
 
 	// Define Plugin version
 	if ( ! defined( 'WPSC_VERSION' ) ) {
-		define( 'WPSC_VERSION'            , '3.10.1-working' );
+		define( 'WPSC_VERSION'            , '3.11.1' );
 	}
 
 	if ( ! defined( 'WPSC_MINOR_VERSION' ) ) {
-		define( 'WPSC_MINOR_VERSION'      , 'd31303e' );
+		define( 'WPSC_MINOR_VERSION'      , 'd31363e' );
 	}
 
 	if ( ! defined( 'WPSC_PRESENTABLE_VERSION' ) ) {
-		define( 'WPSC_PRESENTABLE_VERSION', '3.10.1' );
+		define( 'WPSC_PRESENTABLE_VERSION', '3.11.1' );
 	}
 
 	// Define a salt to use when we hash, WPSC_SALT may be defined for us in our config file, so check first
@@ -379,6 +379,6 @@ function wpsc_core_setup_globals() {
 
 	// Setup some globals
 	$wpsc_query_vars = array();
-    require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');
-    $wpec_ash = new ASH();
+    	require_once( WPSC_FILE_PATH . '/wpsc-includes/shipping.helper.php');
+    	$wpec_ash = new ASH();
 }

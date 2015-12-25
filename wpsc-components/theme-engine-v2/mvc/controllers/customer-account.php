@@ -40,7 +40,7 @@ class WPSC_Controller_Customer_Account extends WPSC_Controller {
 			WHERE user_ID = %d
 			GROUP BY processed
 			ORDER BY processed
-		", wpsc_get_current_customer_id() );
+		", get_current_user_id() );
 
 		$results     = $wpdb->get_results( $sql );
 		$statuses    = array();
@@ -76,7 +76,7 @@ class WPSC_Controller_Customer_Account extends WPSC_Controller {
 	}
 
 	public function orders() {
-		$this->parse_index_args(func_get_args());
+		$this->parse_index_args( func_get_args() );
 
 		if ( $this->order_id ) {
 			$this->order( $this->order_id );
@@ -100,7 +100,7 @@ class WPSC_Controller_Customer_Account extends WPSC_Controller {
 		$this->form    = WPSC_Checkout_Form::get();
 		$this->log     = new WPSC_Purchase_Log( $id );
 		$this->title   = sprintf(
-			__( 'View Order #%d', 'wpsc' ),
+			__( 'View Order #%d', 'wp-e-commerce' ),
 			$id
 		);
 
@@ -175,7 +175,7 @@ class WPSC_Controller_Customer_Account extends WPSC_Controller {
 
 		if ( is_wp_error( $validation ) ) {
 			$this->message_collection->add(
-				__( 'Sorry but it looks like there are some errors with your submitted information.', 'wpsc' ),
+				__( 'Sorry, but it looks like there are some errors with your submitted information.', 'wp-e-commerce' ),
 				'error'
 			);
 			wpsc_set_validation_errors( $validation, $context = 'inline' );

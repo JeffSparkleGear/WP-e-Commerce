@@ -8,22 +8,23 @@
 
 class wpsc_variations {
 	// variation groups: i.e. colour, size
-	var $variation_groups;
-	var $variation_group_count   = 0;
-	var $current_variation_group = -1;
-	var $variation_group;
+	public $variation_groups;
+	public $variation_group_count   = 0;
+	public $current_variation_group = -1;
+	public $variation_group;
 
 	// for getting the product price
-	var $first_variations;
+	public $first_variations;
 
 	//variations inside variation groups: i.e. ( red, green, blue ) or ( S, M, L, XL )
-	var $variations;
-	var $variation_count   = 0;
-	var $current_variation = -1;
-	var $variation;
+	public $variations;
+	public $variation_count   = 0;
+	public $current_variation = -1;
+	public $variation;
+	public $all_associated_variations;
 
 
-	function wpsc_variations( $product_id ) {
+	function __construct( $product_id ) {
 		global $wpdb;
 
 		if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
@@ -52,7 +53,7 @@ class wpsc_variations {
 			array_unshift(
 				$this->all_associated_variations[$variation_set], (object) array(
 				'term_id' => 0,
-				'name'    => __( '-- Please Select --', 'wpsc' ),
+				'name'    => __( '-- Please Select --', 'wp-e-commerce' ),
 				)
 			);
 		}
@@ -198,7 +199,7 @@ function wpsc_get_child_object_in_terms( $parent_id, $terms, $taxonomies = 'wpsc
 
 	foreach ( $taxonomies as $taxonomy ) {
 		if ( ! taxonomy_exists( $taxonomy ) )
-			return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wpsc' ) );
+			return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wp-e-commerce' ) );
 	}
 
 	$defaults = array(
@@ -264,10 +265,10 @@ function wpsc_get_child_object_in_terms_var( $parent_id, $terms, $taxonomies, $a
 	foreach ( ( array ) $taxonomies as $taxonomy ) {
 		if ( $current_version_number < 3.8 ) {
 			if ( ! taxonomy_exists( $taxonomy ) )
-				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wpsc' ) );
+				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wp-e-commerce' ) );
 		} else {
 			if ( !taxonomy_exists( $taxonomy ) )
-				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wpsc' ) );
+				return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy', 'wp-e-commerce' ) );
 		}
 	}
 

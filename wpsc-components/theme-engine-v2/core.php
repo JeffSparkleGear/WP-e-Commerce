@@ -45,7 +45,7 @@ function _wpsc_te_v2_includes() {
 		require_once( WPSC_THEME_ENGINE_V2_PATH . '/admin.php' );
 	}
 
-	if ( ! is_admin() ) {
+	if ( ! is_admin() || ( is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
 		_wpsc_te2_mvc_init();
 	}
 
@@ -115,16 +115,12 @@ function _wpsc_te_v2_product_category_args( $args ) {
 	return $args;
 }
 
-function _wpsc_action_flush_rewrite_rules() {
-	flush_rewrite_rules( false );
-}
-
 /**
  * Return the permalink of a product.
  *
  * This function is usually used inside a hook action.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  _wpsc_filter_product_permalink()
  *
  * @param  string $permalink
@@ -146,7 +142,7 @@ add_filter( 'post_type_link', 'wpsc_filter_product_permalink', 10, 4 );
  * product permalink with product category, and whether hierarchical product category URL is enabled.
  *
  * @access private
- * @since 0.1
+ * @since 4.0
  * @uses   apply_filters()        Applies 'wpsc_product_permalink_canonical' filter if $canonical is true.
  * @uses   apply_filters()        Applies 'wpsc_product_permalink' filter if $canonical is false.
  * @uses   get_option()           Gets 'permalink_structure' option.

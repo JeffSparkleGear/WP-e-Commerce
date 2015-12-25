@@ -4,7 +4,7 @@
  *
  * See {@link wpsc_get_breadcrumb()} for a list of available options to customize the output.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_breadcrumb()
  * @uses  wpsc_product_breadcrumb_after()
  * @uses  wpsc_product_breadcrumb_before()
@@ -36,7 +36,7 @@ function wpsc_breadcrumb( $args = '' ) {
  *                         Defaults to true.
  *     'current_text'    - The text for the current link. Defaults to the category / product title.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters()      Applies 'wpsc_breadcrumb_array'     filter.
  * @uses  apply_filters()      Applies 'wpsc_breadcrumb_class'     filter.
  * @uses  apply_filters()      Applies 'wpsc_breadcrumb_separator' filter.
@@ -75,13 +75,15 @@ function wpsc_get_breadcrumb( $args = '' ) {
 
 		// Default to 'Home'
 		} else {
-			$pre_front_text = __( 'Home', 'wpsc' );
+			$pre_front_text = __( 'Home', 'wp-e-commerce' );
 		}
 	}
 
 	// No custom store text
 	if ( empty( $args['store_text'] ) ) {
 		$pre_store_text = wpsc_get_store_title();
+	} else {
+		$pre_store_text = $args['store_text'];
 	}
 
 	$parent = null;
@@ -114,7 +116,6 @@ function wpsc_get_breadcrumb( $args = '' ) {
 		if ( $term->parent ) {
 			$parent = get_term( $term->parent, 'wpsc_product_category' );
 		}
-
 	} elseif ( wpsc_is_product_tag() ) {
 		// if this is a product tag, set "current_text" to the tag name by default
 		$pre_current_text = wpsc_get_product_tag_name();
@@ -129,13 +130,13 @@ function wpsc_get_breadcrumb( $args = '' ) {
 			$pre_current_text = $c->order_id;
 			$parent = array(
 				array(
-					'title' => __( 'Your Account', 'wpsc' ),
+					'title' => __( 'Your Account', 'wp-e-commerce' ),
 					'url'   => wpsc_get_customer_account_url()
 				),
 			);
 		} else {
 			// otherwise, set the "current_text" argument to "Your Account"
-			$pre_current_text = __( 'Your Account', 'wpsc' );
+			$pre_current_text = __( 'Your Account', 'wp-e-commerce' );
 		}
 	}
 
@@ -148,7 +149,7 @@ function wpsc_get_breadcrumb( $args = '' ) {
 		'before_divider'  => '<span class="%s">',
 		'after_divider'   => '</span>',
 		'divider'         => '&raquo;',
-		'padding'         => 1,
+		'padding'         => 0,
 
 		// Home
 		'include_home'    => true,
@@ -175,9 +176,8 @@ function wpsc_get_breadcrumb( $args = '' ) {
 
 	// if padding is set, prepare the length, padding string and divider
 	if ( $padding ) {
-		/* @todo: Check if $padding is supposed to use $length, rather than $padding.  Otherwise, $length is dead. */
-		$length = strlen( $divider ) + $padding * 2;
-		$padding = str_repeat( "&nbsp;", $padding );
+		$length = strlen( html_entity_decode( $divider, ENT_COMPAT, 'UTF-8' ) ) + $padding * 2;
+		$padding = str_repeat( "&nbsp;", $length );
 		$divider = $padding . $divider . $padding;
 	}
 	$divider        = $before_divider . $divider . $after_divider;
@@ -288,13 +288,13 @@ function wpsc_get_user_messages( $args = '' ) {
  * @return string HTML output
  */
 function wpsc_get_keep_shopping_button() {
-	$keep_shopping_url =   isset( $_REQUEST['_wp_http_referer'] )
+	$keep_shopping_url = isset( $_REQUEST['_wp_http_referer'] )
 	                     ? esc_attr( $_REQUEST['_wp_http_referer'] )
 	                     : wpsc_get_store_url();
 
 	$title = apply_filters(
 		'wpsc_keep_shopping_button_title',
-		__( 'Keep Shopping', 'wpsc' )
+		__( 'Keep Shopping', 'wp-e-commerce' )
 	);
 
 	$button = sprintf(
@@ -347,7 +347,6 @@ function wpsc_get_checkout_steps() {
 			$classes[] = 'pending';
 		}
 
-
 		$classes[] = 'split-' . count( $steps );
 		$output   .= '<li class="' . implode( ' ', $classes ) . '">';
 
@@ -393,9 +392,9 @@ function wpsc_get_customer_account_tabs() {
 	$active_tab = _wpsc_get_current_controller_slug();
 
 	$tabs = apply_filters( 'wpsc_customer_account_tabs', array(
-		'orders'          => _x( 'Orders'          , 'customer account tab', 'wpsc' ),
-		'digital-content' => _x( 'Digital Contents', 'customer account tab', 'wpsc' ),
-		'settings'        => _x( 'Settings'        , 'customer account tab', 'wpsc' )
+		'orders'          => _x( 'Orders'          , 'customer account tab', 'wp-e-commerce' ),
+		'digital-content' => _x( 'Digital Contents', 'customer account tab', 'wp-e-commerce' ),
+		'settings'        => _x( 'Settings'        , 'customer account tab', 'wp-e-commerce' )
 	), $active_tab );
 
 	$output = sprintf( '<ul class="wpsc-tabs wpsc-customer-account-tabs">' );;
@@ -433,13 +432,13 @@ function wpsc_get_customer_orders_statuses() {
 	$controller = _wpsc_get_current_controller();
 
 	$view_labels = array(
-		0 => _nx_noop( 'All <span class="count">(%s)</span>'       , 'All <span class="count">(%s)</span>'       , 'purchase logs' ),
-		1 => _nx_noop( 'Incomplete <span class="count">(%s)</span>', 'Incomplete <span class="count">(%s)</span>', 'purchase logs' ),
-		2 => _nx_noop( 'Received <span class="count">(%s)</span>'  , 'Received <span class="count">(%s)</span>'  , 'purchase logs' ),
-		3 => _nx_noop( 'Accepted <span class="count">(%s)</span>'  , 'Accepted <span class="count">(%s)</span>'  , 'purchase logs' ),
-		4 => _nx_noop( 'Dispatched <span class="count">(%s)</span>', 'Dispatched <span class="count">(%s)</span>', 'purchase logs' ),
-		5 => _nx_noop( 'Closed <span class="count">(%s)</span>'    , 'Closed <span class="count">(%s)</span>'    , 'purchase logs' ),
-		6 => _nx_noop( 'Declined <span class="count">(%s)</span>'  , 'Declined <span class="count">(%s)</span>'  , 'purchase logs' ),
+		0 => _nx_noop( 'All <span class="count">(%s)</span>'       , 'All <span class="count">(%s)</span>'       , 'purchase logs', 'wp-e-commerce' ),
+		1 => _nx_noop( 'Incomplete <span class="count">(%s)</span>', 'Incomplete <span class="count">(%s)</span>', 'purchase logs', 'wp-e-commerce' ),
+		2 => _nx_noop( 'Received <span class="count">(%s)</span>'  , 'Received <span class="count">(%s)</span>'  , 'purchase logs', 'wp-e-commerce' ),
+		3 => _nx_noop( 'Accepted <span class="count">(%s)</span>'  , 'Accepted <span class="count">(%s)</span>'  , 'purchase logs', 'wp-e-commerce' ),
+		4 => _nx_noop( 'Dispatched <span class="count">(%s)</span>', 'Dispatched <span class="count">(%s)</span>', 'purchase logs', 'wp-e-commerce' ),
+		5 => _nx_noop( 'Closed <span class="count">(%s)</span>'    , 'Closed <span class="count">(%s)</span>'    , 'purchase logs', 'wp-e-commerce' ),
+		6 => _nx_noop( 'Declined <span class="count">(%s)</span>'  , 'Declined <span class="count">(%s)</span>'  , 'purchase logs', 'wp-e-commerce' ),
 	);
 
 	$views = array();
@@ -449,11 +448,11 @@ function wpsc_get_customer_orders_statuses() {
 			continue;
 
 		$text = sprintf(
-			translate_nooped_plural( $view_labels[ $status ], $count, 'wpsc' ),
+			translate_nooped_plural( $view_labels[ $status ], $count, 'wp-e-commerce' ),
 			number_format_i18n( $count )
 		);
 
-		$url =   ( $status )
+		$url = ( $status )
 		       ? wpsc_get_customer_account_url( 'orders/status/' . $status )
 		       : wpsc_get_customer_account_url();
 		$link = '<a href="' . esc_url( $url ) . '">' . $text . '</a>';
@@ -514,8 +513,8 @@ function wpsc_get_customer_orders_pagination_links( $args = array() ) {
 		'format'    => $format,
 		'total'     => $controller->total_pages,
 		'current'   => $controller->current_page,
-		'prev_text' => is_rtl() ? __( '&rarr;', 'wpsc' ) : __( '&larr;', 'wpsc' ),
-		'next_text' => is_rtl() ? __( '&larr;', 'wpsc' ) : __( '&rarr;', 'wpsc' ),
+		'prev_text' => is_rtl() ? __( '&rarr;', 'wp-e-commerce' ) : __( '&larr;', 'wp-e-commerce' ),
+		'next_text' => is_rtl() ? __( '&larr;', 'wp-e-commerce' ) : __( '&rarr;', 'wp-e-commerce' ),
 		'end_size'  => 3,
 		'mid_size'  => 2,
 	);
@@ -541,14 +540,14 @@ function wpsc_customer_orders_pagination_count() {
 
 	if ( $controller->total_items > 1 ) {
 		if ( $from == $to ) {
-			$output = sprintf( __( 'Viewing product %1$s (of %2$s total)', 'wpsc' ), $from, $controller->total_items );
+			$output = sprintf( __( 'Viewing product %1$s (of %2$s total)', 'wp-e-commerce' ), $from, $controller->total_items );
 		} elseif ( $controller->total_pages === 1 ) {
-			$output = sprintf( __( 'Viewing %1$s products', 'wpsc' ), $controller->total_items );
+			$output = sprintf( __( 'Viewing %1$s products', 'wp-e-commerce' ), $controller->total_items );
 		} else {
-			$output = sprintf( __( 'Viewing %1$s products - %2$s through %3$s (of %4$s total)', 'wpsc' ), $controller->count_items, $from, $to, $controller->total_items );
+			$output = sprintf( __( 'Viewing %1$s products - %2$s through %3$s (of %4$s total)', 'wp-e-commerce' ), $controller->count_items, $from, $to, $controller->total_items );
 		}
 	} else {
-		$output = sprintf( __( 'Viewing %1$s product', 'wpsc' ), $controller->total_items );
+		$output = sprintf( __( 'Viewing %1$s product', 'wp-e-commerce' ), $controller->total_items );
 	}
 
 	// Filter and return
@@ -641,3 +640,34 @@ function wpsc_get_checkout_customer_details() {
 function wpsc_checkout_customer_details() {
 	echo wpsc_get_checkout_customer_details();
 }
+
+/**
+ * Adds a UI for allowing guests to create an account on checkout.
+ *
+ * This function is hooked into the payment method args in WPSC_Controller_Checkout::payment().
+ * Handling of the user account creation is in WPSC_Controller_Checkout::create_account.
+ *
+ * @param array $args Array of arguments for Forms API.
+ *
+ * @since  4.0
+ * @return array $args Array of arguments for Forms API.
+ */
+function wpsc_create_account_checkbox( $args ) {
+	ob_start();
+?>
+	<div class="wpsc-form-actions">
+		<p><strong class="wpsc-large"><?php _e( 'Create an Account?', 'wp-e-commerce' ); ?></strong></p>
+		<label><input type="checkbox" name="wpsc_create_account" /> <?php _e( 'Creating an account keeps your order history, user profile, and more all in one place. We’ll email you account information right away.', 'wp-e-commerce' ); ?></label>
+	</div>
+<?php
+	$output = ob_get_clean();
+
+	if ( ! isset( $args['before_form_actions'] ) ) {
+		$args['before_form_actions'] = $output;
+	} else {
+		$args['before_form_actions'] = $output . $args['before_form_actions'];
+	}
+
+	return $args;
+}
+

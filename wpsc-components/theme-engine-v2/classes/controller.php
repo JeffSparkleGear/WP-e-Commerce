@@ -25,14 +25,16 @@ class WPSC_Controller {
 	public function __construct() {
 		require_once( WPSC_TE_V2_CLASSES_PATH . '/message-collection.php' );
 
-		add_filter( 'template_include', array( $this, '_filter_template_router' ) );
+		add_filter( 'template_include' , array( $this, '_filter_template_router' ) );
+		add_action( 'wpsc_router_init', array( $this, 'force_ssl'               ) );
+
 		$this->message_collection = WPSC_Message_Collection::get_instance();
 	}
 
 	protected function verify_nonce( $action ) {
 		if ( ! wp_verify_nonce( $_POST['_wp_nonce'], $action ) ) {
 			$this->message_collection->add(
-				__( 'Your form submission could not be processed by our system because the page has been left idle for too long. Please try submitting it again.', 'wpsc' ),
+				__( 'Your form submission could not be processed by our system because the page has been left idle for too long. Please try submitting it again.', 'wp-e-commerce' ),
 				'error'
 			);
 
@@ -40,6 +42,23 @@ class WPSC_Controller {
 		}
 
 		return true;
+	}
+
+	public function force_ssl() {
+		if ( ! is_ssl()                           &&
+			'1' == get_option( 'wpsc_force_ssl' ) &&
+			( wpsc_is_cart() || wpsc_is_checkout() )
+		 ) {
+
+		 	$url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+		 	if ( isset( $_REQUEST['_wp_nonce'] ) ) {
+				$url = add_query_arg( '_wp_nonce', $_REQUEST['_wp_nonce'], $url );
+		 	}
+
+			wp_safe_redirect( $url );
+			exit;
+		}
 	}
 
 	public function _filter_template_router() {

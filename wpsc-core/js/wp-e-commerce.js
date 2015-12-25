@@ -734,7 +734,7 @@ function wpsc_copy_meta_value_to_similiar( element ) {
 				}
 			} else {
 				current_value = jQuery( this ).val();
-				if ( current_value != meta_value ) {
+				if ( current_value != meta_value && meta_value ) {
 					jQuery( this ).val( meta_value );
 				}
 			}
@@ -1188,11 +1188,13 @@ jQuery(document).ready(function ($) {
 
 	// update the price when the variations are altered.
 	jQuery( 'div.wpsc_variation_forms' ).on( 'change', '.wpsc_select_variation', function() {
-		jQuery('option[value="0"]', this).attr('disabled', 'disabled');
+		jQuery( 'option[value="0"]', this ).attr('disabled', 'disabled');
 		var self = this;
 		var parent_form = jQuery(this).closest("form.product_form");
-		if ( parent_form.length === 0 )
+
+		if ( parent_form.length === 0 ) {
 			return;
+		}
 
 		var prod_id = jQuery("input[name='product_id']",parent_form).val();
 		var form_values = jQuery("input[name='product_id'], .wpsc_select_variation",parent_form).serialize() + '&action=update_product_price';
@@ -1210,13 +1212,22 @@ jQuery(document).ready(function ($) {
 			jQuery( document ).trigger( { type : 'wpsc_select_variation', response : response } );
 
 			if ( response.variation_found ) {
+
+				jQuery( '.wpsc_buy_button', parent_form ).prop( 'disabled', false ).css( 'cursor', 'pointer' );
+
+
 				if ( response.stock_available ) {
+					jQuery( '.wpsc_buy_button', parent_form ).prop( 'disabled', false ).css( 'cursor', 'pointer' );
 					stock_display.removeClass('out_of_stock').addClass('in_stock');
 				} else {
+					jQuery( '.wpsc_buy_button', parent_form ).prop( 'disabled', true ).css( 'cursor', 'not-allowed' );
 					stock_display.addClass('out_of_stock').removeClass('in_stock');
 				}
+
 				variation_display.removeClass('no_variation').addClass('is_variation');
+
 			} else {
+				jQuery( '.wpsc_buy_button', parent_form ).prop( 'disabled', true ).css( 'cursor', 'not-allowed' );
 				variation_display.removeClass('is_variation').addClass('no_variation');
 			}
 

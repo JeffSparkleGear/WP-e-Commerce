@@ -238,7 +238,7 @@ class wpec_taxes {
 		}
 
 		//add all markets
-		array_unshift( $returnable, array( 'isocode' => 'all-markets', 'country' => __( 'All Markets', 'wpsc' ) ) );
+		array_unshift( $returnable, array( 'isocode' => 'all-markets', 'country' => __( 'All Markets', 'wp-e-commerce' ) ) );
 
 		return $returnable;
 	} // wpec_taxes_get_countries
@@ -279,7 +279,7 @@ class wpec_taxes {
 		$returnable = false;
 
 		if ( ( 'all-markets' == $region ) || ( 'all-markets' == $country ) ) {
-			$returnable = __( 'All Markets', 'wpsc' );
+			$returnable = __( 'All Markets', 'wp-e-commerce' );
 		} else {
 
 			// prior to version 3.8.14 this function was made available without the country parameter, because
@@ -288,7 +288,7 @@ class wpec_taxes {
 			// little logic here to try to catch an improper call, but it isn't perfect.
 
 			if ( ( $country == null ) ) {
-				_wpsc_doing_it_wrong( __FUNCTION__, __( 'Prior to version 3.8.14 this function was made available without the country parameter, because there is no assurance that region code ar unique across the globe we need to specify a country.', 'wpsc' ), '3.8.14' );
+				_wpsc_doing_it_wrong( __FUNCTION__, __( 'Prior to version 3.8.14 this function was made available without the country parameter. Because there is no assurance that region codes are unique across the globe, we need to specify a country.', 'wp-e-commerce' ), '3.8.14' );
 			}
 
 			//check for all markets ifset return the string 'All Markets'
@@ -332,7 +332,7 @@ class wpec_taxes {
 
 		//add the all markets option to the list
 		if ( ! empty( $regions ) ) {
-			array_unshift( $regions , array( 'region_code' => 'all-markets', 'name' => __( 'All Markets', 'wpsc' ), ) );
+			array_unshift( $regions , array( 'region_code' => 'all-markets', 'name' => __( 'All Markets', 'wp-e-commerce' ), ) );
 		}
 
 		return $regions;

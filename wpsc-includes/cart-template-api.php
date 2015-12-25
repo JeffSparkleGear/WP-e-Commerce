@@ -1,7 +1,7 @@
 <?php
 /**
  * The WPSC Cart API for templates
- * 
+ *
  * @package wp-e-commerce
  */
 
@@ -448,8 +448,8 @@ function wpsc_validate_product_cart_quantity( $quantity, $product_id = 0 ) {
 function _wpsc_validate_cart_product_quantity( $product_id, $parameters, $cart ) {
 	foreach ( $cart->cart_items as $key => $cart_item ) {
 		if ( $cart_item->product_id == $product_id ) {
-			$cart->cart_items[$key]->quantity = wpsc_validate_product_cart_quantity( $cart->cart_items[$key]->quantity, $product_id );
-			$cart->cart_items[$key]->refresh_item();
+			$cart->cart_items[ $key ]->quantity = wpsc_validate_product_cart_quantity( $cart->cart_items[ $key ]->quantity, $product_id );
+			$cart->cart_items[ $key ]->refresh_item();
 		}
 	}
 }
@@ -575,7 +575,7 @@ function _wpsc_verify_global_cart_has_been_initialized( $function = __FUNCTION__
 	// We will try to give a helpful message to the developer so that they can adjust their code
 	static $already_gave_no_valid_cart_message = false;
 	if ( ! $we_have_a_valid_cart && ! $already_gave_no_valid_cart_message ) {
-		_wpsc_doing_it_wrong( $function, __( 'The WPeC global cart is not yet initialized, accessing global cart properties and methods will not work.', 'wpsc' ), '3.8.14' );
+		_wpsc_doing_it_wrong( $function, __( 'The WPeC global cart is not yet initialized. Accessing global cart properties and methods will not work.', 'wp-e-commerce' ), '3.8.14' );
 		$already_gave_no_valid_cart_message = true;
 	}
 

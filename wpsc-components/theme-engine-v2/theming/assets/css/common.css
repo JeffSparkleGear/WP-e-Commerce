@@ -63,11 +63,7 @@
 .wpsc-controller .wpsc-form select[multiple="multiple"] {
   vertical-align: middle;
 }
-.wpsc-controller .wpsc-form legend {
-  border-bottom: 1px solid #cccccc;
-  margin-bottom: 18px;
-  width: 100%;
-}
+
 .wpsc-controller .wpsc-form legend + * {
   /* Fix webkit bug where margin bottom does not apply to legend */
 
@@ -2116,6 +2112,8 @@
 .wpsc-controller .ui-menu {
   width: 200px;
   margin-bottom: 2em;
+  max-height: 50%;
+  overflow-y: scroll;
 }
 .wpsc-controller .ui-spinner {
   position: relative;
@@ -2978,6 +2976,23 @@
 
   border-radius: 3px;
 }
+
+.wpsc-controller .ui-autocomplete li.ui-menu-item {
+  display: inline-block;
+  padding: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #555555;
+  margin: 0;
+  vertical-align: middle
+}
+
+.wpsc-controller .ui-autocomplete li.ui-state-focus {
+  color: #333333;
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
 .wpsc-controller .ui-toolbar {
   padding: 7px 14px;
   margin: 0 0 18px;
@@ -4591,7 +4606,6 @@ br.clear {
 .wpsc-controller table.wpsc-cart-item-table .quantity,
 .wpsc-cart-widget-table table.wpsc-cart-item-table .quantity {
   text-align: right;
-  width: 80px;
 }
 .wpsc-controller table.wpsc-cart-item-table .wpsc-thumbnail,
 .wpsc-cart-widget-table table.wpsc-cart-item-table .wpsc-thumbnail {
@@ -4621,10 +4635,27 @@ br.clear {
 .wpsc-cart-widget-table .wpsc-cart-item-table .wpsc-cart-item-table-actions td {
   text-align: right;
 }
+
+.wpsc-controller .wpsc-cart-item-table .wpsc-cart-item-table-actions td.wpsc-cart-coupon {
+  text-align: left;
+}
+
+#coupon_code {
+  padding: .5em;
+  width: 9em;
+}
+
 .wpsc-controller .wpsc-cart-update,
 .wpsc-cart-widget-table .wpsc-cart-update {
-  margin-left: 10px;
+  float: left;
 }
+
+.wpsc-controller table.wpsc-table td.apply-coupon {
+  white-space: nowrap;
+  vertical-align: bottom;
+  padding-right: 0;
+}
+
 .wpsc-cart-widget-table {
   /*.wpsc-button {
 		.button();

@@ -57,7 +57,6 @@ function wpsc_update_purchase_log_status( $unique_id, $new_status, $by = 'id' ) 
 }
 
 function wpsc_update_purchase_log_details( $unique_id, $details, $by = 'id' ) {
-	global $wpdb;
 
 	$purchase_log = new WPSC_Purchase_Log( $unique_id, $by );
 	$purchase_log->set( $details );
@@ -166,14 +165,47 @@ function _wpsc_process_transaction_coupon( $purchase_log ) {
 	}
 }
 
+/**
+ * Routine that runs when updating a purchase log's status.
+ * Currently, only used to send customer and admin emails upon successful purchase.
+ *
+ * @since  3.8.9
+ * @since  4.0    Removed coupons and stocks from email sending.  Much easier now to remove_action() on either
+ *                of those functions when desiring to override.
+ *
+ * @param  int               $id             Purchase Log ID.
+ * @param  int               $status         Current status.
+ * @param  int               $old_status     Previous status.
+ * @param  WPSC_Purchase_Log $purchase_log   Purchase Log Object.
+ *
+ * @return void
+ */
 function _wpsc_action_update_purchase_log_status( $id, $status, $old_status, $purchase_log ) {
 	if ( $purchase_log->is_order_received() || $purchase_log->is_accepted_payment() ) {
 		wpsc_send_customer_email( $purchase_log );
 		wpsc_send_admin_email( $purchase_log );
 	}
+}
 
-	if ( ! $purchase_log->is_transaction_completed() )
+add_action( 'wpsc_update_purchase_log_status', '_wpsc_action_update_purchase_log_status', 10, 4 );
+
+/**
+ * Routine that runs when updating a purchase log's status, used to update status of coupon's used.
+ *
+ * @since  4.0
+ *
+ * @param  int               $id             Purchase Log ID.
+ * @param  int               $status         Current status.
+ * @param  int               $old_status     Previous status.
+ * @param  WPSC_Purchase_Log $purchase_log   Purchase Log Object.
+ *
+ * @return void
+ */
+function _wpsc_update_purchase_log_coupon_status( $id, $status, $old_status, $purchase_log ) {
+
+	if ( ! $purchase_log->is_transaction_completed() ) {
 		return;
+	}
 
 	$already_processed = in_array(
 		$old_status,
@@ -189,17 +221,55 @@ function _wpsc_action_update_purchase_log_status( $id, $status, $old_status, $pu
 	}
 
 	_wpsc_process_transaction_coupon( $purchase_log );
+}
+
+add_action( 'wpsc_update_purchase_log_status', '_wpsc_update_purchase_log_coupon_status', 11, 4 );
+
+/**
+ * Routine that runs when updating a purchase log's status, used to update status of inventory.
+ *
+ * @since  4.0
+ *
+ * @param  int               $id             Purchase Log ID.
+ * @param  int               $status         Current status.
+ * @param  int               $old_status     Previous status.
+ * @param  WPSC_Purchase_Log $purchase_log   Purchase Log Object.
+ *
+ * @return void
+ */
+
+function _wpsc_update_purchase_log_stock_status( $id, $status, $old_status, $purchase_log ) {
+
+	if ( ! $purchase_log->is_transaction_completed() ) {
+		return;
+	}
+
+	$already_processed = in_array(
+		$old_status,
+		array(
+			WPSC_Purchase_Log::ACCEPTED_PAYMENT,
+			WPSC_Purchase_Log::JOB_DISPATCHED,
+			WPSC_Purchase_Log::CLOSED_ORDER,
+		)
+	);
+
+	if ( $already_processed ) {
+		return;
+	}
+
 	wpsc_decrement_claimed_stock( $id );
 }
 
-add_action( 'wpsc_update_purchase_log_status', '_wpsc_action_update_purchase_log_status', 10, 4 );
+add_action( 'wpsc_update_purchase_log_status', '_wpsc_update_purchase_log_stock_status', 12, 4 );
 
 function wpsc_send_customer_email( $purchase_log ) {
-	if ( ! is_object( $purchase_log ) )
+	if ( ! is_object( $purchase_log ) ) {
 		$purchase_log = new WPSC_Purchase_Log( $purchase_log );
+	}
 
-	if ( ! $purchase_log->is_transaction_completed() && ! $purchase_log->is_order_received() )
+	if ( ! $purchase_log->is_transaction_completed() && ! $purchase_log->is_order_received() ) {
 		return;
+	}
 
 	$email = new WPSC_Purchase_Log_Customer_Notification( $purchase_log );
 	$email_sent = $email->send();
@@ -222,8 +292,7 @@ function wpsc_send_admin_email( $purchase_log, $force = false ) {
 	$email_sent = $email->send();
 
 	if ( $email_sent ) {
-		$purchase_log->set( 'email_sent', 1 );
-		$purchase_log->save();
+		$purchase_log->set( 'email_sent', 1 )->save();
 	}
 
 	do_action( 'wpsc_transaction_send_email_to_admin', $email, $email_sent );
@@ -247,7 +316,7 @@ function wpsc_get_transaction_html_output( $purchase_log ) {
     if ( $checkout_session_id == $purchase_log->get( 'sessionid' ) ) {
     	$output = apply_filters( 'wpsc_get_transaction_html_output', $output, $notification );
 	} else {
-		$output = apply_filters( 'wpsc_get_transaction_unauthorized_view', __( "You don't have the permission to view this page", 'wpsc' ), $output, $notification );
+		$output = apply_filters( 'wpsc_get_transaction_unauthorized_view', __( "You don't have the permission to view this page", 'wp-e-commerce' ), $output, $notification );
 	}
 
 	return $output;

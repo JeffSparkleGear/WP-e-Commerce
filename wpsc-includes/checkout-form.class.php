@@ -99,7 +99,7 @@ class WPSC_Checkout_Form {
 	 */
 	public function __construct( $id = 0, $active_only = true ) {
 		$this->id = $id;
-		$this->active_only = $active_only;
+		$this->active_only = apply_filters( 'wpsc_checkout_form_active_only', $active_only );
 		$this->get_fields();
 	}
 
@@ -115,7 +115,7 @@ class WPSC_Checkout_Form {
 	 */
 	public function field_drop_down_options( $selected_id = false ) {
 		?>
-		<option value=""><?php _e( 'Please select', 'wpsc' ); ?></option>
+		<option value=""><?php _e( 'Please select', 'wp-e-commerce' ); ?></option>
 		<?php foreach ( $this->get_fields() as $field ) { ?>
 			<option <?php if ( $field->type == 'heading' ) echo 'disabled="disabled"'; ?> <?php selected( $field->id, $selected_id ) ?> value="<?php echo esc_attr( $field->id ) ?>"><?php echo esc_html( $field->name ); ?></option>
 		<?php

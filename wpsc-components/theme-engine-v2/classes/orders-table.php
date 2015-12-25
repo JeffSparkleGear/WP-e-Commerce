@@ -23,7 +23,7 @@ class WPSC_Orders_Table extends WPSC_Table {
 		global $wpdb;
 
 		$where = 'user_ID = %d';
-		$vars = array( wpsc_get_current_customer_id() );
+		$vars = array( get_current_user_id() );
 		if ( $this->status !== 0 ) {
 			$where .= ' AND processed = %d';
 			$vars[] = $this->status;
@@ -47,11 +47,11 @@ class WPSC_Orders_Table extends WPSC_Table {
 		parent::__construct();
 
 		$this->columns = array(
-			'id'          => __( 'Order Number', 'wpsc' ),
-			'date'        => __( 'Date', 'wpsc' ),
-			'status'      => __( 'Status', 'wpsc' ),
-			'tracking_id' => __( 'Tracking ID', 'wpsc' ),
-			'total'       => __( 'Total', 'wpsc' ),
+			'id'          => __( 'Order Number', 'wp-e-commerce' ),
+			'date'        => __( 'Date', 'wp-e-commerce' ),
+			'status'      => __( 'Status', 'wp-e-commerce' ),
+			'tracking_id' => __( 'Tracking ID', 'wp-e-commerce' ),
+			'total'       => __( 'Total', 'wp-e-commerce' ),
 		);
 	}
 
@@ -61,23 +61,23 @@ class WPSC_Orders_Table extends WPSC_Table {
 
 	protected function column_id( $item ) {
 		?>
-		<a href="<?php echo esc_url( $this->item_url( $item ) ); ?>" title="<?php esc_attr_e( 'View order details', 'wpsc' ) ?>"><?php echo esc_html( $item->id ); ?></a>
+		<a href="<?php echo esc_url( $this->item_url( $item ) ); ?>"><?php echo esc_html( $item->id ); ?></a>
 		<?php
 	}
 
 	protected function column_date( $item ) {
-		$format    = __( 'Y/m/d g:i:s A' );
+		$format    = _x( 'Y/m/d g:i:s A', 'orders table column date format', 'wp-e-commerce' );
 		$timestamp = (int) $item->date;
 		$full_time = date( $format, $timestamp );
 		$time_diff = time() - $timestamp;
 
 		if ( $time_diff > 0 && $time_diff < 24 * 60 * 60 ) {
-			$h_time = $h_time = sprintf( __( '%s ago' ), human_time_diff( $timestamp ) );
+			$h_time = $h_time = sprintf( __( '%s ago', 'wp-e-commerce' ), human_time_diff( $timestamp ) );
 		} else {
-			$h_time = date( __( get_option( 'date_format', 'Y/m/d' ) ), $timestamp );
+			$h_time = date( get_option( 'date_format', 'Y/m/d' ), $timestamp );
 		}
 
-		echo '<a title="' . $full_time . '" href="' . $this->item_url( $item ) . '">';
+		echo '<a href="' . $this->item_url( $item ) . '">';
 		echo $h_time;
 		echo '</a>';
 	}
@@ -97,7 +97,7 @@ class WPSC_Orders_Table extends WPSC_Table {
 
 	protected function column_tracking_id( $item ) {
 		if ( empty( $item->track_id ) ) {
-			echo __( 'n/a', 'wpsc' );
+			echo __( 'n/a', 'wp-e-commerce' );
 		} else {
 			echo esc_html( $item->track_id );
 		}

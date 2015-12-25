@@ -31,7 +31,7 @@ function _wpsc_ajax_verify_nonce( $ajax_action ) {
 }
 
 function _wpsc_error_invalid_nonce() {
-	return new WP_Error( 'wpsc_ajax_invalid_nonce', __( 'Your session has expired. Please refresh the page and try again.', 'wpsc' ) );
+	return new WP_Error( 'wpsc_ajax_invalid_nonce', __( 'Your session has expired. Please refresh the page and try again.', 'wp-e-commerce' ) );
 }
 
 /**
@@ -52,7 +52,7 @@ function _wpsc_ajax_fire_callback( $ajax_action ) {
 	if ( is_callable( $callback ) )
 		$result = call_user_func( $callback );
 	else
-		$result = new WP_Error( 'wpsc_invalid_ajax_callback', __( 'Invalid AJAX callback.', 'wpsc' ) );
+		$result = new WP_Error( 'wpsc_invalid_ajax_callback', __( 'Invalid AJAX callback.', 'wp-e-commerce' ) );
 
 	return $result;
 }
@@ -74,13 +74,15 @@ function _wpsc_ajax_fire_callback( $ajax_action ) {
 function _wpsc_ajax_handler() {
 	$ajax_action = str_replace( '-', '_', $_REQUEST['wpsc_action'] );
 
-	if ( is_callable( '_wpsc_ajax_verify_' . $ajax_action ) )
+	if ( is_callable( '_wpsc_ajax_verify_' . $ajax_action ) ) {
 		$result = call_user_func( '_wpsc_ajax_verify_' . $ajax_action );
-	else
+	} else {
 		$result = _wpsc_ajax_verify_nonce( $ajax_action );
+	}
 
-	if ( ! is_wp_error( $result ) )
+	if ( ! is_wp_error( $result ) ) {
 		$result = _wpsc_ajax_fire_callback( $ajax_action );
+	}
 
 	$output = array(
 		'is_successful' => false,
@@ -111,8 +113,9 @@ add_action( 'wp_ajax_wpsc_ajax', '_wpsc_ajax_handler' );
 function wpsc_is_doing_ajax( $action = '' ) {
 	$ajax = defined( 'DOING_AJAX' ) && DOING_AJAX && ! empty( $_REQUEST['action'] ) && $_REQUEST['action'] == 'wpsc_ajax';
 
-	if ( $action )
+	if ( $action ) {
 		$ajax = $ajax && ! empty( $_REQUEST['wpsc_action'] ) && $action == str_replace( '-', '_', $_REQUEST['wpsc_action'] );
+	}
 
 	return $ajax;
 }
@@ -179,7 +182,7 @@ function _wpsc_ajax_add_variation_set() {
 	}
 
 	if ( empty( $variation_set_id ) )
-		return new WP_Error( 'wpsc_invalid_variation_id', __( 'Cannot retrieve the variation set in order to proceed.', 'wpsc' ) );
+		return new WP_Error( 'wpsc_invalid_variation_id', __( 'Cannot retrieve the variation set in order to proceed.', 'wp-e-commerce' ) );
 
 	foreach ( $variants as $variant ) {
 		$results = wp_insert_term( apply_filters( 'wpsc_new_variant', $variant, $variation_set_id ), 'wpsc-variation', array( 'parent' => $variation_set_id ) );
@@ -241,6 +244,7 @@ function _wpsc_ajax_add_variation_set() {
  * @return array Response args
  */
 function _wpsc_ajax_payment_gateway_settings_form() {
+
 	require_once( 'settings-page.php' );
 	require_once( 'includes/settings-tabs/gateway.php' );
 
@@ -350,7 +354,7 @@ function _wpsc_ajax_purchase_log_save_tracking_id() {
 	);
 
 	if ( ! $result )
-		return new WP_Error( 'wpsc_cannot_save_tracking_id', __( "Couldn't save tracking ID of the transaction. Please try again.", 'wpsc' ) );
+		return new WP_Error( 'wpsc_cannot_save_tracking_id', __( "Couldn't save tracking ID of the transaction. Please try again.", 'wp-e-commerce' ) );
 
 	$return = array(
 		'rows_affected' => $result,
@@ -397,8 +401,9 @@ function _wpsc_ajax_purchase_log_send_tracking_email() {
 
 	$result = wp_mail( $email, $subject, $message);
 
-	if ( ! $result )
-		return new WP_Error( 'wpsc_cannot_send_tracking_email', __( "Couldn't send tracking email. Please try again.", 'wpsc' ) );
+	if ( ! $result ) {
+		return new WP_Error( 'wpsc_cannot_send_tracking_email', __( "Couldn't send tracking email. Please try again.", 'wp-e-commerce' ) );
+	}
 
 	$return = array(
 		'id'          => $id,
@@ -446,7 +451,7 @@ function _wpsc_ajax_purchase_log_action_link() {
 
 	}
 
-	return new WP_Error( 'wpsc_ajax_invalid_purchase_log_action', __( 'Purchase log action failed.', 'wpsc' ) );
+	return new WP_Error( 'wpsc_ajax_invalid_purchase_log_action', __( 'Purchase log action failed.', 'wp-e-commerce' ) );
 
 }
 
@@ -511,7 +516,7 @@ function _wpsc_ajax_delete_file() {
 	$result = _wpsc_delete_file( $product_id, $file_name );
 
 	if ( ! $result )
-		return new WP_Error( 'wpsc_cannot_delete_file', __( "Couldn't delete the file. Please try again.", 'wpsc' ) );
+		return new WP_Error( 'wpsc_cannot_delete_file', __( "Couldn't delete the file. Please try again.", 'wp-e-commerce' ) );
 
 	$return = array(
 		'product_id' => $product_id,
@@ -535,7 +540,7 @@ function _wpsc_ajax_delete_file() {
 function _wpsc_ajax_remove_product_meta() {
 	$meta_id = (int) $_POST['meta_id'];
 	if ( ! delete_meta( $meta_id ) )
-		return new WP_Error( 'wpsc_cannot_delete_product_meta', __( "Couldn't delete product meta. Please try again.", 'wpsc' ) );
+		return new WP_Error( 'wpsc_cannot_delete_product_meta', __( "Couldn't delete product meta. Please try again.", 'wp-e-commerce' ) );
 
 	return array( 'meta_id' => $meta_id );
 }
@@ -558,7 +563,7 @@ function _wpsc_ajax_remove_product_meta() {
 function _wpsc_ajax_change_purchase_log_status() {
 	$result = wpsc_purchlog_edit_status( $_POST['id'], $_POST['new_status'] );
 	if ( ! $result )
-		return new WP_Error( 'wpsc_cannot_edit_purchase_log_status', __( "Couldn't modify purchase log's status. Please try again.", 'wpsc' ) );
+		return new WP_Error( 'wpsc_cannot_edit_purchase_log_status', __( "Couldn't modify purchase log's status. Please try again.", 'wp-e-commerce' ) );
 
 	$args = array();
 
@@ -630,7 +635,7 @@ function _wpsc_ajax_save_product_order() {
 			'failed_ids' => $failed,
 		);
 
-		return new WP_Error( 'wpsc_cannot_save_product_sort_order', __( "Couldn't save the products' sort order. Please try again.", 'wpsc' ), $error_data );
+		return new WP_Error( 'wpsc_cannot_save_product_sort_order', __( "Couldn't save the products' sort order. Please try again.", 'wp-e-commerce' ), $error_data );
 	}
 
 	return array(
@@ -713,7 +718,7 @@ function _wpsc_ajax_update_checkout_fields_order() {
 	}
 
 	if ( ! empty( $failed ) )
-		return new WP_Error( 'wpsc_cannot_save_checkout_field_sort_order', __( "Couldn't save checkout field sort order. Please try again.", 'wpsc' ), array( 'failed_ids' => $failed ) );
+		return new WP_Error( 'wpsc_cannot_save_checkout_field_sort_order', __( "Couldn't save checkout field sort order. Please try again.", 'wp-e-commerce' ), array( 'failed_ids' => $failed ) );
 
 	return array(
 		'modified' => $modified,
@@ -790,8 +795,8 @@ function _wpsc_ajax_upload_product_file() {
 		$output .= '<td style="padding-right: 30px;">' . $attachment['post_title'] . '</td>';
 		$output .= '<td>' . wpsc_convert_byte( $file_size ) . '</td>';
 		$output .= '<td>.' . wpsc_get_extension( $attachment['post_title'] ) . '</td>';
-		$output .= "<td><a data-file-name='" . esc_attr( $attachment['post_title'] ) . "' data-product-id='" . esc_attr( $product_id ) . "' data-nonce='" . esc_attr( $delete_nonce ) . "' class='file_delete_button' href='{$deletion_url}' >" . _x( 'Delete', 'Digital Download UI row', 'wpsc' ) . "</a></td>";
-		$output .= '<td><a href=' .$file_url .'>' . _x( 'Download', 'Digital Download UI row', 'wpsc' ) . '</a></td>';
+		$output .= "<td><a data-file-name='" . esc_attr( $attachment['post_title'] ) . "' data-product-id='" . esc_attr( $product_id ) . "' data-nonce='" . esc_attr( $delete_nonce ) . "' class='file_delete_button' href='{$deletion_url}' >" . _x( 'Delete', 'Digital Download UI row', 'wp-e-commerce' ) . "</a></td>";
+		$output .= '<td><a href=' .$file_url .'>' . _x( 'Download', 'Digital Download UI row', 'wp-e-commerce' ) . '</a></td>';
 		$output .= '</tr>';
 	}
 
@@ -933,23 +938,23 @@ add_action( 'wp_ajax_wpsc_set_variation_product_thumbnail', '_wpsc_ajax_set_vari
  * @uses update_post_meta()		Updates meta from the specified post
  */
 function product_gallery_image_delete_action() {
-	
+
 	$product_gallery = array();
 	$gallery_image_id = $gallery_post_id = '';
-	
+
 	$gallery_image_id = absint($_POST['product_gallery_image_id']);
 	$gallery_post_id = absint($_POST['product_gallery_post_id']);
-	
+
 	check_ajax_referer( 'wpsc_gallery_nonce', 'wpsc_gallery_nonce_check' );
-	
+
 	$product_gallery = get_post_meta( $gallery_post_id, '_wpsc_product_gallery', true );
-	
+
 	foreach ( $product_gallery as $index => $image_id ) {
 		if ( $image_id == $gallery_image_id ) {
 			unset( $product_gallery[$index] );
 		}
 	}
-	
+
 	update_post_meta( $gallery_post_id, '_wpsc_product_gallery', $product_gallery );
 }
 add_action( 'wp_ajax_product_gallery_image_delete', 'product_gallery_image_delete_action' );

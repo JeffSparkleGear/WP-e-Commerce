@@ -46,11 +46,11 @@ class WPSC_Update {
 			do_action( 'wpsc_update_timeout_terminate' );
 			$location = remove_query_arg( array( 'start_over', 'eta', 'current_percent' ) );
 			$location = add_query_arg( 'run_updates', 1, $location );
-			$location = esc_url( apply_filters( 'wpsc_update_terminate_location', $location ) );
+			$location = esc_url_raw( apply_filters( 'wpsc_update_terminate_location', $location ) );
 			?>
-				<script type="text/javascript">
-					location.href = "<?php echo $location; ?>"
-				</script>
+			<script type="text/javascript">
+				location.href = "<?php echo $location; ?>"
+			</script>
 			<?php
 			exit;
 		}
@@ -113,17 +113,17 @@ class WPSC_Update_Progress {
 			$location = add_query_arg( 'eta', $this->eta, $location );
 		else
 			$location = remove_query_arg( 'eta', $location );
-		return esc_url( $location );
+		return esc_url_raw( $location );
 	}
 
 	private function print_eta() {
 		echo '<div class="eta">';
-		_e( 'Estimated time left:', 'wpsc' );
+		_e( 'Estimated time left:', 'wp-e-commerce' );
 		echo ' ';
 		if ( $this->eta == 0 )
-			_e( 'Under a minute', 'wpsc' );
+			_e( 'Under a minute', 'wp-e-commerce' );
 		else
-			printf( _n( '%d minute', '%d minutes', $this->eta, 'wpsc' ), $this->eta );
+			printf( _n( '%d minute', '%d minutes', $this->eta, 'wp-e-commerce' ), $this->eta );
 		echo '</div>';
 	}
 
@@ -151,7 +151,7 @@ class WPSC_Update_Progress {
 
 		if ( $percent == 100 ) {
 			remove_filter( 'wpsc_update_terminate_location', array( $this, 'filter_terminate_location' ) );
-			echo '<div class="eta">' . _x( 'Done!', 'Update routine completed', 'wpsc' ) . '</div>';
+			echo '<div class="eta">' . _x( 'Done!', 'Update routine completed', 'wp-e-commerce' ) . '</div>';
 			echo '</div>';
 		}
 	}
@@ -183,12 +183,12 @@ function wpsc_update_step( $i, $total ) {
 		$processed = $i - $count + 1;
 		$eta = floor( ( $total - $i ) * ( $now - $start ) / ( $processed * 60 ) );
 		echo '<div class="eta">';
-		_e( 'Estimated time left:', 'wpsc' );
+		_e( 'Estimated time left:', 'wp-e-commerce' );
 		echo ' ';
 		if ( $eta == 0 )
-			_e( 'Under a minute', 'wpsc' );
+			_e( 'Under a minute', 'wp-e-commerce' );
 		else
-			printf( _n( '%d minute', '%d minutes', $eta, 'wpsc' ), $eta );
+			printf( _n( '%d minute', '%d minutes', $eta, 'wp-e-commerce' ), $eta );
 		echo '</div>';
 		$milestone = $now;
 	}
@@ -423,7 +423,7 @@ function wpsc_convert_products_to_posts() {
 				);
 
 				$product['order'] = $wpdb->get_var( $wpdb->prepare( "
-					SELECT order FROM " . WPSC_TABLE_PRODUCT_ORDER . "
+					SELECT `order` FROM " . WPSC_TABLE_PRODUCT_ORDER . "
 					WHERE product_id = %d
 				", $product['id'] ) );
 
@@ -774,9 +774,9 @@ function wpsc_convert_variation_combinations() {
 
 	}
 	delete_option("wpsc-variation_children");
-_get_term_hierarchy('wpsc-variation');
-delete_option("wpsc_product_category_children");
-_get_term_hierarchy('wpsc_product_category');
+	_get_term_hierarchy('wpsc-variation');
+	delete_option("wpsc_product_category_children");
+	_get_term_hierarchy('wpsc_product_category');
 }
 
 function wpsc_update_files() {

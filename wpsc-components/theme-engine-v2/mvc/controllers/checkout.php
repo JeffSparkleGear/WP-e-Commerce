@@ -3,7 +3,8 @@ require_once( WPSC_TE_V2_CLASSES_PATH . '/checkout-wizard.php' );
 
 class WPSC_Controller_Checkout extends WPSC_Controller {
 	protected $current_step  = '';
-	private $wizard;
+	protected $wizard;
+	protected $shipping_calculator;
 
 	public function __construct() {
 		parent::__construct();
@@ -54,7 +55,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 		// If no shipping is available, show an error message.
 		if ( wpsc_uses_shipping() && ! $this->shipping_calculator->has_quotes ) {
 			$this->message_collection->add(
-				__( 'Sorry but we cannot ship products to your submitted address. Please either provide another shipping address or contact the store administrator about product availability to your location.', 'wpsc' ),
+				__( 'Sorry, but we cannot ship products to your submitted address. Please either provide another shipping address or contact the store administrator about product availability to your location.', 'wp-e-commerce' ),
 				'error'
 			);
 			return;
@@ -62,7 +63,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		// Alert the user that the payment process is not complete.
 		$this->message_collection->add(
-			__( 'Your payment is not completed, please review your order details, select a Shipping method and press "Place Order" to complete your order', 'wpsc' ),
+			__( 'Your payment is not completed, please review your order details, select a Shipping method and press "Place Order" to complete your order', 'wp-e-commerce' ),
 			'info'
 		);
 
@@ -84,7 +85,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 	 * @return string
 	 */
 	public function review_order_button_title() {
-		return __( 'Place Order', 'wpsc' );
+		return __( 'Place Order', 'wp-e-commerce' );
 	}
 
 	/**
@@ -158,7 +159,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 			return null;
 		}
 
-		// Update the PurchaseLog
+		// Update the Purchase Log
 		$purchase_log_id = wpsc_get_customer_meta( 'current_purchase_log_id' );
 		$purchase_log    = new WPSC_Purchase_Log( $purchase_log_id );
 		$purchase_log->set( 'base_shipping', $wpsc_cart->calculate_base_shipping() );
@@ -177,9 +178,28 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 		$this->view = 'checkout-shipping-and-billing';
 		_wpsc_enqueue_shipping_billing_scripts();
 
+		$this->maybe_add_guest_account();
+
 		if ( isset( $_POST['action'] ) && $_POST['action'] == 'submit_checkout_form' ) {
 			$this->submit_shipping_and_billing();
 		}
+	}
+
+	/**
+	 * Maybe add UI for creating a guest account.
+	 *
+	 * By default, it will automatically generate a password and use the billing email as the username.
+	 * This way, the customer has no other fields to fill out.
+	 *
+	 * @since  4.0
+	 *
+	 * @return bool Whether or not to add a UI for account creation on checkout.
+	 */
+	private function maybe_add_guest_account() {
+
+		$email = wpsc_get_customer_meta( 'billingemail' );
+
+		return apply_filters( 'wpsc_checkout_maybe_add_guest_account', ( ! is_user_logged_in() ) && get_option( 'users_can_register' ) && ! empty( $email ) && ! username_exists( $email ) );
 	}
 
 	private function submit_shipping_and_billing() {
@@ -195,22 +215,23 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		if ( is_wp_error( $validation ) ) {
 			$this->message_collection->add(
-				__( 'Sorry but it looks like there are some errors with your submitted information.', 'wpsc' ),
+				__( 'Sorry, but it looks like there are some errors with your submitted information.', 'wp-e-commerce' ),
 				'error'
 			);
-			wpsc_set_validation_errors( $validation, $context = 'inline' );
+			wpsc_set_validation_errors( $validation, 'inline' );
 			return;
 		}
 
 		if ( ! empty( $_POST['wpsc_copy_billing_details'] ) ) {
 			_wpsc_copy_billing_details();
+		} else {
+			wpsc_update_customer_meta( 'wpsc_copy_billing_details', 'false' );
 		}
 
 		$this->save_shipping_and_billing_info();
 	}
 
-	private function save_shipping_and_billing_info() {
-		global $wpsc_cart;
+	public function get_purchase_log() {
 
 		// see if an existing purchase log has been set for this user
 		// otherwise create one
@@ -222,11 +243,19 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 			$purchase_log = new WPSC_Purchase_Log();
 		}
 
+		return $purchase_log;
+	}
+
+	public function save_shipping_and_billing_info() {
+		global $wpsc_cart;
+
+		$purchase_log = $this->get_purchase_log();
+
 		$sessionid = ( mt_rand( 100, 999 ) . time() );
 		wpsc_update_customer_meta( 'checkout_session_id', $sessionid );
 
 		$purchase_log->set( array(
-			'user_ID'        => wpsc_get_current_customer_id(),
+			'user_ID'        => get_current_user_id(),
 			'date'           => time(),
 			'plugin_version' => WPSC_VERSION,
 			'statusno'       => '0',
@@ -268,19 +297,31 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		_wpsc_update_location();
 
-		if ( wpsc_is_tax_included() ) {
-			$tax            = $wpsc_cart->calculate_total_tax();
+		//keep track of tax if taxes are exclusive
+		$wpec_taxes_controller = new wpec_taxes_controller();
+		if ( ! $wpec_taxes_controller->wpec_taxes_isincluded() ) {
+			$tax = $wpsc_cart->calculate_total_tax();
 			$tax_percentage = $wpsc_cart->tax_percentage;
 		} else {
-			$tax            = 0;
-			$tax_percentage = 0;
+			$tax = 0.00;
+			$tax_percentage = 0.00;
 		}
+
 		$purchase_log->set( array(
 			'wpec_taxes_total' => $tax,
 			'wpec_taxes_rate'  => $tax_percentage,
 		) );
 
 		$purchase_log->save();
+
+		//Check to ensure purchase log row was inserted successfully
+		if(is_null($purchase_log->get( 'id' ))) {
+			$this->message_collection->add(
+				__( 'A database error occurred while processing your request.', 'wp-e-commerce' ),
+				'error'
+			);
+			return;
+		}
 
 		$wpsc_cart->log_id = $purchase_log->get( 'id' );
 
@@ -292,7 +333,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		if ( wpsc_uses_shipping() && ! $this->shipping_calculator->has_quotes ) {
 			$this->message_collection->add(
-				__( 'Sorry but we cannot ship products to your submitted address. Please either provide another shipping address or contact the store administrator about product availability to your location.', 'wpsc' ),
+				__( 'Sorry, but we cannot ship products to your submitted address. Please either provide another shipping address or contact the store administrator about product availability to your location.', 'wp-e-commerce' ),
 				'error'
 			);
 
@@ -300,7 +341,10 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 		}
 
 		$this->wizard->completed_step( 'shipping-and-billing' );
-		wp_redirect( wpsc_get_checkout_url( $this->wizard->pending_step ) );
+
+		$url = add_query_arg( $_GET, wpsc_get_checkout_url( $this->wizard->pending_step ) );
+
+		wp_redirect( $url );
 		exit;
 	}
 
@@ -308,9 +352,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 		$this->init_shipping_calculator();
 		$this->view = 'checkout-shipping-method';
 
-		add_action( 'wp_enqueue_scripts',
-			array( $this, '_action_shipping_method_scripts' )
-		);
+		add_action( 'wp_enqueue_scripts', array( $this, '_action_shipping_method_scripts' ) );
 
 		if ( isset( $_POST['action'] ) && $_POST['action'] == 'submit_shipping_method' ) {
 			$this->submit_shipping_method();
@@ -334,6 +376,8 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		$submitted_value = $_POST['wpsc_shipping_option'];
 		$found           = false;
+		$module_name     = '';
+		$option          = '';
 
 		foreach ( $this->shipping_calculator->quotes as $module_name => $quotes ) {
 			foreach ( $quotes as $option => $cost ) {
@@ -353,18 +397,21 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		$this->wizard->completed_step( 'shipping-method' );
 
-		/* @todo: I _think_ this will be fine, as $module_name should still be defined at this execution path from the loop, but we need to confirm. */
 		$this->shipping_calculator->set_active_method( $module_name, $option );
-		wp_redirect( wpsc_get_checkout_url( $this->wizard->pending_step ) );
+
+		$url = add_query_arg( $_GET, wpsc_get_checkout_url( $this->wizard->pending_step ) );
+		wp_redirect( $url );
 		exit;
 	}
 
 	public function payment() {
 		$this->view = 'checkout-payment';
-		add_action(
-			'wp_enqueue_scripts',
-			array( $this, '_action_payment_scripts' )
-		);
+
+		add_action( 'wp_enqueue_scripts', array( $this, '_action_payment_scripts' ) );
+
+		if ( $this->maybe_add_guest_account() ) {
+			add_filter( 'wpsc_get_checkout_payment_method_form_args', 'wpsc_create_account_checkbox' );
+		}
 
 		if ( isset( $_POST['action'] ) && $_POST['action'] == 'submit_payment_method' ) {
 			$this->submit_payment_method();
@@ -380,32 +427,37 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		if ( empty( $_POST['wpsc_payment_method'] ) && ! wpsc_is_free_cart() ) {
 			$this->message_collection->add(
-				__( 'Please select a payment method', 'wpsc' ),
+				__( 'Please select a payment method', 'wp-e-commerce' ),
 				'validation'
 			);
 		}
 
-		$valid = apply_filters(
-			'_wpsc_merchant_v2_validate_payment_method',
-			true,
-			$this
-		);
+		$valid = apply_filters( '_wpsc_merchant_v2_validate_payment_method', true, $this );
 
 		if ( ! $valid ) {
 			return;
 		}
 
+		$purchase_log_id   = wpsc_get_customer_meta( 'current_purchase_log_id' );
+		$purchase_log      = new WPSC_Purchase_Log( $purchase_log_id );
 		$submitted_gateway = $_POST['wpsc_payment_method'];
 
-		$purchase_log_id = wpsc_get_customer_meta( 'current_purchase_log_id' );
-		$purchase_log    = new WPSC_Purchase_Log( $purchase_log_id );
-
-		$purchase_log->set( 'gateway', $submitted_gateway );
 		$purchase_log->set( array(
 			'gateway'       => $submitted_gateway,
 			'base_shipping' => $wpsc_cart->calculate_base_shipping(),
 			'totalprice'    => $wpsc_cart->calculate_total_price(),
 		) );
+
+		if ( $this->maybe_add_guest_account() && isset( $_POST['wpsc_create_account'] ) ) {
+
+			$email   = wpsc_get_customer_meta( 'billingemail' );
+			$user_id = wpsc_register_customer( $email, $email, false );
+			$purchase_log->set( 'user_ID', $user_id );
+
+			wpsc_update_customer_meta( 'checkout_details', wpsc_get_customer_meta( 'checkout_details' ), $user_id );
+
+			update_user_meta( $user_id, '_wpsc_visitor_id', wpsc_get_current_customer_id() );
+		}
 
 		$purchase_log->save();
 
@@ -418,7 +470,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 
 		do_action( 'wpsc_submit_checkout', array(
 			'purchase_log_id' => $purchase_log_id,
-			'our_user_id'     => wpsc_get_current_customer_id(),
+			'our_user_id'     => isset( $user_id ) ? $user_id : get_current_user_id(),
 		) );
 
 		do_action( 'wpsc_submit_checkout_gateway', $submitted_gateway, $purchase_log );
@@ -435,10 +487,10 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 	private function init_checkout_wizard() {
 		$this->wizard = WPSC_Checkout_Wizard::get_instance();
 		$this->wizard->steps = array(
-			'shipping-and-billing' => __( 'Details', 'wpsc' ),
-			'shipping-method'      => __( 'Delivery', 'wpsc' ),
-			'payment'              => __( 'Place Order', 'wpsc' ),
-			'results'              => __( 'Complete', 'wpsc' ),
+			'shipping-and-billing' => __( 'Details', 'wp-e-commerce' ),
+			'shipping-method'      => __( 'Delivery', 'wp-e-commerce' ),
+			'payment'              => __( 'Place Order', 'wp-e-commerce' ),
+			'results'              => __( 'Complete', 'wp-e-commerce' ),
 		);
 
 		if ( ! wpsc_uses_shipping() ) {
@@ -461,11 +513,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 			return;
 		}
 
-		$current_log_id = wpsc_get_customer_meta( 'current_purchase_log_id', '' );
-
-		if ( ! $current_log_id ) {
-			return;
-		}
+		$current_log_id = $this->get_purchase_log();
 
 		require_once( WPSC_TE_V2_CLASSES_PATH . '/shipping-calculator.php' );
 		$this->shipping_calculator = new WPSC_Shipping_Calculator( $current_log_id );
@@ -479,7 +527,8 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 			'tax' =>
 				  ( wpsc_is_tax_enabled() && ! wpsc_is_tax_included() )
 				? (float) wpsc_cart_tax( false )
-				: 0
+				: 0,
+			'discount' => wpsc_coupon_amount( false ) > 0 ? wpsc_coupon_amount( false ) : 0
 		);
 
 		foreach ( $this->shipping_calculator->sorted_quotes as $module_name => $quotes ) {
@@ -492,7 +541,7 @@ class WPSC_Controller_Checkout extends WPSC_Controller {
 		$currency          = new WPSC_Country( get_option( 'currency_type' ) );
 		$currency_code     = $currency->get_currency_code();
 		$isocode           = $currency->get_isocode();
-		$without_fractions = in_array( $currency_code, array( 'JPY', 'HUF', 'VND' ) );
+		$without_fractions = in_array( $currency_code, WPSC_Payment_Gateways::currencies_without_fractions() );
 
 		$decimals = $without_fractions ? 0 : 2;
 		$decimals            = apply_filters( 'wpsc_modify_decimals'                 , $decimals, $isocode );

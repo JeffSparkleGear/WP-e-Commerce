@@ -215,7 +215,7 @@ function wpsc_list_product_templates( $path = '' ) {
 function wpsc_theme_upgrade_notice() { ?>
 
 	<div id="message" class="updated fade">
-		<p><?php printf( __( '<strong>WP eCommerce is ready</strong>. If you plan on editing the look of your site, you should <a href="%1s">update your active theme</a> to include the additional WP eCommerce files. <a href="%2s">Click here</a> to ignore and remove this box.', 'wpsc' ), admin_url( 'admin.php?page=wpsc-settings&tab=presentation' ), admin_url( 'admin.php?page=wpsc-settings&tab=presentation&wpsc_notices=theme_ignore' ) ) ?></p>
+		<p><?php printf( __( '<strong>WP eCommerce is ready</strong>. If you plan on editing the look of your site, you should <a href="%1s">update your active theme</a> to include the additional WP eCommerce files. <a href="%2s">Click here</a> to ignore and remove this box.', 'wp-e-commerce' ), admin_url( 'admin.php?page=wpsc-settings&tab=presentation' ), admin_url( 'admin.php?page=wpsc-settings&tab=presentation&wpsc_notices=theme_ignore' ) ) ?></p>
 	</div>
 
 <?php
@@ -232,7 +232,7 @@ function wpsc_theme_upgrade_notice() { ?>
 function wpsc_database_update_notice() { ?>
 
 	<div class="error fade">
-		<p><?php printf( __( '<strong>Your WP eCommerce data needs to be updated</strong>. You\'ve upgraded from a previous version of the WP eCommerce plugin, and your store needs updating.<br>You should <a href="%1s">update your database</a> for your store to continue working.', 'wpsc' ), admin_url( 'index.php?page=wpsc-update' ) ) ?></p>
+		<p><?php printf( __( '<strong>Your WP eCommerce data needs to be updated</strong>. You\'ve upgraded from a previous version of the WP eCommerce plugin, and your store needs updating.<br>You should <a href="%1s">update your database</a> for your store to continue working.', 'wp-e-commerce' ), admin_url( 'index.php?page=wpsc-update' ) ) ?></p>
 	</div>
 
 <?php
@@ -245,7 +245,7 @@ function wpsc_theme_admin_notices() {
 	if ( false !== get_option( 'wpsc_version' ) ) {
 
 		// Database update notice is most important
-		if ( version_compare( get_option( 'wpsc_version' ), 3.8, '<' ) ) {
+		if ( version_compare( get_option ( 'wpsc_version' ), 3.8, '<' ) ) {
 
 			add_action ( 'admin_notices', 'wpsc_database_update_notice' );
 
@@ -274,7 +274,7 @@ function wpsc_theme_admin_notices() {
 function wpsc_turn_on_wp_register() {?>
 
 	<div id="message" class="updated fade">
-		<p><?php printf( __( '<strong>Store Settings</strong>: You have set \'users must register before checkout\', for this to work you need to check \'Anyone can register\' in your WordPress <a href="%1s">General Settings</a>.', 'wpsc' ), admin_url( 'options-general.php' ) ) ?></p>
+		<p><?php printf( __( '<strong>Store Settings</strong>: You have set \'users must register before checkout\', for this to work you need to check \'Anyone can register\' in your WordPress <a href="%1s">General Settings</a>.', 'wp-e-commerce' ), admin_url( 'options-general.php' ) ) ?></p>
 	</div>
 
 <?php
@@ -567,7 +567,28 @@ function wpsc_single_template( $content ) {
 
 		$is_preview = isset( $wp_query->query_vars['preview'] ) && $wp_query->query_vars['preview'];
 
-		$wpsc_temp_query = new WP_Query( array( 'p' => $wp_query->post->ID , 'post_type' => 'wpsc-product','posts_per_page' => 1, 'preview' => $is_preview ) );
+		$post_type_object = get_post_type_object( 'wpsc-product' );
+
+		/**
+		 * Filter post_status on product query.
+		 *
+		 * Assumes publish, if user has edit_posts capability, can override
+		 *
+		 * @since 4.1.0
+		 *
+		 * @param array array() Allowed post_status values.
+		 */
+		$permitted_post_statuses = current_user_can( $post_type_object->cap->edit_posts ) ? apply_filters( 'wpsc_product_display_status', array( 'publish' ) ) : array( 'publish' );
+
+		$wpsc_temp_query = new WP_Query(
+			array(
+				'p'              => $wp_query->post->ID ,
+				'post_type'      => 'wpsc-product',
+				'posts_per_page' => 1,
+				'preview'        => $is_preview,
+				'post_status'    => $permitted_post_statuses,
+			)
+		);
 
 		list( $wp_query, $wpsc_temp_query ) = array( $wpsc_temp_query, $wp_query ); // swap the wpsc_query object
 		$_wpsc_is_in_custom_loop = true;
@@ -1278,7 +1299,7 @@ function wpsc_display_featured_products_page() {
  */
 function wpsc_hidesubcatprods_init() {
 
-	_wpsc_doing_it_wrong( 'wpsc_hidesubcatprods_init', __( 'This function is deprecated. There is no direct replacement. Hiding subcategory products in parent categories is now handled by the private wpsc_hide_subcatsprods_in_cat_query() function.', 'wpsc' ), '4.0' );
+	_wpsc_doing_it_wrong( 'wpsc_hidesubcatprods_init', __( 'This function is deprecated. There is no direct replacement. Hiding subcategory products in parent categories is now handled by the private wpsc_hide_subcatsprods_in_cat_query() function.', 'wp-e-commerce' ), '4.0' );
 
 }
 

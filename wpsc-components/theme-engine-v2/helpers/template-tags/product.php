@@ -3,7 +3,7 @@
  * Whether current product loop has results to loop over.
  *
  * @see   WP_Query::have_posts()
- * @since 0.1
+ * @since 4.0
  *
  * @return bool
  */
@@ -15,7 +15,7 @@ function wpsc_have_products() {
  * Iterate the product index of the loop.
  *
  * @see   WP_Query::the_post()
- * @since 0.1
+ * @since 4.0
  */
 function wpsc_the_product() {
 	the_post();
@@ -24,7 +24,7 @@ function wpsc_the_product() {
 /**
  * Return the current product ID in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_the_ID()
  *
  * @return int The Product ID
@@ -36,7 +36,7 @@ function wpsc_get_product_id() {
 /**
  * Output the current product ID in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  the_ID()
  */
 function wpsc_product_id() {
@@ -46,7 +46,7 @@ function wpsc_product_id() {
 /**
  * Output the class attribute of the current product in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  post_class()
  */
 function wpsc_product_class( $class = '', $post_id = null ) {
@@ -64,7 +64,7 @@ function wpsc_get_product_class( $class, $post_id = null ) {
 /**
  * Return the product permalink.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_get_product_permalink' filter
  * @uses  get_permalink()
  *
@@ -83,7 +83,7 @@ function wpsc_get_product_permalink( $id = 0, $leavename = false ) {
 /**
  * Output the permalink of the current product in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_product_permalink()
  */
 function wpsc_product_permalink( $id = 0 ) {
@@ -100,7 +100,7 @@ function wpsc_product_permalink( $id = 0 ) {
  * esc_attr()} before it is passed to the user or displayed. The default
  * as with {@link wpsc_product_title()}, is to display the title.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  esc_attr()
  * @uses  wp_parse_args()
  * @uses  wpsc_get_product_title()
@@ -116,14 +116,12 @@ function wpsc_product_title_attribute( $args = '' ) {
 	}
 
 	$defaults = array( 'before' => '', 'after' =>  '', 'echo' => true );
-	$r        = wp_parse_args( $args, $defaults);
+	$r        = wp_parse_args( $args, $defaults );
 
-	extract( $r, EXTR_SKIP );
-
-	$title = $before . $title . $after;
+	$title = $r['before'] . $title . $r['after'];
 	$title = esc_attr( strip_tags( $title ) );
 
-	if ( $echo ) {
+	if ( $r['echo'] ) {
 		echo $title;
 	} else {
 		return $title;
@@ -134,7 +132,7 @@ function wpsc_product_title_attribute( $args = '' ) {
 /**
  * Return the title a product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses apply_filters() Applies 'wpsc_get_product_title' filter
  * @uses get_the_title()
  *
@@ -148,7 +146,7 @@ function wpsc_get_product_title( $id = 0 ) {
 /**
  * Output the title of the current product in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters()          Applies 'wpsc_product_title' filter.
  * @uses  wpsc_get_product_title()
  *
@@ -185,7 +183,7 @@ function wpsc_product_title( $before = '', $after = '', $id = 0, $echo = true ) 
  *     'after'     - HTML after the list. Defaults to ''.
  *     'separator' - The separator of list items. Defaults to ', '.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_the_term_list()
  * @uses  wp_parse_args()
  *
@@ -197,7 +195,7 @@ function wpsc_get_product_category_list( $args = '' ) {
 		'id'        => 0,
 		'before'    => '',
 		'after'     => '',
-		'separator' => __( ', ', 'category list separator', 'wpsc' ),
+		'separator' => _x( ', ', 'category list separator', 'wp-e-commerce' ),
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -210,7 +208,7 @@ function wpsc_get_product_category_list( $args = '' ) {
 /**
  * Output the category list of the current product in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_product_category_list()
  *
  * @param string $args Optional. Defaults to ''. See {@link wpsc_get_product_category_list()} for the full list of arguments you can use to customize the output.
@@ -222,7 +220,7 @@ function wpsc_product_category_list( $args = '' ) {
 /**
  * Return HTML for the list of product tags.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_the_term_list()
  * @uses  wp_parse_args()
  *
@@ -234,7 +232,7 @@ function wpsc_get_product_tag_list( $args = '' ) {
 		'id'        => 0,
 		'before'    => '',
 		'after'     => '',
-		'separator' => __( ', ', 'tag list separator', 'wpsc' ),
+		'separator' => _x( ', ', 'tag list separator', 'wp-e-commerce' ),
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -247,7 +245,7 @@ function wpsc_get_product_tag_list( $args = '' ) {
 /**
  * Return the number of categories associated with a product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_the_terms()
  *
  * @param  int $id Optional. Product ID. Defaults to current product in the loop.
@@ -266,7 +264,7 @@ function wpsc_get_product_category_count( $id = 0 ) {
 /**
  * Return the number of tags associated with a product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_the_terms()
  *
  * @param  int $id Optional. Product ID. Defaults to current product in the loop.
@@ -285,7 +283,7 @@ function wpsc_get_product_tag_count( $id = 0 ) {
 /**
  * Output the edit link of a product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_edit_product_link' filter.
  * @uses  edit_post_link()
  * @uses  wp_parse_args()
@@ -297,7 +295,7 @@ function wpsc_edit_product_link( $args = '' ) {
 		'id'     => 0,
 		'before' => '<span class="edit-link">',
 		'after'  => '</span>',
-		'title'  => _x( 'Edit This Product', 'product edit link template tag', 'wpsc' ),
+		'title'  => _x( 'Edit This Product', 'product edit link template tag', 'wp-e-commerce' ),
 	);
 
 	$defaults = apply_filters( 'wpsc_edit_product_link_default_args', $defaults );
@@ -313,7 +311,7 @@ function wpsc_edit_product_link( $args = '' ) {
 /**
  * Return the ID of the product thumbnail of a product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_post_thumbnail_id()
  *
  * @param  null|int $product_id Optional. The product ID. Defaults to the current product ID in the loop.
@@ -352,6 +350,64 @@ function wpsc_get_product_thumbnail_id( $product_id = null ) {
 }
 
 /**
+ * Sets the structured product name to the product title.
+ *
+ * @param  array $crumbs Array of breadcrumb elements.
+ *
+ * @since  4.0
+ *
+ * @return array         Array of breadcrumb elements with product title structured semantically.
+ */
+function wpsc_set_structured_product_name( $crumbs ) {
+
+	if ( wpsc_is_single() ) {
+		$product = str_replace( 'wpsc-breadcrumb-item"', 'wpsc-breadcrumb-item" itemprop="name"', array_pop( $crumbs ) );
+		$crumbs[] = $product;
+	}
+
+	return $crumbs;
+}
+
+add_filter( 'wpsc_breadcrumb_array', 'wpsc_set_structured_product_name' );
+
+/**
+ * Template tag for base country currency code.
+ *
+ * Helpful for templates using structured data, likely other use cases.
+ * Temporarily located here, until #1865 lands.
+ *
+ * @since  4.0
+ *
+ * @return  string Base country currency code.
+ */
+function wpsc_base_country_code() {
+
+	$base = new WPSC_Country( wpsc_get_base_country() );
+
+	echo esc_attr( $base->get_currency_code() );
+}
+
+/**
+ * Sets structured data for product thumbnails.
+ *
+ * @param  string $html Product thumbnail HTML.
+ *
+ * @since  4.0
+ *
+ * @return string $html Product thumbnail HTML with strucutred data.
+ */
+function wpsc_set_structured_image_data( $html ) {
+
+	if ( ! wpsc_is_single() ) {
+		return $html;
+	}
+
+	return str_replace( '<img', '<img itemprop="image"', $html );
+}
+
+add_filter( 'post_thumbnail_html', 'wpsc_set_structured_image_data' );
+
+/**
  * Return the HTML of a product's featured thumbnail.
  *
  * Note that the $size argument of this function is different from that of get_the_post_thumbnail().
@@ -364,7 +420,7 @@ function wpsc_get_product_thumbnail_id( $product_id = null ) {
  *     'cart'     - corresponds to the cart product thumbnail size option.
  *
  * @see   wpsc_check_thumbnail_support() Where the thumbnail sizes are registered.
- * @since 0.1
+ * @since 4.0
  *
  * @uses  $_wp_additional_image_sizes The array holding registered thumbnail sizes.
  * @uses  get_attached_file()
@@ -441,7 +497,7 @@ function wpsc_get_product_thumbnail( $id = null, $size = false, $attr = '' ) {
 /**
  * Output the thumbnail for the current product in the loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_product_thumbnail()
  *
  * @param  string $size Optional. Defaults to 'single'. See {@link wpsc_get_product_thumbnail()} for a list of available sizes you can use.
@@ -455,7 +511,7 @@ function wpsc_product_thumbnail( $size = false, $attr = '' ) {
  * Output a dummy thumbnail image in case the current product in the loop does not have a specified
  * featured thumbnail.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  $_wp_additional_image_size The array containing registered image sizes
  * @uses  apply_filters() Applies 'wpsc_product_no_thumbnail_url' filter
  * @uses  apply_filters() Applies 'wpsc_product_no_thumbnail_html' filter
@@ -513,7 +569,7 @@ function wpsc_product_no_thumbnail_image( $size = false, $attr = '' ) {
  * Output the description of the current product in the loop.
  *
  * @see   wpsc_get_product_description()
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'the_content' filter
  * @uses  apply_filters() Applies 'wpsc_product_description' filter
  * @uses  wpsc_get_product_description()
@@ -543,7 +599,7 @@ function wpsc_product_description( $more_link_text = null, $mode = 'with-teaser'
  *     'only-teaser' - Only the teaser is displayed, the text after <!--more--> tag will be ignored
  *     'no-teaser'   - The teaser is stripped out.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  add_filter()      Adds 'wpsc_filter_remove_content_more_link' to 'the_content_more_link' filter
  * @uses  apply_filters()   Applies 'wpsc_get_product_description' filter hook
  * @uses  get_the_content() Retrieves product's description
@@ -561,10 +617,10 @@ function wpsc_get_product_description( $more_link_text = null, $mode = 'with-tea
 	}
 
 	if ( ! $more_link_text ) {
-		$more_link_text = __( 'More details &raquo;', 'wpsc' );
+		$more_link_text = __( 'More details &raquo;', 'wp-e-commerce' );
 	}
 
-	$content = get_the_content( $more_link_text, $stripteaser );
+	$content = in_the_loop() ? get_the_content( $more_link_text, $stripteaser ) : get_post_field( 'post_content', get_queried_object_id() );
 
 	if ( $mode == 'only-teaser' ) {
 		remove_filter( 'the_content_more_link', '__return_empty_string', 99 );
@@ -582,7 +638,7 @@ function wpsc_get_product_description( $more_link_text = null, $mode = 'with-tea
  * Display the drop down listing child variation terms of a variation set associated with a certain
  * product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_product_variation_set_dropdown()
  *
  * @param  int $variation_set_id The term_id of the variation set.
@@ -639,7 +695,7 @@ function wpsc_product_variation_dropdown( $args = '' ) {
 /**
  * Return the HTML for variation set dropdown of a certain product.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  wpsc_get_product_id()
  *
  * @param  int $variation_set_id The term_id of the variation set.
@@ -671,7 +727,7 @@ function wpsc_get_product_variation_set_dropdown( $variation_set_id, $product_id
  * See {@link wpsc_get_product_original_price()} for more information about the $format
  * argument.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_product_original_price' filter.
  * @uses  wpsc_get_product_original_price()
  *
@@ -689,7 +745,7 @@ function wpsc_product_original_price( $product_id = null, $from_text = true ) {
  *     'string' - Return the price with currency symbol and 2 decimal places (e.g. $10.26)
  *     'float'  - Return an unformatted numeric value with no currency symbol (e.g. 10.259)
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_get_product_original_price' filter.
  * @uses  get_post_meta()
  * @uses  wpsc_format_currency()
@@ -716,7 +772,7 @@ function wpsc_get_product_original_price( $product_id = null, $from_text = true 
 }
 
 function _wpsc_get_from_text( $price ) {
-	$from_text = apply_filters( 'wpsc_from_text', __( 'from %s', 'wpsc' ) );
+	$from_text = apply_filters( 'wpsc_from_text', __( 'from %s', 'wp-e-commerce' ) );
 	$from_text = sprintf( $from_text, $price );
 	return $from_text;
 }
@@ -726,7 +782,7 @@ function _wpsc_get_from_text( $price ) {
  *
  * See {@link wpsc_get_product_sale_price()} for more information about the $format argument.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_product_sale_price' filter.
  * @uses  wpsc_get_product_sale_price()
  *
@@ -748,7 +804,7 @@ function wpsc_product_you_save( $product_id = null, $format = false, $from_text 
  *     'string' - Return the price with currency symbol and 2 decimal places (e.g. $10.26)
  *     'float'  - Return an unformatted numeric value with no currency symbol (e.g. 10.259)
  *
- * @since 0.1
+ * @since 4.0
  * @uses  apply_filters() Applies 'wpsc_get_product_sale_price' filter.
  * @uses  get_post_meta()
  * @uses  wpsc_format_currency()
@@ -781,7 +837,7 @@ function wpsc_get_product_you_save( $product_id = null, $format = false, $from_t
 
 	if ( ! $format ) {
 		/* translators: %1$s: saving amount, %2$s: saving percent */
-		$format = _x( '%1$s (%2$s)', 'product saving format', 'wpsc' );
+		$format = _x( '%1$s (%2$s)', 'product saving format', 'wp-e-commerce' );
 	}
 
 	$product = WPSC_Product::get_instance( $product_id );
@@ -789,7 +845,7 @@ function wpsc_get_product_you_save( $product_id = null, $format = false, $from_t
 	$saving         = wpsc_format_currency( $product->saving );
 	$saving_percent = sprintf(
 		/* translators: %1$s: saving percent, %%: percentage sign */
-		_x( '%1$s%%', 'product saving percent', 'wpsc' ),
+		_x( '%1$s%%', 'product saving percent', 'wp-e-commerce' ),
 		$product->saving_percent
 	);
 
@@ -806,7 +862,7 @@ function wpsc_get_product_you_save( $product_id = null, $format = false, $from_t
 /**
  * Wraps the read more link with a custom class.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_post_type()
  *
  * @param  string $link
@@ -846,7 +902,7 @@ function wpsc_product_pagination( $position = 'bottom' ) {
 /**
  * Return the number of pages for the current loop.
  *
- * @since 0.1
+ * @since 4.0
  *
  * @return int
  */
@@ -858,7 +914,7 @@ function wpsc_product_pagination_page_count() {
 /**
  * Output the pagination count.
  *
- * @since 0.1
+ * @since 4.0
  * @uses apply_filters() Applies 'wpsc_product_pagination_count' filter.
  * @uses get_query_var()
  * @uses wpsc_get_current_page_number()
@@ -880,14 +936,14 @@ function wpsc_product_pagination_count() {
 
 	if ( $total > 1 ) {
 		if ( $from == $to ) {
-			$output = sprintf( __( 'Viewing product %1$s (of %2$s total)', 'wpsc' ), $from, $total );
+			$output = sprintf( __( 'Viewing product %1$s (of %2$s total)', 'wp-e-commerce' ), $from, $total );
 		} elseif ( $total_pages === 1 ) {
-			$output = sprintf( __( 'Viewing %1$s products', 'wpsc' ), $total );
+			$output = sprintf( __( 'Viewing %1$s products', 'wp-e-commerce' ), $total );
 		} else {
-			$output = sprintf( __( 'Viewing %1$s products - %2$s through %3$s (of %4$s total)', 'wpsc' ), $post_count, $from, $to, $total );
+			$output = sprintf( __( 'Viewing %1$s products - %2$s through %3$s (of %4$s total)', 'wp-e-commerce' ), $post_count, $from, $to, $total );
 		}
 	} else {
-		$output = sprintf( __( 'Viewing %1$s product', 'wpsc' ), $total );
+		$output = sprintf( __( 'Viewing %1$s product', 'wp-e-commerce' ), $total );
 	}
 
 	// Filter and return
@@ -897,7 +953,7 @@ function wpsc_product_pagination_count() {
 /**
  * Return the current page number of the current loop.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  get_query_var()
  *
  * @return int
@@ -917,7 +973,7 @@ function wpsc_get_current_page_number() {
  *
  * See {@link paginate_links()} for the available options that you can use with this function.
  *
- * @since 0.1
+ * @since 4.0
  * @uses  $wp_rewrite
  * @uses  apply_filters() Applies 'wpsc_product_pagination_links'      filter.
  * @uses  apply_filters() Applies 'wpsc_product_pagination_links_args' filter.
@@ -954,8 +1010,8 @@ function wpsc_get_product_pagination_links( $args = '' ) {
 		'format'    => $format,
 		'total'     => $wp_query->max_num_pages,
 		'current'   => wpsc_get_current_page_number(),
-		'prev_text' => is_rtl() ? __( '&rarr;', 'wpsc' ) : __( '&larr;', 'wpsc' ),
-		'next_text' => is_rtl() ? __( '&larr;', 'wpsc' ) : __( '&rarr;', 'wpsc' ),
+		'prev_text' => is_rtl() ? __( '&rarr;', 'wp-e-commerce' ) : __( '&larr;', 'wp-e-commerce' ),
+		'next_text' => is_rtl() ? __( '&larr;', 'wp-e-commerce' ) : __( '&rarr;', 'wp-e-commerce' ),
 		'end_size'  => 3,
 		'mid_size'  => 2,
 	);
@@ -971,7 +1027,7 @@ function wpsc_product_pagination_links( $args = '' ) {
 }
 
 function wpsc_get_category_archive_title() {
-	$title = sprintf( __( 'Product Category: %s', 'wpsc' ), '<span>' . single_term_title( '', false ) . '</span>' );
+	$title = sprintf( __( 'Product Category: %s', 'wp-e-commerce' ), '<span>' . single_term_title( '', false ) . '</span>' );
 	return apply_filters( 'wpsc_get_category_archive_title', $title );
 }
 
@@ -1004,7 +1060,7 @@ function wpsc_get_category_filter( $args = '' ) {
 		'divider'                   => '|',
 		'drill_down_divider'        => '&raquo;',
 		'padding'                   => 1,
-		'all_text'                  => _x( 'All', 'category filter', 'wpsc' ),
+		'all_text'                  => _x( 'All', 'category filter', 'wp-e-commerce' ),
 	);
 
 	$defaults = apply_filters( 'wpsc_get_category_filter_default_args', $defaults );
@@ -1061,7 +1117,7 @@ function wpsc_get_category_filter( $args = '' ) {
 
 		// First item is always "All"
 		$before_all  = sprintf( $before_item, 'wpsc-category-filter-drill-down-item wpsc-category-filter-drill-down-item-all' );
-		$link        = '<a href="' . esc_url( wpsc_get_store_url() ) . '">' . esc_html_x( 'All', 'category filter', 'wpsc' ) . '</a>';
+		$link        = '<a href="' . esc_url( wpsc_get_store_url() ) . '">' . esc_html_x( 'All', 'category filter', 'wp-e-commerce' ) . '</a>';
 		$drilldown[] = $before_all . $link . $drill_down_divider . $after_item;
 
 		$ancestors = array_reverse( $ancestors );
@@ -1104,7 +1160,7 @@ function wpsc_get_category_filter( $args = '' ) {
 
 		// First item is always "All"
 		$before_all = sprintf( $before_item, 'wpsc-category-filter-item wpsc-category-filter-item-all' );
-		$link       = '<a href="' . esc_url( wpsc_get_store_url() ) . '">' . esc_html_x( 'All', 'category filter', 'wpsc' ) . '</a>';
+		$link       = '<a href="' . esc_url( wpsc_get_store_url() ) . '">' . esc_html_x( 'All', 'category filter', 'wp-e-commerce' ) . '</a>';
 		$filters[]  = $before_all . $link . $divider . $after_item;
 	}
 

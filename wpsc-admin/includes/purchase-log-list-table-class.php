@@ -77,7 +77,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 
 		if ( isset( $_REQUEST['post'] ) ) {
 			$posts   = array_map( 'absint', $_REQUEST['post'] );
-			$where[] = 'p.id IN (' . implode( ', ', $posts ) . ')';
+			$where[] = ' and (p.id IN (' . implode( ', ', $posts ) . '))';
 		}
 
 		$i = 1;
@@ -126,28 +126,42 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$search_sql = implode( ' AND ', array_values( $search_sql ) );
 
 		if ( $search_sql ) {
-			$where[] = $search_sql;
+			$where[] = " AND ({$search_sql})";
 		}
 
 		// filter by status
 		if ( ! empty( $_REQUEST['status'] ) && $_REQUEST['status'] != 'all' ) {
 			$this->status = absint( $_REQUEST['status'] );
-			$where[] = 'processed = ' . $this->status;
+			$where[] = ' AND (processed = ' . $this->status .')';
 		}
 
-		$this->where_no_filter = implode( ' AND ', $where );
+		$this->where_no_filter = implode( ' ', $where );
 
 		// filter by month
 		if ( ! empty( $_REQUEST['m'] ) ) {
-			$year = (int) substr( $_REQUEST['m'], 0, 4);
-			$month = (int) substr( $_REQUEST['m'], -2 );
-			$where[] = "YEAR(FROM_UNIXTIME(date)) = " . esc_sql( $year );
-			$where[] = "MONTH(FROM_UNIXTIME(date)) = " . esc_sql( $month );
+
+			// so we can tell WP_Date_Query we're legit
+			add_filter( 'date_query_valid_columns', array( $this, 'set_date_column_to_date') );
+
+			if ( strlen( $_REQUEST['m'] ) < 4 ) {
+				$query_args = $this->assemble_predefined_periods_query( $_REQUEST['m'] );
+			} else {
+				$query_args = array(
+					'year'     => (int) substr( $_REQUEST['m'], 0, 4),
+					'monthnum' => (int) substr( $_REQUEST['m'], -2 ),
+				);
+			}
+
+			$date_query = new WP_Date_Query( $query_args , $column = '__date__' );
+			/* this is a subtle hack since the FROM_UNIXTIME doesn't survive WP_Date_Query
+			 * so we use __date__ as a proxy
+			 */
+			$where[] = str_replace( '__date__', 'FROM_UNIXTIME(p.date)', $date_query->get_sql() );
 		}
 
 		$selects     = apply_filters( 'wpsc_manage_purchase_logs_selects', implode( ', ', $selects ) );
 		$this->joins = apply_filters( 'wpsc_manage_purchase_logs_joins'  , implode( ' ', $joins ) );
-		$this->where = apply_filters( 'wpsc_manage_purchase_logs_where'  , implode( ' AND ', $where ) );
+		$this->where = apply_filters( 'wpsc_manage_purchase_logs_where'  , implode( ' ', $where ) );
 
 		$limit = ( $this->per_page !== 0 ) ? "LIMIT {$offset}, {$this->per_page}" : '';
 
@@ -157,7 +171,6 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$orderby = esc_sql( apply_filters( 'wpsc_manage_purchase_logs_orderby', $orderby ) );
 		$order   = esc_sql( $order );
 
-		$submitted_data_log = WPSC_TABLE_SUBMITTED_FORM_DATA;
 		$purchase_log_sql   = apply_filters( 'wpsc_manage_purchase_logs_sql', "
 			SELECT SQL_CALC_FOUND_ROWS {$selects}
 			FROM " . WPSC_TABLE_PURCHASE_LOGS . " AS p
@@ -180,7 +193,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$total_where = apply_filters( 'wpsc_manage_purchase_logs_total_where', $this->where );
 
 		if ( $this->status == 'all' ) {
-			$total_where .= ' AND p.processed IN (2, 3, 4) ';
+			$total_where .= ' AND p.processed IN (3, 4, 5) ';
 		}
 
 		$total_sql = "
@@ -191,6 +204,170 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		";
 
 		$this->total_amount = $wpdb->get_var( $total_sql );
+	}
+
+	/**
+	 * Construct the date queries for pre-defined periods in the Sales Log.
+	 *
+	 * Supports pre-defined periods for the purchase log, including today, yesterday, this week,
+	 * last week, this month, last month, last two months + month to date (this quarter),
+	 * prior 3 months, this year, last year. You can insert your own custom periods by filtering
+	 * either based on the $period_flag or just filter the final query setup.
+	 *
+	 * @since 4.0
+	 *
+	 * @param array $period_flag The period requested from $_REQUEST['m'].
+	 *
+	 * @return array formatted to pass to WP_Date_Query.
+	 */
+
+	private function assemble_predefined_periods_query( $period_flag ){
+		// warning: period flag is unsanitized user input directly from $_REQUEST - only compare against actual values
+
+		/**
+		 *	date functions
+		 */
+		$now_string     = current_time( 'mysql' );
+		$week_start_end = get_weekstartend( $now_string ); // returns array with start/end
+		$blog_time_zone = get_option( 'timezone_string' );
+
+		if ( empty( $blog_time_zone ) ) {
+			$blog_time_zone = date_default_timezone_get();
+		}
+
+		$timezone = new DateTimeZone( $blog_time_zone );
+		$now      = new DateTime( 'now',  $timezone );
+
+		// Based on $_REQUEST['m']
+		switch ( $period_flag ) {
+			// Today
+			case 1:
+				$date_query = array(
+					'year'     => $now->format( 'Y' ),
+					'monthnum' => $now->format( 'n' ),
+					'day'      => $now->format( 'd' )
+				);
+				break;
+
+			// Yesterday
+			case 2:
+				$yesterday = new DateTime( date( 'Y-m-d', strtotime( 'yesterday' ) ), $timezone );
+				$date_query = array(
+					'year'     => $yesterday->format( 'Y' ),
+					'monthnum' => $yesterday->format( 'n' ),
+					'day'      => $yesterday->format( 'd' )
+				);
+				break;
+
+			// This Week-to-date
+			case 3:
+				$start_of_this_week = new DateTime( date( 'Y-m-d 00:00:00', $week_start_end['start'] ), $timezone );
+				$date_query = array( 'date_query' => array(
+					'after' 	=> $start_of_this_week->format('Y-m-d 00:00:00'),
+					'compare'	=> '>',
+					'inclusive'	=> true
+					));
+				break;
+
+			// Last Week
+			case 4:
+				$start_of_last_week = new DateTime( date('Y-m-d 00:00:00', $week_start_end['start'] - ( DAY_IN_SECONDS * 7 ) ), $timezone );
+				$start = $start_of_last_week->format( 'Y-m-d 00:00:00' );
+				$start_of_last_week->modify( '+7 days' );
+				$date_query = array( 'date_query' => array(
+					'after'	    => $start,
+					'before'    => $start_of_last_week->format( 'Y-m-d 00:00:00' ),
+					'inclusive'	=> false,
+				));
+				break;
+
+			// This Month-to-Date (Same as choosing the explicit month on selector)
+			case 5:
+				$date_query = array(
+					'year'     => $now->format('Y'),
+					'monthnum' => $now->format('n'),
+				);
+				break;
+
+			// Last Month (Same as choosing the explicit month on selector)
+			case 6:
+				$now->modify('-1 month');
+				$date_query = array(
+					'year'     => $now->format('Y'),
+					'monthnum' => $now->format('n'),
+				);
+				break;
+
+			// This Quarter (last three months inclusive)
+			case 7:
+				$date_query = array('date_query' => array(
+					'after'	=> 'first day of -2 months' ),
+					'compare'	=> '>',
+					'inclusive'	=> true,
+					);
+
+				break;
+
+			// Prior Three Months
+			case 8:
+				$date_query = array( 'date_query' => array(
+					'after'	=> 'first day of -2 months',
+					'before' => 'last day of -1 month',
+					'inclusive'	=> true,
+				));
+				break;
+
+			// This Year
+			case 9:
+				$date_query = array( 'date_query' => array(
+					'after'	    => '1/1 this year',
+					'compare'	=> '>',
+					'inclusive'	=> true,
+				));
+				break;
+
+			// Last year
+			case 10:
+				$date_query = array( 'date_query' => array(
+					'after'	    => '1/1 last year',
+					'before'    => '12/31 last year',
+					'inclusive'	=> true,
+				));
+				break;
+
+			// default - return empty where clause
+			default:
+				/**
+				 * Return a custom date query for custom period_flag's.
+				 *
+				 * This filter extends the functionality allowing for custom periods if a new value
+				 * is passed via $_REQUEST['m']. {@see 'purchase_log_special_periods'}.
+				 *
+				 * @since 4.1.0
+				 *
+				 * @param array Empty array to be filled with a valid query {@see WP_Date_Query}.
+				 */
+				$date_query = apply_filters( 'wpsc_purchase_log_predefined_periods_' . $period_flag, array() );
+		}
+
+		/**
+		 * Filter the parsed date query.
+		 *
+		 * This filter can be used to override the constructed date_query.
+		 *
+		 * @since 4.1.0
+		 *
+		 * @param array $date_query    Empty array to be filled with a valid date query {@see WP_Date_Query}
+		 * @param string $period_flag  Value passed from $_REQUEST['m'].
+		 */
+		return apply_filters( 'wpsc_purchase_log_predefined_periods', $date_query, $period_flag );
+	}
+
+	public function set_date_column_to_date( $columns ){
+
+		$columns[] = '__date__';
+		return $columns;
+
 	}
 
 	public function is_pagination_enabled() {
@@ -219,12 +396,12 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'       => '<input type="checkbox" />',
-			'id'       => __( 'Order ID', 'wpsc' ),
-			'customer' => __( 'Customer', 'wpsc' ),
-			'amount'   => __( 'Amount', 'wpsc' ),
-			'status'   => _x( 'Status', 'sales log list table column', 'wpsc' ),
-			'date'     => __( 'Date', 'wpsc' ),
-			'tracking' => _x( 'Tracking ID', 'purchase log', 'wpsc' ),
+			'id'       => __( 'Order ID', 'wp-e-commerce' ),
+			'customer' => __( 'Customer', 'wp-e-commerce' ),
+			'amount'   => __( 'Amount', 'wp-e-commerce' ),
+			'status'   => _x( 'Status', 'sales log list table column', 'wp-e-commerce' ),
+			'date'     => __( 'Date', 'wp-e-commerce' ),
+			'tracking' => _x( 'Tracking ID', 'purchase log', 'wp-e-commerce' ),
 		) ;
 	}
 
@@ -232,7 +409,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 	 * Define the columns in the table which are sortable. You can add/amend
 	 * this list using the WordPress core filter manage_{screen}_sortable_columns
 	 * Specifically: manage_dashboard_page_wpsc-purchase-logs_sortable_columns
-* 	 *
+ 	 *
 	 * @return array[string]string List of sortable column IDs and corresponding db column of the item
 	 */
 	public function get_sortable_columns() {
@@ -289,7 +466,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 					'%s <span class="count">(%d)</span>',
 					'%s <span class="count">(%d)</span>',
 					'Purchase log view links for custom status with no explicit translation.',
-					'wpsc'
+					'wp-e-commerce'
 				);
 				$view_labels[$status['order']]['label'] = $status['label'];
 			}
@@ -335,7 +512,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$statuses    = $this->get_per_status_counts();
 
 		$all_text = sprintf(
-			_nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $statuses['all'], 'purchase logs', 'wpsc' ),
+			_nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $statuses['all'], 'purchase logs', 'wp-e-commerce' ),
 			number_format_i18n( $statuses['all'] )
 		);
 
@@ -367,13 +544,13 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 			if ( empty( $view_labels[$status]['label'] ) ) {
 				// This translation needs only the quantity dropping in.
 				$text = sprintf(
-					translate_nooped_plural( $view_labels[$status]['view_label'], $count, 'wpsc' ),
+					translate_nooped_plural( $view_labels[$status]['view_label'], $count, 'wp-e-commerce' ),
 					number_format_i18n( $count )
 				);
 			} else {
 				// This translation needs the status label, and quantity dropping in.
 				$text = sprintf(
-					translate_nooped_plural( $view_labels[$status]['view_label'], $count, 'wpsc' ),
+					translate_nooped_plural( $view_labels[$status]['view_label'], $count, 'wp-e-commerce' ),
 					$view_labels[$status]['label'],
 					number_format_i18n( $count )
 				);
@@ -416,8 +593,11 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		if ( ! empty( $months ) ) {
 			?>
 			<select name="m">
-				<option <?php selected( 0, $m ); ?> value="0"><?php _e( 'Show all dates' ); ?></option>
+				<option <?php selected( 0, $m ); ?> value="0"><?php _e( 'Show all dates', 'wp-e-commerce' ); ?></option>
 				<?php
+
+				$this->special_periods( $m );
+
 				foreach ( $months as $arc_row ) {
 					$month = zeroise( $arc_row->month, 2 );
 					$year = $arc_row->year;
@@ -431,8 +611,54 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 				?>
 			</select>
 			<?php
-			submit_button( _x( 'Filter', 'extra navigation in purchase log page', 'wpsc' ), 'secondary', false, false, array( 'id' => 'post-query-submit' ) );
+			submit_button( _x( 'Filter', 'extra navigation in purchase log page', 'wp-e-commerce' ), 'secondary', false, false, array( 'id' => 'post-query-submit' ) );
+
 		}
+	}
+
+	/**
+	 * Outputs the pre-defined selectable periods.
+	 *
+	 * Inserts new predefined periods into the period filter select on sales log screen.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param string $selected The value of $_REQUEST['m'] - unsanitized.
+	 */
+	private function special_periods( $selected ){
+
+		/**
+		 * Filter the available special periods on the purchase log listing screen.
+		 *
+		 * Can Used to remove periods or add new period definitions {@see wpsc_purchase_log_predefined_periods_}
+		 *
+		 * @since 4.1.0
+		 *
+		 * @param array array() The periods currently defined.
+		 */
+		$periods = apply_filters( 'wpsc_purchase_log_special_periods', array(
+			1 => _x('Today', 'time period for the current day', 'wp-e-commerce'),
+			2 => _x('Yesterday', 'time period for the previous day', 'wp-e-commerce'),
+			3 => _x('This Week', 'time period for the current week', 'wp-e-commerce'),
+			4 => _x('Last Week', 'time period for the prior week', 'wp-e-commerce'),
+			5 => _x('This Month', 'time period for the current month to date', 'wp-e-commerce'),
+			6 => _x('Last Month', 'time period for the prior month', 'wp-e-commerce'),
+			7 => _x('This Quarter', 'time period for the prior two months plus this month-to-date', 'wp-e-commerce'),
+			8 => _x('Prior 3 Months', 'time period for the three months prior to the current month', 'wp-e-commerce'),
+			9 => _x('This Year', 'time period for the current year to date', 'wp-e-commerce'),
+			10 => _x('Last Year', 'time period for the prior year', 'wp-e-commerce'),
+		) );
+
+		echo '<option disabled="disabled">---------</option>';
+		foreach( $periods as $value => $label ){
+			printf( "<option %s value='%s'>%s</option>\n",
+				selected( $value, $selected, false ),
+				esc_attr( $value ),
+				esc_html( $label )
+			);
+		}
+		echo '<option disabled="disabled">---------</option>';
+
 	}
 
 	public function extra_tablenav( $which ) {
@@ -449,9 +675,9 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		parent::pagination( $which );
 		$output = ob_get_clean();
 		if ( $this->status == 'all' )
-			$string = _x( 'Total (excluding Incomplete and Declined): %s', 'sales log page total', 'wpsc' );
+			$string = _x( 'Total (excluding Incomplete and Declined): %s', 'sales log page total', 'wp-e-commerce' );
 		else
-			$string = _x( 'Total: %s', 'sales log page total', 'wpsc' );
+			$string = _x( 'Total: %s', 'sales log page total', 'wp-e-commerce' );
 		$total_amount = ' - ' . sprintf( $string, wpsc_currency_display( $this->total_amount ) );
 		$total_amount = str_replace( '$', '\$', $total_amount );
 		$output = preg_replace( '/(<span class="displaying-num">)([^<]+)(<\/span>)/', '${1}${2}' . ' ' . $total_amount . '${3}', $output );
@@ -499,13 +725,13 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$name = trim( $name );
 
 		if ( empty( $name ) ) {
-			$name = apply_filters( 'wpsc_purchase_log_list_no_name', __( 'No name provided', 'wpsc' ), $item );
+			$name = apply_filters( 'wpsc_purchase_log_list_no_name', __( 'No name provided', 'wp-e-commerce' ), $item );
 		}
 
 
 	?>
 		<strong>
-			<a class="row-title" href="<?php echo esc_url( $this->item_url( $item ) ); ?>" title="<?php esc_attr_e( 'View order details', 'wpsc' ) ?>"><?php echo esc_html( $name ); ?></a>
+			<a class="row-title" href="<?php echo esc_url( $this->item_url( $item ) ); ?>" title="<?php esc_attr_e( 'View order details', 'wp-e-commerce' ) ?>"><?php echo esc_html( $name ); ?></a>
 		</strong><br />
 
 		<?php if ( isset( $item->email ) ) : ?>
@@ -531,31 +757,31 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 
 	public function column_id( $item ) {
 		?>
-		<a href="<?php echo esc_url( $this->item_url( $item ) ); ?>" title="<?php esc_attr_e( 'View order details', 'wpsc' ) ?>"><?php echo esc_html( $item->id ); ?></a>
+		<a href="<?php echo esc_url( $this->item_url( $item ) ); ?>" title="<?php esc_attr_e( 'View order details', 'wp-e-commerce' ) ?>"><?php echo esc_html( $item->id ); ?></a>
 		<?php if ( ! $this->current_action() == 'delete' ): ?>
 			<br />
-			<small><a class="delete" href="<?php echo esc_url( $this->delete_url( $item ) ); ?>"><?php echo esc_html_x( 'Delete', 'Sales log page', 'wpsc' ); ?></a></small>
+			<small><a class="delete" href="<?php echo esc_url( $this->delete_url( $item ) ); ?>"><?php echo esc_html_x( 'Delete', 'Sales log page', 'wp-e-commerce' ); ?></a></small>
 		<?php endif ?>
 		<?php
 	}
 
 	public function column_date( $item ) {
-		$format = __( 'Y/m/d g:i:s A' );
+		$format = _x( 'Y/m/d g:i:s A', 'default date format for purchase log columns', 'wp-e-commerce' );
 		$timestamp = (int) $item->date;
 		$full_time = date( $format, $timestamp );
 		$time_diff = time() - $timestamp;
 		if ( $time_diff > 0 && $time_diff < 24 * 60 * 60 )
-			$h_time = $h_time = sprintf( __( '%s ago' ), human_time_diff( $timestamp ) );
+			$h_time = $h_time = sprintf( __( '%s ago', 'wp-e-commerce' ), human_time_diff( $timestamp ) );
 		else
-			$h_time = date( __( get_option( 'date_format', 'Y/m/d' ) ), $timestamp );
+			$h_time = date( get_option( 'date_format', 'Y/m/d' ), $timestamp );
 
-		echo '<abbr title="' . $full_time . '">' . $h_time . '</abbr>';
+		echo '<abbr title="' . esc_attr( $full_time ) . '">' . esc_html( $h_time ) . '</abbr>';
 	}
 
 	public function column_amount( $item ) {
-		echo '<a href="' . esc_attr( $this->item_url( $item ) ) . '" title="' . esc_attr__( 'View order details', 'wpsc' ) . '">';
+		echo '<a href="' . esc_attr( $this->item_url( $item ) ) . '" title="' . esc_attr__( 'View order details', 'wp-e-commerce' ) . '">';
 		echo wpsc_currency_display( $item->amount ) . "<br />";
-		echo '<small>' . sprintf( _n( '1 item', '%s items', $item->item_count, 'wpsc' ), number_format_i18n( $item->item_count ) ) . '</small>';
+		echo '<small>' . sprintf( _n( '1 item', '%s items', $item->item_count, 'wp-e-commerce' ), number_format_i18n( $item->item_count ) ) . '</small>';
 		echo '</a>';
 	}
 
@@ -590,11 +816,11 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 		$empty = empty( $item->track_id );
 		?>
 			<div data-log-id="<?php echo esc_attr( $item->id ); ?>" <?php echo $empty ? ' class="empty"' : ''; ?>>
-				<a class="add" href="#"><?php echo esc_html_x( 'Add Tracking ID', 'add purchase log tracking id', 'wpsc' ); ?></a>
+				<a class="add" href="#"><?php echo esc_html_x( 'Add Tracking ID', 'add purchase log tracking id', 'wp-e-commerce' ); ?></a>
 				<input type="text" class="wpsc-purchase-log-tracking-id" value="<?php echo esc_attr( $item->track_id ); ?>" />
-				<a class="button save" href="#"><?php echo esc_html_x( 'Save', 'save sales log tracking id', 'wpsc' ); ?></a>
+				<a class="button save" href="#"><?php echo esc_html_x( 'Save', 'save sales log tracking id', 'wp-e-commerce' ); ?></a>
 				<img src="<?php echo esc_url( wpsc_get_ajax_spinner() ); ?>" class="ajax-feedback" title="" alt="" /><br class="clear" />
-				<small class="send-email"><a href="#"><?php echo esc_html_x( 'Send Email', 'sales log', 'wpsc' ); ?></a></small>
+				<small class="send-email"><a href="#"><?php echo esc_html_x( 'Send Email', 'sales log', 'wp-e-commerce' ); ?></a></small>
 			</div>
 		<?php
 	}
@@ -618,7 +844,7 @@ class WPSC_Purchase_Log_List_Table extends WP_List_Table {
 
 		// Standard actions.
 		$actions = array(
-			'delete' => _x( 'Delete', 'bulk action', 'wpsc' ),
+			'delete' => _x( 'Delete', 'bulk action', 'wp-e-commerce' ),
 		);
 
 		// Loop through all statuses and register bulk actions for them.

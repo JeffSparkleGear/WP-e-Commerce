@@ -5,7 +5,6 @@ add_action( 'wpsc_add_item'              , '_wpsc_action_customer_used_cart' );
 add_action( 'wpsc_before_submit_checkout', '_wpsc_action_customer_used_cart' );
 add_action( 'wp_login'                   , '_wpsc_action_setup_customer'     );
 
-
 /**
  * Setup current user object and customer ID as well as cart.
  *
@@ -27,7 +26,7 @@ function _wpsc_action_setup_customer() {
 	// the 'posts_selection' hook.
 	/////////////////////////////////////////////////////////////////////////
 	if ( ! did_action( 'init' ) ) {
-		_wpsc_doing_it_wrong( __FUNCTION__, __( 'Customer cannot be reliably setup until at least the "init" hook as been fired during AJAX processing.', 'wpsc' ), '3.8.14' );
+		_wpsc_doing_it_wrong( __FUNCTION__, __( 'Customer cannot be reliably setup until at least the "init" hook as been fired during AJAX processing.', 'wp-e-commerce' ), '3.8.14' );
 	}
 
 	// if the customer cookie is invalid, unset it

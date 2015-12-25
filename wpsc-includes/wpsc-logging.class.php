@@ -12,7 +12,6 @@
 
 class WPSC_Logging {
 
-
     /**
      * WPSC_Logging Class
      *
@@ -144,20 +143,19 @@ class WPSC_Logging {
         /* logs post type */
 
         $log_args = array(
-            'labels'          => array( 'name' => __( 'Logs', 'wpsc' ) ),
+            'labels'          => array( 'name' => __( 'Logs', 'wp-e-commerce' ) ),
             'public'          => false,
             'show_in_ui'      => defined( 'WP_DEBUG' ) && WP_DEBUG,
             'query_var'       => false,
             'rewrite'         => false,
             'capability_type' => 'post',
-            'supports'        => array( 'title', 'editor' ),
+            'supports'        => array( 'title', 'editor', 'custom-fields' ),
             'can_export'      => false
         );
 
         register_post_type( 'wpsc_log', apply_filters( 'wpsc_logging_post_type_args', $log_args ) );
 
     }
-
 
     /**
      * Registers the Type Taxonomy
@@ -191,7 +189,6 @@ class WPSC_Logging {
         }
     }
 
-
     /**
      * Check if a log type is valid
      *
@@ -206,7 +203,6 @@ class WPSC_Logging {
     private static function valid_type( $type ) {
         return in_array( $type, self::log_types() );
     }
-
 
     /**
      * Create new log entry
@@ -234,7 +230,6 @@ class WPSC_Logging {
         return self::insert_log( $log_data );
 
     }
-
 
     /**
      * Stores a log entry
@@ -276,7 +271,7 @@ class WPSC_Logging {
         // set log meta, if any
         if ( $log_id && ! empty( $log_meta ) ) {
             foreach ( (array) $log_meta as $key => $meta ) {
-                update_post_meta( $log_id, '_wp_log_' . sanitize_key( $key ), $meta );
+                update_post_meta( $log_id, 'wp_log_' . sanitize_key( $key ), $meta );
             }
         }
 
@@ -284,7 +279,6 @@ class WPSC_Logging {
 
         return $log_id;
     }
-
 
     /**
      * Update an existing log item.
@@ -343,7 +337,6 @@ class WPSC_Logging {
 
         return self::get_connected_logs( array( 'post_parent' => $object_id, 'paged' => $paged, 'log_type' => $type ) );
     }
-
 
     /**
      * Retrieve all connected logs

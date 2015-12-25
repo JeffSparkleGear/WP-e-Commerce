@@ -65,10 +65,10 @@ function wpsc_display_form_fields() {
 								class="wpsc-visitor-meta"
 								name='shippingSameBilling'
 								id='shippingSameBilling' <?php echo $checked; ?> />
-							<?php _e( 'Same as billing address:', 'wpsc' ); ?>
+							<?php _e( 'Same as billing address:', 'wp-e-commerce' ); ?>
 						</label>
 						<br>
-						<span id="shippingsameasbillingmessage"><?php _e('Your orders will be shipped to the billing address', 'wpsc'); ?></span>
+						<span id="shippingsameasbillingmessage"><?php _e('Your orders will be shipped to the billing address', 'wp-e-commerce'); ?></span>
 					</td>
 			</tr>
 			<?php }
@@ -81,7 +81,7 @@ function wpsc_display_form_fields() {
                	$email_markup = "<div class='wpsc_email_address'>
                   <p class='" . wpsc_checkout_form_element_id() . "'>
                      <label class='wpsc_email_address' for='" . wpsc_checkout_form_element_id() . "'>
-                     " . __( 'Enter your email address', 'wpsc' ) . "
+                     " . __( 'Enter your email address', 'wp-e-commerce' ) . "
                      </label>
                   <p class='wpsc_email_address_p'>
                   <img src='https://secure.gravatar.com/avatar/empty?s=60&amp;d=mm' id='wpsc_checkout_gravatar' />
@@ -114,42 +114,82 @@ function wpsc_display_form_fields() {
 function wpsc_has_downloads() {
 	global $wpdb, $user_ID, $files, $links, $products;
 
+	$has_downloads = false;
+
 	$purchases = $wpdb->get_results( "SELECT `id`, `processed` FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE user_ID = " . ( int ) $user_ID . "" );
 	$rowcount = count( $purchases );
 
 	if ( $rowcount >= 1 ) {
+
 		$perchidstr = "(";
 		$perchids = array();
-		foreach ( ( array ) $purchases as $purchase ) {
+
+		foreach ( (array) $purchases as $purchase ) {
 			$is_transaction = wpsc_check_purchase_processed( $purchase->processed );
-			if( $is_transaction ) {
+
+			if ( $is_transaction ) {
 				$perchids[] = $purchase->id;
 			}
 		}
-		if(!empty($perchids)){
+
+		$active_ids = array();
+
+		if ( ! empty( $perchids ) ) {
 			$perchidstr .= implode( ',', $perchids );
 			$perchidstr .= ")";
+
 			$sql = "SELECT * FROM `" . WPSC_TABLE_DOWNLOAD_STATUS . "` WHERE `purchid` IN " . $perchidstr . " AND `active` IN ('1') ORDER BY `datetime` DESC";
+
 			$products = $wpdb->get_results( $sql, ARRAY_A );
 			$products = apply_filters( 'wpsc_has_downloads_products', $products );
+
+			foreach ( (array) $products as $key => $product ) {
+
+				$post = get_post( $product['fileid'] );
+
+				if ( ! $post ) {
+					unset( $products[ $key ] );
+					continue;
+				}
+
+				$products = array_values( $products );
+
+				$links[]      = empty( $product['uniqueid'] ) ? add_query_arg( 'downloadid', $product['id'], home_url() ) : add_query_arg( 'downloadid', $product['uniqueid'], home_url() );
+				$downloads[]  = $product['product_id'];
+				$active_ids[] = $product['fileid'];
+			}
+
+			if ( ! empty( $downloads ) ) {
+
+				$downloads = new WP_Query(
+					array(
+						'post_parent__in' => $downloads,
+						'post_type'       => 'wpsc-product-file',
+						'posts_per_page'  => -1,
+						'post_status'     => 'all',
+						'post__in'        => $active_ids
+					)
+				);
+
+				if ( $downloads->have_posts() ) {
+					$files = $downloads->query( $downloads->query_vars );
+
+					foreach ( $files as $key => $post ) {
+						$files[ $key ] = (array) $post;
+					}
+
+				} else {
+					$files = array();
+				}
+			} else {
+				$files = array();
+			}
+
+			$has_downloads = count( $files ) > 0;
 		}
 	}
 
-	foreach ( (array)$products as $key => $product ) {
-	if( empty( $product['uniqueid'] ) ) { // if the uniqueid is not equal to null, its "valid", regardless of what it is
-			$links[] = home_url( '/?downloadid=' . $product['id'] );
-		} else {
-			$links[] = home_url( '/?downloadid=' . $product['uniqueid'] );
- 		}
-		$sql = $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE id = %d", $product['fileid'] );
-		$file = $wpdb->get_results( $sql, ARRAY_A );
-		$files[] = $file[0];
-	}
-	if ( count( $files ) > 0 ) {
-		return true;
-	} else {
-		return false;
-	}
+	return apply_filters( 'wpsc_has_downloads', $has_downloads );
 }
 
 function wpsc_has_purchases() {
@@ -209,9 +249,9 @@ function wpsc_user_profile_links( $args = array() ) {
 	$args = wp_parse_args( $args, $defaults );
 
 	$profile_tabs = apply_filters( 'wpsc_user_profile_tabs', array(
-		'purchase_history' => __( 'Purchase History', 'wpsc' ),
-		'edit_profile'     => __( 'Your Details', 'wpsc' ),
-		'downloads'        => __( 'Your Downloads', 'wpsc' )
+		'purchase_history' => __( 'Purchase History', 'wp-e-commerce' ),
+		'edit_profile'     => __( 'Your Details', 'wp-e-commerce' ),
+		'downloads'        => __( 'Your Downloads', 'wp-e-commerce' )
 	) );
 
 	echo $args['before_link_list'];
@@ -265,7 +305,7 @@ function wpsc_user_purchases() {
 
 		echo "<img class=\"log_expander_icon\" id=\"log_expander_icon_" . $purchase['id'] . "\" src=\"" . WPSC_CORE_IMAGES_URL . "/icon_window_$status_state.gif\" alt=\"\" title=\"\" />";
 
-		echo "<span id='form_group_" . $purchase['id'] . "_text'>" . __( 'Details', 'wpsc' ) . "</span>";
+		echo "<span id='form_group_" . $purchase['id'] . "_text'>" . __( 'Details', 'wp-e-commerce' ) . "</span>";
 		echo "</a>";
 		echo " </td>\n\r";
 
@@ -298,7 +338,7 @@ function wpsc_user_purchases() {
 						$gateway_name = $gateway['name'];
 					}
 				} else {
-					$gateway_name = __( "Manual Payment", 'wpsc' );
+					$gateway_name = __( "Manual Payment", 'wp-e-commerce' );
 				}
 			}
 			echo $gateway_name;
@@ -314,7 +354,7 @@ function wpsc_user_purchases() {
 		//order status code lies here
 		//check what $purchase['processed'] reflects in the $wpsc_purchlog_statuses array
 		$status_name = wpsc_find_purchlog_status_name( $purchase['processed'] );
-		echo "  <strong class='form_group'>" . __( 'Order Status', 'wpsc' ) . ":</strong>\n\r";
+		echo "  <strong class='form_group'>" . __( 'Order Status', 'wp-e-commerce' ) . ":</strong>\n\r";
 		echo $status_name . "<br /><br />";
 
                 do_action( 'wpsc_user_log_after_order_status', $purchase );
@@ -336,7 +376,7 @@ function wpsc_user_purchases() {
 			$parsed = $parsed[0]['children'][0]['children'];
 			if ( $purchase['track_id'] != null ) {
 				echo "<br /><br />";
-				echo " <strong class='form_group'>" . __( 'Shipping Address', 'wpsc' ) . "</strong>\n\r";
+				echo " <strong class='form_group'>" . __( 'Shipping Address', 'wp-e-commerce' ) . "</strong>\n\r";
 				echo "<table>";
 				foreach ( (array)$parsed as $parse ) {
 					if ( $parse['name'] == "TRACKSUMMARY" )
@@ -353,7 +393,7 @@ function wpsc_user_purchases() {
 		}
 		//end of written by allen
 		//cart contents display starts here;
-		echo "  <strong class='form_group'>" . __( 'Order Details', 'wpsc' ) . ":</strong>\n\r";
+		echo "  <strong class='form_group'>" . __( 'Order Details', 'wp-e-commerce' ) . ":</strong>\n\r";
 		$cartsql = $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid`= %d", $purchase['id'] );
 		$cart_log = $wpdb->get_results( $cartsql, ARRAY_A );
 		$j = 0;
@@ -363,27 +403,27 @@ function wpsc_user_purchases() {
 			echo "<tr class='toprow2'>";
 
 			echo " <th class='details_name'>";
-			_e( 'Name', 'wpsc' );
+			_e( 'Name', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo " <th class='details_quantity'>";
-			_e( 'Quantity', 'wpsc' );
+			_e( 'Quantity', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo " <th class='details_price'>";
-			_e( 'Price', 'wpsc' );
+			_e( 'Price', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo " <th class='details_tax'>";
-			_e( 'GST', 'wpsc' );
+			_e( 'GST', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo " <th class='details_shipping'>";
-			_e( 'Shipping', 'wpsc' );
+			_e( 'Shipping', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo " <th class='details_total'>";
-			_e( 'Total', 'wpsc' );
+			_e( 'Total', 'wp-e-commerce' );
 			echo " </th>";
 
 			echo "</tr>";
@@ -452,9 +492,9 @@ function wpsc_user_purchases() {
 			echo " </td>";
 
 			echo " <td class='details_totals_labels'>";
-			echo "<strong>" . __( 'Total Shipping', 'wpsc' ) . ":</strong><br />";
-			echo "<strong>" . __( 'Total Tax', 'wpsc' ) . ":</strong><br />";
-			echo "<strong>" . __( 'Final Total', 'wpsc' ) . ":</strong>";
+			echo "<strong>" . __( 'Total Shipping', 'wp-e-commerce' ) . ":</strong><br />";
+			echo "<strong>" . __( 'Total Tax', 'wp-e-commerce' ) . ":</strong><br />";
+			echo "<strong>" . __( 'Final Total', 'wp-e-commerce' ) . ":</strong>";
 			echo " </td>";
 
 			echo " <td class='details_totals_labels'>";
@@ -475,7 +515,7 @@ function wpsc_user_purchases() {
 			echo "</table>";
 			echo "<br />";
 
-			echo "<strong>" . __( 'Customer Details', 'wpsc' ) . ":</strong>";
+			echo "<strong>" . __( 'Customer Details', 'wp-e-commerce' ) . ":</strong>";
 			echo "<table class='customer_details'>";
 
 
@@ -519,14 +559,14 @@ function wpsc_user_purchases() {
 				}
 			}
 
-			$payment_gateway_names = '';
-			$payment_gateway_names = get_option('payment_gateway_names');
+			$display_name = '';
+			$payment_gateway_names = get_option( 'payment_gateway_names', array() );
 
 			foreach ( (array)$payment_gateway_names as $gatewayname ) {
 				//if the gateway has a custom name
-				if (!empty ($gatewayname) )
-					$display_name = $payment_gateway_names[$purchase_log[0]['gateway']];
-				else{
+				if ( ! empty ( $gatewayname ) && isset( $payment_gateway_names[ $purchase_log[0]['gateway'] ] ) ) {
+					$display_name = $payment_gateway_names[ $purchase_log[0]['gateway'] ];
+				} else {
 				//if not fall back on default name
 					foreach ( (array)$nzshpcrt_gateways as $gateway ){
 						if ( $gateway['internalname'] == $purchase['gateway'])
@@ -535,10 +575,10 @@ function wpsc_user_purchases() {
 				}
 			}
 
-			echo "  <tr><td>" . __( 'Payment Method', 'wpsc' ) . ":</td><td>" . $display_name . "</td></tr>";
-			echo "  <tr><td>" . __( 'Purchase #', 'wpsc' ) . ":</td><td>" . $purchase['id'] . "</td></tr>";
+			echo "  <tr><td>" . __( 'Payment Method', 'wp-e-commerce' ) . ":</td><td>" . $display_name . "</td></tr>";
+			echo "  <tr><td>" . __( 'Purchase #', 'wp-e-commerce' ) . ":</td><td>" . $purchase['id'] . "</td></tr>";
 			if ( $purchase['transactid'] != '' ) {
-				echo "  <tr><td>" . __( 'Transaction Id', 'wpsc' ) . ":</td><td>" . $purchase['transactid'] . "</td></tr>";
+				echo "  <tr><td>" . __( 'Transaction Id', 'wp-e-commerce' ) . ":</td><td>" . $purchase['transactid'] . "</td></tr>";
 			}
 			echo "</table>";
 		}
@@ -604,13 +644,12 @@ function _wpsc_action_downloads_section() {
 			}
 
 			$item['downloads'] = $products[$key]['downloads'];
-			$item['datetime'] = date( get_option( 'date_format' ), strtotime( $products[$key]['datetime'] ) );
+			$item['datetime'] = date( get_option( 'date_format' ), strtotime( $file['post_date'] ) );
 			$items[] = (object) $item;
 		}
 	}
 
 	include( wpsc_get_template_file_path( 'wpsc-account-downloads.php' ) );
 }
-add_action( 'wpsc_user_profile_section_downloads', '_wpsc_action_downloads_section' );
 
-?>
+add_action( 'wpsc_user_profile_section_downloads', '_wpsc_action_downloads_section' );
