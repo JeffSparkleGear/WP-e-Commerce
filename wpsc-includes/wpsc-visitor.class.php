@@ -154,7 +154,7 @@ class WPSC_Visitor {
 			return $this;
 		}
 
-		$property_name = '_' . $attribute;
+		$property_name = $this->property_name( $attribute );
 
 		if ( isset( $this->$property_name ) ) {
 			$value = $this->$property_name;
@@ -176,7 +176,7 @@ class WPSC_Visitor {
 	 */
 	function set( $attribute, $value ) {
 
-		$property_name        = '_' . $attribute;
+		$property_name = $this->property_name( $attribute );
 		$this->$property_name = $value;
 
 		if ( in_array( $attribute, self::$visitor_table_attribute_list ) ) {
@@ -200,7 +200,7 @@ class WPSC_Visitor {
 	 * @since 3.8.14
 	 */
 	function delete( $attribute ) {
-		$property_name = '_' . $attribute;
+		$property_name = $this->property_name( $attribute );
 		if ( isset( $this->$property_name ) ) {
 			unset( $attribute->$property_name );
 		}
@@ -209,6 +209,43 @@ class WPSC_Visitor {
 
 		return $this;
 
+	}
+
+	/**
+	 * Does visitor have an attribute
+	 *
+	 * @param  $attribute attribute name
+	 *
+	 * @return this
+	 * @since 4.0.0
+	 */
+	function has_property( $attribute ) {
+		$property_name = $this->property_name( $attribute );
+		return isset( $this->$property_name );
+	}
+
+
+	/**
+	 * Does visitor have an attribute with a value
+	 *
+	 * @param  $attribute attribute name
+	 *
+	 * @return this
+	 * @since 4.0.0
+	 */
+	function is_empty( $attribute = false ) {
+		if ( ! $attribute ) {
+			return $this->all_empty();
+		}
+
+		$property_name = $this->property_name( $attribute );
+		$result = false;
+
+		if ( isset( $this->$property_name ) ) {
+			$result = empty( $this->$property_name );
+		}
+
+		return $result;
 	}
 
 	// helper function for well known variables
@@ -261,7 +298,7 @@ class WPSC_Visitor {
 	/**
 	 * @return bool
 	 */
-	function is_empty() {
+	function all_empty() {
 		$result = true;
 
 		if ( $this->_user_id ) {
@@ -283,6 +320,10 @@ class WPSC_Visitor {
 		}
 
 		return $result;
+	}
+
+	private function property_name( $attribute ) {
+		return '_' . trim( $attribute );
 	}
 
 }
