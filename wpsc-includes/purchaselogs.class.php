@@ -517,6 +517,44 @@ function wpsc_display_purchlog_buyers_state_and_postcode() {
    return $output;
 }
 
+function wpsc_display_purchlog_buyers_city_state_and_postcode() {
+	global $purchlogitem;
+
+	$output = '';
+
+	if ( isset( $purchlogitem->userinfo['billingpostcode']['value'] ) && ! empty( $purchlogitem->userinfo['billingpostcode']['value'] ) ) {
+		$output = esc_html( $purchlogitem->userinfo['billingpostcode']['value'] );
+	}
+
+	if( is_numeric($purchlogitem->extrainfo->billing_region ) ) {
+		$state = wpsc_get_region( $purchlogitem->extrainfo->billing_region );
+	} else {
+		$state = $purchlogitem->userinfo['billingstate']['value'];
+	}
+
+	if ( ! empty( $state ) ) {
+		if ( !empty( $output ) ) {
+			$output = ' ' . $output;
+		}
+
+		$output = $state . $output;
+	}
+
+
+	$city = wpsc_display_purchlog_buyers_city();
+	if ( ! empty( $city ) ) {
+		if ( ! empty ( $state ) ) {
+			$output = $city . ', ' . $output;
+		} else {
+			$output = $city . ' ' . $output;
+		}
+	}
+
+	$output = esc_html( $output );
+
+	return $output;
+}
+
 function wpsc_display_purchlog_buyers_country() {
    global $purchlogitem;
    return esc_html( wpsc_get_country( $purchlogitem->extrainfo->billing_country ) );}
@@ -573,19 +611,49 @@ function wpsc_display_purchlog_shipping_city() {
 function wpsc_display_purchlog_shipping_state_and_postcode() {
    global $purchlogitem;
    $state = '';
-   if( is_numeric($purchlogitem->extrainfo->shipping_region) )
-		$state = esc_html( wpsc_get_region($purchlogitem->extrainfo->shipping_region) );
-   else
-		$state = esc_html( $purchlogitem->shippinginfo['shippingstate']['value'] );
+   if( is_numeric($purchlogitem->extrainfo->shipping_region) ) {
+	   $state = esc_html( wpsc_get_region( $purchlogitem->extrainfo->shipping_region ) );
+   } else {
+	   $state = esc_html( $purchlogitem->shippinginfo['shippingstate']['value'] );
+   }
 
    if ( !empty( $purchlogitem->shippinginfo['shippingpostcode']['value'] ) ){
-		if( empty( $state ) )
+		if( empty( $state ) ) {
 			$state = esc_html( $purchlogitem->shippinginfo['shippingpostcode']['value'] );
-		else
+		} else {
 			$state .= ', ' . esc_html( $purchlogitem->shippinginfo['shippingpostcode']['value'] );
+		}
    }
 
    return $state;
+}
+
+
+function wpsc_display_purchlog_shipping_city_state_and_postcode() {
+	global $purchlogitem;
+
+	$city = wpsc_display_purchlog_shipping_city();
+
+	$state = '';
+	if( is_numeric($purchlogitem->extrainfo->shipping_region) ) {
+		$state = esc_html( wpsc_get_region( $purchlogitem->extrainfo->shipping_region ) );
+	} else {
+		$state = esc_html( $purchlogitem->shippinginfo['shippingstate']['value'] );
+	}
+
+	if ( !empty( $purchlogitem->shippinginfo['shippingpostcode']['value'] ) ){
+		if( empty( $state ) ) {
+			$state = esc_html( $purchlogitem->shippinginfo['shippingpostcode']['value'] );
+		} else {
+			$state = $state . ' ' . esc_html( $purchlogitem->shippinginfo['shippingpostcode']['value'] );
+		}
+	}
+
+	if ( ! empty( $city ) ) {
+		$state = $city . ', ' . $state;
+	}
+
+	return $state;
 }
 
 function wpsc_display_purchlog_shipping_country() {

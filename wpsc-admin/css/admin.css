@@ -321,6 +321,15 @@ th#status {
 	text-align: right;
 }
 
+.dashboard_page_wpsc-purchase-logs .tablenav .tablenav-pages {
+    width: 100%;
+}
+
+.dashboard_page_wpsc-purchase-logs .tablenav .tablenav-pages .next-page  {
+    float: right;
+}
+
+
 
 /**
  * Display Products CSS starts here

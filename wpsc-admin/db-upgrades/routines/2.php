@@ -5,7 +5,7 @@ function _wpsc_db_upgrade_2() {
 	_wpsc_fix_guernsey_country_code();
 	_wpsc_new_country_serbia();
 	_wpsc_new_country_montenegro();
-	_wpsc_fix_timor_leste_name();
+//	_wpsc_fix_timor_leste_name();
 	_wpsc_new_country_aland_islands();
 	_wpsc_new_country_saint_barthelemy();
 	_wpsc_new_country_bonaire_et_al();

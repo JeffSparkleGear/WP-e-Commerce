@@ -483,7 +483,7 @@ function _wpsc_is_bot_user() {
 			// the user agent could be google bot, bing bot or some other bot,  one would hope real user agents do not have the
 			// string 'bot|spider|crawler|preview' in them, there are bots that don't do us the kindness of identifying themselves as such,
 			// check for the user being logged in in a real user is using a bot to access content from our site
-			$bot_agent_strings = array( 'robot', 'bot', 'crawler', 'spider', 'preview', 'WordPress', );
+			$bot_agent_strings = array( 'robot', 'bot', 'crawler', 'spider', 'preview', 'WordPress', 'mod_pagespeed', 'Wget', );
 			$bot_agent_strings = apply_filters( 'wpsc_bot_user_agents', $bot_agent_strings );
 
 			foreach ( $bot_agent_strings as $bot_agent_string ) {
