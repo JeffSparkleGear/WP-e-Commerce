@@ -1116,7 +1116,11 @@ class wpsc_purchaselogs_items {
       $sql = "SELECT DISTINCT `" . WPSC_TABLE_PURCHASE_LOGS . "` . * FROM `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` LEFT JOIN `" . WPSC_TABLE_PURCHASE_LOGS . "` ON `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "`.`log_id` = `" . WPSC_TABLE_PURCHASE_LOGS . "`.`id` WHERE `" . WPSC_TABLE_PURCHASE_LOGS . "`.`id`=" . $this->purchlogid;
       $extrainfo = $wpdb->get_results( $sql );
 
-      $this->extrainfo = $extrainfo[0];
+	   if ( count( $extrainfo ) ) {
+		   $this->extrainfo = $extrainfo[0];
+	   } else {
+		   $this->extrainfo = '';
+	   }
 
       $usersql = "SELECT `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "`.`id`, `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "`.`value`, `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`name`, `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`unique_name` FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` LEFT JOIN `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "` ON `" . WPSC_TABLE_CHECKOUT_FORMS . "`.id = `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "`.`form_id` WHERE `" . WPSC_TABLE_SUBMITTED_FORM_DATA . "`.`log_id`=" . $this->purchlogid . " ORDER BY `" . WPSC_TABLE_CHECKOUT_FORMS . "`.`checkout_order`";
       $userinfo = $wpdb->get_results( $usersql, ARRAY_A );
