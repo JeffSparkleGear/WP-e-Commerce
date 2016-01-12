@@ -19,7 +19,7 @@ function _wpsc_visitor_database_ready() {
 		global $wpdb;
 
 		$visitor_database_ready = ( $wpdb->get_var( "SHOW TABLES LIKE '$wpdb->wpsc_visitors'" )
-										&& $wpdb->get_var( "SHOW TABLES LIKE '$wpdb->wpsc_visitormeta'" ) );
+		                            && $wpdb->get_var( "SHOW TABLES LIKE '$wpdb->wpsc_visitormeta'" ) );
 
 	}
 
@@ -442,8 +442,8 @@ function wpsc_delete_visitor( $visitor_id ) {
 	$result = 0;
 
 	$ok_to_delete_visitor = ! ( wpsc_visitor_has_purchases( $visitor_id )
-									&& wpsc_visitor_post_count( $visitor_id )
-										&& wpsc_visitor_comment_count( $visitor_id ) );
+	                            && wpsc_visitor_post_count( $visitor_id )
+	                            && wpsc_visitor_comment_count( $visitor_id ) );
 
 	$ok_to_delete_visitor = apply_filters( 'wpsc_before_delete_visitor', $ok_to_delete_visitor, $visitor_id );
 
@@ -980,7 +980,7 @@ function wpsc_get_visitor_meta( $visitor_id, $meta_key = '', $single = false ) {
  *
  * @param int $visitor_id visitor ID.
  * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
-* @return boolean true of the key is set, false if not.
+ * @return boolean true of the key is set, false if not.
  *  is true.
  */
 function wpsc_visitor_meta_exists( $visitor_id, $meta_key ) {
@@ -1190,10 +1190,10 @@ function wpsc_get_visitor_meta_by_timestamp( $timestamp = 0, $comparison = '>', 
 
 /**************************************************************************************************
  *
-* There are some built in business and data consistency rules rules related to well-known
-* customer meta.  We use the customer meta actions to implement these rules
-*
-**************************************************************************************************/
+ * There are some built in business and data consistency rules rules related to well-known
+ * customer meta.  We use the customer meta actions to implement these rules
+ *
+ **************************************************************************************************/
 
 /**
  * Update any values dependent on shipping region
@@ -1247,6 +1247,15 @@ function _wpsc_updated_visitor_meta_shippingcountry( $meta_value, $meta_key, $vi
 		if ( ! empty ( $old_shipping_region ) &&  $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_shipping_region ) ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'shippingregion' );
 		}
+
+		if ( ! empty ( $old_shipping_region ) &&  !$wpsc_country->has_regions() ) {
+			wpsc_delete_visitor_meta( $visitor_id, 'shippingregion' );
+		}
+
+		if ( ! empty ( $old_shipping_state ) &&  !$wpsc_country->has_regions() ) {
+			wpsc_delete_visitor_meta( $visitor_id, 'shippingstate' );
+		}
+
 	} else {
 		wpsc_delete_visitor_meta( $visitor_id, 'shippingstate' );
 		wpsc_delete_visitor_meta( $visitor_id, 'shippingregion' );
@@ -1289,7 +1298,7 @@ add_action( 'wpsc_updated_visitor_meta_billingregion', '_wpsc_updated_visitor_me
  * @param string $meta_key Metadata name.
  * @param int $visitor_id visitor ID
  * @return none
-*/
+ */
 function _wpsc_updated_visitor_meta_billingcountry( $meta_value, $meta_key, $visitor_id ) {
 
 	$old_billing_state  = wpsc_get_visitor_meta( $visitor_id, 'billingstate' , true );
@@ -1304,7 +1313,15 @@ function _wpsc_updated_visitor_meta_billingcountry( $meta_value, $meta_key, $vis
 			wpsc_delete_visitor_meta( $visitor_id, 'billingstate' );
 		}
 
+		if ( ! empty ( $old_billing_state ) &&  ! $wpsc_country->has_regions() ) {
+			wpsc_delete_visitor_meta( $visitor_id, 'billingstate' );
+		}
+
 		if ( ! empty ( $old_billing_region ) && $wpsc_country->has_regions() && ! $wpsc_country->has_region( $old_billing_region ) ) {
+			wpsc_delete_visitor_meta( $visitor_id, 'billingregion' );
+		}
+
+		if ( ! empty ( $old_billing_region ) && ! $wpsc_country->has_regions() ) {
 			wpsc_delete_visitor_meta( $visitor_id, 'billingregion' );
 		}
 	} else {
