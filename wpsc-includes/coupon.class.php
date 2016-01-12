@@ -510,7 +510,7 @@ class WPSC_Coupon {
 	 */
 	public function is_valid() {
 
-		if ( ! $this->is_active() || $this->is_used() || $this->is_scheduled() || $this->is_expired() ) {
+		if ( ! $this->is_active() || $this->is_scheduled() || $this->is_expired() ) {
 			$valid = false;
 		} else {
 			$valid = true;

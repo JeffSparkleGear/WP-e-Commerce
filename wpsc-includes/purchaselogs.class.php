@@ -302,6 +302,13 @@ function wpsc_purchaselog_details_name() {
    return esc_html( apply_filters( 'the_title', $purchlogitem->purchitem->name ) );
 }
 
+function wpsc_purchaselog_details_href() {
+	global $purchlogitem;
+	$name = esc_html( apply_filters( 'the_title', $purchlogitem->purchitem->name ) );
+	$permalink = get_permalink( $purchlogitem->purchitem->prodid );
+	return "<a href=\"{$permalink}\">{$name}</a>";
+}
+
 function wpsc_purchaselog_details_id() {
    global $purchlogitem;
    return $purchlogitem->purchitem->id;

@@ -311,9 +311,21 @@ function wpsc_get_transaction_html_output( $purchase_log ) {
 
 	// see if the customer trying to view this transaction output is the person
 	// who made the purchase.
-	$checkout_session_id = wpsc_get_customer_meta( 'checkout_session_id' );
+	$session_id_validated = false;
 
-    if ( $checkout_session_id == $purchase_log->get( 'sessionid' ) ) {
+	$purchase_session_id = $purchase_log->get( 'sessionid' );
+	if ( isset( $_REQUEST['sessionid'] ) ) {
+		if ( $purchase_session_id == $_REQUEST['sessionid'] ) {
+			$session_id_validated = true;
+		}
+	}
+
+	$checkout_session_id = wpsc_get_customer_meta( 'checkout_session_id' );
+	if ( $checkout_session_id == $purchase_session_id ) {
+		$session_id_validated = true;
+	}
+
+    if ( $session_id_validated ) {
     	$output = apply_filters( 'wpsc_get_transaction_html_output', $output, $notification );
 	} else {
 		$output = apply_filters( 'wpsc_get_transaction_unauthorized_view', __( "You don't have the permission to view this page", 'wp-e-commerce' ), $output, $notification );

@@ -166,7 +166,6 @@ function wpsc_disregard_billing_state_fields(){
 function wpsc_shipping_details() {
 	global $wpsc_checkout;
 	if ( stristr( $wpsc_checkout->checkout_item->unique_name, 'shipping' ) != false ) {
-
 		return ' wpsc_shipping_forms';
 	} else {
 		return "";

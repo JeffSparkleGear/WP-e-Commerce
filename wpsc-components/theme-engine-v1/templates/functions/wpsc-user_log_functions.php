@@ -24,6 +24,8 @@ else
  */
 function wpsc_display_form_fields() {
 
+	global $wpsc_checkout;
+
 	do_action( 'wpsc_start_display_user_log_form_fields' );
 
 	$wpsc_checkout = wpsc_core_get_checkout();
@@ -31,6 +33,9 @@ function wpsc_display_form_fields() {
 	$i = 0;
 	while ( wpsc_have_checkout_items() ) {
 		wpsc_the_checkout_item();
+
+		$uniquename = $wpsc_checkout->checkout_item->unique_name;
+		$form_element_id = wpsc_checkout_form_element_id();
 
 		if ( wpsc_checkout_form_is_header() ) {
 			$i ++;
@@ -74,7 +79,7 @@ function wpsc_display_form_fields() {
 			<?php }
 
 			// Not a header so start display form fields
-		} elseif ( $wpsc_checkout->checkout_item->unique_name == 'billingemail' ) {
+		} elseif ( $wpsc_checkout->checkout_item->unique_name == 'XXXXbillingemail' ) {
 			?>
                <?php
 
@@ -90,6 +95,8 @@ function wpsc_display_form_fields() {
 			if ( wpsc_the_checkout_item_error() != '' )
 				$email_markup .= "<p class='validation-error'>" . wpsc_the_checkout_item_error() . "</p>";
 			$email_markup .= "</div>";
+
+			echo $email_markup;
 		} else {
 			?>
 			<tr>
