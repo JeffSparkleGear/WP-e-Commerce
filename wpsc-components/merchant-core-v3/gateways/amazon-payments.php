@@ -1271,7 +1271,7 @@ class WPSC_Amazon_Payments_Order_Handler {
 
 					// Refund form
 					?>
-					<p class="refund_form" style="display:none">
+					<form class="refund_form" style="display:none">
 						<input type="number" step="any" style="width:100%" class="amazon_refund_amount" value="<?php echo $this->log->get( 'totalprice' ); ?>" />
 						<input type="text" style="width:100%" class="amazon_refund_note" placeholder="<?php _e( 'Add a note about this refund', 'wp-e-commerce' ); ?>" /><br/>
 						<a href="#" class="button" data-action="refund" data-id="<?php echo esc_attr( $amazon_capture_id ); ?>"><?php _e( 'Refund', 'wp-e-commerce' ); ?></a>

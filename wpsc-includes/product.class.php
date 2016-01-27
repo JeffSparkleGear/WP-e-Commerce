@@ -25,8 +25,8 @@
  * @property-read int     $all_stock               Total inventory of this product
  * @property-read int     $claimed_stock           Total claimed stock of this product
  * @property-read int     $stock                   Total available stock of this product
- * @property-read float   $sales                   Sales stats for this product
- * @property-read float   $earnings                Earnings stats for this product
+ * @property-write float   $sales                   Sales stats for this product
+ * @property-write float   $earnings                Earnings stats for this product
  */
 class WPSC_Product {
 

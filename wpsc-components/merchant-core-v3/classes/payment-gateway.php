@@ -97,6 +97,8 @@ final class WPSC_Payment_Gateways {
 
 		WPSC_Payment_Gateways::register_dir( WPSC_MERCHANT_V3_PATH . '/gateways' );
 
+		do_action( 'wpsc_after_register_gateways', 'WPSC_Payment_Gateways' );
+
 		// Call the Active Gateways init function
 		self::initialize_gateways();
 
@@ -181,7 +183,7 @@ final class WPSC_Payment_Gateways {
 			$return = self::register_file( $path );
 
 			if ( is_wp_error( $return ) ) {
-				return $return;
+				//return $return;
 			}
 		}
 	}
@@ -241,6 +243,7 @@ final class WPSC_Payment_Gateways {
 		$meta = array(
 			'class'        => $classname,
 			'path'         => $file,
+//			'internalname' => strtolower( $filename ), // compat with older API
 			'internalname' => $filename, // compat with older API
 		);
 
@@ -351,6 +354,7 @@ final class WPSC_Payment_Gateways {
 	 * @return void
 	 */
 	public static function initialize_gateways() {
+
 		$active_gateways = self::get_active_gateways();
 
 		foreach( $active_gateways as $gateway_id ) {
@@ -726,8 +730,21 @@ class WPSC_Payment_Gateway_Setting {
 	 * @since 3.9
 	 */
 	public function get( $setting, $default = false ) {
-		$this->lazy_load();
-		return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
+		switch( $setting ) {
+			case 'gateway_name':
+				$result = $this->gateway_name;
+				break;
+
+			case 'option_name':
+				$result = $this->option_name;
+				break;
+
+			default:
+				$this->lazy_load();
+				$result = isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
+		}
+
+		return $result;
 	}
 
 	/**

@@ -6,10 +6,18 @@ global $wpsc_purchlog_statuses;
 if (!isset($wpsc_purchlog_statuses) || !count($wpsc_purchlog_statuses))
    wpsc_core_load_purchase_log_statuses();
 
-function wpsc_instantiate_purchaselogitem() {
+function wpsc_instantiate_purchaselogitem( $purchase_log_id = false ) {
    global $purchlogitem;
-   if ( isset( $_REQUEST['purchaselog_id'] ) )
-	  $purchlogitem = new wpsc_purchaselogs_items( (int)$_REQUEST['purchaselog_id'] );
+
+	if ( empty( $purchase_log_id ) ) {
+		if ( isset( $_REQUEST['purchaselog_id'] ) ) {
+			$purchase_log_id = intval( $_REQUEST['purchaselog_id'] );
+		}
+	}
+
+   if ( ! empty( $purchase_log_id ) ) {
+	   $purchlogitem = new wpsc_purchaselogs_items( (int) $purchase_log_id );
+   }
 
 }
 

@@ -647,8 +647,10 @@ function wpsc_submit_checkout( $collected_data = true ) {
 		}
 	}
 
-	// check to see if the current gateway is in the list of available gateways
-	if ( array_search( $submitted_gateway, $selected_gateways ) !== false || wpsc_is_free_cart() ) {
+	// No submitted gateway if the cart is free
+	if ( wpsc_is_free_cart() ) {
+		wpsc_delete_customer_meta( 'selected_gateway' );
+	} elseif ( ! empty( $submitted_gateway ) ) {
 		wpsc_update_customer_meta( 'selected_gateway', $submitted_gateway );
 	} else {
 		$is_valid = false;
