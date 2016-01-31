@@ -377,7 +377,7 @@ class ASHPackage {
      * @since 0.0.1
      * @param array $args
      */
-    function ASHPackage(array $args = array()){
+    function __construct(array $args = array()){
         foreach($args as $key=>$value){
             $this->$key=$value;
         }
@@ -485,7 +485,7 @@ class ASHShipment{
      *
      * @since 0.0.1
      */
-    function ASHShipment(){
+    function __construct(){
     }
 
     /**
@@ -564,7 +564,7 @@ class ASH{
      * General constructor for ASH class
      *
      */
-    function ASH(){
+    function __construct(){
     }
 
     /**

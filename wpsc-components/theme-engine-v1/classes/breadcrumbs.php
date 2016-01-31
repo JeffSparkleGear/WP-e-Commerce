@@ -201,7 +201,7 @@ class wpsc_breadcrumbs {
 	 * @access public
 	 * @return void
 	 */
-	function wpsc_breadcrumbs() {
+	function __construct() {
 		global $wp_query, $wpsc_query;
 		$this->breadcrumbs = array();
 		$query_data = Array();

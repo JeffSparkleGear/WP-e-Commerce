@@ -792,7 +792,7 @@ class wpsc_purchaselogs {
    var $end_timestamp;
 
 	/* Constructor function */
-	function wpsc_purchaselogs() {
+	function __construct() {
 		$this->getall_formdata();
 		if ( !isset( $_GET['view_purchlogs_by'] ) && !isset( $_GET['purchlogs_searchbox'] ) ) {
 			$dates = $this->getdates();
@@ -1107,7 +1107,7 @@ class wpsc_purchaselogs_items {
    var $additional_fields = array();
 
 
-   function wpsc_purchaselogs_items( $id ) {
+   function __construct( $id ) {
 	  $this->purchlogid = $id;
 	  $this->get_purchlog_details();
    }

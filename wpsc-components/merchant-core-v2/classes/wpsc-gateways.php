@@ -11,7 +11,7 @@ class wpsc_gateways {
 	var $current_gateway = -1;
 	var $in_the_loop = false;
 
-	function wpsc_gateways() {
+	function __construct() {
 		global $nzshpcrt_gateways;
 
 		$gateway_options = get_option( 'custom_gateway_options' );

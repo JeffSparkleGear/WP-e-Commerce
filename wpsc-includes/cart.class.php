@@ -90,7 +90,7 @@ class wpsc_cart {
 	public $_signature = '';
 
 
-    function wpsc_cart( $init_cart = true ) {
+    function __construct( $init_cart = true ) {
 		$coupon = 'percentage';
 
 	    if ( $init_cart ) {
