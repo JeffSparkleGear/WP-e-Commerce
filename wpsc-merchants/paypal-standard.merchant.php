@@ -149,6 +149,14 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 			'country'    => isset( $this->cart_data['billing_address']['country'] ) ? $this->cart_data['billing_address']['country'] : '',
 		);
 
+		$wpsc_country = new WPSC_Country( $this->cart_data['billing_address']['country'] );
+		$wpsc_region = $wpsc_country->get_region( $this->cart_data['billing_address']['state'] );
+
+		$region_code = $wpsc_region->get_code();
+		if ( ! empty( $region_code ) ) {
+			$paypal_vars['state'] = $region_code;
+		}
+
 		// Shipping
 		if ( (bool) get_option( 'paypal_ship' ) && ! $buy_now ) {
 
@@ -374,6 +382,11 @@ class wpsc_merchant_paypal_standard extends wpsc_merchant {
 			$gateway_values = implode( '&', $name_value_pairs );
 
 			$redirect = get_option( 'paypal_multiple_url' ) . "?" . $gateway_values;
+		}
+
+		if ( defined( 'PAYPAL_DEBUG' ) ) {
+			error_log( __FUNCTION__ . ' ' . var_export( $redirect, true ) );
+			error_log( __FUNCTION__ . ' ' . var_export( $this->collected_gateway_data, true ) );
 		}
 
 		if ( defined( 'WPSC_ADD_DEBUG_PAGE' ) && WPSC_ADD_DEBUG_PAGE ) {

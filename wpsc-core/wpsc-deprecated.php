@@ -2163,29 +2163,33 @@ function nzshpcrt_region_list( $selected_country = null, $selected_region = null
 	return $output;
 }
 
-/**
- * Not yet deprecated, but should be considered deprecated.
- *
- * Used only in PayPal Standard and Chronopay gateways.
- *
- * @param  [type] $selected_field [description]
- * @return [type]                 [description]
- */
-function nzshpcrt_form_field_list( $selected_field = null ) {
-	global $wpdb;
-	$output = "<option value=''>" . esc_html__( 'Please choose', 'wp-e-commerce' ) . "</option>";
-	$form_sql = "SELECT * FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `active` = '1';";
-	$form_data = $wpdb->get_results( $form_sql, ARRAY_A );
 
-	foreach ( (array)$form_data as $form ) {
-		$selected = '';
-		if ( $selected_field == $form['id'] ) {
-			$selected = "selected='selected'";
+if ( ! function_exists( 'nzshpcrt_form_field_list' ) ) {
+	/**
+	 * Not yet deprecated, but should be considered deprecated.
+	 *
+	 * Used only in PayPal Standard and Chronopay gateways.
+	 *
+	 * @param  [type] $selected_field [description]
+	 *
+	 * @return [type]                 [description]
+	 */
+	function nzshpcrt_form_field_list( $selected_field = null ) {
+		global $wpdb;
+		$output    = "<option value=''>" . esc_html__( 'Please choose', 'wp-e-commerce' ) . "</option>";
+		$form_sql  = "SELECT * FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `active` = '1';";
+		$form_data = $wpdb->get_results( $form_sql, ARRAY_A );
+
+		foreach ( (array) $form_data as $form ) {
+			$selected = '';
+			if ( $selected_field == $form['id'] ) {
+				$selected = "selected='selected'";
+			}
+			$output .= "<option value='" . $form['id'] . "' $selected>" . $form['name'] . "</option>";
 		}
-		$output .= "<option value='" . $form['id'] . "' $selected>" . $form['name'] . "</option>";
-	}
 
-	return $output;
+		return $output;
+	}
 }
 
 function wpsc_sanitise_keys($value) {
