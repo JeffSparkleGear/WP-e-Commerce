@@ -261,21 +261,10 @@ class WPSC_Countries {
 		// set default return value
 		$wpsc_region = false;
 
-		if ( is_numeric( $region ) ) {
-			$region_id = intval( $region );
-		} else {
-			$wpsc_country = self::get_country_using_code_or_id( $country );
-
-			if ( $wpsc_country && $wpsc_country->has_regions() ) {
-				$region_id = $wpsc_country->get_region_id_by_region_code( $region );
-			}
-		}
-
 		// we want to get to the unique region id to retrieve the region object, it might have been passed, or we
-		// will have to figure it out from the country and the region
-		if ( is_int( $region ) ) {
+		// will have to figure it out from the country and the regiongit push
+		if ( empty( $country ) && is_numeric( $region ) ) {
 
-			$region_id = $region;
 			if ( isset( self::$regions_by_region_id[ $region ] ) ) {
 				$wpsc_region = self::$regions_by_region_id[ $region ];
 			}
