@@ -48,8 +48,13 @@ add_filter( 'wpsc_javascript_localizations', '_wpsc_admin_localizations', 1 );
  */
 function wpsc_query_vars_product_list( $vars ){
 
-	if( 'wpsc-product' != $vars['post_type'] || in_array( $vars['orderby'], array( 'meta_value_num', 'meta_value' ) ) )
-	    return $vars;
+	if( 'wpsc-product' != $vars['post_type'] ) {
+		return $vars;
+	}
+
+	if ( isset( $vars['orderby'] ) && ( ( $vars['orderby'] == 'meta_value_num' ) || ( $vars['orderby'] == 'meta_value' ) ) ) {
+		return $vars;
+	}
 
 	$vars['posts_per_archive_page'] = 0;
 
@@ -562,7 +567,9 @@ function wpsc_meta_boxes() {
 
 	//if a variation page do not show these metaboxes
 	if ( is_object( $post ) && $post->post_parent == 0 ) {
-		add_meta_box( 'wpsc_product_variation_forms'    , __( 'Variations', 'wp-e-commerce' )           , 'wpsc_product_variation_forms'    , $pagename, 'normal', 'high' );
+		if ( ! ( defined( 'DISABLE_WPSC_VARIATIONS' ) && DISABLE_WPSC_VARIATIONS ) ) {
+			add_meta_box('wpsc_product_variation_forms', __('Variations', 'wp-e-commerce'), 'wpsc_product_variation_forms', $pagename, 'normal', 'high');
+		}
 	} else if( is_object( $post ) && $post->post_status == "inherit" ) {
 		remove_meta_box( 'tagsdiv-product_tag'             , 'wpsc-product', 'core' );
 		remove_meta_box( 'wpsc_product_categorydiv'        , 'wpsc-product', 'core' );
