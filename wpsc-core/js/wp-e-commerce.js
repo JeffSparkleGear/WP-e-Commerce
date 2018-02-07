@@ -1117,7 +1117,7 @@ jQuery(document).ready(function ($) {
 	jQuery( 'form.product_form, .wpsc-add-to-cart-button-form' ).on( 'submit', function() {
 		// we cannot submit a file through AJAX, so this needs to return true to submit the form normally if a file formfield is present
 		file_upload_elements = jQuery.makeArray( jQuery( 'input[type="file"]', jQuery( this ) ) );
-		if(file_upload_elements.length > 0) {
+		if(false && file_upload_elements.length > 0) {
 			return true;
 		} else {
 
@@ -1143,6 +1143,7 @@ jQuery(document).ready(function ($) {
 						if ( jQuery( '#fancy_notification_content' ) ) {
 							jQuery( '#fancy_notification_content' ).html( response.fancy_notification );
 							jQuery( '#loading_animation').css( 'display', 'none' );
+                            jQuery( '#fancy_notification' ).css( 'display', 'block' );
 							jQuery( '#fancy_notification_content' ).css( 'display', 'block' );
 						}
 					}
