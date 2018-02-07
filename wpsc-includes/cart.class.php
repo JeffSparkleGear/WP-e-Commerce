@@ -927,7 +927,7 @@ class wpsc_cart {
 	 */
 	function calculate_total_weight( $for_shipping = false ) {
 		global $wpdb;
-		$total = '';
+		$total = 0;
 		if ( $for_shipping == true ) {
 			foreach ( $this->cart_items as $key => $cart_item ) {
 				if ( $cart_item->uses_shipping == 1 ) {
@@ -1080,7 +1080,7 @@ class wpsc_cart {
 	 */
 	function calculate_per_item_shipping( $method = null ) {
 		global $wpdb, $wpsc_shipping_modules;
-		$total = '';
+		$total = 0;
 		if ( $method == null ) {
 			$method = $this->selected_shipping_method;
 		}

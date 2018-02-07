@@ -380,7 +380,7 @@ class wpsc_cart_item {
 
 	function calculate_shipping($method = null) {
 		global $wpdb, $wpsc_cart, $wpsc_shipping_modules;
-		$shipping = '';
+		$shipping = 0;
 		if($method === null)
 			$method = $this->cart->selected_shipping_method;
 
