@@ -35,9 +35,14 @@ Variables
 	margin: 0 0 7% 2.5%;
 	font-size: initial;
 	vertical-align: top;
+	padding-top: 0;
 }
 
-.wpsc-grid .wpsc-page-main-store .wpsc-product-summary {
+.wpsc-grid .wpsc-product + .wpsc-product {
+	margin-top: 0;
+}
+
+.wpsc-grid .wpsc-product-summary {
 	width: 100%;
 }
 
@@ -235,6 +240,34 @@ Variables
 	float: right;
 }
 
+.wpsc-list .wpsc-add-to-cart-form {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: flex-start;
+	-moz-justify-content: flex-start;
+	-ms-justify-content: flex-start;
+	justify-content: flex-start;
+	-webkit-flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-align-items: center;
+	-moz-align-items: center;
+	-ms-align-items: center;
+	align-items: center;
+}
+
+.wpsc-list .wpsc-add-to-cart-form .wpsc-form-actions {
+	margin-bottom: 0;
+}
+
+.wpsc-list .wpsc-add-to-cart-form .wpsc-field {
+	margin-right: 5%;
+}
+
 .wpsc-single { /*****************
   Product List
   *****************/
@@ -247,6 +280,34 @@ Variables
 .wpsc-single .wpsc-product-summary {
 	display: inline-block;
 	float: right;
+}
+
+.wpsc-single .wpsc-add-to-cart-form {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: flex-start;
+	-moz-justify-content: flex-start;
+	-ms-justify-content: flex-start;
+	justify-content: flex-start;
+	-webkit-flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-align-items: center;
+	-moz-align-items: center;
+	-ms-align-items: center;
+	align-items: center;
+}
+
+.wpsc-single .wpsc-add-to-cart-form .wpsc-form-actions {
+	margin-bottom: 0;
+}
+
+.wpsc-single .wpsc-add-to-cart-form .wpsc-field {
+	margin-right: 5%;
 }
 
 /*******************
@@ -580,37 +641,72 @@ Shopping Cart
   ********************/
 }
 
-.wpsc-checkout .entry-content .wpsc-field-textfield input {
+.wpsc-checkout .wpsc-field-textfield input {
 	width: 100%;
 }
 
-.wpsc-checkout .entry-content #wpsc-checkout-form-shipping {
+.wpsc-checkout #wpsc-checkout-form-shipping {
 	margin-left: 5%;
 }
 
-.wpsc-checkout .entry-content fieldset {
-	width: 47.5%;
-	display: inline-block;
-	vertical-align: top;
-}
-
-.wpsc-checkout .entry-content .wpsc-field-wpsc_shipping_option,
-.wpsc-checkout .entry-content .wpsc-shipping-method,
-.wpsc-checkout .entry-content .wpsc-payment-method,
-.wpsc-checkout .entry-content #wpsc-checkout-form .wpsc-form-actions {
+.wpsc-checkout .wpsc-field-wpsc_shipping_option,
+.wpsc-checkout .wpsc-shipping-method,
+.wpsc-checkout .wpsc-payment-method,
+.wpsc-checkout .wpsc-checkout-form .wpsc-form-actions {
 	text-align: left;
 }
 
-.wpsc-checkout .entry-content .wpsc-order-preview {
+.wpsc-checkout .wpsc-checkout-form {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-justify-content: space-between;
+	-moz-justify-content: space-between;
+	-ms-justify-content: space-between;
+	justify-content: space-between;
+}
+
+.wpsc-checkout .wpsc-checkout-form .wpsc-form-actions {
+	width: 100%;
+}
+
+.wpsc-checkout .wpsc-checkout-form fieldset {
+	margin: 0 0 2em 0;
+	vertical-align: top;
+	-webkit-align-self: flex-start;
+	-moz-align-self: flex-start;
+	-ms-align-self: flex-start;
+	align-self: flex-start;
+	-webkit-flex-grow: 1;
+	-moz-flex-grow: 1;
+	-ms-flex-grow: 1;
+	flex-grow: 1;
+	-webkit-flex-basis: 3%;
+	-moz-flex-basis: 3%;
+	-ms-flex-basis: 3%;
+	flex-basis: 3%;
+}
+
+.wpsc-checkout .wpsc-order-preview {
 	margin-bottom: 1.5em;
 }
 
-.wpsc-checkout .entry-content .wpsc-cart-quantity-input {
+.wpsc-checkout .wpsc-cart-quantity-input {
 	width: 40px;
 }
 
-.wpsc-checkout .entry-content .wpsc-form-radio-wrapper img {
+.wpsc-checkout .wpsc-form-radio-wrapper img {
 	vertical-align: middle;
+}
+
+.wpsc-checkout .wpsc-paypal li {
+	list-style-type: none;
 }
 
 /**********************
@@ -676,6 +772,135 @@ Accounts Page
 
 .wpsc-customer-account-digital-content .wpsc-cart-header {
 	border-top: 0;
+}
+
+/*******************
+JS Float Label
+********************/
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country,
+.wpsc-controller.wpsc-float-js .wpsc-field-password {
+	position: relative;
+}
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield input,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-password input,
+.wpsc-controller.wpsc-float-js .wpsc-field-password textarea {
+	padding: 1em;
+}
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield input,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country label,
+.wpsc-controller.wpsc-float-js .wpsc-field-password input,
+.wpsc-controller.wpsc-float-js .wpsc-field-password textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-password label {
+	-webkit-transition: 0.2s ease-in-out;
+	-moz-transition: 0.2s ease-in-out;
+	-ms-transition: 0.2s ease-in-out;
+	-o-transition: 0.2s ease-in-out;
+	transition: 0.2s ease-in-out;
+}
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country label,
+.wpsc-controller.wpsc-float-js .wpsc-field-password label {
+	position: absolute;
+	top: 1em;
+	left: 1em;
+	opacity: 0;
+}
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.focused label,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.populated label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.focused label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.populated label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.focused label,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.populated label,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.focused label,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.populated label {
+	opacity: 1;
+	top: 0;
+	left: 1em;
+	font-size: 0.65em;
+	font-weight: 600;
+}
+
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.focused input,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.focused textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.populated input,
+.wpsc-controller.wpsc-float-js .wpsc-field-textfield.populated textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.focused input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.focused textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.populated input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_region.populated textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.focused input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.focused textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.populated input,
+.wpsc-controller.wpsc-float-js .wpsc-field-select_country.populated textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.focused input,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.focused textarea,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.populated input,
+.wpsc-controller.wpsc-float-js .wpsc-field-password.populated textarea {
+	padding-top: 1.5em;
+	padding-bottom: .5em;
+}
+
+/*******************
+Product Forms
+********************/
+
+.wpsc-field-quantity .wpsc-controls {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	border: 1px solid #ccc;
+}
+
+.wpsc-field-quantity .wpsc-controls input[type="text"] {
+	width: 40px;
+	-webkit-order: 2;
+	-moz-order: 2;
+	-ms-order: 2;
+	order: 2;
+	text-align: center;
+	border: none;
+	box-shadow: none;
+}
+
+.wpsc-field-quantity .wpsc-controls .dec {
+	-webkit-order: 1;
+	-moz-order: 1;
+	-ms-order: 1;
+	order: 1;
+}
+
+.wpsc-field-quantity .wpsc-controls .inc {
+	-webkit-order: 3;
+	-moz-order: 3;
+	-ms-order: 3;
+	order: 3;
+}
+
+.wpsc-field-quantity .wpsc-qty-button {
+	padding: .5em .75em;
+	cursor: pointer;
 }
 
 /*****************

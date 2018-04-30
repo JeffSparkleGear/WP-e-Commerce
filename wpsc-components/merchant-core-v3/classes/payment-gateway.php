@@ -241,15 +241,6 @@ final class WPSC_Payment_Gateways {
 			require_once $file;
 		}
 
-		if ( is_callable( array( $classname, 'load' ) ) && ! call_user_func( array( $classname, 'load' ) ) ) {
-
-			self::unregister_file( $filename );
-
-			$error = new WP_Error( 'wpsc-payment', __( 'Error', 'wp-e-commerce' ) );
-
-			return $error;
-		}
-
 		$meta = array(
 			'class'        => $classname,
 			'path'         => $file,
@@ -261,6 +252,14 @@ final class WPSC_Payment_Gateways {
 
 		if ( is_wp_error( $gateway ) ) {
 			return $gateway;
+		}
+
+		if ( ! $gateway->load() ) {
+			self::unregister_file( $filename );
+
+			$error = new WP_Error( 'wpsc-payment', __( 'Error', 'wp-e-commerce' ) );
+
+			return $error;
 		}
 
 		$meta['name']  = $gateway->get_title();
@@ -359,7 +358,7 @@ final class WPSC_Payment_Gateways {
 	 * Initialize the Active Gateways
 	 *
 	 * @access public
-	 * @since 4.0
+	 * @since 3.9.0
 	 *
 	 * @return void
 	 */
@@ -384,7 +383,7 @@ final class WPSC_Payment_Gateways {
 	 *
 	 * @link http://www.currency-iso.org/dam/downloads/table_a1.xml
 	 *
-	 * @since  4.0
+	 * @since  3.9.0
 	 *
 	 * @return array Currency ISO codes that do not use fractions.
 	 */
@@ -421,7 +420,7 @@ final class WPSC_Payment_Gateways {
 	 *
 	 * MC (monaco) and IM (Isle of Man, part of UK) also use VAT.
 	 *
-	 * @since  4.0
+	 * @since  3.9.0
 	 * @param  $type Type of countries to retrieve. Blank for EU member countries. eu_vat for EU VAT countries.
 	 * @return string[]
 	 */
@@ -549,7 +548,7 @@ abstract class WPSC_Payment_Gateway {
 	 *
 	 * @param string $feature string The name of a feature to test support for.
 	 * @return bool True if the gateway supports the feature, false otherwise.
-	 * @since 4.0
+	 * @since 3.9.0
 	 */
 	public function supports( $feature ) {
 		return apply_filters( 'wpsc_payment_gateway_supports', in_array( $feature, $this->supports ) ? true : false, $feature, $this );
@@ -749,11 +748,15 @@ abstract class WPSC_Payment_Gateway {
 	 * You should use this function for hooks with actions and filters that are required by the gateway.
 	 *
 	 * @access public
-	 * @since 4.0
+	 * @since 3.9.0
 	 *
 	 * @return void
 	 */
 	public function init() {}
+
+	public function load() {
+		return true;
+	}
 
 	/**
 	 * Process refund
@@ -761,15 +764,30 @@ abstract class WPSC_Payment_Gateway {
 	 * If the gateway declares 'refunds' support, this will allow it to refund
 	 * a passed in amount.
 	 *
-	 * @param  int    $order_id
+	 * @param  int     $purchase_log The WPSC_Purchase_Log object.
 	 * @param  float   $amount
 	 * @param  string  $reason
 	 * @param  boolean $manual If refund is a manual refund.
 	 *
-	 * @since 4.0.0
+	 * @since 3.9.0
 	 * @return bool|WP_Error True or false based on success, or a WP_Error object
 	 */
-	public function process_refund( $order_id, $amount = 0.00, $reason = '', $manual = false ) {
+	public function process_refund( $purchase_log, $amount = 0.00, $reason = '', $manual = false ) {
+		return false;
+	}
+
+	/**
+	 * Capture Payment
+	 *
+	 * If the gateway declares 'auth-capture' or 'partial-refunds' support,
+	 * this allows a previously authorized payment to be captured.
+	 *
+	 * @param  int     $purchase_log The WPSC_Purchase_Log object.
+	 *
+	 * @since 3.12.0
+	 * @return bool|WP_Error True or false based on success, or a WP_Error object
+	 */
+	public function capture_payment( $purchase_log, $transaction_id ) {
 		return false;
 	}
 }

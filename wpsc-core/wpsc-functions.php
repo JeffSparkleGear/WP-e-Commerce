@@ -308,6 +308,39 @@ function wpsc_core_load_purchase_log_statuses() {
 			),
 			'order'          => 6,
 		),
+		array(
+			'internalname'   => 'refunded',
+			'label'          => __( 'Refunded', 'wp-e-commerce' ),
+			'view_label'     => _nx_noop(
+				'Refunded <span class="count">(%d)</span>',
+				'Refunded <span class="count">(%d)</span>',
+				'Purchase log view links',
+				'wp-e-commerce'
+			),
+			'order'          => 7,
+		),
+		array(
+			'internalname'   => 'refund_pending',
+			'label'          => __( 'Refund Pending', 'wp-e-commerce' ),
+			'view_label'     => _nx_noop(
+				'Refund Pending <span class="count">(%d)</span>',
+				'Refund Pending <span class="count">(%d)</span>',
+				'Purchase log view links',
+				'wp-e-commerce'
+			),
+			'order'          => 8,
+		),
+		array(
+			'internalname'   => 'partially_refunded',
+			'label'          => __( 'Partially Refunded', 'wp-e-commerce' ),
+			'view_label'     => _nx_noop(
+				'Partially Refunded <span class="count">(%d)</span>',
+				'Partially Refunded <span class="count">(%d)</span>',
+				'Purchase log view links',
+				'wp-e-commerce'
+			),
+			'order'          => 9,
+		),
 	);
 	$wpsc_purchlog_statuses = apply_filters( 'wpsc_set_purchlog_statuses', $wpsc_purchlog_statuses );
 }
@@ -677,7 +710,7 @@ function wpsc_get_page_post_names() {
  * @return void
  */
 function wpsc_cron() {
-	$default_schedules = array( 'hourly', 'twicedaily', 'daily', 'weekly');
+	$default_schedules = array( 'hourly', 'twicedaily', 'daily', 'weekly' );
 
 	/*
 	 * Create a cron event for each likely cron schedule.  The likely cron schedules
@@ -1003,7 +1036,7 @@ add_action( 'admin_init', '_wpsc_clear_wp_cache_on_version_change', 1 );
  *
  * In a future version, we will likely have a `System` page that would include a link to the repair.php page.
  *
- * @since  4.0
+ * @since  3.11.0
  *
  * @param  array $tables Core tables
  *

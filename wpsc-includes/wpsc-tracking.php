@@ -45,7 +45,7 @@ class WPSC_Tracking {
 	 * @access public
 	 */
 	public function __construct() {
-		add_action( 'init'                           , array( $this, 'schedule_send' ) );
+		add_action( 'admin_init'                     , array( $this, 'capture_tracking_settings' ) );
 		add_action( 'wpsc_opt_into_tracking'         , array( $this, 'check_for_optin' ) );
 		add_action( 'wpsc_opt_out_of_tracking'       , array( $this, 'check_for_optout' ) );
 		add_action( 'wpsc_settings_page_save_options', array( $this, 'check_for_settings_optin' ), 10, 2 );
@@ -59,7 +59,7 @@ class WPSC_Tracking {
 	 * @access public
 	 * @return void
 	 */
-	public function schedule_send() {
+	public function capture_tracking_settings() {
 
 		if ( isset( $_REQUEST['wpsc_tracking_action'] ) && ( $_REQUEST['wpsc_tracking_action'] == 'opt_into_tracking' ) ) {
 			do_action( 'wpsc_opt_into_tracking' );
@@ -68,9 +68,6 @@ class WPSC_Tracking {
 		if ( isset( $_REQUEST['wpsc_tracking_action'] ) && ( $_REQUEST['wpsc_tracking_action'] == 'opt_out_of_tracking' ) ) {
 			do_action( 'wpsc_opt_out_of_tracking' );
 		}
-
-		// We send once a week (while tracking is allowed) to check in, which can be used to determine active sites
-		add_action( 'wpsc_weekly_cron_task', array( $this, 'send_data' ) );
 	}
 
 	/**
@@ -245,6 +242,8 @@ class WPSC_Tracking {
 		// General site info
 		$data['url']                = home_url();
 		$data['email']              = get_option( 'admin_email' );
+		$data['first_name']         = wp_get_current_user()->first_name;
+		$data['last_name']          = wp_get_current_user()->last_name;
 
 		// Theme info
 		$data['theme']              = self::get_theme_info();
@@ -420,9 +419,12 @@ class WPSC_Tracking {
 	private static function get_wpec_info() {
 		$wpec_data = array();
 
-		$wpec_data['version'] = WPSC_VERSION;
-		$wpec_data['url']     = WPSC_URL;
-		$wpec_data['debug']   = WPSC_DEBUG;
+		$base_country = new WPSC_Country( wpsc_get_base_country() );
+
+		$wpec_data['version']      = WPSC_VERSION;
+		$wpec_data['url']          = WPSC_URL;
+		$wpec_data['base_country'] = $base_country->get_name();
+		$wpec_data['debug']        = WPSC_DEBUG;
 
 		return $wpec_data;
 	}

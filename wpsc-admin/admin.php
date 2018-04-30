@@ -123,7 +123,7 @@ add_filter('set-screen-option', 'wpsc_set_screen_option', 99, 3);
  * @param   string  $taxonomy  Taxonomy.
  * @param   string  $context   Context.
  *
- * @since  4.0.0
+ * @since  3.11.5
  *
  * @return  array              Filtered dropdown args.
  */
@@ -437,6 +437,7 @@ function wpsc_admin_include_purchase_logs_css_and_js() {
 		'purchase_log_save_tracking_id_nonce'    => _wpsc_create_ajax_nonce( 'purchase_log_save_tracking_id' ),
 		'purchase_log_send_tracking_email_nonce' => _wpsc_create_ajax_nonce( 'purchase_log_send_tracking_email' ),
 		'purchase_log_refund_items_nonce'        => _wpsc_create_ajax_nonce( 'purchase_log_refund_items' ),
+		'purchase_log_capture_payment_nonce'     => _wpsc_create_ajax_nonce( 'purchase_log_capture_payment' ),
 		'remove_log_item_nonce'                  => _wpsc_create_ajax_nonce( 'remove_log_item' ),
 		'update_log_item_qty_nonce'              => _wpsc_create_ajax_nonce( 'update_log_item_qty' ),
 		'add_log_item_nonce'                     => _wpsc_create_ajax_nonce( 'add_log_item' ),
@@ -1566,7 +1567,7 @@ add_filter( 'plugin_action_links_' . WPSC_PLUGIN_BASENAME, 'wpsc_support_links' 
  *
  * @param  array $args Array of removable query args.
  *
- * @since  4.0.0
+ * @since  3.11.5
  *
  * @return array $args Array of removable query args.
  */
@@ -1583,7 +1584,7 @@ add_filter( 'removable_query_args', 'wpsc_removable_query_args' );
  * @param  array $bulk_messages Array of bulk messages.
  * @param  int   $bulk_counts   The amount of messages affected.
  *
- * @since  4.0.0
+ * @since  3.11.5
  *
  * @return array                Array of bulk messages.
  */
@@ -1624,3 +1625,9 @@ function wpsc_admin_rate_us( $footer_text ) {
 	}
 }
 add_filter( 'admin_footer_text', 'wpsc_admin_rate_us' );
+
+function wpsc_product_category_edit_form_tag() {
+	echo 'enctype="multipart/form-data" ';
+}
+add_action( 'wpsc_product_category_term_new_form_tag', 'wpsc_product_category_edit_form_tag' );
+add_action( 'wpsc_product_category_term_edit_form_tag', 'wpsc_product_category_edit_form_tag' );

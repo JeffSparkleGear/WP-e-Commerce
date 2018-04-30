@@ -462,8 +462,7 @@ class WPSC_Cart {
 	 * @access public
 	 */
 	function update_shipping( $method, $option ) {
-		global $wpdb, $wpsc_shipping_modules;
-
+		global $wpsc_shipping_modules;
 
 		if ( ! empty( $method ) ) {
 			$this->selected_shipping_method = $method;
@@ -839,7 +838,6 @@ class WPSC_Cart {
 	 * @return float returns the price as a floating point value
 	 */
 	public function calculate_subtotal( $for_shipping = false ) {
-		global $wpdb;
 		if ( $for_shipping == true ) {
 			$total = 0;
 			foreach ( $this->cart_items as $key => $cart_item ) {
@@ -1103,8 +1101,6 @@ class WPSC_Cart {
 	 * @return float returns the price as a floating point value
 	 */
 	function uses_shipping() {
-		global $wpdb;
-
 		if ( get_option( 'do_not_use_shipping' ) ) {
 			return false;
 		}
@@ -1143,8 +1139,6 @@ class WPSC_Cart {
 	 *
 	 */
 	function save_to_db( $purchase_log_id ) {
-		global $wpdb;
-
 		foreach ( $this->cart_items as $key => $cart_item ) {
 			$cart_item->save_to_db( $purchase_log_id );
 		}

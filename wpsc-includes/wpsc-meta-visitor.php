@@ -558,7 +558,7 @@ function wpsc_get_visitor_list( $include_expired_visitors ) {
  */
 function wpsc_get_visitor_cart( $visitor_id ) {
 
-	$wpsc_cart = new wpsc_cart( false );
+	$wpsc_cart = new WPSC_Cart( false );
 	if ( _wpsc_visitor_database_ready() ) {
 
 		foreach ( $wpsc_cart as $key => $value ) {
