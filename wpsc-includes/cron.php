@@ -36,6 +36,8 @@ function wpsc_clear_stock_claims() {
  */
 function _wpsc_delete_expired_visitors() {
 
+	error_log( __FUNCTION__ );
+	
 	if ( ! defined( 'WPSC_MAX_DELETE_PROFILE_TIME' ) ) {
 		define( 'WPSC_MAX_DELETE_PROFILE_TIME', 20 );
 	}
@@ -49,8 +51,13 @@ function _wpsc_delete_expired_visitors() {
 
 	$expired_visitor_ids = wpsc_get_expired_visitor_ids();
 
+	$expired_count = count( $expired_visitor_ids );
+
+	error_log( __FUNCTION__ . '::' .__LINE__ . ' expired visitor count is ' . $expired_count );
+
 	$a_little_bit_of_time_after_start = time() + WPSC_MAX_DELETE_PROFILE_TIME;
 	$too_much_memory_is_being_used = memory_get_usage( true ) + WPSC_MAX_DELETE_MEMORY_USAGE;
+	$deleted_visitor_count = 0;
 
 	// For each of the ids double check to be sure there isn't any important data associated with the temporary user.
 	// If important data is found the user is no longer temporary. We also use a filter so that if other plug-ins
@@ -58,6 +65,7 @@ function _wpsc_delete_expired_visitors() {
 	// have that chance.
 	foreach ( $expired_visitor_ids as $index => $expired_visitor_id ) {
 		wpsc_do_delete_visitor_ajax( $expired_visitor_id );
+		$deleted_visitor_count++;
 
 		unset( $expired_visitor_ids[$index] );
 
@@ -72,6 +80,8 @@ function _wpsc_delete_expired_visitors() {
 			break;
 		}
 	}
+
+	error_log( __FUNCTION__ . '::' .__LINE__ . ' Deleted ' .  $deleted_visitor_count . ' expired visitors' );
 
 	// Since there are no visitors to delete this is a good time to cleanup the visitors meta table
 	// eliminating any orphaned meta data, asingle SQL query will do it!
@@ -99,11 +109,12 @@ function _wpsc_delete_expired_visitors() {
 function wpsc_do_delete_visitor_ajax( $visitor_id ) {
 
 	$delete_visitor_nonce_action = 'wpsc_delete_visitor_id_' .  $visitor_id;
+	$remote_ajax_url = admin_url( 'admin-ajax.php', 'https' );
 
 	$wpsc_security = wp_create_nonce( $delete_visitor_nonce_action );
 
 	$response = wp_safe_remote_post(
-									admin_url( 'admin-ajax.php' ),
+									$remote_ajax_url,
 									array(
 										'method'      => 'POST',
 										'timeout'     => 15,
@@ -113,12 +124,17 @@ function wpsc_do_delete_visitor_ajax( $visitor_id ) {
 										'headers'     => array(),
 										'body'        => array( 'action' => 'wpsc_delete_visitor', 'wpsc_visitor_id' => $visitor_id, 'wpsc_security' => $wpsc_security, ),
 										'cookies'     => array(),
+										'sslverify'   => false,
 									)
 								);
 
 	if ( is_wp_error( $response ) ) {
+		error_log( __FUNCTION__ . '::' .__LINE__ . ' ERROR: deleting visitor id ' . $visitor_id );
+		error_log( 'Remote AJAX URL:' . $remote_ajax_url );
+		error_log( var_export( $response, true ) );
 		$result = false;
 	} else {
+		error_log( __FUNCTION__ . '::' .__LINE__ . ' SUCCESS: deleting visitor id ' . $visitor_id );
 		$result = true;
 	}
 

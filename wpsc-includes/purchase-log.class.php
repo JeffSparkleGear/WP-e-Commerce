@@ -705,6 +705,9 @@ class WPSC_Purchase_Log {
 		return apply_filters( 'wpsc_purchase_log_get_property', $value, $key, $this );
 	}
 
+	/**
+	 * @return
+	 */
 	public function get_cart_contents() {
 		global $wpdb;
 

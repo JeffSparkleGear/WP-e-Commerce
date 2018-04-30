@@ -396,13 +396,20 @@ function _wpsc_ajax_purchase_log_send_tracking_email() {
 	$subject = get_option( 'wpsc_trackingid_subject' );
 	$subject = str_replace( '%shop_name%', get_option( 'blogname' ), $subject );
 
+	$subject = apply_filters( 'wpsc_tracking_email_subject', $subject, $trackingid, $id, $email );
+	$message = apply_filters( 'wpsc_tracking_email_message', $message, $trackingid, $id, $email );
+
 	add_filter( 'wp_mail_from', 'wpsc_replace_reply_address', 0 );
 	add_filter( 'wp_mail_from_name', 'wpsc_replace_reply_name', 0 );
 
-	$result = wp_mail( $email, $subject, $message);
+	$result = apply_filters( 'wpsc_send_tracking_email_message', true, $email, $subject, $message, $trackingid, $id );
 
-	if ( ! $result ) {
-		return new WP_Error( 'wpsc_cannot_send_tracking_email', __( "Couldn't send tracking email. Please try again.", 'wp-e-commerce' ) );
+	if ( $result ) {
+		$result = wp_mail( $email, $subject, $message );
+
+		if ( ! $result ) {
+			return new WP_Error( 'wpsc_cannot_send_tracking_email', __( "Couldn't send tracking email. Please try again.", 'wp-e-commerce' ) );
+		}
 	}
 
 	$return = array(

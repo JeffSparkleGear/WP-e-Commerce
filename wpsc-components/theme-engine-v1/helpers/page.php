@@ -1205,9 +1205,12 @@ function wpsc_remove_page_from_query_string( $query_string ) {
 	if ( isset( $query_string['name'] ) && $query_string['name'] == 'page' && isset( $query_string['page'] ) ) {
 		unset( $query_string['name'] );
 
-		list( $delim, $page_index ) = explode( '/', $query_string['page'] );
-
-		$query_string['paged'] = $page_index;
+		if ( is_numeric( $query_string['page'] )  ) {
+			$query_string['paged'] = intval( $query_string['page'] );
+		} else {
+			list($delim, $page_index) = explode('/', $query_string['page']);
+			$query_string['paged'] = $page_index;
+		}
 	}
 
 	if ( isset( $query_string['wpsc-product'] ) && 'page' == $query_string['wpsc-product'] ) {

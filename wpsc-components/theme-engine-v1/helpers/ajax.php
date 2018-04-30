@@ -570,11 +570,18 @@ function wpsc_populate_also_bought_list() {
  * No parameters, returns nothing
  */
 function wpsc_submit_checkout( $collected_data = true ) {
-	global $wpdb, $wpsc_cart, $user_ID, $nzshpcrt_gateways, $wpsc_shipping_modules, $wpsc_gateways;
+	global $wpsc_cart, $user_ID;
+
+	$customer_id = wpsc_get_current_customer_id();
+
+	error_log( __FUNCTION__ . ' ' . $customer_id . ' $_REQUEST: ' . var_export( $_POST, true ) );
 
 	if ( $collected_data && isset( $_POST['collected_data'] ) && is_array( $_POST['collected_data'] ) ) {
 		_wpsc_checkout_customer_meta_update( $_POST['collected_data'] );
 	}
+
+	// make sure the cart locations are in sync with most recent customer meta
+    $wpsc_cart->update_location();
 
 	// initialize our checkout status variable, we start be assuming
 	// checkout is falid, until we find a reason otherwise
@@ -593,7 +600,6 @@ function wpsc_submit_checkout( $collected_data = true ) {
 
 	$wpsc_checkout = new wpsc_checkout();
 
-	$selected_gateways = get_option( 'custom_gateway_options' );
 	$submitted_gateway = isset( $_POST['custom_gateway'] ) ? $_POST['custom_gateway'] : '';
 
 	if ( $collected_data ) {

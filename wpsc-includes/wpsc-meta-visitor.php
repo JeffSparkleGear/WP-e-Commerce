@@ -1351,6 +1351,7 @@ function wpsc_delete_visitor_ajax() {
 
 	if ( ! wp_verify_nonce( $security_nonce, $delete_visitor_nonce_action ) ) {
 		// This nonce is not valid.
+		error_log( __FUNCTION__ . ' deleting vistor id failed the security check ' );
 		die( 'Security check' );
 	} else {
 		error_log( __FUNCTION__ . ' deleting vistor id ' . $visitor_id_to_delete );

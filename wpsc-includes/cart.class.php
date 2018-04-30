@@ -426,7 +426,7 @@ class wpsc_cart {
 	 *
 	 * @access public
 	 *
-	 * @return none
+	 * @return null
 	 */
 	function get_shipping_option() {
 		global $wpsc_shipping_modules;
@@ -838,7 +838,7 @@ class wpsc_cart {
 	 * @param boolean for_shipping = exclude items with no shipping,
 	 * @return float returns the price as a floating point value
 	 */
-	function calculate_subtotal( $for_shipping = false ) {
+	public function calculate_subtotal( $for_shipping = false ) {
 		global $wpdb;
 		if ( $for_shipping == true ) {
 			$total = 0;
@@ -878,6 +878,9 @@ class wpsc_cart {
 	 * @return array        Cart items
 	 */
 	public function get_items( $args = array() ) {
+		$order = 'ASC';
+		$fields = 'all';
+
 		$defaults = array(
 				'fields'  => 'all',
 				'orderby' => '',
@@ -926,8 +929,7 @@ class wpsc_cart {
 	 * @return float returns the price as a floating point value
 	 */
 	function calculate_total_weight( $for_shipping = false ) {
-		global $wpdb;
-		$total = '';
+		$total = 0;
 		if ( $for_shipping == true ) {
 			foreach ( $this->cart_items as $key => $cart_item ) {
 				if ( $cart_item->uses_shipping == 1 ) {
@@ -1079,8 +1081,7 @@ class wpsc_cart {
 	 * @return float returns the shipping as a floating point value
 	 */
 	function calculate_per_item_shipping( $method = null ) {
-		global $wpdb, $wpsc_shipping_modules;
-		$total = '';
+		$total = 0;
 		if ( $method == null ) {
 			$method = $this->selected_shipping_method;
 		}
@@ -1329,7 +1330,7 @@ class wpsc_cart {
 	/**
 	 * Applying Coupons
 	 */
-	function apply_coupons( $coupons_amount = '', $coupon_name = '' ) {
+	public function apply_coupons( $coupons_amount = '', $coupon_name = '' ) {
 		$this->clear_cache();
 		$this->coupons_name = $coupon_name;
 		$this->coupons_amount = apply_filters( 'wpsc_coupons_amount', $coupons_amount, $coupon_name, $this );

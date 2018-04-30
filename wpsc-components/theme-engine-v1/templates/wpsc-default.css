@@ -488,8 +488,9 @@ table.list_productdisplay p.soldout {
 .single_product_display form.product_form fieldset p, #content .single_product_display form.product_form fieldset p {
 	margin:0 0 10px 0;
 	padding:0;
-	line-height:1.2em;
-	font-size:14px;
+	/* jas 11-16-2016 */
+	/*line-height:1.2em;*/
+	/*font-size:14px;*/
 }
 
 .default_product_display .wpsc_variation_forms {
