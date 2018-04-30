@@ -417,7 +417,7 @@ function _wpsc_filter_control_submit( $output, $field, $args ) {
 		$class .= ' wpsc-button-primary';
 	}
 
-	$output .= wpsc_form_submit( $name, $title, array( 'class' => $class ), false );
+	$output .= wpsc_form_submit( $name, $title, array( 'class' => $class, 'id' => $id ), false );
 
 	return $output;
 }
@@ -434,18 +434,21 @@ function _wpsc_filter_control_hidden( $output, $field, $args ) {
 }
 
 function _wpsc_filter_control_button( $output, $field, $args ) {
-	extract( $field );
 	$class = $args['id'] . '-button wpsc-button';
 
 	if ( $field['primary'] ) {
 		$class .= ' wpsc-button-primary';
 	}
 
+	if ( isset( $field['button_class'] ) ) {
+		$class .= ' ' . $field['button_class'];
+	}
+
 	if ( ! isset( $field['icon'] ) ) {
 		$field['icon'] = '';
 	}
 
-	$output .= wpsc_form_button( $name, $title, array( 'class' => $class, 'icon' => $field['icon'] ), false );
+	$output .= wpsc_form_button( $field['name'], $field['title'], array( 'class' => $class, 'icon' => $field['icon'] ), false );
 
 	return $output;
 }

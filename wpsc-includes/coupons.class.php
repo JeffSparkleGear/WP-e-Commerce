@@ -69,7 +69,7 @@ class wpsc_coupons {
 	 * @param string code (optional) the coupon code you would like to use.
 	 * @return bool True if coupon code exists, False otherwise.
 	 */
-	function __construct( $code = '' ) {
+	public function __construct( $code = '' ) {
 	    global $wpdb;
 
 		if ( empty( $code ) ) {

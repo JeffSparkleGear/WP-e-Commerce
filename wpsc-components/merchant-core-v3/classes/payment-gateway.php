@@ -50,25 +50,35 @@ final class WPSC_Payment_Gateways {
 	 * Return a particular payment gateway object
 	 *
 	 * @access public
+	 *
 	 * @param string $gateway Name of the payment gateway you want to get
-	 * @return object
+	 * @param string $meta    Pass-through parameter for meta
+	 *
+	 * @return WPSC_Payment_Gateway|WP_Error Returns an error if gateway cannot be found, 3.0 gateway otherwise.
 	 * @since 3.9
 	 */
-	public static function &get( $gateway, $meta = false ) {
+	public static function &get( $gateway, $meta = array() ) {
+
+		$errors = new WP_Error();
+
+		if ( empty( $gateway ) ) {
+			$errors->add( 'empty_gateway', __( 'You cannot pass an empty string as a gateway object.', 'wp-e-commerce' ) );
+			return $errors;
+		}
 
 		if ( empty( self::$instances[ $gateway ] ) ) {
 
-			if ( ! $meta ) {
-				$meta = self::$gateways[ $gateway ];
-			}
+            if ( ! $meta ) {
+                $meta = self::$gateways[ $gateway ];
+            }
 
-			if ( ! file_exists( $meta['path'] ) ) {
-				WPSC_Payment_Gateways::flush_cache();
-			}
+            if ( ! file_exists( $meta['path'] ) ) {
+                WPSC_Payment_Gateways::flush_cache();
+            }
 
-			require_once( $meta['path'] );
+            require_once( $meta['path'] );
 
-			$class_name = $meta['class'];
+            $class_name = $meta['class'];
 
 			$options = array(
 				'http_client' => new WPSC_Payment_Gateway_HTTP(),
@@ -100,7 +110,7 @@ final class WPSC_Payment_Gateways {
 		do_action( 'wpsc_after_register_gateways', 'WPSC_Payment_Gateways' );
 
 		// Call the Active Gateways init function
-		self::initialize_gateways();
+		add_action( 'wpsc_ready', array( __CLASS__, 'initialize_gateways' ) );
 
 		if ( isset( $_REQUEST['payment_gateway'] ) && isset( $_REQUEST['payment_gateway_callback'] ) ) {
 			add_action( 'init', array( 'WPSC_Payment_Gateways', 'action_process_callbacks' ) );
@@ -183,7 +193,7 @@ final class WPSC_Payment_Gateways {
 			$return = self::register_file( $path );
 
 			if ( is_wp_error( $return ) ) {
-				//return $return;
+				//We should log this
 			}
 		}
 	}
@@ -310,7 +320,7 @@ final class WPSC_Payment_Gateways {
 	 *               returns false.
 	 */
 	public static function get_meta( $gateway ) {
-		return isset( self::$gateways[$gateway] ) ? self::$gateways[$gateway] : false;
+		return isset( self::$gateways[ $gateway ] ) ? self::$gateways[ $gateway ] : false;
 	}
 
 	/**
@@ -337,8 +347,8 @@ final class WPSC_Payment_Gateways {
 	 */
 	public static function get_active_gateways() {
 		if ( empty( self::$active_gateways ) ) {
-			$selected_gateways = get_option( 'custom_gateway_options', array() );
-			$registered_gateways = self::get_gateways();
+			$selected_gateways     = get_option( 'custom_gateway_options', array() );
+			$registered_gateways   = self::get_gateways();
 			self::$active_gateways = array_intersect( $selected_gateways, $registered_gateways );
 		}
 
@@ -359,7 +369,10 @@ final class WPSC_Payment_Gateways {
 
 		foreach( $active_gateways as $gateway_id ) {
 			$gateway = self::get( $gateway_id );
-			$gateway->init();
+
+			if ( ! is_wp_error( $gateway ) ) {
+				$gateway->init();
+			}
 		}
 	}
 
@@ -451,6 +464,106 @@ abstract class WPSC_Payment_Gateway {
 	public $currency_code;
 
 	public $title;
+
+	/**
+	 * Supported features such as 'default_credit_card_form', 'refunds'.
+	 * @var array
+	 */
+	public $supports = array();
+
+	/**
+	 * Display default credit card form.
+	 *
+	 * @param  array $args
+	 * @param  array $fields
+	 * @since
+	 */
+	public function default_credit_card_form( $args = array(), $fields = array() ) {
+
+		if ( $this->supports( 'tev1' ) && '1.0' == get_option( 'wpsc_get_active_theme_engine' ) ) {
+			// Show 2.0 gateway API table-based code
+			?>
+				<table class="wpsc_checkout_table <?php echo wpsc_gateway_form_field_style(); ?>">
+					<tr>
+						<td><?php _e( 'Card Number', 'wp-e-commerce' ); ?></td>
+						<td>
+							<input type='text' id='card_number' value='' autocomplete="off" />
+						</td>
+					</tr>
+					<tr>
+						<td><?php _e( 'Expiration Date', 'wp-e-commerce' ); ?></td>
+						<td>
+							<input type='text' id='card_expiry_month' value='' autocomplete="off" maxlength='2' size='3' placeholder="<?php esc_attr_e( 'MM', 'wp-e-commerce' ); ?>" />&nbsp;
+							<input type='text' id='card_expiry_year' value='' autocomplete="off" maxlength='2' size='3' placeholder="<?php esc_attr_e( 'YY', 'wp-e-commerce' ); ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td><?php _e( 'Card Code', 'wp-e-commerce' ); ?></td>
+						<td>
+							<input type='text' id='card_code' value='' autocomplete="off" size='5' maxlength='4' placeholder="<?php esc_attr_e( 'CVC', 'wp-e-commerce' ); ?>" />
+						</td>
+					</tr>
+				</table>
+			<?php
+		} else {
+			$default_args = array(
+				'fields_have_names' => true, // Some gateways like stripe don't need names as the form is tokenized.
+			);
+
+			$args = wp_parse_args( $args, apply_filters( 'wpsc_default_credit_card_form_args', $default_args, $this->setting->gateway_name ) );
+			$default_fields = array(
+				'card-number-field' => '<p class="form-row form-row-wide">
+					<label for="' . esc_attr( $this->setting->gateway_name ) . '-card-number">' . __( 'Card Number', 'wp-e-commerce' ) . ' <span class="required">*</span></label>
+					<input id="' . esc_attr( $this->setting->gateway_name ) . '-card-number" class="input-text wpsc-credit-card-form-card-number" type="text" maxlength="20" autocomplete="off" placeholder="•••• •••• •••• ••••" />
+				</p>',
+				'card-expiry-field' => '<p class="form-row form-row-first">
+					<label for="' . esc_attr( $this->setting->gateway_name ) . '-card-expiry">' . __( 'Expiration Date (MM/YY)', 'wp-e-commerce' ) . ' <span class="required">*</span></label>
+					<input id="' . esc_attr( $this->setting->gateway_name ) . '-card-expiry" class="input-text wpsc-credit-card-form-card-expiry" type="text" autocomplete="off" placeholder="' . esc_attr__( 'MM / YY', 'wp-e-commerce' ) . '" />
+				</p>',
+				'card-cvc-field' => '<p class="form-row form-row-last">
+					<label for="' . esc_attr( $this->setting->gateway_name ) . '-card-cvc">' . __( 'Card Code', 'wp-e-commerce' ) . ' <span class="required">*</span></label>
+					<input id="' . esc_attr( $this->setting->gateway_name ) . '-card-cvc" class="input-text wpsc-credit-card-form-card-cvc" type="text" autocomplete="off" placeholder="' . esc_attr__( 'CVC', 'wp-e-commerce' ) . '" />
+				</p>'
+			);
+			$fields = wp_parse_args( $fields, apply_filters( 'wpsc_default_credit_card_form_fields', $default_fields, $this->setting->gateway_name ) );
+			?>
+			<fieldset id="<?php echo $this->setting->gateway_name; ?>-cc-form">
+				<?php do_action( 'wpsc_default_credit_card_form_start', $this->setting->gateway_name ); ?>
+				<?php
+					foreach ( $fields as $field ) {
+						echo $field;
+					}
+				?>
+				<?php do_action( 'wpsc_default_credit_card_form_end', $this->setting->gateway_name ); ?>
+				<div class="clear"></div>
+			</fieldset>
+		<?php
+		}
+	}
+
+
+	/**
+	 * Check if a gateway supports a given feature.
+	 *
+	 * Gateways should override this to declare support (or lack of support) for a feature.
+	 *
+	 * @param string $feature string The name of a feature to test support for.
+	 * @return bool True if the gateway supports the feature, false otherwise.
+	 * @since 4.0
+	 */
+	public function supports( $feature ) {
+		return apply_filters( 'wpsc_payment_gateway_supports', in_array( $feature, $this->supports ) ? true : false, $feature, $this );
+	}
+
+	/**
+	 * If There are no payment fields show the description if set.
+	 * Override this in your gateway if you have some.
+	 */
+	public function payment_fields() {
+		if ( $this->supports( 'default_credit_card_form' ) ) {
+			$this->default_credit_card_form();
+		}
+	}
 
 	/**
 	 * Return the title of the payment gateway. For this to work, $this->title must
@@ -580,15 +693,14 @@ abstract class WPSC_Payment_Gateway {
 		return get_option( 'transact_url' );
 	}
 
-	public function get_shopping_cart_url() {
-		return get_option( 'shopping_cart_url' );
+	public function get_cart_url() {
+
+		return ! wpsc_is_theme_engine( '1.0' ) ? wpsc_get_cart_url() : get_option( 'shopping_cart_url' );
 	}
 
 	public function get_shopping_cart_payment_url() {
 
-		$te = get_option( 'wpsc_get_active_theme_engine', '1.0' );
-
-		return '1.0' !== $te ? wpsc_get_checkout_url( 'shipping-and-billing' ) : get_option( 'shopping_cart_url' );
+		return ! wpsc_is_theme_engine( '1.0' ) ? wpsc_get_checkout_url( 'shipping-and-billing' ) : get_option( 'shopping_cart_url' );
 	}
 
 	public function get_products_page_url() {
@@ -600,15 +712,15 @@ abstract class WPSC_Payment_Gateway {
 		switch ( $this->purchase_log->get( 'processed' ) ) {
 			case 3:
 				// payment worked
-				do_action('wpsc_payment_successful');
+				do_action( 'wpsc_payment_successful' );
 				break;
 			case 1:
 				// payment declined
-				do_action('wpsc_payment_failed');
+				do_action( 'wpsc_payment_failed' );
 				break;
 			case 2:
 				// something happened with the payment
-				do_action('wpsc_payment_incomplete');
+				do_action( 'wpsc_payment_incomplete' );
 				break;
 		}
 
@@ -642,6 +754,24 @@ abstract class WPSC_Payment_Gateway {
 	 * @return void
 	 */
 	public function init() {}
+
+	/**
+	 * Process refund
+	 *
+	 * If the gateway declares 'refunds' support, this will allow it to refund
+	 * a passed in amount.
+	 *
+	 * @param  int    $order_id
+	 * @param  float   $amount
+	 * @param  string  $reason
+	 * @param  boolean $manual If refund is a manual refund.
+	 *
+	 * @since 4.0.0
+	 * @return bool|WP_Error True or false based on success, or a WP_Error object
+	 */
+	public function process_refund( $order_id, $amount = 0.00, $reason = '', $manual = false ) {
+		return false;
+	}
 }
 
 class WPSC_Payment_Gateway_Setting {
@@ -668,7 +798,7 @@ class WPSC_Payment_Gateway_Setting {
 	 * @access private
 	 * @var string
 	 */
-	private $gateway_name = '';
+	public $gateway_name = '';
 
 	/**
 	 * Name of the option containing all the settings in WP DB

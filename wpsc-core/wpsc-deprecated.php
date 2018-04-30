@@ -483,7 +483,7 @@ function wpsc_total_product_count() {
  *
  */
 class WPSC_Query extends WP_Query {
-	function __construct( $query = '' ) {
+	public function __construct( $query = '' ) {
 		_wpsc_deprecated_function( __FUNCTION__, '3.8', 'WP_Query()' );
 		$query = wp_parse_args( $query );
 		$query['post_type'] = 'wpsc-product';
@@ -2356,5 +2356,56 @@ function wpsc_duplicate_product_image_process( $child_post, $new_parent_id ) {
 
 	$duplicate = new WPSC_Duplicate_Product( $child_post->ID, $new_parent_id );
 	$duplicate->duplicate_product_image_process();
+
+}
+
+/**
+ * Fancy Notifications
+ *
+ * @deprecated  Since 4.0. Use WPSC_Fancy_Notifications::fancy_notifications() instead.
+ *
+ * @uses  WPSC_Fancy_Notifications  Fancy notifications class.
+ *
+ * @return  string  Fancy Notification HTML.
+ */
+function fancy_notifications() {
+
+	return WPSC_Fancy_Notifications::fancy_notifications( true );
+
+}
+
+/**
+ * Fancy Notifications
+ *
+ * @deprecated  Since 4.0. Use WPSC_Fancy_Notifications::fancy_notifications() instead.
+ *
+ * @uses  WPSC_Fancy_Notifications  Fancy notifications class.
+ *
+ * @param   boolean  $return  Return or echo.
+ * @return  string            Fancy Notification HTML.
+ */
+function wpsc_fancy_notifications( $return = false ) {
+
+	if ( $return ) {
+		return WPSC_Fancy_Notifications::fancy_notifications( $return );
+	} else {
+		echo WPSC_Fancy_Notifications::fancy_notifications( $return );
+	}
+
+}
+
+/**
+ * Fancy Notification Content
+ *
+ * @deprecated  Since 4.0. Use WPSC_Fancy_Notifications::fancy_notification_content() instead.
+ *
+ * @uses  WPSC_Fancy_Notifications  Fancy notifications class.
+ *
+ * @param   array  $cart_messages  Cart messages.
+ * @return  array                  Cart messages.
+ */
+function fancy_notification_content( $cart_messages ) {
+
+	return WPSC_Fancy_Notifications::fancy_notification_content( $cart_messages );
 
 }

@@ -792,7 +792,7 @@ class wpsc_purchaselogs {
    var $end_timestamp;
 
 	/* Constructor function */
-	function __construct() {
+	public function __construct() {
 		$this->getall_formdata();
 		if ( !isset( $_GET['view_purchlogs_by'] ) && !isset( $_GET['purchlogs_searchbox'] ) ) {
 			$dates = $this->getdates();

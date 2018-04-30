@@ -135,7 +135,7 @@ function _wpsc_action_after_setup_theme() {
 	}
 
 	foreach ( $paths as $path ) {
-		$filename = $path . '/functions.php';
+		$filename = $path . '/wpsc-functions.php';
 		if ( file_exists( $filename ) ) {
 			require_once( $filename );
 		}
@@ -377,6 +377,10 @@ function _wpsc_filter_body_class( $classes ) {
 	$classes[] = 'wpsc-' . _wpsc_get_current_controller_name();
 	$classes[] = 'wpsc-controller-' . _wpsc_get_current_controller_slug();
 
+	if ( wpsc_is_store() || wpsc_is_store_front_page() || wpsc_is_product_category() || wpsc_is_product_tag() ) {
+		$classes[] = 'wpsc-' . wpsc_get_option( 'layout' );
+	}
+
 	return $classes;
 }
 
@@ -478,7 +482,7 @@ function _wpsc_filter_generate_attachment_metadata( $metadata, $id ) {
 		$key = "wpsc_product_{$size}_thumbnail";
 
 		// if this size is not generated for this attachment, skip it
-		if ( ! array_key_exists( $key, $metadata['sizes'] ) ) {
+		if ( ! isset( $metadata['sizes'] ) || ! array_key_exists( $key, $metadata['sizes'] ) ) {
 			continue;
 		}
 
@@ -498,3 +502,20 @@ add_filter(
 	10,
 	2
 );
+
+function wpsc_add_products_per_row_class( $classes ) {
+
+	$layout = wpsc_get_option( 'layout' );
+
+	if ( 'grid' !== $layout ) {
+		return $classes;
+	}
+
+	$rows = wpsc_get_option( 'products_per_row' );
+
+	$classes[] = 'wpsc-column-' . $rows;
+
+	return $classes;
+}
+
+add_filter( 'wpsc_product_class', 'wpsc_add_products_per_row_class' );

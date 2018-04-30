@@ -37,7 +37,7 @@ class wpsc_theming {
 	 *
 	 * @return
 	 */
-	function __construct() {
+	public function __construct() {
 		check_admin_referer( 'wpsc_copy_themes' );
 
 		$this->active_wp_style   = trailingslashit( get_stylesheet_directory() );

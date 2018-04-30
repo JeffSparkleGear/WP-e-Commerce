@@ -297,19 +297,12 @@ function wpsc_stock_control_forms() {
 		$product_meta = maybe_unserialize( $product_data["_wpsc_product_metadata"][0] );
 	}
 
-	// this is to make sure after upgrading to 3.8.9, products will have
-	// "notify_when_none_left" enabled by default if "unpublish_when_none_left"
-	// is enabled.
-	if ( ! isset( $product_meta['notify_when_none_left'] ) ) {
-		$product_meta['notify_when_none_left'] = 0;
-
-		if ( ! empty( $product_meta['unpublish_when_none_left'] ) ) {
-			$product_meta['notify_when_none_left'] = 1;
-		}
-	}
-
 	if ( ! isset( $product_meta['unpublish_when_none_left'] ) ) {
 		$product_meta['unpublish_when_none_left'] = '';
+	}
+
+	if ( ! isset( $product_meta['stock_limit_notify'] ) ) {
+		$product_meta['stock_limit_notify'] = '';
 	}
 
 	// Display live title if stock is set
@@ -321,7 +314,7 @@ function wpsc_stock_control_forms() {
 		echo $live_title;
 	}
 
-	if ( ! empty( $product_meta['unpublish_when_none_left'] ) && ! isset( $product_meta['notify_when_none_left'] ) )
+	if ( ! empty( $product_meta['unpublish_when_none_left'] ) )
 ?>
 		<label for="wpsc_sku"><abbr title="<?php esc_attr_e( 'Stock Keeping Unit', 'wp-e-commerce' ); ?>"><?php esc_html_e( 'SKU:', 'wp-e-commerce' ); ?></abbr></label>
 <?php
@@ -367,14 +360,15 @@ function wpsc_stock_control_forms() {
 							}
 						?>
 					<?php endif; ?>
-
-						<p><?php esc_html_e( 'When stock reduces to zero:', 'wp-e-commerce' ); ?></p>
-						<div class='notify_when_none_left'>
-							<input  type='checkbox' id="notify_when_oos"
-									name='meta[_wpsc_product_metadata][notify_when_none_left]'
-									class='notify_when_oos'<?php checked( $product_meta['notify_when_none_left'] ); ?> />
-							<label for="notify_when_oos"><?php esc_html_e( 'Notify site owner via email', 'wp-e-commerce' ); ?></label>
-						</div>
+						<hr>
+						<p><?php esc_html_e( 'Notify site owner via email when stock reduces to :', 'wp-e-commerce' ); ?>
+							<input type='number' min="0" step="1" style="width:70px; margin-left:10px;"
+								id="stock_limit_notify" name='meta[_wpsc_product_metadata][stock_limit_notify]'
+								size='3' value='<?php echo absint( $product_meta['stock_limit_notify'] ); ?>'
+								class='stock_limit_notify' />
+						</p>
+						<hr>
+						<p><?php esc_html_e( 'When stock reduces to zero:', 'wp-e-commerce' ); ?>
 						<div class='unpublish_when_none_left'>
 							<input  type='checkbox' id="unpublish_when_oos"
 									name='meta[_wpsc_product_metadata][unpublish_when_none_left]'
@@ -387,7 +381,6 @@ function wpsc_stock_control_forms() {
 				<div style='display: none;' class='edit_stock'>
 					 <?php esc_html_e( 'Stock Qty', 'wp-e-commerce' ); ?><input type='text' name='meta[_wpsc_stock]' value='0' size='10' />
 					<div style='font-size:9px; padding:5px;'>
-						<input type='checkbox' class='notify_when_oos' name='meta[_wpsc_product_metadata][notify_when_none_left]' /> <?php esc_html_e( 'Email site owner if this Product runs out of stock', 'wp-e-commerce' ); ?>
 						<input type='checkbox' class='unpublish_when_oos' name='meta[_wpsc_product_metadata][unpublish_when_none_left]' /> <?php esc_html_e( 'Set status to Unpublished if this Product runs out of stock', 'wp-e-commerce' ); ?>
 					</div>
 				</div>
@@ -922,7 +915,7 @@ function wpsc_product_gallery( $post ) {
 	$output .= '</p>';
 
 	// include a nonce for verification
-	$output .= wp_nonce_field( 'wpec_product_gallery_nonce', 'wpec_product_gallery_nonce', false, false );
+	$output .= wp_nonce_field( 'wpsc_product_gallery_nonce', 'wpsc_product_gallery_nonce', false, false );
 
 	// echo the gallery output
 	echo $output;
@@ -1528,7 +1521,7 @@ function variation_price_field_check( $variation ) {
 	<tr class="form-field">
 		<th scope="row" valign="top"><label for="apply_to_current"><?php esc_html_e( 'Apply to current variations?', 'wp-e-commerce' ) ?></label></th>
 		<td>
-			<span class="description"><input type="checkbox" name="apply_to_current" id="apply_to_current" style="width:2%;" <?php echo $checked; ?> /><?php _e( 'By checking this box, the price rule you implement above will be applied to all variations that currently exist.  If you leave it unchecked, it will only apply to products that use this variation created or edited from now on.  Take note, this will apply this rule to <strong>every</strong> product using this variation.  If you need to override it for any reason on a specific product, simply go to that product and change the price.', 'wp-e-commerce' ); ?></span>
+			<span class="description"><input type="checkbox" name="apply_to_current" id="apply_to_current" <?php echo $checked; ?> /><?php _e( 'By checking this box, the price rule you implement above will be applied to all variations that currently exist.  If you leave it unchecked, it will only apply to products that use this variation created or edited from now on.  Take note, this will apply this rule to <strong>every</strong> product using this variation.  If you need to override it for any reason on a specific product, simply go to that product and change the price.', 'wp-e-commerce' ); ?></span>
 		</td>
 	</tr>
 <?php

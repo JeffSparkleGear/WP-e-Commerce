@@ -3,7 +3,7 @@
   * Plugin Name: WP eCommerce
   * Plugin URI: http://wpecommerce.org/
   * Description: A plugin that provides a WordPress Shopping Cart. See also: <a href="http://wpecommerce.org" target="_blank">WPeCommerce.org</a> | <a href="https://wordpress.org/support/plugin/wp-e-commerce/" target="_blank">Support Forum</a> | <a href="http://docs.wpecommerce.org/" target="_blank">Documentation</a>
-  * Version: 3.11.4
+  * Version: 3.11.5
   * Author: WP eCommerce
   * Author URI: http://wpecommerce.org/
   * Text Domain: wp-e-commerce
@@ -87,6 +87,11 @@ class WP_eCommerce {
 				WPSC_FILE_PATH . '/wpsc-components/marketplace-core-v1/marketplace-core-v1.php'
 		);
 
+		$components['fancy-notifications']['fancy-notifications-v1'] = array(
+			'title'    => __( 'Fancy Notifications v1', 'wpsc' ),
+			'includes' => WPSC_FILE_PATH . '/wpsc-components/fancy-notifications/fancy-notifications.php'
+		);
+
 		return $components;
 	}
 
@@ -138,7 +143,7 @@ class WP_eCommerce {
 	/**
 	 * Sets table names as WPDB properties.
 	 *
-	 * @since  4.0
+	 * @since  4.0.0
 	 * @return array Array of custom tables
 	 */
 	public function setup_table_names() {

@@ -160,7 +160,7 @@ class wpsc_checkout {
 	 * wpsc_checkout method, gets the tax rate as a percentage, based on the selected country and region
 	 * @access public
 	 */
-	function __construct( $checkout_set = 0 ) {
+	public function __construct( $checkout_set = 0 ) {
 		global $wpdb;
 		$this->checkout_items = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `active` = '1'  AND `checkout_set`= %s ORDER BY `checkout_order`;", $checkout_set ) );
 
@@ -329,7 +329,7 @@ class wpsc_checkout {
 			case "select":
 				$options = $this->get_checkout_options( $this->checkout_item->id );
 				if ( $options != '' ) {
-					$output = '<select class="wpsc-visitor-meta" data-wpsc-meta-key="' . $meta_key . '" name="collected_data[' . $this->checkout_item->id . ']"' . $an_array . '">';
+					$output = '<select class="wpsc-visitor-meta" data-wpsc-meta-key="' . $meta_key . '" name="collected_data[' . $this->checkout_item->id . ']' . $an_array . '">';
 					$output .= "<option value='-1'>" . _x( 'Select an Option', 'Dropdown default when called within checkout class' , 'wp-e-commerce' ) . "</option>";
 					foreach ( (array)$options as $label => $value ) {
 						$value = esc_attr(str_replace( ' ', '', $value ) );

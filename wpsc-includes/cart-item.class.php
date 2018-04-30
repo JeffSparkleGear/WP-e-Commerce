@@ -13,7 +13,7 @@
 /**
  * The WPSC Cart Items class
  */
-class wpsc_cart_item {
+class WPSC_Cart_Item {
 
 	// Variation Cache
 	private static $variation_cache;
@@ -59,7 +59,7 @@ class wpsc_cart_item {
 	public $priceandstock_id;
 
 	// user provided values
-	public $custom_message = null;
+	public $custom_message = '';
 	public $custom_file = null;
 
 	/**
@@ -484,6 +484,8 @@ class wpsc_cart_item {
 	 * @access public
 	 *
 	 * @param integer purchase log id
+	 *
+	 * @return int    The inserted cart item ID.
 	 */
 	function save_to_db($purchase_log_id) {
 		global $wpdb, $wpsc_shipping_modules;
@@ -603,6 +605,8 @@ class wpsc_cart_item {
 		}
 
 		do_action( 'wpsc_save_cart_item', $cart_item_id, $this->product_id, $this );
+
+		return $cart_item_id;
 	}
 
 }

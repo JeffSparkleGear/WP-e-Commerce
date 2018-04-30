@@ -147,7 +147,7 @@ endif;
                         <?php _e('Please provide a Zipcode and click Calculate in order to continue.', 'wp-e-commerce'); ?>
                      </td>
                   </tr>
-            <?php else: ?>
+            <?php elseif ( ! empty( wpsc_get_customer_meta( 'shippingcountry' ) ) ) : ?>
                <tr class='wpsc_update_location_error'>
                   <td colspan='5' class='shipping_error' >
                      <?php _e('Sorry, shipping quotes could not be calculated with the details provided. Please double check your shipping address details.', 'wp-e-commerce'); ?>
@@ -278,10 +278,7 @@ endif;
       */
       ?>
 
-    <?php if(wpsc_show_user_login_form()):
-          global $current_user;
-          get_currentuserinfo();   ?>
-
+    <?php if(wpsc_show_user_login_form()): ?>
 		<div class="wpsc_registration_form">
 
 	        <fieldset class='wpsc_registration_form wpsc_right_registration'>

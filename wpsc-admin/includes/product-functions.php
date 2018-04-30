@@ -33,7 +33,6 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 		$post_data['meta'] = (array) $_POST['meta'];
 	}
 
-
 	if ( isset( $post_data['meta']['_wpsc_price'] ) )
 		$post_data['meta']['_wpsc_price'] = wpsc_string_to_float( $post_data['meta']['_wpsc_price'] );
 
@@ -55,6 +54,15 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 		$post_data['meta']['_wpsc_stock'] = isset( $post_data['meta']['_wpsc_stock'] ) ? (int) $post_data['meta']['_wpsc_stock'] : 0;
 	}
 
+	// Update low stock notifications
+	if ( isset( $post_data['meta']['_wpsc_stock'] ) && isset( $post_data['meta']['_wpsc_product_metadata'] ) && ( $post_data['meta']['_wpsc_stock'] > $post_data['meta']['_wpsc_product_metadata']['stock_limit_notify'] ) ) {
+		// Check if notification has been sent
+		$notify_sent = get_product_meta( $product_id, 'stock_limit_notify_sent', true );
+		if( ! empty( $notify_sent ) ) {
+			delete_product_meta( $product_id, 'stock_limit_notify_sent' );
+		}
+	}
+
 	unset($post_data['meta']['_wpsc_limited_stock']);
 	if(!isset($post_data['quantity_limited'])) $post_data['quantity_limited'] = '';
     if(!isset($post_data['special'])) $post_data['special'] = '';
@@ -66,10 +74,8 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 	if ( isset( $_POST['wpsc_product_stock_nonce'] ) && wp_verify_nonce( $_POST['wpsc_product_stock_nonce'], 'update' ) ) {
 
 		$post_data['meta']['_wpsc_product_metadata'] = wp_parse_args( $post_data['meta']['_wpsc_product_metadata'], array(
-			'notify_when_none_left'    => 0,
 			'unpublish_when_none_left' => 0
 		) );
-		$post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'] = absint( (bool) $post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'] );
 		$post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'] = absint( (bool) $post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'] );
 
 	}
@@ -186,7 +192,6 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 
 	// Fill in any missing product meta values with existing values.
 	$default_meta_values = wp_parse_args( get_product_meta( $product_id, 'product_metadata', true ), array(
-		'notify_when_none_left'    => 0,
 		'unpublish_when_none_left' => 0,
 		'no_shipping'              => 0,
 		'external_link'            => '',
@@ -246,7 +251,6 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 	// and the custom meta
 	wpsc_update_custom_meta($product_id, $post_data);
 
-
 	// Update the alternative currencies
 	if ( isset( $post_data['wpsc-update-currency-layers'] ) && wp_verify_nonce( $post_data['wpsc-update-currency-layers'], 'update-options' ) ) {
 
@@ -276,7 +280,7 @@ function wpsc_admin_submit_product( $post_ID, $post ) {
 }
 
 
-function wpsc_pre_update( $data , $postarr ) {
+function wpsc_pre_update( $data, $postarr ) {
  	if ( (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) || $postarr["post_type"] != 'wpsc-product' )
         return $data;
     if( isset( $postarr["additional_description"] ) )
@@ -295,10 +299,6 @@ function wpsc_pre_update( $data , $postarr ) {
 	} else {
 		$data["comment_status"] = "open";
 	}
-
-    //Can anyone explain to me why this is here?
-    if ( isset( $sku ) && ( $sku != '' ) )
-        $data['guid'] = $sku;
 
     return $data;
 }
@@ -375,17 +375,15 @@ function wpsc_sanitise_product_forms($post_data = null) {
 	$post_data['meta']['_wpsc_stock'] = (int)$post_data['meta']['_wpsc_stock'];
 
 	if (!isset($post_data['meta']['_wpsc_limited_stock'])) $post_data['meta']['_wpsc_limited_stock'] = '';
-	if((bool)$post_data['meta']['_wpsc_limited_stock'] != true) {
+	if((bool)$post_data['meta']['_wpsc_limited_stock'] !== true) {
 	  $post_data['meta']['_wpsc_stock'] = false;
 	}
 	unset($post_data['meta']['_wpsc_limited_stock']);
-	if(!isset($post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'])) $post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'] = 0;
 	if(!isset($post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'])) $post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'] = '';
     if(!isset($post_data['quantity_limited'])) $post_data['quantity_limited'] = '';
     if(!isset($post_data['special'])) $post_data['special'] = '';
     if(!isset($post_data['meta']['_wpsc_product_metadata']['no_shipping'])) $post_data['meta']['_wpsc_product_metadata']['no_shipping'] = '';
 
-	$post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'] = (int)(bool)$post_data['meta']['_wpsc_product_metadata']['notify_when_none_left'];
 	$post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'] = (int)(bool)$post_data['meta']['_wpsc_product_metadata']['unpublish_when_none_left'];
 	$post_data['meta']['_wpsc_product_metadata']['quantity_limited'] = (int)(bool)$post_data['quantity_limited'];
 	$post_data['meta']['_wpsc_product_metadata']['special'] = (int)(bool)$post_data['special'];
@@ -439,7 +437,6 @@ function wpsc_insert_product($post_data, $wpsc_error = false) {
 		'thumbnail_image' => null,
 		'thumbnail_state' => null
 	);
-
 
 	foreach ( $product_columns as $column => $default ) {
 		if ( ! isset( $post_data[ $column ] ) ) {
@@ -520,7 +517,6 @@ function term_id_price($term_id, $parent_price) {
 				$percentage = (floatval($price) / 100);
 				$price = $parent_price + ($parent_price * $percentage);
 			}
-
 		} else {
 
 			if ( $var_price_type == 'differential' ) {
@@ -698,7 +694,6 @@ function wpsc_edit_product_variations($product_id, $post_data) {
 				update_product_meta( $child_product_id, 'price', $price );
 		}
 	}
-
 
 	//For reasons unknown, this code did not previously deal with variation deletions.
 	//Basically, we'll just check if any existing term associations are missing from the posted variables, delete if they are.
@@ -1086,24 +1081,24 @@ class wpsc_variation_combinator {
 	var $reprocessed_array = array();
 	var $combinations= array();
 
-	function __construct($variation_sets) {
-		if( $variation_sets ) {
-			foreach($variation_sets as $variation_set_id => $variation_set) {
-				$this->variation_sets[] = absint($variation_set_id);
-				$new_variation_set = array();
-				if( $variation_set ) {
-					foreach($variation_set as $variation => $active) {
-						if($active == 1) {
-							$new_variation_set[] = array(absint($variation));
-							$this->variation_values[] = $variation;
-						}
+publicfunction __construct($variation_sets) {
+	if( $variation_sets ) {
+		foreach($variation_sets as $variation_set_id => $variation_set) {
+			$this->variation_sets[] = absint($variation_set_id);
+			$new_variation_set = array();
+			if( $variation_set ) {
+				foreach($variation_set as $variation => $active) {
+					if($active == 1) {
+						$new_variation_set[] = array(absint($variation));
+						$this->variation_values[] = $variation;
 					}
 				}
-				$this->reprocessed_array[] = $new_variation_set;
 			}
-			$this->get_combinations(array(), $this->reprocessed_array, 0);
+			$this->reprocessed_array[] = $new_variation_set;
 		}
+		$this->get_combinations(array(), $this->reprocessed_array, 0);
 	}
+}
 
 
 	function get_combinations($batch, $elements, $i)  {

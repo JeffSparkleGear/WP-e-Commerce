@@ -12,7 +12,7 @@ class WP_Widget_Shopping_Cart extends WP_Widget {
 	/**
 	 * Widget Constuctor
 	 */
-	function __construct() {
+	public function __construct() {
 
 		$widget_ops = array(
 			'classname'   => 'widget_wpsc_shopping_cart',
@@ -30,13 +30,13 @@ class WP_Widget_Shopping_Cart extends WP_Widget {
 	 * @param $instance (array) Widget values.
 	 *
 	 */
-	function widget( $args, $instance ) {
+	public function widget( $args, $instance ) {
 
 		extract( $args );
 
 		// Create fancy collapser
 		$fancy_collapser = '';
-		if ( $instance['show_sliding_cart'] == 1 ) {
+		if ( isset( $instance['show_sliding_cart'] ) && $instance['show_sliding_cart'] == 1 ) {
 			if ( isset($_SESSION['slider_state']) && is_numeric( $_SESSION['slider_state'] ) ) {
 				if ( $_SESSION['slider_state'] == 0 ) {
 					$collapser_image = 'plus.png';
@@ -101,7 +101,7 @@ class WP_Widget_Shopping_Cart extends WP_Widget {
 	 *
 	 * @return (array) New values.
 	 */
-	function update( $new_instance, $old_instance ) {
+	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
 		$instance['title']  = strip_tags( $new_instance['title'] );
@@ -114,7 +114,7 @@ class WP_Widget_Shopping_Cart extends WP_Widget {
 	 *
 	 * @param $instance (array) Widget values.
 	 */
-	function form( $instance ) {
+	public function form( $instance ) {
 		global $wpdb;
 
 		// Defaults

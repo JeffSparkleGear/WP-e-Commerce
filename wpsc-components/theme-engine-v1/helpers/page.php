@@ -245,30 +245,27 @@ function wpsc_theme_admin_notices() {
 	if ( false !== get_option( 'wpsc_version' ) ) {
 
 		// Database update notice is most important
-		if ( version_compare( get_option ( 'wpsc_version' ), 3.8, '<' ) ) {
+		if ( version_compare( get_option( 'wpsc_version' ), 3.8, '<' ) ) {
 
-			add_action ( 'admin_notices', 'wpsc_database_update_notice' );
+			add_action( 'admin_notices', 'wpsc_database_update_notice' );
 
 		// If that's not an issue check if theme updates required
 		} else {
 
 			if ( '' === get_option( 'wpsc_ignore_theme', '' ) ) {
-				add_option( 'wpsc_ignore_theme',false );
+				add_option( 'wpsc_ignore_theme', false );
 			}
 
 			if ( ! get_option( 'wpsc_ignore_theme' ) ) {
 				add_action( 'admin_notices', 'wpsc_theme_upgrade_notice' );
 			}
-
 		}
-
 	}
 
 	// Flag config inconsistencies
 	if ( 1 == get_option( 'require_register' ) && 1 != get_option( 'users_can_register' ) ) {
 		add_action( 'admin_notices', 'wpsc_turn_on_wp_register' );
 	}
-
 }
 
 function wpsc_turn_on_wp_register() {?>
@@ -361,7 +358,6 @@ function wpsc_enqueue_user_script_and_css() {
 		wp_enqueue_script( 'wp-e-commerce', WPSC_CORE_JS_URL . '/wp-e-commerce.js', array( 'jquery' ), $version_identifier );
 		wp_localize_script( 'wp-e-commerce', 'wpsc_vars', wpsc_javascript_localizations() );
 
-		wp_enqueue_script( 'livequery',                   WPSC_URL 			. '/wpsc-admin/js/jquery.livequery.js',   array( 'jquery' ), '1.0.3' );
 		if ( get_option( 'product_ratings' ) == 1 )
 			wp_enqueue_script( 'jquery-rating',               WPSC_CORE_JS_URL 	. '/jquery.rating.js',                 array( 'jquery' ), $version_identifier );
 		wp_enqueue_script( 'wp-e-commerce-legacy',        WPSC_CORE_JS_URL 	. '/user.js',                          array( 'jquery' ), WPSC_VERSION . WPSC_MINOR_VERSION );
@@ -387,22 +383,6 @@ function wpsc_enqueue_user_script_and_css() {
 		if( get_option( 'product_ratings' ) == 1 )
 			wp_enqueue_style( 'wpsc-product-rater',           WPSC_CORE_JS_URL 	. '/product_rater.css',                                       false, $version_identifier, 'all' );
 
-	}
-
-
-	if ( !defined( 'WPSC_MP3_MODULE_USES_HOOKS' ) && function_exists( 'listen_button' ) ) {
-
-		function wpsc_legacy_add_mp3_preview( $product_id, &$product_data ) {
-			global $wpdb;
-			if ( function_exists( 'listen_button' ) ) {
-				$file_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_PRODUCT_FILES . "` WHERE `id` = %d LIMIT 1", $product_data['file'] ), ARRAY_A );
-				if ( $file_data != null ) {
-					echo listen_button( $file_data['idhash'], $file_data['id'] );
-				}
-			}
-		}
-
-		add_action( 'wpsc_product_before_description', 'wpsc_legacy_add_mp3_preview', 10, 2 );
 	}
 }
 
@@ -580,6 +560,11 @@ function wpsc_single_template( $content ) {
 		 */
 		$permitted_post_statuses = current_user_can( $post_type_object->cap->edit_posts ) ? apply_filters( 'wpsc_product_display_status', array( 'publish' ) ) : array( 'publish' );
 
+		// If previewing a product, ensure post status can be draft
+		if ( $wp_query->is_preview() ) {
+			$permitted_post_statuses[] = 'draft';
+		}
+
 		$wpsc_temp_query = new WP_Query(
 			array(
 				'p'              => $wp_query->post->ID ,
@@ -632,7 +617,7 @@ function _wpsc_is_in_custom_loop() {
  * @uses get_term_by()                  Gets term object by defined item, and what you pass
  * @uses get_query_var()                Gets query var from wp_query
  */
-function wpsc_the_category_title( $title='', $id='' ){
+function wpsc_the_category_title( $title = '', $id = '' ) {
 
 	if ( ! empty( $id ) )
 		_wpsc_deprecated_argument( __FUNCTION__, '3.8.10', 'The $id param is not used. If you are trying to get the title of the category use get_term' );
@@ -733,7 +718,7 @@ function wpsc_get_current_category_id() {
 
 	$category_id = '';
 
-	if ( isset( $wp_query ) && isset( $wp_query->query_vars['taxonomy'] ) && ('wpsc_product_category' ==  $wp_query->query_vars['taxonomy'] ) || is_numeric( get_option( 'wpsc_default_category' ) ) )
+	if ( isset( $wp_query ) && isset( $wp_query->query_vars['taxonomy'] ) && ('wpsc_product_category' == $wp_query->query_vars['taxonomy'] ) || is_numeric( get_option( 'wpsc_default_category' ) ) )
 		$category_id = isset( $wp_query->query_vars['term'] ) && is_string( $wp_query->query_vars['term'] ) ? wpsc_get_category_id( $wp_query->query_vars['term'], 'slug' ) : get_option( 'wpsc_default_category' );
 
 	return $category_id;
@@ -1013,7 +998,7 @@ function wpsc_all_products_on_page(){
 	do_action('wpsc_swap_the_template');
 	$products_page_id = wpsc_get_the_post_id_by_shortcode('[productspage]');
 	$term = get_query_var( 'wpsc_product_category' );
-	$tax_term = get_query_var ('product_tag' );
+	$tax_term = get_query_var( 'product_tag' );
 	$obj = $wp_query->get_queried_object();
 
 	$id = isset( $obj->ID ) ? $obj->ID : null;
@@ -1029,7 +1014,6 @@ function wpsc_all_products_on_page(){
 		if ( $tax_term && ! is_single() ) {
 			array_push( $templates, "taxonomy-product_tag-{$tax_term}.php", 'taxonomy-product_tag.php' );
 		}
-
 
 		// Attempt to use the [productspage]'s custom page template as a higher priority than the normal page.php template
 		if ( false !== $productspage_page_template = get_post_meta($products_page_id, '_wp_page_template', true) )
@@ -1062,7 +1046,7 @@ function wpsc_count_themes_in_uploads_directory() {
 	if ( !$uploads_dir )
 		return false;
 
-	$file_names = array( );
+	$file_names = array();
 	while ( ($file = @readdir( $uploads_dir )) !== false ) {
 		if ( is_dir( WPSC_OLD_THEMES_PATH . get_option('wpsc_selected_theme') . '/' . $file ) && ($file != "..") && ($file != ".") && ($file != ".svn") )
 			$file_names[] = $file;
@@ -1338,7 +1322,6 @@ function wpsc_obtain_the_title() {
 
 	if ( !isset( $wp_query->query_vars['wpsc_product_category'] ) && isset($wp_query->query_vars['wpsc-product']) )
 		$wp_query->query_vars['wpsc_product_category'] = 0;
-
 
 	if ( isset( $wp_query->query_vars['taxonomy'] ) && 'wpsc_product_category' ==  $wp_query->query_vars['taxonomy'] || isset($wp_query->query_vars['wpsc_product_category']))
 		$category_id = wpsc_get_the_category_id($wp_query->query_vars['wpsc_product_category'],'slug');
