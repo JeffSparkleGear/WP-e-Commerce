@@ -303,9 +303,11 @@ class WPSC_Purchase_Log {
 		// if this product has variations
 		if ( $product->has_variations ) {
 			// get total stats of variations
+			$args = array();
 			$args['products'] = $product->variations;
 		} else {
 			// otherwise, get stats of only this product
+			$args = array();
 			$args['products'] = array( $product );
 		}
 

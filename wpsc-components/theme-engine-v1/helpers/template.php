@@ -270,12 +270,12 @@ function wpsc_the_sticky_image( $product_id ) {
 				'order' => 'ASC'
 			) );
 	if ( has_post_thumbnail( $product_id ) ) {
-		add_image_size( 'featured-product-thumbnails', 540, 260, TRUE );
+		add_image_size( 'featured-product-thumbnails', 400, 400, TRUE );
 		$image = get_the_post_thumbnail( $product_id, 'featured-product-thumbnails' );
 		return $image;
 	} elseif ( !empty( $attached_images ) ) {
 		$attached_image = $attached_images[0];
-		$image_link = wpsc_product_image( $attached_image->ID, 540, 260 );
+		$image_link = wpsc_product_image( $attached_image->ID, 400, 400 );
 		return '<img src="' . $image_link . '" alt="" />';
 	} else {
 		return false;

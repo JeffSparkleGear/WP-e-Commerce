@@ -230,7 +230,7 @@ class WPSC_Purchase_Log_Page {
 	private function purchase_log_cart_items() {
 		while( wpsc_have_purchaselog_details() ) : wpsc_the_purchaselog_item(); ?>
 		<tr>
-			<td><?php echo wpsc_purchaselog_details_name(); ?></td> <!-- NAME! -->
+			<td><?php echo wpsc_purchaselog_details_href(); ?></td> <!-- NAME! -->
 			<td><?php echo wpsc_purchaselog_details_SKU(); ?></td> <!-- SKU! -->
 			<td><?php echo wpsc_purchaselog_details_quantity(); ?></td> <!-- QUANTITY! -->
 			<td>

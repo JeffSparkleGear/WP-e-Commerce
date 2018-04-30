@@ -365,7 +365,8 @@ function wpsc_split_the_query( $query ) {
 
 	// otherwise, check if we are looking at a product, if so, duplicate the query and swap the old one out for a products page request
 	// JS - 6.4.1020 - Added is_admin condition, as the products condition broke categories in backend
-	if ( !empty($query->query_vars['pagename']) && ($query->query_vars['pagename'] == $products_page) || isset( $query->query_vars['products'] ) && !is_admin() ) {
+	if ( !empty($query->query_vars['pagename']) && ($query->query_vars['pagename'] == $products_page)
+        || isset( $query->query_vars['products'] ) && !is_admin() ) {
 		// store a copy of the wordpress query
 		$wpsc_query_data = $query->query;
 
@@ -399,10 +400,11 @@ function wpsc_split_the_query( $query ) {
 			unset( $wpsc_query_data['pagename'] );
 			$wpsc_query_vars = $wpsc_query_data;
 		}
-	}
 
-	add_filter( 'redirect_canonical', 'wpsc_break_canonical_redirects', 10, 2 );
-	remove_filter( 'pre_get_posts', 'wpsc_split_the_query', 8 );
+        add_filter( 'redirect_canonical', 'wpsc_break_canonical_redirects', 10, 2 );
+        remove_filter( 'pre_get_posts', 'wpsc_split_the_query', 8 );
+
+	}
 }
 
 /**
@@ -545,11 +547,14 @@ function wpsc_add_meta_table($join){
 function wpsc_break_canonical_redirects( $redirect_url, $requested_url ) {
 	global $wp_query;
 
-	if ( ( isset( $wp_query->query_vars['products'] ) && ($wp_query->query_vars['products'] != '') ) || ( isset( $wp_query->query_vars['products'] ) && $wp_query->query_vars['products'] != 'wpsc_item') )
-		return false;
+	if ( ( isset( $wp_query->query_vars['products'] ) && ($wp_query->query_vars['products'] != '') )
+        || ( isset( $wp_query->query_vars['products'] ) && $wp_query->query_vars['products'] != 'wpsc_item') ) {
+        return false;
+    }
 
-	if ( stristr( $requested_url, $redirect_url ) )
-		return false;
+	if ( stristr( $requested_url, $redirect_url ) ) {
+        return false;
+    }
 
 	return $redirect_url;
 }
