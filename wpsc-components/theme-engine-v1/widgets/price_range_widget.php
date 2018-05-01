@@ -90,7 +90,15 @@ class WP_Widget_Price_Range extends WP_Widget {
 
 }
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("WP_Widget_Price_Range");' ) );
+add_action( 'widgets_init', 'init_price_range_widget' );
+/**
+ *
+ */
+function init_price_range_widget() {
+	return register_widget("WP_Widget_Price_Range");
+}
+
+
 
 /**
  * Price Range Widget content function

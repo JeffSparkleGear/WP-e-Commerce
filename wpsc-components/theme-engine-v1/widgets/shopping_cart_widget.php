@@ -145,6 +145,11 @@ class WP_Widget_Shopping_Cart extends WP_Widget {
 		<?php
 	}
 }
-add_action( 'widgets_init', create_function( '', 'return register_widget("WP_Widget_Shopping_Cart");' ) );
+add_action( 'widgets_init', 'init_cart_widget' );
+function init_cart_widget() {
+	return register_widget("WP_Widget_Shopping_Cart");
+}
+
+
 
 ?>

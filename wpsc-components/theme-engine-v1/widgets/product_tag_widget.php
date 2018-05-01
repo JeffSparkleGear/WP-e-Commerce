@@ -90,7 +90,11 @@ class WP_Widget_Product_Tags extends WP_Widget {
 
 }
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("WP_Widget_Product_Tags");' ) );
+add_action( 'widgets_init', 'init_product_tags_widget' );
+function init_product_tags_widget() {
+	return register_widget("WP_Widget_Product_Tags");
+}
+
 
 
 
