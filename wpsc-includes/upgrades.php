@@ -262,7 +262,7 @@ function get_upgrades($upgrade_folder = '') {
 		return strnatcasecmp( $a["Name"], $b["Name"] );
 	}
 
-	uasort( $wpsc_upgrades, &sorter );
+	uasort( $wpsc_upgrades, 'sorter' );
 
 	$cache_upgrades[ $upgrade_folder ] = $wpsc_upgrades;
 	wp_cache_set('wpsc_upgrades', $cache_upgrades, 'wpsc_upgrades');
