@@ -1082,7 +1082,6 @@ class WPSC_Purchase_Log extends WPSC_Query_Base {
 						wpsc_add_purchase_meta( $this->get( 'id' ), $key, $val );
 					}
 				}
-
 			} else {
 				wpsc_update_purchase_meta( $this->get( 'id' ), $key, $value );
 			}

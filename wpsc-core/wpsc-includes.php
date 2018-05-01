@@ -52,6 +52,10 @@ require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-theme-engine-bootstrap.php' 
 require_once( WPSC_FILE_PATH . '/wpsc-includes/country-and-region-data.php'         );
 require_once( WPSC_FILE_PATH . '/wpsc-includes/country-api.php'                     );
 
+if ( defined( 'REST_API_VERSION' ) ) {
+	require_once( WPSC_FILE_PATH . '/wpsc-includes/wpsc-rest-api.class.php'         );
+}
+
 do_action( 'wpsc_loaded_module_'. basename( __FILE__ ) );
 
 // Taxes
